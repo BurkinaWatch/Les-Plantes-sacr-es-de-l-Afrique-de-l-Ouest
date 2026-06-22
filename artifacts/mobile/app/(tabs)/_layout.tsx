@@ -100,7 +100,7 @@ export default function TabLayout() {
         name="animaux"
         options={{
           title: t.tab_animals,
-          tabBarIcon: tabIcon("leaf.fill", "leaf-maple", "mci"),
+          tabBarIcon: tabIcon("leaf.fill", "sprout", "mci"),
         }}
       />
       <Tabs.Screen
