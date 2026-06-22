@@ -390,6 +390,126 @@ uri = "file://artifacts/mobile/assets/images/icon-plants.png"
 type = "image"
 title = "sacred-plants-icon-medallion"
 
+[[generated]]
+id = "or8IsvZj_1PMFvfJyZmo7"
+uri = "file://artifacts/mobile/assets/images/plants/baobab.png"
+type = "image"
+title = "generated_image"
+
+[[generated]]
+id = "4DzErr_nuF_LAm-cLrSFQ"
+uri = "file://artifacts/mobile/assets/images/plants/fromager.png"
+type = "image"
+title = "generated_image"
+
+[[generated]]
+id = "jVGcklOfmO2bMbjOEI0CR"
+uri = "file://artifacts/mobile/assets/images/plants/cailcedrat.png"
+type = "image"
+title = "generated_image"
+
+[[generated]]
+id = "zgt1dLFNP2ut2pj2OUYPa"
+uri = "file://artifacts/mobile/assets/images/plants/ficus.png"
+type = "image"
+title = "generated_image"
+
+[[generated]]
+id = "_M4khjUElk3BRY0sTc9oc"
+uri = "file://artifacts/mobile/assets/images/plants/tamarinier.png"
+type = "image"
+title = "generated_image"
+
+[[generated]]
+id = "JFz7q96S7p-_hFD5y8Kt9"
+uri = "file://artifacts/mobile/assets/images/plants/moringa.png"
+type = "image"
+title = "generated_image"
+
+[[generated]]
+id = "YSx6SnxK1-cJSO0nR59Yw"
+uri = "file://artifacts/mobile/assets/images/plants/neem.png"
+type = "image"
+title = "generated_image"
+
+[[generated]]
+id = "7LL1rd5wzG_NWPt3LA5JE"
+uri = "file://artifacts/mobile/assets/images/plants/papayer.png"
+type = "image"
+title = "generated_image"
+
+[[generated]]
+id = "WmAw9lRFLkolTb457uh3o"
+uri = "file://artifacts/mobile/assets/images/plants/gingembre.png"
+type = "image"
+title = "generated_image"
+
+[[generated]]
+id = "Kf5GzP3-vDzPusKaj27d8"
+uri = "file://artifacts/mobile/assets/images/plants/kolatier.png"
+type = "image"
+title = "generated_image"
+
+[[generated]]
+id = "krC7xFIlRQMxFfsUCTf82"
+uri = "file://artifacts/mobile/assets/images/plants/nere.png"
+type = "image"
+title = "generated_image"
+
+[[generated]]
+id = "o-LOUvkhH8ma0918Vfj0P"
+uri = "file://artifacts/mobile/assets/images/plants/karite.png"
+type = "image"
+title = "generated_image"
+
+[[generated]]
+id = "BSlK2u0PuGIjP7uxY48yP"
+uri = "file://artifacts/mobile/assets/images/plants/gombo.png"
+type = "image"
+title = "generated_image"
+
+[[generated]]
+id = "AE9cuEFMU_-m9160GCGPB"
+uri = "file://artifacts/mobile/assets/images/plants/vetiver.png"
+type = "image"
+title = "generated_image"
+
+[[generated]]
+id = "uEI6fAcV8kzdfHoeNembg"
+uri = "file://artifacts/mobile/assets/images/plants/acacia.png"
+type = "image"
+title = "generated_image"
+
+[[generated]]
+id = "tinG6hsxS5HJzFoJCbpbk"
+uri = "file://artifacts/mobile/assets/images/plants/citronnelle.png"
+type = "image"
+title = "generated_image"
+
+[[generated]]
+id = "lzvvO4ij3ZtFc1G6Mozfx"
+uri = "file://artifacts/mobile/assets/images/plants/raphia.png"
+type = "image"
+title = "generated_image"
+
+[[generated]]
+id = "SlZI4Sopr7RELwJA9zkFB"
+uri = "file://artifacts/mobile/assets/images/plants/mil.png"
+type = "image"
+title = "generated_image"
+
+[[generated]]
+id = "X8CksOVYLo49ME2H47rbG"
+uri = "file://artifacts/mobile/assets/images/plants/ronier.png"
+type = "image"
+title = "generated_image"
+
+[[generated]]
+id = "KQBWlGslQzdJj8UVMpTec"
+uri = "file://artifacts/mobile/assets/images/plants/dattier.png"
+type = "image"
+title = "generated_image"
+
 [[outputs]]
 id = "a_w4uSYXiM09eT84cCfYU"
 uri = "file://artifacts/mobile/assets/sounds/elephant.mp3"
