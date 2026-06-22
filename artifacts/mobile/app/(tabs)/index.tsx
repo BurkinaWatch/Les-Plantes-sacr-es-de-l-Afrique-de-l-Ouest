@@ -21,15 +21,7 @@ import { ANIMALS } from '@/data/animals';
 import { QUIZ_QUESTIONS } from '@/data/quiz';
 import { useColors } from '@/hooks/useColors';
 import { useTranslation } from '@/i18n';
-
-const PLANT_ICONS: Record<string, string> = {
-  'Arbres Sacrés': '🌳',
-  'Plantes Médicinales': '🌿',
-  'Plantes Alimentaires': '🫘',
-  'Plantes Rituelles': '✦',
-  'Herbes & Graminées': '🌾',
-  'Palmiers': '🌴',
-};
+import PLANT_IMAGES from '@/constants/plantImages';
 
 export default function HomeScreen() {
   const colors = useColors();
@@ -155,24 +147,28 @@ export default function HomeScreen() {
                 style={({ pressed }) => [styles.featuredCard, { width: cardWidth, height: cardHeight, opacity: pressed ? 0.85 : 1 }]}
                 onPress={() => router.push(`/animal/${plante.id}` as any)}
               >
-                <LinearGradient
-                  colors={[plante.couleur, plante.couleurSecondaire]}
+                <ImageBackground
+                  source={PLANT_IMAGES[plante.id]}
                   style={styles.featuredGradient}
+                  imageStyle={styles.featuredImage}
+                  resizeMode="cover"
                 >
-                  <View style={styles.featuredIconWrap}>
-                    <Text style={[styles.featuredIcon, { fontSize: isTablet ? 72 : 60 }]}>
-                      {PLANT_ICONS[plante.categorie] ?? '🌿'}
-                    </Text>
-                  </View>
+                  {!PLANT_IMAGES[plante.id] && (
+                    <LinearGradient
+                      colors={[plante.couleur, plante.couleurSecondaire]}
+                      style={StyleSheet.absoluteFillObject}
+                    />
+                  )}
                   <LinearGradient
-                    colors={['transparent', 'rgba(0,0,0,0.55)']}
+                    colors={['rgba(0,0,0,0.08)', 'rgba(0,0,0,0.72)']}
+                    locations={[0.3, 1]}
                     style={[StyleSheet.absoluteFillObject, { pointerEvents: 'none' }]}
                   />
                   <View style={styles.featuredTextBlock}>
                     <Text style={[styles.featuredNom, isTablet && styles.featuredNomTablet]}>{plante.nom}</Text>
                     <Text style={[styles.featuredPouvoir, isTablet && styles.featuredPouvoirTablet]}>{plante.pouvoirs[0]}</Text>
                   </View>
-                </LinearGradient>
+                </ImageBackground>
               </Pressable>
             ))}
           </ScrollView>
@@ -370,18 +366,8 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-end',
     position: 'relative',
   },
-  featuredIconWrap: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingTop: 20,
-    opacity: 0.35,
-  },
-  featuredIcon: {
-    fontSize: 60,
+  featuredImage: {
+    borderRadius: 18,
   },
   featuredTextBlock: {
     padding: 12,
