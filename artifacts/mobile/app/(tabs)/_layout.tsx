@@ -100,14 +100,14 @@ export default function TabLayout() {
         name="animaux"
         options={{
           title: t.tab_animals,
-          tabBarIcon: tabIcon("leaf.fill", "leaf", "feather"),
+          tabBarIcon: tabIcon("pawprint.fill", "paw", "mci"),
         }}
       />
       <Tabs.Screen
         name="savoir"
         options={{
           title: t.tab_knowledge,
-          tabBarIcon: tabIcon("book.closed.fill", "book-open", "feather"),
+          tabBarIcon: tabIcon("books.vertical.fill", "book-open-variant", "mci"),
         }}
       />
       <Tabs.Screen
@@ -120,7 +120,7 @@ export default function TabLayout() {
         name="mon-animal"
         options={{
           title: t.tab_my_animal,
-          tabBarIcon: tabIcon("star.circle.fill", "star-circle", "mci"),
+          tabBarIcon: tabIcon("crown.fill", "crown", "mci"),
         }}
       />
       <Tabs.Screen

@@ -99,13 +99,13 @@ export default function HomeScreen() {
         resizeMode="cover"
       >
         <LinearGradient
-          colors={['rgba(10,4,1,0.72)', 'rgba(10,4,1,0.22)', 'rgba(10,4,1,0.04)', 'rgba(0,0,0,0)']}
+          colors={['rgba(4,12,4,0.80)', 'rgba(4,12,4,0.30)', 'rgba(4,12,4,0.06)', 'rgba(0,0,0,0)']}
           locations={[0, 0.28, 0.48, 1]}
           style={StyleSheet.absoluteFillObject}
         />
         <LinearGradient
-          colors={['rgba(0,0,0,0)', 'rgba(10,4,1,0.28)']}
-          locations={[0.6, 1]}
+          colors={['rgba(0,0,0,0)', 'rgba(4,12,4,0.55)']}
+          locations={[0.55, 1]}
           style={StyleSheet.absoluteFillObject}
         />
 
@@ -247,9 +247,9 @@ const styles = StyleSheet.create({
     width: 112,
     height: 112,
     borderRadius: 56,
-    backgroundColor: 'rgba(180,210,255,0.18)',
+    backgroundColor: 'rgba(200,160,32,0.16)',
     ...Platform.select({
-      web: { boxShadow: '0 0 28px 12px rgba(160,200,255,0.30)' },
+      web: { boxShadow: '0 0 28px 14px rgba(200,160,32,0.28)' },
     }),
   },
   logoGlowInner: {
@@ -258,15 +258,15 @@ const styles = StyleSheet.create({
     height: 88,
     borderRadius: 44,
     borderWidth: 1,
-    borderColor: 'rgba(200,225,255,0.35)',
-    backgroundColor: 'rgba(140,185,255,0.08)',
+    borderColor: 'rgba(200,160,32,0.38)',
+    backgroundColor: 'rgba(92,122,62,0.12)',
   },
   heroLogo: {
     width: 80,
     height: 80,
     borderRadius: 40,
     ...Platform.select({
-      web: { filter: 'brightness(1.15) saturate(0.7) hue-rotate(195deg) drop-shadow(0 0 10px rgba(160,205,255,0.55))' },
+      web: { filter: 'brightness(1.1) saturate(1.1) drop-shadow(0 0 10px rgba(200,160,32,0.50))' },
     }),
   },
   logoMoonOverlay: {
@@ -274,7 +274,7 @@ const styles = StyleSheet.create({
     width: 80,
     height: 80,
     borderRadius: 40,
-    backgroundColor: 'rgba(160,200,255,0.10)',
+    backgroundColor: 'rgba(200,160,32,0.08)',
   },
 
   logoRow: {
