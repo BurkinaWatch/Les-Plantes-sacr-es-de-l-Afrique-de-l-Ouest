@@ -104,6 +104,13 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
+        name="scanner"
+        options={{
+          title: t.tab_scanner,
+          tabBarIcon: tabIcon("camera.fill", "camera", "feather"),
+        }}
+      />
+      <Tabs.Screen
         name="savoir"
         options={{
           title: t.tab_knowledge,

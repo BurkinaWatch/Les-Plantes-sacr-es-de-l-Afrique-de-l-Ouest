@@ -30,8 +30,31 @@ export interface Translations {
   tab_home: string;
   tab_animals: string;
   tab_knowledge: string;
+  tab_scanner: string;
   tab_my_animal: string;
   tab_profile: string;
+
+  // ── SCANNER
+  scanner_title: string;
+  scanner_subtitle: string;
+  scanner_btn_camera: string;
+  scanner_btn_gallery: string;
+  scanner_analyzing: string;
+  scanner_result_origin: string;
+  scanner_result_family: string;
+  scanner_result_uses: string;
+  scanner_result_medicinal: string;
+  scanner_result_africa: string;
+  scanner_result_tips: string;
+  scanner_result_curiosity: string;
+  scanner_result_confidence: string;
+  scanner_confidence_high: string;
+  scanner_confidence_medium: string;
+  scanner_confidence_low: string;
+  scanner_error_no_plant: string;
+  scanner_error_generic: string;
+  scanner_retry: string;
+  scanner_new_scan: string;
 
   // ── HOME
   home_tagline: string;

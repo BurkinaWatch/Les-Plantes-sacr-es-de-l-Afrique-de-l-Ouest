@@ -37,4 +37,13 @@ config.server = {
 
 ## Google Fonts / fontfaceobserver timeout
 
-`@expo-google-fonts/*` packages fetch fonts from Google CDN at runtime. In Replit's proxied environment, this times out (fontfaceobserver shows "Xms timeout exceeded" in the error debugger). Remove the import and use system fonts instead — remove `useFonts` from `_layout.tsx`.
+`@expo-google-fonts/*` packages fetch fonts from Google CDN at runtime. In Replit's proxied environment, this times out (fontfaceobserver shows "Xms timeout exceeded" in the error debugger). Fix: preload icon fonts (Feather, MaterialCommunityIcons) in `_layout.tsx` using `Font.loadAsync` with a `Promise.race` timeout of 3000ms and a try/catch — render the app even if fonts fail.
+
+## expo-image-picker version compatibility
+
+For **Expo SDK 54** (`expo@~54.0.27`), the correct version is `expo-image-picker@~17.0.11`.
+- `~16.x` → SDK 53
+- `~17.x` → SDK 54 ✓
+- `~56.x` or later → too new, crashes with `createPermissionHook is not a function`
+
+**Why:** Expo uses `createPermissionHook` from the `expo` package internally. Mismatched versions cause a runtime crash at module load time before any screen renders.

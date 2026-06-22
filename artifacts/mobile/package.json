@@ -52,6 +52,7 @@
     "zod-validation-error": "^3.4.0"
   },
   "dependencies": {
-    "expo-audio": "~1.1.1"
+    "expo-audio": "~1.1.1",
+    "expo-image-picker": "^17.0.11"
   }
 }
