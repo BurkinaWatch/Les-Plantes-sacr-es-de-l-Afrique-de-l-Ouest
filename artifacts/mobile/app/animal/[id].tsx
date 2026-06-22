@@ -3,6 +3,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import React from 'react';
 import {
+  Image,
   Platform,
   Pressable,
   ScrollView,
@@ -10,6 +11,7 @@ import {
   Text,
   View,
 } from 'react-native';
+import PLANT_IMAGES from '@/constants/plantImages';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Feather } from '@expo/vector-icons';
 
@@ -114,10 +116,18 @@ export default function PlanteDetailScreen() {
           </View>
 
           <View style={styles.planteImagePlaceholder}>
-            <View style={styles.phInner}>
-              <View style={[styles.phCircle, { borderColor: 'rgba(255,255,255,0.3)' }]} />
-              <Text style={styles.phIcon}>{categoryIcon}</Text>
-            </View>
+            {PLANT_IMAGES[plante.id] ? (
+              <Image
+                source={PLANT_IMAGES[plante.id]}
+                style={styles.planteImage}
+                resizeMode="cover"
+              />
+            ) : (
+              <View style={styles.phInner}>
+                <View style={[styles.phCircle, { borderColor: 'rgba(255,255,255,0.3)' }]} />
+                <Text style={styles.phIcon}>{categoryIcon}</Text>
+              </View>
+            )}
           </View>
 
           <LinearGradient
@@ -370,7 +380,8 @@ const styles = StyleSheet.create({
   hd3: { position: 'absolute', left: -60, bottom: 20, width: 200, height: 200, borderRadius: 100, borderWidth: 1 },
   navRow: { flexDirection: 'row', justifyContent: 'space-between', zIndex: 10 },
   navBtn: { width: 44, height: 44, borderRadius: 22, alignItems: 'center', justifyContent: 'center' },
-  planteImagePlaceholder: { width: '100%', height: 200, borderRadius: 18, marginTop: 16, alignItems: 'center', justifyContent: 'center' },
+  planteImagePlaceholder: { width: '100%', height: 220, borderRadius: 18, marginTop: 16, alignItems: 'center', justifyContent: 'center', overflow: 'hidden' },
+  planteImage: { width: '100%', height: '100%', borderRadius: 18 },
   phInner: { alignItems: 'center', justifyContent: 'center' },
   phCircle: { position: 'absolute', width: 120, height: 120, borderRadius: 60, borderWidth: 1.5 },
   phIcon: { fontSize: 80 },

@@ -1004,6 +1004,688 @@ export const ANIMALS: Animal[] = [
     vertus: ['Fruits nutritifs', 'Sève sucrée', 'Feuilles artisanales'],
     usagesTraditionnels: ['Fruits consommés', 'Vin de palme', 'Vannerie', 'Indicateur d\'eau souterraine', 'Toiture'],
   },
+
+  /* ═══════════════════════════════════════════════════════════
+     NOUVELLES PLANTES — ARBRES SACRÉS
+  ═══════════════════════════════════════════════════════════ */
+
+  {
+    id: 'iroko',
+    nom: 'Iroko',
+    nomAnglais: 'African Teak',
+    nomScientifique: 'Milicia excelsa',
+    categorie: 'Arbres Sacrés',
+    element: 'Terre',
+    description:
+      "L'Iroko est le Roi Silencieux des forêts sacrées d'Afrique de l'Ouest. Colossal, immobile depuis des siècles, il est interdit de le couper sous peine de malédiction. Son bois dense et précieux, couleur d'or vieilli, est le bois des rois et des autels. Il incarne la permanence divine, la puissance qui n'a pas besoin de se montrer.",
+    symboliqueAfricaine:
+      "Chez les Yoruba du Nigeria, l'Iroko est habité par un esprit puissant — l'Iroko-man — qui exauce les souhaits mais exige en échange. Couper un Iroko sans rituel de permission attire la folie ou la mort. Au Bénin et en Côte d'Ivoire, ses racines contreforts abritent des autels où les guérisseurs font leurs offrandes. Nul village ne coupe son Iroko sacré.",
+    symboliqueSpirirtuelle:
+      "L'Iroko symbolise la puissance qui n'a pas besoin de se prouver — il est là depuis des siècles, silencieux, indestructible. Il enseigne que la grandeur véritable se reconnaît à sa permanence, non à ses éclats. Sa présence seule transforme l'espace autour de lui en espace sacré.",
+    symbolique: "Symbole de permanence divine, de puissance silencieuse et de royauté de la forêt.",
+    qualites: ['Permanence divine', 'Puissance silencieuse', 'Ancrage millénaire', 'Autorité naturelle', 'Présence transformatrice'],
+    defauts: ['Immobilisme', 'Résistance totale au changement', 'Inaccessibilité', 'Pesanteur parfois écrasante'],
+    pouvoirs: ['Permanence sacrée', 'Protection de la forêt', 'Accès aux esprits profonds', 'Autorité divine'],
+    enseignements: [
+      "La vraie puissance n'a pas besoin de se manifester — elle rayonne",
+      "Certaines choses ne se touchent pas — respecte la hiérarchie du vivant",
+      "Ta permanence dans tes valeurs est ta plus grande force",
+      "La présence consciente transforme l'espace sans aucun effort",
+    ],
+    citation: "L'iroko ne parle jamais — mais tous savent qu'il est là.",
+    proverbes: [
+      "L'iroko ne parle jamais — mais tous savent qu'il est là.",
+      "On ne coupe pas l'iroko sans demander permission — certaines forces exigent le respect.",
+      "L'ombre de l'iroko est froide même en plein cœur de l'été — ainsi la sagesse rafraîchit toujours.",
+    ],
+    legendes: [
+      "La légende yoruba raconte qu'un bûcheron qui coupa un Iroko sacré entendit un rire dans son tronc. La nuit, l'esprit Iroko-man vint le visiter en rêve et lui demanda : 'Pourquoi m'as-tu dérangé ?' Le bûcheron, effrayé, promit de planter dix Iroko en échange. L'esprit accepta — et depuis ce jour, la tradition veut qu'on plante dix arbres pour chaque Iroko qu'on abat.",
+    ],
+    conseilsDeVie: [
+      "Cultive une présence profonde et ancrée — les gens sentent la solidité de ceux qui sont vraiment enracinés.",
+      "Certaines de tes valeurs fondamentales ne se négocient pas — tiens-les comme l'Iroko tient sa forêt.",
+      "Respecte les hiérarchies invisibles autour de toi — tout n'est pas accessible à tout le monde.",
+    ],
+    niveauSpirituel: 5,
+    regionOrigine: "Forêts tropicales humides — Côte d'Ivoire, Nigeria, Ghana, Bénin",
+    couleur: '#6B4A2A',
+    couleurSecondaire: '#3D2810',
+    enseignementDuJour:
+      "Aujourd'hui, sois présent sans faire d'effort — laisse ta présence solide parler pour toi comme l'Iroko parle par son existence.",
+    vertus: ['Bois imputrescible', 'Anti-inflammatoire (écorce)', 'Antimicrobien', 'Fébrifuge'],
+    usagesTraditionnels: ['Bois sacré pour autels', 'Écorce en décoction', 'Sculpture rituelle', 'Construction de pirogues sacrées', 'Offrandes aux esprits'],
+  },
+
+  /* ═══════════════════════════════════════════════════════════
+     NOUVELLES PLANTES — PLANTES MÉDICINALES
+  ═══════════════════════════════════════════════════════════ */
+
+  {
+    id: 'bissap',
+    nom: 'Bissap',
+    nomAnglais: 'Roselle Hibiscus',
+    nomScientifique: 'Hibiscus sabdariffa',
+    categorie: 'Plantes Médicinales',
+    element: 'Feu',
+    description:
+      "Le Bissap est la Fleur du Cœur, la plante rouge sang dont les calices écarlates sont à la fois la boisson nationale du Sénégal et un remède cardiaque puissant. Sa couleur évoque le sang vitalisé, la passion maîtrisée, la beauté qui soigne. Il incarne la guérison par la beauté et la joie.",
+    symboliqueAfricaine:
+      "Au Sénégal, en Guinée et au Mali, le bissap est bien plus qu'une boisson — c'est le lien social par excellence. Offrir un verre de bissap rouge, c'est offrir son cœur. Lors des cérémonies de mariage, le bissap est servi aux invités pour symboliser la chaleur et la passion de l'union. Les guérisseurs wolof l'utilisent dans les remèdes du cœur brisé.",
+    symboliqueSpirirtuelle:
+      "Le Bissap symbolise la passion transformée en santé — son rouge sang n'est pas la violence mais la vitalité. Il enseigne que les émotions intenses, bien canalisées, sont des médicaments pour le corps et l'âme. Sa saveur acidulée représente les expériences difficiles qui, une fois intégrées, deviennent source d'énergie.",
+    symbolique: "Symbole de passion vitale, de guérison par le cœur et de chaleur partagée.",
+    qualites: ['Passion vitale', 'Chaleur du cœur', 'Beauté qui guérit', 'Générosité émotionnelle', 'Intensité créatrice'],
+    defauts: ['Intensité parfois épuisante', 'Acidité émotionnelle', 'Fragilité face au gel', 'Passion qui brûle les autres'],
+    pouvoirs: ['Guérison du cœur', 'Vitalité sanguine', 'Passion transformatrice', 'Lien social sacré'],
+    enseignements: [
+      "Tes émotions intenses sont tes médicaments — apprends à les doser",
+      "La beauté qui guérit vaut plus que la médecine qui punit",
+      "Partage ta chaleur sans te consumer",
+      "Le rouge de ta passion est une force — pas une blessure",
+    ],
+    citation: "Le bissap est rouge comme le sang — et comme lui, il fait vivre le cœur.",
+    proverbes: [
+      "Le bissap est rouge comme le sang — et comme lui, il fait vivre le cœur.",
+      "Là où le bissap fleurit, les cœurs sont ouverts.",
+      "Une fleur rouge au bon moment vaut mille médicaments amers.",
+    ],
+    legendes: [
+      "La légende wolof raconte qu'une femme guérisseuse dont le fils était mourant découvrit les calices rouges du bissap en suivant un oiseau rouge dans la forêt. Elle en fit une tisane et le donna à son fils qui revint à la vie en une nuit. Depuis, le bissap est appelé 'la couleur qui rappelle à la vie' — et on le sert à tous les malades du cœur.",
+    ],
+    conseilsDeVie: [
+      "Transforme tes passions les plus intenses en sources de créativité et de guérison.",
+      "Partage ta chaleur et ta vitalité avec générosité — le bissap se partage, jamais bu seul.",
+      "Prends soin de ton cœur — littéralement et spirituellement.",
+    ],
+    niveauSpirituel: 3,
+    regionOrigine: "Savanes tropicales — Sénégal, Mali, Guinée, Burkina Faso",
+    couleur: '#B03060',
+    couleurSecondaire: '#7A1A3A',
+    enseignementDuJour:
+      "Aujourd'hui, partage quelque chose de rouge — une passion, une émotion, une chaleur — avec quelqu'un qui en a besoin.",
+    vertus: ['Hypotenseur naturel', 'Riche en vitamine C', 'Antioxydant puissant', 'Diurétique doux', 'Anti-cholestérol'],
+    usagesTraditionnels: ['Boisson (jus de bissap)', 'Tisane cardiaque', 'Colorant naturel', 'Confiture', 'Remède tensions artérielles'],
+  },
+
+  {
+    id: 'kinkeliba',
+    nom: 'Kinkéliba',
+    nomAnglais: 'Kinkeliba',
+    nomScientifique: 'Combretum micranthum',
+    categorie: 'Plantes Médicinales',
+    element: 'Terre',
+    description:
+      "Le Kinkéliba est le Médecin du Village, le grand purificateur de l'Afrique soudano-sahélienne. Sa tisane ambrée est le premier remède contre la fièvre, le paludisme, les maladies du foie. Dans tout le Sahel, 'prendre le kinkéliba' est synonyme de prendre soin de soi profondément.",
+    symboliqueAfricaine:
+      "Au Sénégal et au Mali, le kinkéliba est la plante du retour à la santé. Les femmes wolof et bambara le préparent pour toute la famille lors des changements de saison. Il est aussi utilisé dans les rituels de purification après une épreuve — maladies, deuils, ruptures. Boire le kinkéliba, c'est se laver de l'intérieur.",
+    symboliqueSpirirtuelle:
+      "Le Kinkéliba symbolise la purification profonde qui vient de l'humilité — c'est un buisson discret, sans éclat, dont les feuilles allongées cachent une puissance médicinale extraordinaire. Il enseigne que les guérisseurs les plus puissants ne cherchent pas à être vus, que la vraie médecine est souvent là où on ne la cherche pas.",
+    symbolique: "Symbole de purification intérieure, d'humilité guérisseuse et de force cachée.",
+    qualites: ['Purification profonde', 'Humilité active', 'Force cachée', 'Constance thérapeutique', 'Discernement médical'],
+    defauts: ['Amertume rebutante', 'Discrétion excessive', 'Méconnaissance par ceux qui cherchent l\'éclat', 'Besoin de patience'],
+    pouvoirs: ['Purification hépatique', 'Fièvre maîtrisée', 'Retour à l\'équilibre', 'Guérison discrète'],
+    enseignements: [
+      "Les remèdes les plus puissants sont souvent les plus humbles",
+      "La vraie guérison commence par accepter l'amertume de la vérité",
+      "Ton pouvoir n'a pas besoin d'être vu pour être réel",
+      "Prends soin de ton foie — il est le siège des émotions non digérées",
+    ],
+    citation: "Le kinkéliba ne cherche pas à plaire — il guérit, c'est tout.",
+    proverbes: [
+      "Le kinkéliba ne cherche pas à plaire — il guérit, c'est tout.",
+      "Un buisson humble vaut mieux qu'un grand arbre qui n'a rien à donner.",
+      "Qui connaît le kinkéliba ne craint pas la fièvre.",
+    ],
+    legendes: [
+      "La tradition bambara raconte qu'un génie de la brousse enseigna le kinkéliba à une femme en la guidant vers ses feuilles lors d'une épidémie de fièvre. Elle dut d'abord accepter de boire elle-même l'amère tisane avant de la donner aux malades. Sa guérison convainquit tout le village. Depuis, le kinkéliba est la plante du courage de se soigner.",
+    ],
+    conseilsDeVie: [
+      "Prends soin de ta santé profondemment — pas seulement les symptômes, mais les causes.",
+      "Accepte les vérités amères qui te guérissent plutôt que les douceurs qui t'endorment.",
+      "Valorise les gens discrets autour de toi — souvent les plus précieux se montrent le moins.",
+    ],
+    niveauSpirituel: 3,
+    regionOrigine: "Sahel — Sénégal, Mali, Guinée, Burkina Faso",
+    couleur: '#7A6030',
+    couleurSecondaire: '#4D3A10',
+    enseignementDuJour:
+      "Aujourd'hui, occupe-toi d'une purification intérieure — corps, esprit ou émotions. Le kinkéliba nettoie en profondeur.",
+    vertus: ['Anti-paludéen puissant', 'Hépatoprotecteur', 'Fébrifuge', 'Diurétique', 'Cholérétique'],
+    usagesTraditionnels: ['Tisane de purification', 'Remède paludisme', 'Soins du foie', 'Purification rituelle après deuil', 'Traitement fièvre'],
+  },
+
+  {
+    id: 'kalanchoe',
+    nom: 'Kalanchoé',
+    nomAnglais: 'Miracle Leaf',
+    nomScientifique: 'Kalanchoe pinnata',
+    categorie: 'Plantes Médicinales',
+    element: 'Eau',
+    description:
+      "Le Kalanchoé est la Plante de la Résurrection, celle qui se reproduit à partir d'une seule feuille tombée. Sur le bord de chaque feuille naissent de petites plantules déjà formées — prêtes à prendre racine là où elles tombent. Il symbolise la régénération perpétuelle et l'invincibilité de la vie.",
+    symboliqueAfricaine:
+      "En Afrique de l'Ouest, le Kalanchoé est planté autour des maisons pour sa protection et sa guérison. On dit que 'là où le Kalanchoé pousse, la mort ne peut entrer'. Ses feuilles charnues sont appliquées directement sur les blessures, les brûlures et les infections. Son nom populaire — 'feuille de vie' — dit tout.",
+    symboliqueSpirirtuelle:
+      "Le Kalanchoé enseigne la multiplication par le don — chaque feuille donnée engendre une nouvelle plante. Il symbolise la générosité créatrice : ce qu'on offre revient multiplié. Sa capacité à s'enraciner partout où il tombe représente la résilience de l'âme qui transforme chaque chute en nouveau départ.",
+    symbolique: "Symbole de régénération perpétuelle, de générosité multiplicatrice et de vie indestructible.",
+    qualites: ['Régénération constante', 'Générosité multiplicatrice', 'Adaptabilité totale', 'Vie indestructible', 'Guérison naturelle'],
+    defauts: ['Envahissement progressif', 'Difficulté à se contenir', 'Multiplication incontrôlable', 'Besoin de limites'],
+    pouvoirs: ['Régénération sacrée', 'Multiplication de la vie', 'Guérison des blessures', 'Invincibilité vitale'],
+    enseignements: [
+      "Ce que tu offres se multiplie — la générosité est une loi cosmique",
+      "Chaque chute peut être un nouveau départ si tu décides de t'enraciner",
+      "La vie trouve toujours un chemin — même depuis une seule feuille",
+      "Ta capacité de régénération est infinie si tu y crois",
+    ],
+    citation: "Le kalanchoé fait de chaque chute une naissance — il n'a pas peur de tomber.",
+    proverbes: [
+      "Le kalanchoé fait de chaque chute une naissance — il n'a pas peur de tomber.",
+      "La feuille qui tombe engendre cent enfants — ainsi le geste généreux revient multiplié.",
+      "Là où le kalanchoé pousse, la vie s'accroche.",
+    ],
+    legendes: [
+      "La légende fon du Bénin raconte qu'une femme guerrière blessée en combat se traîna jusqu'à un Kalanchoé. Elle appliqua ses feuilles sur ses plaies et se coucha pour mourir. Au matin, elle était guérie. Elle rapporta la plante au village et dit : 'Cette feuille ne connaît pas la mort.' Depuis, le Kalanchoé est la plante des soldats et des mères qui veillent.",
+    ],
+    conseilsDeVie: [
+      "Tu as une capacité de régénération que tu sous-estimes — souviens-t'en dans les moments sombres.",
+      "Partage tes dons généreusement — ils reviennent toujours sous une autre forme.",
+      "Transforme chaque blessure en force — le Kalanchoé fait de chaque feuille tombée une nouvelle plante.",
+    ],
+    niveauSpirituel: 4,
+    regionOrigine: "Tropiques d'Afrique de l'Ouest — présent du Sénégal au Cameroun",
+    couleur: '#2E7A5C',
+    couleurSecondaire: '#1A4D38',
+    enseignementDuJour:
+      "Aujourd'hui, trouve comment transformer une difficulté récente en nouveau départ. Le Kalanchoé ne connaît pas les impasses.",
+    vertus: ['Cicatrisant puissant', 'Anti-inflammatoire', 'Antibactérien', 'Antifongique', 'Hémosta-tique'],
+    usagesTraditionnels: ['Feuilles sur les plaies', 'Traitement brûlures', 'Anti-infectieux', 'Remède ulcères', 'Protection de la maison'],
+  },
+
+  {
+    id: 'artemisia',
+    nom: 'Artémisia Africaine',
+    nomAnglais: 'African Wormwood',
+    nomScientifique: 'Artemisia afra',
+    categorie: 'Plantes Médicinales',
+    element: 'Air',
+    description:
+      "L'Artémisia Africaine est la Grande Guérisseuse des Hauts Plateaux, la plante argentée dont le parfum âcre et puissant purifie l'air et le corps. Reconnue mondialement pour ses propriétés anti-paludéennes, elle est utilisée depuis des millénaires dans la médecine traditionnelle sub-saharienne comme remède universel.",
+    symboliqueAfricaine:
+      "Dans les traditions d'Afrique de l'Est et du Sud qui rayonnent vers l'Afrique de l'Ouest, l'Artémisia est la plante des guérisseuses. Ses feuilles argentées et laineuses sont brûlées dans les rituels de purification. On dit qu'elle voit les maladies avant qu'elles ne se manifestent — et qu'elle les empêche d'entrer dans le corps.",
+    symboliqueSpirirtuelle:
+      "L'Artémisia symbolise la prophylaxie spirituelle — protéger avant que le mal n'arrive. Ses feuilles argentées représentent la sagesse lunaire, intuitive, qui anticipe. Elle enseigne que la vraie médecine est préventive, que le guérisseur sage agit avant la maladie, non après.",
+    symbolique: "Symbole de prophylaxie spirituelle, de sagesse lunaire et de guérison préventive.",
+    qualites: ['Anticipation intuitive', 'Sagesse préventive', 'Purification active', 'Discernement médical', 'Protection naturelle'],
+    defauts: ['Amertume rebutante', 'Puissance parfois excessive', 'Usage à doses précises seulement', 'Incompréhension par les non-initiés'],
+    pouvoirs: ['Prophylaxie sacrée', 'Purification par le parfum', 'Sagesse lunaire', 'Anti-paludisme ancestral'],
+    enseignements: [
+      "La prévention vaut mille guérisons — anticipe avant que la crise n'arrive",
+      "Ton intuition qui pressentoit le danger est un don à cultiver",
+      "Purifie ton environnement régulièrement avant que la toxicité ne s'installe",
+      "La sagesse argentée est douce et acérée à la fois — comme l'intuition vraie",
+    ],
+    citation: "L'artémisia guérit la maladie avant que le malade ne sache qu'il l'a.",
+    proverbes: [
+      "L'artémisia guérit la maladie avant que le malade ne sache qu'il l'a.",
+      "La feuille argentée voit dans l'ombre ce que l'œil ordinaire ne voit pas.",
+      "Plante l'artémisia avant la saison des fièvres — ainsi font les sages.",
+    ],
+    legendes: [
+      "Les guérisseurs de l'est africain racontent que la déesse Lune offrit l'Artémisia aux femmes guérisseuses pour les aider à voir les maladies dans le corps avant qu'elles ne se manifestent. C'est pourquoi la plante est argentée comme la lune et que ses propriétés sont maximales la nuit de pleine lune. Les récolter au clair de lune les charge d'une puissance particulière.",
+    ],
+    conseilsDeVie: [
+      "Anticipe les risques dans ta vie — la prévention est l'intelligence supérieure.",
+      "Fais confiance à ton intuition qui perçoit le danger avant qu'il ne soit visible.",
+      "Purifie régulièrement ton espace de vie, tes relations et tes pensées.",
+    ],
+    niveauSpirituel: 4,
+    regionOrigine: "Hauts plateaux d'Afrique — du Zimbabwe au Nigeria",
+    couleur: '#7A9E7A',
+    couleurSecondaire: '#4D6B4D',
+    enseignementDuJour:
+      "Aujourd'hui, fais un acte préventif dans un domaine de ta vie — santé, finances, relation — avant que le problème ne survienne.",
+    vertus: ['Anti-paludéen (artémisinine)', 'Antiparasitaire', 'Antibactérien', 'Anti-inflammatoire', 'Vermifuge'],
+    usagesTraditionnels: ['Tisane préventive paludisme', 'Fumigation purifiante', 'Inhalation pour infections', 'Bain médicinal', 'Remède universel'],
+  },
+
+  /* ═══════════════════════════════════════════════════════════
+     NOUVELLES PLANTES — PLANTES ALIMENTAIRES
+  ═══════════════════════════════════════════════════════════ */
+
+  {
+    id: 'igname',
+    nom: 'Igname',
+    nomAnglais: 'African Yam',
+    nomScientifique: 'Dioscorea rotundata',
+    categorie: 'Plantes Alimentaires',
+    element: 'Terre',
+    description:
+      "L'Igname est la Nourriture Royale, le tubercule sacré qui a nourri les grandes civilisations d'Afrique de l'Ouest depuis des millénaires. Sa récolte est une fête, sa première coupe est un rituel — au Nigeria, les Ibo célèbrent la Fête des Ignames comme le Nouvel An de la terre. C'est la plante de l'abondance et de la gratitude.",
+    symboliqueAfricaine:
+      "Chez les Ibo du Nigeria, l'Igname est 'le roi des cultures'. La Fête des Ignames (Iri Ji Ohuru) est la cérémonie la plus importante de l'année — elle marque le début de l'abondance retrouvée. Nul ne mange l'igname nouvelle avant que le chef n'ait fait les offrandes aux ancêtres. Elle appartient d'abord aux esprits, ensuite aux hommes.",
+    symboliqueSpirirtuelle:
+      "L'Igname symbolise le cycle de la gratitude — on ne consomme pas sans d'abord remercier. Elle enseigne que l'abondance n'est pas un droit mais un cadeau qui mérite d'être honoré. Son tubercule caché sous terre représente les richesses cachées qui demandent de s'agenouiller pour les trouver.",
+    symbolique: "Symbole de gratitude pour l'abondance, de royauté de la terre et de célébration communautaire.",
+    qualites: ['Gratitude profonde', 'Célébration de l\'abondance', 'Sens du sacré alimentaire', 'Royauté de l\'ancrage', 'Générosité festive'],
+    defauts: ['Lourdeur', 'Lenteur de croissance', 'Dépendance au sol fertile', 'Besoin de soins constants'],
+    pouvoirs: ['Abondance royale', 'Connexion à la terre nourricière', 'Gratitude sacrée', 'Festin communautaire'],
+    enseignements: [
+      "Remercie la terre avant de prendre ses fruits — la gratitude est la première sagesse",
+      "Les richesses qui comptent sont cachées sous la surface — creuse avant de récolter",
+      "Célèbre l'abondance collectivement — elle se multiplie quand elle est partagée",
+      "Honore les cycles de la terre — elle sait mieux que toi quand c'est le bon moment",
+    ],
+    citation: "L'igname ne se mange pas sans d'abord la présenter aux ancêtres — ainsi tout festin commence par la gratitude.",
+    proverbes: [
+      "L'igname ne se mange pas sans d'abord la présenter aux ancêtres — ainsi tout festin commence par la gratitude.",
+      "Celui qui honore la première igname ne manquera jamais de la dernière.",
+      "La richesse de la terre appartient à ceux qui la respectent.",
+    ],
+    legendes: [
+      "La légende ibo raconte que le premier homme reçut l'igname directement de Chukwu, le dieu créateur. Il lui dit : 'Partage-la avec ta communauté et remercie-moi avant chaque repas. Si tu oublies, l'abondance se retirera.' Depuis, la Fête des Ignames est le rappel annuel de ce premier pacte entre l'homme et le divin.",
+    ],
+    conseilsDeVie: [
+      "Pratique la gratitude systématique avant de consommer — de la nourriture, du temps des autres, des ressources.",
+      "Célèbre tes récoltes — petites et grandes — collectivement.",
+      "Cherche tes richesses profondes en creusant sous la surface apparente.",
+    ],
+    niveauSpirituel: 4,
+    regionOrigine: "Ceinture de l'igname — Nigeria, Bénin, Ghana, Côte d'Ivoire",
+    couleur: '#C8892A',
+    couleurSecondaire: '#8B5A10',
+    enseignementDuJour:
+      "Aujourd'hui, exprime une gratitude profonde et sincère pour une abondance dans ta vie que tu tiens pour acquise.",
+    vertus: ['Riche en glucides complexes', 'Source de potassium', 'Fibres digestives', 'Antioxydant', 'Régulation glycémique'],
+    usagesTraditionnels: ['Fufu (plat principal)', 'Igname pilée', 'Fête des Ignames', 'Offrande aux ancêtres', 'Alimentation de base'],
+  },
+
+  {
+    id: 'manioc',
+    nom: 'Manioc',
+    nomAnglais: 'Cassava',
+    nomScientifique: 'Manihot esculenta',
+    categorie: 'Plantes Alimentaires',
+    element: 'Terre',
+    description:
+      "Le Manioc est le Grand Adaptateur, la plante qui nourrit même là où rien d'autre ne pousse. Poussant dans les terres pauvres, supportant la sécheresse, produisant dans l'adversité — il est la plante de la résilience alimentaire. Sa toxicité crue, transformée par les femmes en nourriture saine, symbolise la transmutation des poisons en remèdes.",
+    symboliqueAfricaine:
+      "Introduit en Afrique de l'Ouest à partir du XVIème siècle, le Manioc s'est si bien intégré qu'il est devenu la base alimentaire de nombreux peuples. Au Congo, en Côte d'Ivoire et au Cameroun, le 'foutou' et l'attiéké de manioc sont des aliments identitaires. Les femmes qui maîtrisent sa transformation — enlever la toxicité — sont respectées comme des alchimistes.",
+    symboliqueSpirirtuelle:
+      "Le Manioc symbolise la transformation alchimique : ce qui est toxique cru devient nourrissant transformé. Il enseigne que les situations les plus difficiles et les personnes les plus 'difficiles' peuvent devenir des ressources extraordinaires si on sait comment les transformer. La patience et le savoir-faire féminin transmutent le poison en nourriture.",
+    symbolique: "Symbole de transformation alchimique, de résilience dans l'adversité et de savoir-faire transmutateur.",
+    qualites: ['Résilience absolue', 'Adaptabilité totale', 'Transformation alchimique', 'Nourriture de l\'adversité', 'Patience transformatrice'],
+    defauts: ['Toxicité crue', 'Besoin de transformation avant d\'être utilisable', 'Dépendance aux techniques', 'Pauvreté nutritionnelle brute'],
+    pouvoirs: ['Transmutation du poison en nourriture', 'Résilience alimentaire', 'Savoir-faire alchimique', 'Abondance dans les terres pauvres'],
+    enseignements: [
+      "Ce qui paraît toxique peut devenir nourrissant avec la bonne transformation",
+      "Ton adaptabilité à des conditions difficiles est ta plus grande force",
+      "Valorise le savoir-faire de transformation — c'est l'intelligence pratique du peuple",
+      "Les terres pauvres peuvent produire des richesses si on sait comment les travailler",
+    ],
+    citation: "Le manioc cru empoisonne — transformé, il nourrit des millions. Ainsi les épreuves : elles dépendent de ce qu'on en fait.",
+    proverbes: [
+      "Le manioc cru empoisonne — transformé, il nourrit des millions. Ainsi les épreuves : elles dépendent de ce qu'on en fait.",
+      "La femme qui sait travailler le manioc ne connaît pas la faim.",
+      "La terre pauvre qui produit du manioc vaut mieux que la terre riche qui produit rien.",
+    ],
+    legendes: [
+      "La légende congolaise raconte que la première femme qui découvrit comment détoxifier le manioc reçut ce secret dans un rêve d'une ancêtre. Elle vit que l'eau emportait le poison quand on laissait tremper les racines. Ainsi le peuple fut sauvé de la faim — par le savoir d'une femme qui écouta ses rêves.",
+    ],
+    conseilsDeVie: [
+      "Identifie les situations 'toxiques' dans ta vie et cherche comment les transformer en ressources.",
+      "Valorise le savoir-faire de transformation — en toi et chez les autres.",
+      "Développe ta résilience en situations difficiles — le manioc pousse là où rien d'autre ne pousserait.",
+    ],
+    niveauSpirituel: 3,
+    regionOrigine: "Zones tropicales d'Afrique de l'Ouest — partout du Sénégal au Congo",
+    couleur: '#C8A87A',
+    couleurSecondaire: '#8B6B3A',
+    enseignementDuJour:
+      "Aujourd'hui, transforme une situation difficile en opportunité — comme le manioc transforme la terre pauvre en nourriture.",
+    vertus: ['Glucides énergétiques', 'Source de calcium', 'Fibres digestives', 'Faible en matières grasses'],
+    usagesTraditionnels: ['Foutou, attiéké, gari', 'Farine de manioc', 'Tapioca', 'Colle naturelle (amidon)', 'Alimentation du bétail'],
+  },
+
+  {
+    id: 'arachide',
+    nom: 'Arachide',
+    nomAnglais: 'Peanut',
+    nomScientifique: 'Arachis hypogaea',
+    categorie: 'Plantes Alimentaires',
+    element: 'Terre',
+    description:
+      "L'Arachide est la Plante de l'Humilité Productive, celle qui cache ses fruits sous terre mais nourrit des millions. Sa fleur jaune vive produit en superficie, puis courbe sa tige pour enterrer ses gousses — comme si elle cachait sa propre réussite. C'est la plante de la discrétion qui produit en silence.",
+    symboliqueAfricaine:
+      "Au Sénégal, le 'pays de l'arachide', elle est l'or sous la terre qui a permis la prospérité coloniale — mais aussi le trésor des femmes qui extraient son huile depuis des siècles. Les marabouts sénégalais l'utilisent dans leurs gris-gris de protection. Partager une poignée d'arachides grillées, c'est partager l'essentiel de soi.",
+    symboliqueSpirirtuelle:
+      "L'Arachide enseigne que les réussites les plus solides se construisent sous la surface — invisibles, discrètes, sans vantardise. Elle courbe sa tige pour mettre ses graines en terre : humilité productive. Elle symbolise celui qui travaille dans l'ombre et produit ce dont tout le monde a besoin.",
+    symbolique: "Symbole d'humilité productive, de richesse cachée et de travail discret qui nourrit.",
+    qualites: ['Humilité productive', 'Discrétion efficace', 'Richesse partagée', 'Travail de fond', 'Constance silencieuse'],
+    defauts: ['Excès de discrétion', 'Invisibilité des accomplissements', 'Difficulté à se valoriser', 'Modestie parfois handicapante'],
+    pouvoirs: ['Richesse cachée', 'Nourriture des peuples', 'Humilité féconde', 'Travail de fond sacré'],
+    enseignements: [
+      "Les accomplissements les plus solides se construisent sous la surface",
+      "L'humilité n'est pas l'absence de valeur — c'est la valeur qui ne se vante pas",
+      "Travaille dans le silence — la terre reconnaît ce qu'on y sème",
+      "Partage ce que tu produis, même en petite quantité — ça nourrit plus qu'on ne croit",
+    ],
+    citation: "L'arachide cache ses fruits sous terre — et nourrit pourtant des continents.",
+    proverbes: [
+      "L'arachide cache ses fruits sous terre — et nourrit pourtant des continents.",
+      "Celui qui travaille en silence comme l'arachide récolte en abondance.",
+      "Ne méprise pas ce qui est petit — l'arachide est petite et nourrit les rois.",
+    ],
+    legendes: [
+      "La légende sérère du Sénégal raconte qu'une petite fille qui ne voulait pas se faire remarquer découvrit la première arachide en observant des fourmis traîner de petites graines dans leurs galeries souterraines. Elle les planta discrètement, sans le dire à personne. À la récolte, tout le village mangea grâce à elle — mais personne ne sut qui avait planté la première.",
+    ],
+    conseilsDeVie: [
+      "Construis ta richesse dans la discrétion — les accomplissements silencieux sont les plus solides.",
+      "Apprécie la valeur des petites choses — elles nourrissent souvent mieux que les grandes.",
+      "Partage même ce qui te semble modeste — l'essentiel est souvent dans le geste.",
+    ],
+    niveauSpirituel: 2,
+    regionOrigine: "Sénégal, Gambie, Mali — tout le Sahel",
+    couleur: '#C49A30',
+    couleurSecondaire: '#8B6510',
+    enseignementDuJour:
+      "Aujourd'hui, valorise ton travail discret. L'arachide produit sous terre — ce que tu fais sans être vu est aussi réel que ce que tout le monde voit.",
+    vertus: ['Protéines végétales complètes', 'Bonnes graisses (acide oléique)', 'Vitamine E', 'Magnésium', 'Résveratrol antioxydant'],
+    usagesTraditionnels: ['Huile d\'arachide', 'Pâte d\'arachide', 'Mafé (sauce)', 'Grillée comme snack', 'Savon artisanal'],
+  },
+
+  {
+    id: 'sesame',
+    nom: 'Sésame',
+    nomAnglais: 'Sesame',
+    nomScientifique: 'Sesamum indicum',
+    categorie: 'Plantes Alimentaires',
+    element: 'Feu',
+    description:
+      "Le Sésame est la Plante de l'Ouverture, la graine magique qui cache sa richesse jusqu'au dernier instant — puis s'ouvre en éclatant à maturité. 'Sésame, ouvre-toi !' est l'incantation universelle de l'ouverture du trésor caché. Il enseigne que les richesses les plus précieuses attendent celui qui sait être patient et prononcer les bons mots.",
+    symboliqueAfricaine:
+      "Au Burkina Faso, au Niger et au Mali, le sésame est l'or des femmes du Sahel. Ses petites graines blanches ou noires sont pressées pour une huile précieuse utilisée dans la cuisine, les massages de bébés et les rituels de beauté. On dit que l'huile de sésame 'ouvre les pores de l'âme' lors des massages rituels des nouveau-nés.",
+    symboliqueSpirirtuelle:
+      "Le Sésame symbolise l'ouverture au moment juste — ni trop tôt, ni trop tard. Ses gousses s'ouvrent en explosant quand elles sont mûres, dispersant leurs graines au vent. Il enseigne que certains trésors ne se révèlent qu'à leur moment exact, que la patience jusqu'à la maturité est la seule façon d'accéder aux richesses profondes.",
+    symbolique: "Symbole d'ouverture au moment juste, de richesse patiente et de maturité explosive.",
+    qualites: ['Patience jusqu\'à la maturité', 'Ouverture au bon moment', 'Richesse concentrée', 'Timing parfait', 'Générosité explosive'],
+    defauts: ['Fermeture obstinée avant maturité', 'Explosion incontrôlable', 'Dispersion des ressources', 'Difficulté à retenir'],
+    pouvoirs: ['Ouverture sacrée', 'Richesse révélée', 'Timing divin', 'Explosion de la maturité'],
+    enseignements: [
+      "Les trésors les plus profonds attendent le bon moment pour se révéler — sois patient",
+      "Dis les bons mots au bon moment — 'Sésame ouvre-toi' fonctionne dans ta vie aussi",
+      "Ta maturité intérieure est ce qui permet l'accès aux richesses profondes",
+      "Quand le moment vient, n'hésite pas — ouvre-toi entièrement",
+    ],
+    citation: "Sésame, ouvre-toi — trois mots pour tous les trésors du monde, si on sait les dire au bon moment.",
+    proverbes: [
+      "Sésame, ouvre-toi — trois mots pour tous les trésors du monde, si on sait les dire au bon moment.",
+      "La petite graine de sésame contient plus d'huile qu'on ne croit.",
+      "Attend que le sésame soit mûr — les trésors précipités se perdent.",
+    ],
+    legendes: [
+      "La tradition sahélienne raconte que le sésame fut le premier don des djinns aux humains. Un pêcheur perdu trouva un champ de sésame gardé par un génie. Le génie lui dit : 'Prononce les mots justes et tu pourras en emporter.' Le pêcheur dit honnêtement : 'Je te le demande pour nourrir ma famille.' Le génie lui ouvrit le chemin — car l'honnêteté était le mot de passe.",
+    ],
+    conseilsDeVie: [
+      "Identifie le bon timing dans ta vie — certaines portes ne s'ouvrent qu'au bon moment.",
+      "Attends ta vraie maturité avant de t'exposer — comme le sésame qui éclate quand il est prêt.",
+      "Formule avec précision ce que tu demandes — les mots justes ouvrent les bonnes portes.",
+    ],
+    niveauSpirituel: 3,
+    regionOrigine: "Sahel — Burkina Faso, Niger, Mali, Sénégal",
+    couleur: '#D4A850',
+    couleurSecondaire: '#8B6B1A',
+    enseignementDuJour:
+      "Aujourd'hui, identifie un trésor dans ta vie qui attend le bon moment pour s'ouvrir. Sois patient — le sésame sait quand éclater.",
+    vertus: ['Riche en calcium (tahini)', 'Acides aminés essentiels', 'Vitamine E', 'Zinc et magnésium', 'Lignanes antioxydants'],
+    usagesTraditionnels: ['Huile de sésame', 'Graines en cuisine', 'Massage des nourrissons', 'Pâte de sésame', 'Cosmétique capillaire'],
+  },
+
+  /* ═══════════════════════════════════════════════════════════
+     NOUVELLES PLANTES — HERBES & GRAMINÉES
+  ═══════════════════════════════════════════════════════════ */
+
+  {
+    id: 'sorgho',
+    nom: 'Sorgho',
+    nomAnglais: 'Sorghum',
+    nomScientifique: 'Sorghum bicolor',
+    categorie: 'Herbes & Graminées',
+    element: 'Feu',
+    description:
+      "Le Sorgho est la Graminée de Feu, la céréale solaire qui résiste à la chaleur là où les autres meurent. Ses grandes panicules rouges et marron dominent les champs comme des torches vivantes. C'est la céréale de la bière traditionnelle, des cérémonies du feu et des rituels de passage masculins en Afrique de l'Ouest.",
+    symboliqueAfricaine:
+      "Dans les traditions mandingues, dogon et peules, le sorgho est la céréale de la force masculine et des initiations. La bière de sorgho (dolo) est la boisson sacrée des cérémonies, servie aux ancêtres avant d'être bue par les vivants. Au Burkina Faso, les forgerons — caste sacrée — récoltent le sorgho selon des rituels spéciaux, car ils seuls savent manier le feu.",
+    symboliqueSpirirtuelle:
+      "Le Sorgho symbolise l'endurance solaire — sa capacité à pousser dans la chaleur intense là où les autres cèdent. Il représente le guerrier qui ne recule pas sous la pression, la force tempérée par la chaleur. Sa couleur rouge-brun évoque le sang maîtrisé, la passion contrôlée au service de la communauté.",
+    symbolique: "Symbole d'endurance solaire, de force masculine sacrée et de célébration par le feu.",
+    qualites: ['Endurance solaire', 'Force maîtrisée', 'Résistance à la chaleur', 'Célébration collective', 'Constance productive'],
+    defauts: ['Rigidité parfois', 'Résistance au changement', 'Force brute difficile à raffiner', 'Besoin d\'espace'],
+    pouvoirs: ['Feu sacré', 'Endurance du guerrier', 'Bière rituelle', 'Résistance climatique'],
+    enseignements: [
+      "La vraie force s'exprime dans les conditions les plus difficiles",
+      "Résiste à la chaleur des épreuves — c'est là que ton caractère se forge",
+      "Célèbre avec ceux qui t'ont aidé à passer les saisons difficiles",
+      "Ton endurance n'est pas de l'entêtement — c'est de la constance",
+    ],
+    citation: "Le sorgho reste debout quand le soleil brûle tout — ainsi l'homme de caractère reste debout dans l'adversité.",
+    proverbes: [
+      "Le sorgho reste debout quand le soleil brûle tout — ainsi l'homme de caractère reste debout dans l'adversité.",
+      "La bière de sorgho unit les vivants et les morts — ainsi la tradition unit les générations.",
+      "Celui qui plante le sorgho en plein soleil ne craint pas la chaleur.",
+    ],
+    legendes: [
+      "La légende dogon raconte que le sorgho fut apporté du ciel par les Nommo lors de la descente de l'arche cosmique. Il tomba en premier sur la terre comme un cadeau du cosmos pour les humains. C'est pourquoi sa récolte est célébrée comme un retour aux origines — un souvenir de ce premier don du ciel à la terre.",
+    ],
+    conseilsDeVie: [
+      "Développe ta résistance aux conditions difficiles — ton endurance est ton vrai capital.",
+      "Célèbre collectivement tes réussites — la bière de sorgho se partage, jamais bue seul.",
+      "Trouve du sens dans les moments chauds de ta vie — ils forgent quelque chose d'important.",
+    ],
+    niveauSpirituel: 3,
+    regionOrigine: "Sahel — Burkina Faso, Mali, Niger, Sénégal, Nigeria",
+    couleur: '#A83030',
+    couleurSecondaire: '#6B1A1A',
+    enseignementDuJour:
+      "Aujourd'hui, montre ton endurance dans une situation difficile. Le sorgho brille quand le soleil est le plus fort.",
+    vertus: ['Riche en fer et vitamines B', 'Antioxydant (tanins)', 'Sans gluten', 'Fibres alimentaires', 'Anti-diabétique'],
+    usagesTraditionnels: ['Tô et bouillie', 'Bière sacrée (dolo)', 'Farine de sorgho', 'Cérémonies d\'initiation', 'Alimentation du bétail'],
+  },
+
+  {
+    id: 'fonio',
+    nom: 'Fonio',
+    nomAnglais: 'Fonio',
+    nomScientifique: 'Digitaria exilis',
+    categorie: 'Herbes & Graminées',
+    element: 'Air',
+    description:
+      "Le Fonio est la Graine de l'Humilité Sacrée, la plus petite céréale du monde qui contenait autrefois le plus grand pouvoir nutritif. Surnommé 'la céréale des dieux' par les Dogon, il pousse sur les terres les plus ingrates sans engrais ni irrigation. Sa petitesse cache une richesse extraordinaire en acides aminés essentiels introuvables ailleurs.",
+    symboliqueAfricaine:
+      "Selon la cosmogonie dogon, le fonio est le 'germe du monde' — la première graine que Dieu confia à Nommo lors de la création. Il est la céréale des cérémonies spirituelles les plus hautes. Au Mali et en Guinée, le fonio est servi lors des naissances, des funérailles et des initiations — les trois passages de vie. Aucune cérémonie dogon ne peut se tenir sans le fonio.",
+    symboliqueSpirirtuelle:
+      "Le Fonio symbolise la puissance de l'infiniment petit — une graine minuscule qui contient plus de nutriments rares que toute autre céréale. Il enseigne l'humilité sacrée : ne pas sous-estimer ce qui est petit, car les plus grands pouvoirs sont souvent dans les plus petites formes. Il représente la grâce légère qui accomplit ce que la force lourde ne peut pas.",
+    symbolique: "Symbole de puissance cachée dans l'humilité, de grâce légère et de sacré dans le quotidien.",
+    qualites: ['Puissance dans la légèreté', 'Grâce sacrée', 'Humilité parfaite', 'Richesse inattendue', 'Adaptation maximale'],
+    defauts: ['Difficulté de décorticage', 'Fragilité apparente', 'Méconnaissance de sa valeur', 'Petitesse mal comprise'],
+    pouvoirs: ['Graine des dieux', 'Nourriture des passages', 'Puissance de l\'infiniment petit', 'Grâce alimentaire'],
+    enseignements: [
+      "Ne sous-estime jamais ce qui est petit — les plus grandes puissances sont parfois minuscules",
+      "La légèreté n'est pas la faiblesse — c'est une forme supérieure de force",
+      "Les passages importants de ta vie méritent les nourritures les plus sacrées",
+      "Cultive l'humilité — elle est souvent plus puissante que la grandeur affichée",
+    ],
+    citation: "Le fonio est si petit qu'on le voit à peine — et pourtant les dieux eux-mêmes en mangent.",
+    proverbes: [
+      "Le fonio est si petit qu'on le voit à peine — et pourtant les dieux eux-mêmes en mangent.",
+      "La plus petite graine du Sahel contient le plus grand mystère.",
+      "Celui qui méprise le fonio ne connaît pas encore la sagesse des choses légères.",
+    ],
+    legendes: [
+      "La cosmogonie dogon enseigne que lors de la création, Amma (Dieu) donna aux humains quatre graines pour survivre. Le fonio fut la dernière, la plus petite — et Nommo dit : 'Celle-ci est la plus sacrée car elle contient le commencement de toutes les autres.' Les Dogon plantent toujours le fonio en premier, avant toute autre culture, pour rappeler que le commencement est sacré.",
+    ],
+    conseilsDeVie: [
+      "Reconnais la valeur extraordinaire des petites choses dans ta vie.",
+      "Cultive la légèreté et la grâce dans ta façon d'agir — l'air porte plus que la pierre.",
+      "Marque tes grands passages de vie par des rituels intentionnels — comme le fonio marque les cérémonies.",
+    ],
+    niveauSpirituel: 5,
+    regionOrigine: "Haut plateau mandingue — Guinée, Mali, Sénégal, Burkina Faso",
+    couleur: '#D4BF7A',
+    couleurSecondaire: '#8B7A2E',
+    enseignementDuJour:
+      "Aujourd'hui, prête attention à quelque chose de petit que tu as négligé. Le fonio rappelle que la grandeur peut se cacher dans l'infiniment petit.",
+    vertus: ['Acides aminés essentiels (méthionine, cystine)', 'Sans gluten', 'Index glycémique bas', 'Digestion facile', 'Fer et zinc'],
+    usagesTraditionnels: ['Couscous de fonio', 'Bouillie sacrée', 'Bière de fonio', 'Cérémonies de naissance', 'Initiations spirituelles'],
+  },
+
+  /* ═══════════════════════════════════════════════════════════
+     NOUVELLES PLANTES — PLANTES RITUELLES
+  ═══════════════════════════════════════════════════════════ */
+
+  {
+    id: 'basilic-africain',
+    nom: 'Basilic Africain',
+    nomAnglais: 'African Basil',
+    nomScientifique: 'Ocimum gratissimum',
+    categorie: 'Plantes Rituelles',
+    element: 'Feu',
+    description:
+      "Le Basilic Africain est la Plante du Seuil, celle qu'on plante à l'entrée des maisons pour purifier ce qui entre et protéger ce qui est dedans. Son parfum puissant, entre l'anisé et l'épicé, est à la fois médicament et offrande. Il est la frontière vivante entre le monde ordinaire et l'espace sacré.",
+    symboliqueAfricaine:
+      "Dans les traditions yoruba du Nigeria, le Basilic Africain est associé à Oshun, l'Orisha de l'amour et de la féminité sacrée. On le place dans les maisons au nom de cet Orisha pour attirer l'amour et la fertilité. Au Ghana, les Akan l'utilisent dans les purifications avant les grandes cérémonies — son parfum chasse les énergies mortes.",
+    symboliqueSpirirtuelle:
+      "Le Basilic Africain symbolise la protection par la présence aimante — il ne combat pas, il enveloppe. Son parfum crée un espace où le négatif n'est pas détruit mais simplement rendu incompatible. Il représente la frontière sacrée entre l'intime et le public, entre le sacré et le profane.",
+    symbolique: "Symbole de protection par l'amour, de frontière sacrée et de purification par la présence.",
+    qualites: ['Protection par l\'amour', 'Frontière sacrée', 'Purification vivante', 'Présence enveloppante', 'Fertilité aimante'],
+    defauts: ['Besoin de chaleur constante', 'Fragilité au froid', 'Dépendance à l\'amour pour s\'épanouir', 'Surprotection possible'],
+    pouvoirs: ['Protection sacrée', 'Purification des seuils', 'Attraction de l\'amour', 'Frontière vivante'],
+    enseignements: [
+      "La protection la plus puissante vient de l'amour, pas de la peur",
+      "Crée une frontière sacrée entre ton espace intérieur et le monde",
+      "Purifie tes seuils — tout ce qui entre dans ta vie t'influence",
+      "L'amour est un espace, pas seulement une émotion — cultivez-le dans votre environnement",
+    ],
+    citation: "Le basilic à l'entrée de la maison dit à tout ce qui passe : l'amour habite ici.",
+    proverbes: [
+      "Le basilic à l'entrée de la maison dit à tout ce qui passe : l'amour habite ici.",
+      "Plante le basilic à ta porte — et tes ennemis passeront sans entrer.",
+      "La maison qui sent le basilic est une maison où les esprits bons se sentent les bienvenus.",
+    ],
+    legendes: [
+      "La légende yoruba raconte qu'Oshun elle-même planta le premier basilic africain sur les rives du fleuve qui porte son nom. Elle dit : 'Là où je plante ce parfum, l'amour ne peut que fleurir.' Depuis, les femmes yoruba plantent le basilic à l'entrée de leurs maisons pour que l'Orisha de l'amour guide ce qui entre et protège ce qui y vit.",
+    ],
+    conseilsDeVie: [
+      "Crée des 'seuils sacrés' dans ta vie — des pratiques qui protègent ton espace intérieur.",
+      "Purifie régulièrement l'entrée de ton foyer et de ton espace de travail.",
+      "Protège-toi avec l'amour plutôt qu'avec la peur — c'est une protection plus durable.",
+    ],
+    niveauSpirituel: 4,
+    regionOrigine: "Zones tropicales d'Afrique de l'Ouest — Nigeria, Ghana, Côte d'Ivoire, Bénin",
+    couleur: '#4A8A5A',
+    couleurSecondaire: '#2A5A3A',
+    enseignementDuJour:
+      "Aujourd'hui, crée ou renforce une frontière saine dans ta vie — une limite qui protège ce que tu as de précieux.",
+    vertus: ['Antibactérien puissant', 'Anti-inflammatoire', 'Antifongique', 'Vermifuge', 'Stimulant digestif'],
+    usagesTraditionnels: ['Plante protectrice de seuil', 'Huile essentielle purifiante', 'Tisane digestive', 'Rituel d\'amour (Oshun)', 'Fumigation cérémonielle'],
+  },
+
+  /* ═══════════════════════════════════════════════════════════
+     NOUVELLES PLANTES — PALMIERS
+  ═══════════════════════════════════════════════════════════ */
+
+  {
+    id: 'palmier-huile',
+    nom: 'Palmier à Huile',
+    nomAnglais: 'Oil Palm',
+    nomScientifique: 'Elaeis guineensis',
+    categorie: 'Palmiers',
+    element: 'Feu',
+    description:
+      "Le Palmier à Huile est le Grand Pourvoyeur d'Afrique de l'Ouest, le palmier aux fruits rouges ardents dont l'huile d'or rouge illumine et nourrit. De ses grappes de fruits orange-rouge coule l'huile palmiste, base de la cuisine, du savon, des cosmétiques et des rituels depuis des millénaires. Il incarne l'abondance solaire et la générosité ardente.",
+    symboliqueAfricaine:
+      "Chez les Ibo du Nigeria et les Fon du Bénin, le palmier à huile est associé à Amadioha et Shango — les dieux du tonnerre et du feu. Son huile rouge est utilisée dans presque toutes les cérémonies vaudou et yoruba : elle oint les statues, les autels, les initiés. La palme est l'arbre du monde ibo — 'Qui a un frère palmiste ne meurt pas de faim.'",
+    symboliqueSpirirtuelle:
+      "Le Palmier à Huile symbolise la générosité ardente — tout en lui peut servir : huile, palme, sève, bois, noyau. Il enseigne que la vraie richesse est celle qui peut tout transformer en ressource. Son huile rouge évoque le sang de la vie, la passion productive, la chaleur qui nourrit et unit.",
+    symbolique: "Symbole de générosité ardente, d'abondance totale et de transformation sacrée.",
+    qualites: ['Générosité ardente', 'Productivité totale', 'Abondance transmissible', 'Chaleur nourricière', 'Polyvalence totale'],
+    defauts: ['Intensité parfois excessive', 'Couleur qui tache et marque', 'Besoin d\'espace', 'Mono-culture épuisante'],
+    pouvoirs: ['Huile sacrée', 'Feu nourricier', 'Abondance totale', 'Onction rituelle'],
+    enseignements: [
+      "Toutes les parties de toi peuvent être utiles — ne réserve pas ta générosité à un seul aspect",
+      "La richesse qui nourrit la communauté est sacrée",
+      "L'ardeur productive vaut plus que la contemplation stérile",
+      "Offre ton huile — ce qui te semble ordinaire peut transformer la vie des autres",
+    ],
+    citation: "Le palmier à huile ne garde rien — ses fruits rouges apartiennent à tout le monde.",
+    proverbes: [
+      "Le palmier à huile ne garde rien — ses fruits rouges appartiennent à tout le monde.",
+      "L'huile rouge du palmier ne se cache pas — ainsi la vraie générosité est visible.",
+      "Qui a un frère palmiste ne meurt pas de faim — ainsi qui a un ami généreux est riche.",
+    ],
+    legendes: [
+      "La légende ibo raconte que le palmier à huile fut planté par Chukwu au centre du premier village créé. Ses fruits rouges représentaient le sang de la création — et qui le consommait participait à la vie divine. Depuis, l'huile de palme rouge est la première offrande faite aux divinités ibo avant toute cérémonie.",
+    ],
+    conseilsDeVie: [
+      "Offre ta générosité sans compter — comme le palmier dont les régimes nourrissent des familles entières.",
+      "Développe ta polyvalence — le palmier à huile est utile du fruit au bois.",
+      "Mets de la passion et de la chaleur dans tout ce que tu produis.",
+    ],
+    niveauSpirituel: 4,
+    regionOrigine: "Forêts tropicales humides — Côte d'Ivoire, Nigeria, Ghana, Congo",
+    couleur: '#C83020',
+    couleurSecondaire: '#8B1A0A',
+    enseignementDuJour:
+      "Aujourd'hui, sois généreux avec ardeur dans un domaine qui te tient à cœur. Le palmier rouge donne sans retenue.",
+    vertus: ['Huile riche en vitamine E', 'Acide palmitique et oléique', 'Caroténoïdes antioxydants', 'Vitamine K', 'Coenzyme Q10'],
+    usagesTraditionnels: ['Huile de palme rouge (cuisine)', 'Huile palmiste (cosmétique)', 'Vin de palme', 'Savon traditionnel', 'Onction rituelle des autels'],
+  },
+
+  {
+    id: 'cocotier',
+    nom: 'Cocotier',
+    nomAnglais: 'Coconut Palm',
+    nomScientifique: 'Cocos nucifera',
+    categorie: 'Palmiers',
+    element: 'Eau',
+    description:
+      "Le Cocotier est l'Arbre de la Côte, le palmier voyageur dont les noix naviguent sur les océans depuis des millénaires pour coloniser de nouveaux rivages. Il symbolise l'aventure du voyage, la confiance dans les courants de la vie et l'abondance des côtes où la mer et la terre se rencontrent.",
+    symboliqueAfricaine:
+      "Dans les traditions côtières d'Afrique de l'Ouest — Sénégal, Côte d'Ivoire, Ghana, Nigeria — le cocotier est l'arbre des pêcheurs et des navigateurs. Ses fronds agités par le vent sont lus comme des messages des esprits marins. L'eau de coco est offerte aux visiteurs arrivant de la mer — symbole d'hospitalité et de purification après le voyage.",
+    symboliqueSpirirtuelle:
+      "Le Cocotier symbolise la confiance dans le voyage — sa noix se lance dans l'océan sans savoir où elle s'enracinera. Il enseigne que certains destins nécessitent de naviguer à la dérive, de faire confiance aux courants plutôt que de forcer la direction. Ses racines profondes dans le sable tenu par le vent représentent l'ancrage malgré l'incertitude.",
+    symbolique: "Symbole de confiance dans le voyage, d'abondance côtière et d'hospitalité universelle.",
+    qualites: ['Confiance dans le voyage', 'Hospitalité généreuse', 'Adaptabilité maritime', 'Ancrage dans l\'incertitude', 'Abondance légère'],
+    defauts: ['Déracinement facile', 'Dispersion possible', 'Fragilité aux grandes tempêtes', 'Nostalgie des rivages'],
+    pouvoirs: ['Voyage sacré', 'Purification maritime', 'Hospitalité divine', 'Confiance dans les courants'],
+    enseignements: [
+      "Fais confiance aux courants de la vie — ils t'emmènent là où tu dois aller",
+      "L'hospitalité est la plus haute forme de la générosité",
+      "Voyage léger — les cocotiers ne portent que leurs noix",
+      "Enracine-toi profondément même sur les sables mouvants de l'incertitude",
+    ],
+    citation: "La noix de coco ne choisit pas sa rive — mais partout où elle s'échoue, elle donne tout.",
+    proverbes: [
+      "La noix de coco ne choisit pas sa rive — mais partout où elle s'échoue, elle donne tout.",
+      "Celui qui offre l'eau de coco à l'étranger reçoit la bénédiction de la mer.",
+      "Le cocotier penché vers la mer n'a pas peur de tomber — il sait que l'eau le rattrapera.",
+    ],
+    legendes: [
+      "La légende des pêcheurs alladian de la Côte d'Ivoire raconte qu'une famille perdue en mer fut guidée vers la côte par la lumière qui brillait à travers les fronds d'un cocotier. Ils comprirent que les esprits des ancêtres s'étaient installés dans l'arbre pour les guider. Depuis, les pêcheurs plantent un cocotier sur la rive pour y appeler les esprits protecteurs des navigateurs.",
+    ],
+    conseilsDeVie: [
+      "Fais confiance au voyage même quand tu n'en vois pas la destination.",
+      "Accueille les étrangers et les voyageurs avec générosité — ils portent des bénédictions.",
+      "Ancre-toi dans tes valeurs profondes même en terrain instable.",
+    ],
+    niveauSpirituel: 3,
+    regionOrigine: "Côtes d'Afrique de l'Ouest — Sénégal, Guinée, Côte d'Ivoire, Ghana, Nigeria",
+    couleur: '#3D8A6A',
+    couleurSecondaire: '#1A5A3A',
+    enseignementDuJour:
+      "Aujourd'hui, fais confiance à un courant dans ta vie que tu voulais contrôler. Le cocotier voyage sans peur — et trouve toujours une rive.",
+    vertus: ['Eau de coco électrolytes naturels', 'Huile de coco anti-microbienne', 'Chair nutritive', 'Acide laurique immuno-stimulant'],
+    usagesTraditionnels: ['Eau de coco purifiante', 'Huile de coco cosmétique', 'Chair alimentaire', 'Huile pour rituels', 'Lait de coco en cuisine'],
+  },
 ];
 
 export const CATEGORIES: AnimalCategorie[] = [

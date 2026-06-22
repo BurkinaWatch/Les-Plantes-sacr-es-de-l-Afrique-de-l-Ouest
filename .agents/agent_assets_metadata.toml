@@ -502,13 +502,97 @@ title = "generated_image"
 id = "X8CksOVYLo49ME2H47rbG"
 uri = "file://artifacts/mobile/assets/images/plants/ronier.png"
 type = "image"
-title = "generated_image"
+title = "borassus palm West Africa"
 
 [[generated]]
 id = "KQBWlGslQzdJj8UVMpTec"
 uri = "file://artifacts/mobile/assets/images/plants/dattier.png"
 type = "image"
 title = "generated_image"
+
+[[generated]]
+id = "Jn09DBQf34PXQDIzHcLJJ"
+uri = "file://artifacts/mobile/assets/images/plants/bissap.png"
+type = "image"
+title = "bissap hibiscus plant"
+
+[[generated]]
+id = "FENuZHUfE6YesZhKn9Bnw"
+uri = "file://artifacts/mobile/assets/images/plants/kinkeliba.png"
+type = "image"
+title = "kinkeliba plant West Africa"
+
+[[generated]]
+id = "3bktEC-TF4e9HDGnwiwPG"
+uri = "file://artifacts/mobile/assets/images/plants/igname.png"
+type = "image"
+title = "igname yam plant Africa"
+
+[[generated]]
+id = "c2ODBd75a7A0tVCu38TEj"
+uri = "file://artifacts/mobile/assets/images/plants/manioc.png"
+type = "image"
+title = "manioc cassava plant"
+
+[[generated]]
+id = "SLZw_pewREPsZd_YWhnf7"
+uri = "file://artifacts/mobile/assets/images/plants/arachide.png"
+type = "image"
+title = "arachide peanut plant"
+
+[[generated]]
+id = "QozCZaE-IjBAPyDxXOYdp"
+uri = "file://artifacts/mobile/assets/images/plants/sorgho.png"
+type = "image"
+title = "sorghum grain plant Africa"
+
+[[generated]]
+id = "RHSjVKJ4Wd_v3nIhIuvlF"
+uri = "file://artifacts/mobile/assets/images/plants/fonio.png"
+type = "image"
+title = "fonio sacred grain Africa"
+
+[[generated]]
+id = "U6dioEeLANQxdPQtEzWRK"
+uri = "file://artifacts/mobile/assets/images/plants/iroko.png"
+type = "image"
+title = "iroko sacred tree Africa"
+
+[[generated]]
+id = "0YpyOE68zAV_a5cD4UIR-"
+uri = "file://artifacts/mobile/assets/images/plants/palmier-huile.png"
+type = "image"
+title = "oil palm tree Africa"
+
+[[generated]]
+id = "mrIydLa2oIz3EzaMa4ElY"
+uri = "file://artifacts/mobile/assets/images/plants/cocotier.png"
+type = "image"
+title = "coconut palm tree Africa"
+
+[[generated]]
+id = "RAq8SUH1aWO2dOu9E-Qg9"
+uri = "file://artifacts/mobile/assets/images/plants/basilic-africain.png"
+type = "image"
+title = "African basil ritual herb"
+
+[[generated]]
+id = "6_cLnuzczB86mSmmj7bW1"
+uri = "file://artifacts/mobile/assets/images/plants/kalanchoe.png"
+type = "image"
+title = "kalanchoe succulent Africa"
+
+[[generated]]
+id = "J8VaYZ58RIHrgf4NEI_dm"
+uri = "file://artifacts/mobile/assets/images/plants/sesame.png"
+type = "image"
+title = "sesame plant flowers pods"
+
+[[generated]]
+id = "o516QDecQKtJneGaWzF4P"
+uri = "file://artifacts/mobile/assets/images/plants/artemisia.png"
+type = "image"
+title = "artemisia wormwood Africa"
 
 [[outputs]]
 id = "a_w4uSYXiM09eT84cCfYU"
