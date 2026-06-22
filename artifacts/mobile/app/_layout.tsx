@@ -1,6 +1,6 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import * as Font from "expo-font";
-import { Stack } from "expo-router";
+import { Stack, useRouter, useSegments } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import React, { useEffect, useRef, useState } from "react";
 import {
@@ -8,17 +8,22 @@ import {
   Dimensions,
   Image,
   Platform,
+  Pressable,
   StyleSheet,
   Text,
   View,
 } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
-import { SafeAreaProvider } from "react-native-safe-area-context";
+import { SafeAreaProvider, useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { AppProvider } from "@/context/AppContext";
 import { AuthProvider, useAuth } from "@/context/AuthContext";
+import { useColors } from "@/hooks/useColors";
 import { LanguageProvider } from "@/i18n";
+
+let Feather: any = null;
+try { Feather = require("@expo/vector-icons").Feather; } catch {}
 
 SplashScreen.preventAutoHideAsync();
 
@@ -140,18 +145,92 @@ function AnimatedSplash({ onFinish }: { onFinish: () => void }) {
   );
 }
 
+/* ── FAB Scanner ────────────────────────────────────────────────── */
+const FAB_SIZE = 58;
+
+function ScannerFab() {
+  const segments = useSegments();
+  const router = useRouter();
+  const insets = useSafeAreaInsets();
+  const colors = useColors();
+
+  const isInTabs = segments[0] === "(tabs)" && segments[1] !== "scanner";
+  if (!isInTabs) return null;
+
+  const tabBarH = Platform.OS === "web" ? 84 : 49 + insets.bottom;
+  const fabBottom = tabBarH + 16;
+
+  return (
+    <View
+      style={[fabStyles.row, { bottom: fabBottom, pointerEvents: "box-none" }]}
+    >
+      <Pressable
+        onPress={() => router.push("/(tabs)/scanner")}
+        style={({ pressed }) => [
+          fabStyles.btn,
+          {
+            backgroundColor: colors.gold,
+            opacity: pressed ? 0.85 : 1,
+            transform: [{ scale: pressed ? 0.93 : 1 }],
+          },
+          Platform.select({
+            ios: {
+              shadowColor: "#C8A020",
+              shadowOffset: { width: 0, height: 4 },
+              shadowOpacity: 0.55,
+              shadowRadius: 10,
+            },
+            android: {},
+            web: { boxShadow: "0 4px 20px rgba(200,160,32,0.6)" } as any,
+          }),
+        ]}
+        accessibilityLabel="Scanner une plante"
+        accessibilityRole="button"
+      >
+        {Feather ? (
+          <Feather name="camera" size={26} color={colors.background} />
+        ) : (
+          <Text style={{ fontSize: 22 }}>📷</Text>
+        )}
+      </Pressable>
+    </View>
+  );
+}
+
+const fabStyles = StyleSheet.create({
+  row: {
+    position: "absolute",
+    left: 0,
+    right: 0,
+    alignItems: "center",
+    zIndex: 999,
+    elevation: 12,
+  },
+  btn: {
+    width: FAB_SIZE,
+    height: FAB_SIZE,
+    borderRadius: FAB_SIZE / 2,
+    alignItems: "center",
+    justifyContent: "center",
+    elevation: 12,
+  },
+});
+
 /* ── Navigation ────────────────────────────────────────────────── */
 function RootLayoutNav() {
   const { isLoading } = useAuth();
   if (isLoading) return null;
 
   return (
-    <Stack screenOptions={{ headerShown: false }}>
-      <Stack.Screen name="(tabs)"      options={{ headerShown: false }} />
-      <Stack.Screen name="animal/[id]" options={{ headerShown: false, presentation: "card" }} />
-      <Stack.Screen name="(auth)"      options={{ headerShown: false }} />
-      <Stack.Screen name="chat-totem"  options={{ headerShown: false, presentation: "card" }} />
-    </Stack>
+    <View style={{ flex: 1 }}>
+      <Stack screenOptions={{ headerShown: false }}>
+        <Stack.Screen name="(tabs)"      options={{ headerShown: false }} />
+        <Stack.Screen name="animal/[id]" options={{ headerShown: false, presentation: "card" }} />
+        <Stack.Screen name="(auth)"      options={{ headerShown: false }} />
+        <Stack.Screen name="chat-totem"  options={{ headerShown: false, presentation: "card" }} />
+      </Stack>
+      <ScannerFab />
+    </View>
   );
 }
 
