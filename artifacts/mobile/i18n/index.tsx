@@ -21,8 +21,6 @@ export const LANG_CODES = Object.keys(LANG_NAMES) as LangCode[];
 
 export interface QuizQuestion18n {
   q: string;
-  a: string;
-  b: string;
 }
 
 export interface Translations {
@@ -123,6 +121,11 @@ export interface Translations {
   dim_C_desc: string;
   dim_A_desc: string;
   dim_S_desc: string;
+
+  // ── QUIZ LIKERT LABELS
+  quiz_likert_low: string;
+  quiz_likert_high: string;
+  quiz_likert_instruction: string;
 
   // ── QUIZ QUESTIONS (20)
   quiz_questions: QuizQuestion18n[];

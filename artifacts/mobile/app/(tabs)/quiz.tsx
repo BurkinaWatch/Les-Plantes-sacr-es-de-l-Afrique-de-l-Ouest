@@ -14,13 +14,15 @@ import {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { useApp } from '@/context/AppContext';
-import { QUIZ_QUESTIONS, TOTEM_RESULTS, calculateTotem, type QuizAnswers } from '@/data/quiz';
+import { QUIZ_QUESTIONS, TOTEM_RESULTS, calculateTotem, type LikertValue, type QuizAnswers } from '@/data/quiz';
 import { useColors } from '@/hooks/useColors';
 import { useTranslation } from '@/i18n';
 
 const DIM_ICONS: Record<string, string> = {
   E: '☀', O: '◎', C: '⬟', A: '◈', S: '∞',
 };
+
+const LIKERT_VALUES: LikertValue[] = [1, 2, 3, 4, 5];
 
 type Screen = 'welcome' | 'charte' | 'quiz' | 'result';
 
@@ -35,6 +37,7 @@ export default function QuizScreen() {
   const [currentQ, setCurrentQ] = useState(0);
   const [answers, setAnswers] = useState<QuizAnswers>({});
   const [result, setResult] = useState<ReturnType<typeof calculateTotem> | null>(null);
+  const [selectedValue, setSelectedValue] = useState<LikertValue | null>(null);
 
   const fadeAnim = useRef(new Animated.Value(1)).current;
   const topPad = Platform.OS === 'web' ? Math.max(insets.top, 67) : insets.top;
@@ -47,29 +50,34 @@ export default function QuizScreen() {
     S: { label: t.dim_S_label, icon: DIM_ICONS.S, desc: t.dim_S_desc },
   };
 
-  function handleAnswer(option: 'A' | 'B') {
+  function handleAnswer(value: LikertValue) {
+    if (selectedValue !== null) return;
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    setSelectedValue(value);
+
     const question = QUIZ_QUESTIONS[currentQ];
-    const newAnswers = { ...answers, [question.id]: option };
+    const newAnswers: QuizAnswers = { ...answers, [question.id]: value };
     setAnswers(newAnswers);
 
-    Animated.sequence([
-      Animated.timing(fadeAnim, { toValue: 0, duration: 180, useNativeDriver: true }),
-      Animated.timing(fadeAnim, { toValue: 1, duration: 250, useNativeDriver: true }),
-    ]).start();
-
-    if (currentQ < QUIZ_QUESTIONS.length - 1) {
-      setTimeout(() => setCurrentQ(currentQ + 1), 180);
-    } else {
-      const calc = calculateTotem(newAnswers);
-      setResult(calc);
-      setQuizResult({
-        primary: calc.primary,
-        secondary: calc.secondary,
-        completedAt: new Date().toISOString(),
-      });
-      setTimeout(() => setScreen('result'), 300);
-    }
+    setTimeout(() => {
+      setSelectedValue(null);
+      if (currentQ < QUIZ_QUESTIONS.length - 1) {
+        Animated.sequence([
+          Animated.timing(fadeAnim, { toValue: 0, duration: 160, useNativeDriver: true }),
+          Animated.timing(fadeAnim, { toValue: 1, duration: 240, useNativeDriver: true }),
+        ]).start();
+        setTimeout(() => setCurrentQ((q) => q + 1), 160);
+      } else {
+        const calc = calculateTotem(newAnswers);
+        setResult(calc);
+        setQuizResult({
+          primary: calc.primary,
+          secondary: calc.secondary,
+          completedAt: new Date().toISOString(),
+        });
+        setTimeout(() => setScreen('result'), 300);
+      }
+    }, 380);
   }
 
   function handleRestart() {
@@ -77,6 +85,7 @@ export default function QuizScreen() {
     setCurrentQ(0);
     setAnswers({});
     setResult(null);
+    setSelectedValue(null);
     clearQuizResult();
   }
 
@@ -219,7 +228,6 @@ export default function QuizScreen() {
   if (screen === 'result' && result) {
     const totem = TOTEM_RESULTS[result.primary];
     const secondary = TOTEM_RESULTS[result.secondary];
-    const maxDimScore = 8;
 
     return (
       <ScrollView
@@ -243,8 +251,7 @@ export default function QuizScreen() {
           <View style={[styles.card, { backgroundColor: colors.card, borderColor: colors.border }]}>
             <Text style={[styles.cardLabel, { color: colors.gold }]}>{t.quiz_result_profile_title}</Text>
             {(['E', 'O', 'C', 'A', 'S'] as const).map((d) => {
-              const score = result.dimensionScores[d] ?? 0;
-              const pct = Math.min(Math.round((score / maxDimScore) * 100), 100);
+              const pct = result.dimensionScores[d] ?? 0;
               const dim = DIMENSION_LABELS[d];
               return (
                 <View key={d} style={{ gap: 4 }}>
@@ -313,14 +320,16 @@ export default function QuizScreen() {
     );
   }
 
-  // ── QUESTIONS ────────────────────────────────────────────────
+  // ── QUESTIONS (LIKERT) ───────────────────────────────────────
   const question = QUIZ_QUESTIONS[currentQ];
   const translatedQ = t.quiz_questions[currentQ];
   const progress = (currentQ / QUIZ_QUESTIONS.length) * 100;
   const dimInfo = DIMENSION_LABELS[question.dimension as keyof typeof DIMENSION_LABELS];
+  const statementText = translatedQ?.q ?? question.statement;
 
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
+      {/* ── EN-TÊTE ─────────────────────────────── */}
       <View style={[styles.quizHeader, { paddingTop: topPad + 16, paddingHorizontal: 20, borderBottomColor: colors.border }]}>
         <View style={styles.quizHeaderRow}>
           <Text style={[styles.quizCounter, { color: colors.mutedForeground }]}>
@@ -331,35 +340,64 @@ export default function QuizScreen() {
           </View>
         </View>
         <View style={[styles.progressTrack, { backgroundColor: colors.card }]}>
-          <Animated.View style={[styles.progressFill, { width: `${progress}%` as any, backgroundColor: colors.gold }]} />
+          <View style={[styles.progressFill, { width: `${progress}%` as any, backgroundColor: colors.gold }]} />
         </View>
       </View>
 
-      <Animated.View style={[styles.questionContainer, { opacity: fadeAnim, paddingHorizontal: 20 }]}>
-        <Text style={[styles.questionText, { color: colors.ivory }]}>{translatedQ?.q ?? question.question}</Text>
+      {/* ── AFFIRMATION ──────────────────────────── */}
+      <Animated.View style={[styles.questionContainer, { opacity: fadeAnim, paddingHorizontal: 24 }]}>
+        <Text style={[styles.instructionText, { color: colors.mutedForeground }]}>
+          {t.quiz_likert_instruction}
+        </Text>
+        <Text style={[styles.questionText, { color: colors.ivory }]}>{statementText}</Text>
       </Animated.View>
 
-      <View style={[styles.optionsContainer, { paddingHorizontal: 20, gap: 14, paddingBottom: 90 + insets.bottom }]}>
-        {(['A', 'B'] as const).map((opt) => {
-          const optionText = opt === 'A'
-            ? (translatedQ?.a ?? question.optionA.texte)
-            : (translatedQ?.b ?? question.optionB.texte);
-          return (
-            <Pressable
-              key={opt}
-              style={({ pressed }) => [
-                styles.optionBtn,
-                { backgroundColor: pressed ? colors.card : colors.warmBrown, borderColor: pressed ? colors.gold : colors.border, opacity: pressed ? 0.95 : 1 },
-              ]}
-              onPress={() => handleAnswer(opt)}
-            >
-              <View style={[styles.optionLetter, { backgroundColor: colors.gold + '20', borderColor: colors.gold + '40' }]}>
-                <Text style={[styles.optionLetterText, { color: colors.gold }]}>{opt}</Text>
-              </View>
-              <Text style={[styles.optionText, { color: colors.ivory }]}>{optionText}</Text>
-            </Pressable>
-          );
-        })}
+      {/* ── ÉCHELLE DE LIKERT ────────────────────── */}
+      <View style={[styles.likertSection, { paddingHorizontal: 20, paddingBottom: 90 + insets.bottom }]}>
+        <View style={styles.likertRow}>
+          {LIKERT_VALUES.map((val) => {
+            const isSelected = selectedValue === val;
+            const isNear = selectedValue !== null && Math.abs(val - (selectedValue ?? 0)) <= 0;
+            return (
+              <Pressable
+                key={val}
+                onPress={() => handleAnswer(val)}
+                disabled={selectedValue !== null}
+                style={({ pressed }) => [
+                  styles.likertCircle,
+                  {
+                    backgroundColor: isSelected
+                      ? colors.gold
+                      : pressed
+                      ? colors.gold + '30'
+                      : colors.card,
+                    borderColor: isSelected
+                      ? colors.gold
+                      : pressed
+                      ? colors.gold + '80'
+                      : colors.border,
+                    transform: [{ scale: isSelected ? 1.12 : 1 }],
+                  },
+                ]}
+              >
+                <Text
+                  style={[
+                    styles.likertCircleText,
+                    { color: isSelected ? colors.deepBrown : colors.ivory },
+                  ]}
+                >
+                  {val}
+                </Text>
+              </Pressable>
+            );
+          })}
+        </View>
+
+        {/* ── LABELS EXTRÉMITÉS ─────────────────── */}
+        <View style={styles.likertLabels}>
+          <Text style={[styles.likertEndLabel, { color: colors.mutedForeground }]}>{t.quiz_likert_low}</Text>
+          <Text style={[styles.likertEndLabel, { color: colors.mutedForeground, textAlign: 'right' }]}>{t.quiz_likert_high}</Text>
+        </View>
       </View>
     </View>
   );
@@ -375,7 +413,7 @@ const styles = StyleSheet.create({
   startLabel: { fontSize: 11, fontWeight: '700' as const, letterSpacing: 2.5, marginBottom: 12 },
   startTitle: { fontSize: 40, fontWeight: '800' as const, letterSpacing: 1 },
   startTitleAccent: { fontSize: 40, fontWeight: '800' as const, letterSpacing: 1, marginTop: -4 },
-  startSubtitle: { fontSize: 15, lineHeight: 22, marginTop: 16, fontWeight: '400' as const },
+  startSubtitle: { fontSize: 14, lineHeight: 21, marginTop: 16, fontWeight: '400' as const },
 
   featureItem: { flexDirection: 'row', alignItems: 'center', padding: 16, borderRadius: 14, borderWidth: 1, gap: 14 },
   featureIcon: { fontSize: 22 },
@@ -437,12 +475,21 @@ const styles = StyleSheet.create({
   progressTrack: { height: 4, borderRadius: 2, overflow: 'hidden' },
   progressFill: { height: '100%', borderRadius: 2 },
 
-  questionContainer: { flex: 1, justifyContent: 'center', paddingVertical: 32 },
+  questionContainer: { flex: 1, justifyContent: 'center', gap: 16, paddingVertical: 24 },
+  instructionText: { fontSize: 12, fontWeight: '500' as const, letterSpacing: 0.5, textTransform: 'uppercase' },
   questionText: { fontSize: 22, fontWeight: '700' as const, lineHeight: 32, letterSpacing: 0.2 },
 
-  optionsContainer: { justifyContent: 'flex-end' },
-  optionBtn: { flexDirection: 'row', alignItems: 'center', padding: 18, borderRadius: 16, borderWidth: 1, gap: 14 },
-  optionLetter: { width: 34, height: 34, borderRadius: 10, borderWidth: 1, alignItems: 'center', justifyContent: 'center' },
-  optionLetterText: { fontSize: 13, fontWeight: '800' as const },
-  optionText: { fontSize: 15, flex: 1, lineHeight: 22, fontWeight: '500' as const },
+  likertSection: { justifyContent: 'flex-end', gap: 14 },
+  likertRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
+  likertCircle: {
+    width: 54,
+    height: 54,
+    borderRadius: 27,
+    borderWidth: 1.5,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  likertCircleText: { fontSize: 17, fontWeight: '700' as const },
+  likertLabels: { flexDirection: 'row', justifyContent: 'space-between' },
+  likertEndLabel: { fontSize: 11, fontWeight: '500' as const, flex: 1 },
 });
