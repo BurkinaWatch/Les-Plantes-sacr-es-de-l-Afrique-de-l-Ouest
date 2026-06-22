@@ -1,0 +1,3 @@
+- [i18n system](i18n-system.md) — lightweight custom i18n without external packages; LanguageProvider wraps AppProvider in app/_layout.tsx
+- [Auth system](auth-system.md) — username/password + JWT; bcrypt needs onlyBuiltDependencies approval; zod must be explicit dep of api-server
+- [Expo Replit config](expo-replit-config.md) — REACT_NATIVE_PACKAGER_HOSTNAME must be $REPLIT_EXPO_DEV_DOMAIN; Google Fonts timeout fix; metro.config.js CORS setup

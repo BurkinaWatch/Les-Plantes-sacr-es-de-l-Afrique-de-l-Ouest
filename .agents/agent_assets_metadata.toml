@@ -1,0 +1,709 @@
+uploads = []
+
+[[generated]]
+id = "Hrt6_L9ZRgjWvTC7DbbYH"
+uri = "file://artifacts/mobile/assets/images/icon.png"
+type = "image"
+title = "generated_image"
+
+[[generated]]
+id = "iRESwrFlxz9fSlkiaK4AM"
+uri = "file://artifacts/mobile/assets/images/hero.png"
+type = "image"
+title = "savanna watering hole giraffe zebra hippo flamingo"
+
+[[generated]]
+id = "faFinH8zQejrszvj66f9o"
+uri = "file://artifacts/mobile/assets/images/lion.png"
+type = "image"
+title = "generated_image"
+
+[[generated]]
+id = "OJfQJZ1WMMPh6U0hI29Mi"
+uri = "file://artifacts/mobile/assets/images/elephant.png"
+type = "image"
+title = "generated_image"
+
+[[generated]]
+id = "8NkIehbZnlhJgPVg8nmfn"
+uri = "file://artifacts/mobile/assets/images/leopard.png"
+type = "image"
+title = "generated_image"
+
+[[generated]]
+id = "C1nKZzMWiryIogg85puLc"
+uri = "file://artifacts/mobile/assets/images/crocodile.png"
+type = "image"
+title = "generated_image"
+
+[[generated]]
+id = "p3hWu6Kgscic4pSHdGknT"
+uri = "file://artifacts/mobile/assets/images/aigle.png"
+type = "image"
+title = "generated_image"
+
+[[generated]]
+id = "jVLewsfz6xeOaV0KxJfFo"
+uri = "file://artifacts/mobile/assets/images/serpent.png"
+type = "image"
+title = "generated_image"
+
+[[generated]]
+id = "ZDlZKFZLisEjqqIlYytkp"
+uri = "file://artifacts/mobile/assets/images/grenouille.png"
+type = "image"
+title = "generated_image"
+
+[[generated]]
+id = "Gawv3vTfIFN_vkHYuifqN"
+uri = "file://artifacts/mobile/assets/images/hippopotame.png"
+type = "image"
+title = "generated_image"
+
+[[generated]]
+id = "ybSy9CLAXqQS_5YSHY-6I"
+uri = "file://artifacts/mobile/assets/images/panthere.png"
+type = "image"
+title = "generated_image"
+
+[[generated]]
+id = "Gw21mCf3pfTt4gkEpk2Ll"
+uri = "file://artifacts/mobile/assets/images/cigogne.png"
+type = "image"
+title = "generated_image"
+
+[[generated]]
+id = "l74to1qT6GiFWZiDuokVS"
+uri = "file://artifacts/mobile/assets/images/tortue.png"
+type = "image"
+title = "generated_image"
+
+[[generated]]
+id = "hl8JqZDqq5WGvuD4am005"
+uri = "file://artifacts/mobile/assets/images/cameleon.png"
+type = "image"
+title = "generated_image"
+
+[[generated]]
+id = "mx2OhtNtxs6AHK-VGzV9K"
+uri = "file://artifacts/mobile/assets/images/vautour.png"
+type = "image"
+title = "generated_image"
+
+[[generated]]
+id = "nugFf-nQW12ryBQBZsZbM"
+uri = "file://artifacts/mobile/assets/images/poisson-chat.png"
+type = "image"
+title = "generated_image"
+
+[[generated]]
+id = "vZlJ8Q8yd7uCXUaCMPh_3"
+uri = "file://artifacts/mobile/assets/images/hyene.png"
+type = "image"
+title = "generated_image"
+
+[[generated]]
+id = "qQHnmBlVGLQaowB77XonM"
+uri = "file://artifacts/mobile/assets/images/lezard.png"
+type = "image"
+title = "generated_image"
+
+[[generated]]
+id = "Dw_KnxWn-mkrLqLefLlIs"
+uri = "file://artifacts/mobile/assets/images/singe.png"
+type = "image"
+title = "generated_image"
+
+[[generated]]
+id = "cgG9B4T77HMzDVdVf0xIT"
+uri = "file://artifacts/mobile/assets/images/souris.png"
+type = "image"
+title = "generated_image"
+
+[[generated]]
+id = "dSGDxPEK-7mJ0Vjr4sGSt"
+uri = "file://artifacts/mobile/assets/images/calao.png"
+type = "image"
+title = "generated_image"
+
+[[generated]]
+id = "sicuVzRbpZIywSbU4sLoH"
+uri = "file://artifacts/mobile/assets/images/cheval.png"
+type = "image"
+title = "generated_image"
+
+[[generated]]
+id = "HQSrRI08rf_6gYTz7Tm_X"
+uri = "file://artifacts/mobile/assets/images/iguane.png"
+type = "image"
+title = "generated_image"
+
+[[generated]]
+id = "LbfyK5iqnXQea67oX93vk"
+uri = "file://artifacts/mobile/assets/images/chevre.png"
+type = "image"
+title = "generated_image"
+
+[[generated]]
+id = "JkiYIXfjvjdEBwhgfQ57M"
+uri = "file://artifacts/mobile/assets/images/pintade.png"
+type = "image"
+title = "generated_image"
+
+[[generated]]
+id = "M7AmdbGdxH8x7hNk0KvpY"
+uri = "file://artifacts/mobile/assets/images/lievre.png"
+type = "image"
+title = "generated_image"
+
+[[generated]]
+id = "eKycDwvJ-0AaGqIvHI9O-"
+uri = "file://artifacts/mobile/assets/images/colombe.png"
+type = "image"
+title = "generated_image"
+
+[[generated]]
+id = "KHDulE5Px7twXvTjMxvKp"
+uri = "file://artifacts/mobile/assets/images/poisson.png"
+type = "image"
+title = "generated_image"
+
+[[generated]]
+id = "AK8jxUCVzW6XyMNZMPm3l"
+uri = "file://artifacts/mobile/assets/images/cerf.png"
+type = "image"
+title = "generated_image"
+
+[[generated]]
+id = "i150_c284o05cycKscMGm"
+uri = "file://artifacts/mobile/assets/images/chien.png"
+type = "image"
+title = "generated_image"
+
+[[generated]]
+id = "HNzOppZ9zqIXstzNLclsT"
+uri = "file://artifacts/mobile/assets/images/ane.png"
+type = "image"
+title = "generated_image"
+
+[[generated]]
+id = "y8BJGZGJ7K5KsP-SaJwhn"
+uri = "file://artifacts/mobile/assets/images/antilope.png"
+type = "image"
+title = "generated_image"
+
+[[generated]]
+id = "h4-HfHLw5ojL4xTZ3lZ7w"
+uri = "file://artifacts/mobile/assets/images/tatou.png"
+type = "image"
+title = "generated_image"
+
+[[generated]]
+id = "EMrOr3ihJ8fSYNQiI9f-F"
+uri = "file://artifacts/mobile/assets/images/poulet.png"
+type = "image"
+title = "generated_image"
+
+[[generated]]
+id = "bboFKIKm-oOa5G2F-OPGj"
+uri = "file://artifacts/mobile/assets/images/cochon.png"
+type = "image"
+title = "generated_image"
+
+[[generated]]
+id = "oNFHhPbEy0SSnV6xwzT1m"
+uri = "file://artifacts/mobile/assets/images/pigeon.png"
+type = "image"
+title = "generated_image"
+
+[[generated]]
+id = "hFATrlHFh4k3Yhb2sgCr2"
+uri = "file://artifacts/mobile/assets/images/lapin.png"
+type = "image"
+title = "generated_image"
+
+[[generated]]
+id = "SgvH55IMhuJ3w5oxXO6Gq"
+uri = "file://artifacts/mobile/assets/images/porc-epic.png"
+type = "image"
+title = "generated_image"
+
+[[generated]]
+id = "lVUCihG1WFq2_WMKWnT5u"
+uri = "file://artifacts/mobile/assets/images/rat.png"
+type = "image"
+title = "generated_image"
+
+[[generated]]
+id = "tzS9puMBnESDf0o-Pv41Z"
+uri = "file://artifacts/mobile/assets/images/escargot.png"
+type = "image"
+title = "generated_image"
+
+[[generated]]
+id = "GH_mS5TA7Iz6Bm52nQbp2"
+uri = "file://artifacts/mobile/assets/images/ecureuil.png"
+type = "image"
+title = "generated_image"
+
+[[generated]]
+id = "1V2ZhQVweUa6RtTjHKvc3"
+uri = "file://artifacts/mobile/assets/images/cygne.png"
+type = "image"
+title = "generated_image"
+
+[[generated]]
+id = "60TRLPTd7TDivdITgXXCA"
+uri = "file://artifacts/mobile/assets/images/gorille.png"
+type = "image"
+title = "generated_image"
+
+[[generated]]
+id = "UkZrT-0DluNEP2rB6ficU"
+uri = "file://artifacts/mobile/assets/images/buffle.png"
+type = "image"
+title = "generated_image"
+
+[[generated]]
+id = "heRgfI6McoxYpLkEmBR_J"
+uri = "file://artifacts/mobile/assets/images/rhinoceros.png"
+type = "image"
+title = "generated_image"
+
+[[generated]]
+id = "ScVWJ94qbrRwJbo_ua-Lp"
+uri = "file://artifacts/mobile/assets/images/guepard.png"
+type = "image"
+title = "generated_image"
+
+[[generated]]
+id = "OweKcsSdW6zaCHjAlaQoh"
+uri = "file://artifacts/mobile/assets/images/gnou.png"
+type = "image"
+title = "generated_image"
+
+[[generated]]
+id = "M369xzIyiBsFU1U081U6b"
+uri = "file://artifacts/mobile/assets/images/araignee.png"
+type = "image"
+title = "generated_image"
+
+[[generated]]
+id = "d8Hodim8pazq441BceC60"
+uri = "file://artifacts/mobile/assets/images/scorpion.png"
+type = "image"
+title = "generated_image"
+
+[[generated]]
+id = "OG4dNyhN0v1ad0mPa0ZnB"
+uri = "file://artifacts/mobile/assets/images/pangolin.png"
+type = "image"
+title = "generated_image"
+
+[[generated]]
+id = "wbW1kmjuxKFnApSbNuiaj"
+uri = "file://artifacts/mobile/assets/images/perroquet.png"
+type = "image"
+title = "generated_image"
+
+[[generated]]
+id = "6UOk3gyI3mhbEJJpJuWeu"
+uri = "file://artifacts/mobile/assets/images/ibis.png"
+type = "image"
+title = "generated_image"
+
+[[generated]]
+id = "MVwh8NAef0EN-nDNHzDkm"
+uri = "file://artifacts/mobile/assets/images/flamant.png"
+type = "image"
+title = "generated_image"
+
+[[generated]]
+id = "EymKu2Rs_32C04FDsTbzL"
+uri = "file://artifacts/mobile/assets/images/heron.png"
+type = "image"
+title = "generated_image"
+
+[[generated]]
+id = "by1iYAqQREoE2iwyzX-M1"
+uri = "file://artifacts/mobile/assets/images/zebre.png"
+type = "image"
+title = "generated_image"
+
+[[generated]]
+id = "ava8DHd07AQ0tJuWD8-yw"
+uri = "file://artifacts/mobile/assets/images/girafe.png"
+type = "image"
+title = "generated_image"
+
+[[generated]]
+id = "t4aPsHQfHPap7uU-mAGnb"
+uri = "file://artifacts/mobile/assets/images/mangouste.png"
+type = "image"
+title = "generated_image"
+
+[[generated]]
+id = "UaKOyjBGCGwZIHvn621VR"
+uri = "file://artifacts/mobile/assets/images/phacochère.png"
+type = "image"
+title = "generated_image"
+
+[[generated]]
+id = "JEYWiLHayonQ69m5-tOTD"
+uri = "file://attached_assets/logo_lion.png"
+type = "image"
+title = "logo lion sacred african"
+
+[[generated]]
+id = "6cYur3yDnPq7UKLK7XeYS"
+uri = "file://attached_assets/logo_elephant.png"
+type = "image"
+title = "logo elephant emblem african"
+
+[[generated]]
+id = "pdhh-Vx9e93FT5dBGsz5G"
+uri = "file://attached_assets/logo_baobab.png"
+type = "image"
+title = "logo baobab sacred animals"
+
+[[generated]]
+id = "NwhG1sQwWpn-CcVm8sdzI"
+uri = "file://artifacts/mobile/assets/images/phacochere.png"
+type = "image"
+title = "generated_image"
+
+[[generated]]
+id = "IdZMrIv42zJfZJysYFmkw"
+uri = "file://artifacts/mobile/assets/images/hero-v2.png"
+type = "image"
+title = "bright savanna watering hole giraffe zebra hippo flamingo sunset"
+
+[[outputs]]
+id = "a_w4uSYXiM09eT84cCfYU"
+uri = "file://artifacts/mobile/assets/sounds/elephant.mp3"
+type = "audio"
+title = "sound_effect"
+
+[[outputs]]
+id = "pxu9PqGfkcNSvlGKuP7I3"
+uri = "file://artifacts/mobile/assets/sounds/leopard.mp3"
+type = "audio"
+title = "sound_effect"
+
+[[outputs]]
+id = "3iJZTE4m2_NDNB5TkkVfz"
+uri = "file://artifacts/mobile/assets/sounds/lion.mp3"
+type = "audio"
+title = "sound_effect"
+
+[[outputs]]
+id = "Wgh96uQhEURCfOOORQ6Mg"
+uri = "file://artifacts/mobile/assets/sounds/aigle.mp3"
+type = "audio"
+title = "sound_effect"
+
+[[outputs]]
+id = "BYqNcD5L09dCBPAAhXvom"
+uri = "file://artifacts/mobile/assets/sounds/serpent.mp3"
+type = "audio"
+title = "sound_effect"
+
+[[outputs]]
+id = "10CVHhQEIQ9A2HmdGQiHo"
+uri = "file://artifacts/mobile/assets/sounds/crocodile.mp3"
+type = "audio"
+title = "sound_effect"
+
+[[outputs]]
+id = "64-RoR4jE23YQxFXJYgep"
+uri = "file://artifacts/mobile/assets/sounds/grenouille.mp3"
+type = "audio"
+title = "sound_effect"
+
+[[outputs]]
+id = "oirgWu5pcn5N87Ynl3fql"
+uri = "file://artifacts/mobile/assets/sounds/hippopotame.mp3"
+type = "audio"
+title = "hippopotame"
+
+[[outputs]]
+id = "OEL-ajBFZe2seLIIdBO-u"
+uri = "file://artifacts/mobile/assets/sounds/panthere.mp3"
+type = "audio"
+title = "sound_effect"
+
+[[outputs]]
+id = "IbK0wN4J8N_GnWRWCjICQ"
+uri = "file://artifacts/mobile/assets/sounds/cigogne.mp3"
+type = "audio"
+title = "sound_effect"
+
+[[outputs]]
+id = "tis0aSnNQfPTmKQUG-QuZ"
+uri = "file://artifacts/mobile/assets/sounds/tortue.mp3"
+type = "audio"
+title = "sound_effect"
+
+[[outputs]]
+id = "ITGQbuaIUndutSdJJv9D2"
+uri = "file://artifacts/mobile/assets/sounds/cameleon.mp3"
+type = "audio"
+title = "sound_effect"
+
+[[outputs]]
+id = "mPjETYtDrKyT0WPRg2S3W"
+uri = "file://artifacts/mobile/assets/sounds/hyene.mp3"
+type = "audio"
+title = "sound_effect"
+
+[[outputs]]
+id = "CAZdCINP7dOdJNkYBXXFz"
+uri = "file://artifacts/mobile/assets/sounds/poisson-chat.mp3"
+type = "audio"
+title = "sound_effect"
+
+[[outputs]]
+id = "muNjp_2DnF8z1lfMfFruw"
+uri = "file://artifacts/mobile/assets/sounds/lezard.mp3"
+type = "audio"
+title = "sound_effect"
+
+[[outputs]]
+id = "v8KzEvGjp1TaLx4EoS0-m"
+uri = "file://artifacts/mobile/assets/sounds/singe.mp3"
+type = "audio"
+title = "sound_effect"
+
+[[outputs]]
+id = "7FwP7yNDjuKtHCY_YG9cm"
+uri = "file://artifacts/mobile/assets/sounds/souris.mp3"
+type = "audio"
+title = "sound_effect"
+
+[[outputs]]
+id = "DtuzywRRcYZNq14on_26t"
+uri = "file://artifacts/mobile/assets/sounds/calao.mp3"
+type = "audio"
+title = "sound_effect"
+
+[[outputs]]
+id = "cxzcfIkXQ2RZzORtpQM3y"
+uri = "file://artifacts/mobile/assets/sounds/cheval.mp3"
+type = "audio"
+title = "sound_effect"
+
+[[outputs]]
+id = "JSARu_Qn-QLBUlZKvPkWW"
+uri = "file://artifacts/mobile/assets/sounds/chevre.mp3"
+type = "audio"
+title = "sound_effect"
+
+[[outputs]]
+id = "Dyr39wVRC8Xsq6q3gfjmX"
+uri = "file://artifacts/mobile/assets/sounds/pintade.mp3"
+type = "audio"
+title = "pintade"
+
+[[outputs]]
+id = "SYEAjZcRVdgI-9CAtefgP"
+uri = "file://artifacts/mobile/assets/sounds/lievre.mp3"
+type = "audio"
+title = "sound_effect"
+
+[[outputs]]
+id = "d8--bDdaA-Yxb2iDdZNvX"
+uri = "file://artifacts/mobile/assets/sounds/poisson.mp3"
+type = "audio"
+title = "sound_effect"
+
+[[outputs]]
+id = "77CDUjqh_AQ8P0AjRSiN4"
+uri = "file://artifacts/mobile/assets/sounds/colombe.mp3"
+type = "audio"
+title = "sound_effect"
+
+[[outputs]]
+id = "nDzenjtc6Oj30cn7JE2GI"
+uri = "file://artifacts/mobile/assets/sounds/ane.mp3"
+type = "audio"
+title = "sound_effect"
+
+[[outputs]]
+id = "WQMeLBCMTGNP4560SeXH1"
+uri = "file://artifacts/mobile/assets/sounds/chien.mp3"
+type = "audio"
+title = "sound_effect"
+
+[[outputs]]
+id = "vgtc_Q-j2rReBYO6HOR22"
+uri = "file://artifacts/mobile/assets/sounds/antilope.mp3"
+type = "audio"
+title = "sound_effect"
+
+[[outputs]]
+id = "eifnqpZoaaGcQ3jQU9TPd"
+uri = "file://artifacts/mobile/assets/sounds/vautour.mp3"
+type = "audio"
+title = "sound_effect"
+
+[[outputs]]
+id = "tp8ATnKOuzy_-YNodIObD"
+uri = "file://artifacts/mobile/assets/sounds/iguane.mp3"
+type = "audio"
+title = "sound_effect"
+
+[[outputs]]
+id = "731sZh6_Mjh2exUGatt5W"
+uri = "file://artifacts/mobile/assets/sounds/cerf.mp3"
+type = "audio"
+title = "sound_effect"
+
+[[outputs]]
+id = "c7IWf4wuo-8QTxCsLv_y2"
+uri = "file://artifacts/mobile/assets/sounds/cochon.mp3"
+type = "audio"
+title = "sound_effect"
+
+[[outputs]]
+id = "hH_YUhoKvLHaxbFz9uEdG"
+uri = "file://artifacts/mobile/assets/sounds/poulet.mp3"
+type = "audio"
+title = "sound_effect"
+
+[[outputs]]
+id = "QbAYhx09Efc7MeZlYPa9j"
+uri = "file://artifacts/mobile/assets/sounds/tatou.mp3"
+type = "audio"
+title = "sound_effect"
+
+[[outputs]]
+id = "0GKUZ890TDIBx_zM3u9Xt"
+uri = "file://artifacts/mobile/assets/sounds/lapin.mp3"
+type = "audio"
+title = "sound_effect"
+
+[[outputs]]
+id = "ULxLzBwp-OKOGwfpPJhAV"
+uri = "file://artifacts/mobile/assets/sounds/escargot.mp3"
+type = "audio"
+title = "sound_effect"
+
+[[outputs]]
+id = "POeqipyfWladk_PWrZ7Vr"
+uri = "file://artifacts/mobile/assets/sounds/porc-epic.mp3"
+type = "audio"
+title = "sound_effect"
+
+[[outputs]]
+id = "HV-n_ybbzpvBsMRetrolY"
+uri = "file://artifacts/mobile/assets/sounds/ecureuil.mp3"
+type = "audio"
+title = "sound_effect"
+
+[[outputs]]
+id = "9npQMTBPem3muSubJPaXA"
+uri = "file://artifacts/mobile/assets/sounds/cygne.mp3"
+type = "audio"
+title = "sound_effect"
+
+[[outputs]]
+id = "zXl3TxYmchUJ13EY0e7Uh"
+uri = "file://artifacts/mobile/assets/sounds/gorille.mp3"
+type = "audio"
+title = "gorille"
+
+[[outputs]]
+id = "U8otB5OOVYERW-IC2vzJ_"
+uri = "file://artifacts/mobile/assets/sounds/araignee.mp3"
+type = "audio"
+title = "araignee"
+
+[[outputs]]
+id = "yBy9IMlKXUOAC4R81NCQk"
+uri = "file://artifacts/mobile/assets/sounds/gnou.mp3"
+type = "audio"
+title = "gnou"
+
+[[outputs]]
+id = "t_jrOtPQPZP8qZSHnn8rt"
+uri = "file://artifacts/mobile/assets/sounds/guepard.mp3"
+type = "audio"
+title = "guepard"
+
+[[outputs]]
+id = "xjnaMbQWx4bK9pp4VIacK"
+uri = "file://artifacts/mobile/assets/sounds/pangolin.mp3"
+type = "audio"
+title = "pangolin"
+
+[[outputs]]
+id = "PZK0Y6Dh3jASUK5TarY4U"
+uri = "file://artifacts/mobile/assets/sounds/ibis.mp3"
+type = "audio"
+title = "ibis"
+
+[[outputs]]
+id = "RVA9FVd9WrnUBgdJ64w1Q"
+uri = "file://artifacts/mobile/assets/sounds/perroquet.mp3"
+type = "audio"
+title = "perroquet"
+
+[[outputs]]
+id = "mzwqBSz8VM4lX8cFHJNqL"
+uri = "file://artifacts/mobile/assets/sounds/flamant.mp3"
+type = "audio"
+title = "flamant"
+
+[[outputs]]
+id = "aoF7fMpNWaMQMlktFDIAD"
+uri = "file://artifacts/mobile/assets/sounds/heron.mp3"
+type = "audio"
+title = "heron"
+
+[[outputs]]
+id = "h_bVzIy2phAXhQsgRn2Wm"
+uri = "file://artifacts/mobile/assets/sounds/zebre.mp3"
+type = "audio"
+title = "zebre"
+
+[[outputs]]
+id = "bqSMKtWCBMzqktAhMsOGs"
+uri = "file://artifacts/mobile/assets/sounds/girafe.mp3"
+type = "audio"
+title = "girafe"
+
+[[outputs]]
+id = "EQriy4uyToquJTiaZhlxE"
+uri = "file://artifacts/mobile/assets/sounds/mangouste.mp3"
+type = "audio"
+title = "mangouste"
+
+[[outputs]]
+id = "SgYezBUTB82QgU58AVSWu"
+uri = "file://artifacts/mobile/assets/sounds/phacochère.mp3"
+type = "audio"
+title = "phacochère"
+
+[[outputs]]
+id = "Df01pBPGkeer9yKI5CAmY"
+uri = "file://attached_assets/logo_lion.png"
+type = "image"
+title = "Option 1 — Lion géométrique"
+
+[[outputs]]
+id = "SKLY0KRAtgZo2ywa4SKUf"
+uri = "file://attached_assets/logo_elephant.png"
+type = "image"
+title = "Option 2 — Emblème Éléphant"
+
+[[outputs]]
+id = "3gdF3FDm77W1DOTPjilqy"
+uri = "file://attached_assets/logo_baobab.png"
+type = "image"
+title = "Option 3 — Baobab & Animaux"
+
+[[outputs]]
+id = "IPkaaq0hKiP7v6mDYWylM"
+uri = "file://artifacts/mobile/assets/images/hero.png"
+type = "image"
+title = "Nouvelle image héro générée"

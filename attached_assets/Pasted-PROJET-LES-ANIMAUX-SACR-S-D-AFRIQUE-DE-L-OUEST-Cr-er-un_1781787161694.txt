@@ -1,0 +1,247 @@
+PROJET : LES ANIMAUX SACRÉS D'AFRIQUE DE L'OUEST
+
+Créer une application mobile Android moderne inspirée des traditions africaines et des animaux sacrés d'Afrique de l'Ouest.
+
+OBJECTIF
+
+L'application doit être un musée numérique interactif, éducatif et culturel présentant les animaux sacrés africains, leurs symboliques, leurs pouvoirs spirituels, leurs enseignements et leur place dans les traditions ancestrales.
+
+L'application ne doit pas ressembler à une encyclopédie classique mais à une expérience immersive mettant en valeur la sagesse africaine.
+
+TECHNOLOGIES
+
+* React Native avec Expo
+* TypeScript
+* SQLite pour le mode hors ligne
+* Architecture modulaire et évolutive
+* Compatible Android
+* Prévoir une future publication Play Store
+
+DESIGN
+
+Créer une identité visuelle inspirée :
+
+* des motifs africains traditionnels
+* des tissus bogolan
+* des symboles adinkra
+* des couleurs terre d'Afrique
+
+Palette :
+
+* Ocre
+* Terre cuite
+* Brun foncé
+* Or
+* Vert savane
+* Ivoire
+
+Le design doit être élégant, moderne et premium.
+
+ÉCRAN D'ACCUEIL
+
+Afficher :
+
+* Logo de l'application
+* Illustration africaine moderne
+* Citation inspirante africaine
+* Bouton "Découvrir les animaux sacrés"
+
+Ajouter des animations fluides.
+
+NAVIGATION PRINCIPALE
+
+Créer 5 onglets :
+
+1. Accueil
+2. Animaux
+3. Quiz
+4. Mon Animal Sacré
+5. Profil
+
+BASE DE DONNÉES DES ANIMAUX
+
+Chaque animal possède :
+
+* id
+* nom
+* catégorie
+* image
+* description
+* symbolique
+* pouvoirs
+* enseignements
+* citation
+* niveau spirituel
+* région d'origine
+
+Exemples :
+
+Lion
+Pouvoirs :
+
+* Leadership
+* Courage
+* Noblesse
+* Énergie solaire
+
+Éléphant
+Pouvoirs :
+
+* Sagesse
+* Mémoire
+* Justice
+* Responsabilité
+
+Léopard
+Pouvoirs :
+
+* Équilibre
+* Patience
+* Protection
+* Action décisive
+
+Grenouille
+Pouvoirs :
+
+* Transformation
+* Communication
+* Guérison émotionnelle
+
+Crocodile
+Pouvoirs :
+
+* Vie
+* Mort
+* Vision
+* Sagesse
+
+Et tous les autres animaux du livre.
+
+ÉCRAN ANIMAUX
+
+Afficher :
+
+* Recherche
+* Filtres
+* Catégories
+
+Catégories :
+
+* Mammifères
+* Oiseaux
+* Reptiles
+* Amphibiens
+* Aquatiques
+
+Chaque carte doit afficher :
+
+* image
+* nom
+* symbole principal
+
+FICHE ANIMAL
+
+Lorsqu'un utilisateur ouvre un animal :
+
+Afficher :
+
+* grande illustration
+* nom
+* description
+* pouvoirs
+* symbolique
+* enseignements
+* citation inspirante
+
+Ajouter une section :
+
+"Ce que cet animal peut vous enseigner aujourd'hui"
+
+QUIZ SPIRITUEL
+
+Créer un quiz de personnalité.
+
+20 questions.
+
+Exemples :
+
+* Préférez-vous observer ou agir ?
+* Êtes-vous un leader naturel ?
+* Avez-vous confiance en votre intuition ?
+* Préférez-vous la solitude ou la communauté ?
+
+Calculer un profil.
+
+Attribuer un animal dominant.
+
+Résultat :
+
+"Votre animal sacré est le Léopard"
+
+Afficher :
+
+* portrait
+* description
+* forces
+* conseils
+
+MON ANIMAL SACRÉ
+
+Page dédiée au résultat du quiz.
+
+Afficher :
+
+* animal principal
+* animal secondaire
+* qualités associées
+* défis associés
+* mantra quotidien
+
+CITATIONS AFRICAINES
+
+Créer une base de citations inspirées de la sagesse africaine.
+
+Afficher une citation aléatoire chaque jour.
+
+FAVORIS
+
+Permettre :
+
+* sauvegarder des animaux
+* consulter les favoris hors ligne
+
+MODE HORS LIGNE
+
+L'application doit fonctionner sans connexion internet.
+
+Toutes les données sont stockées localement.
+
+ACCESSIBILITÉ
+
+* Interface simple
+* Police lisible
+* Support français
+* Architecture prête pour anglais, mooré, dioula et fulfuldé
+
+ADMINISTRATION FUTURE
+
+Prévoir une architecture permettant ultérieurement :
+
+* ajout d'animaux
+* ajout de légendes
+* ajout de contes africains
+* ajout d'illustrations
+* synchronisation cloud
+
+ANIMATIONS
+
+Utiliser :
+
+* transitions fluides
+* effets de révélation
+* cartes animées
+* effets inspirés des symboles africains
+
+OBJECTIF FINAL
+
+Créer une application culturelle africaine haut de gamme donnant l'impression d'explorer une bibliothèque sacrée de la sagesse ancestrale africaine à travers les animaux symboliques.

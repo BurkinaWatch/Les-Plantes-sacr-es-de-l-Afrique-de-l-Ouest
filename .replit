@@ -1,0 +1,46 @@
+modules = ["nodejs-20", "web", "bash", "python-3.11"]
+
+[deployment]
+router = "application"
+deploymentTarget = "autoscale"
+
+[deployment.postBuild]
+args = ["pnpm", "store", "prune"]
+env = { "CI" = "true" }
+
+[workflows]
+runButton = "Project"
+
+[agent]
+stack = "PNPM_WORKSPACE"
+expertMode = true
+
+[postMerge]
+path = "scripts/post-merge.sh"
+timeoutMs = 20000
+
+[[ports]]
+localPort = 8080
+externalPort = 8080
+
+[[ports]]
+localPort = 8081
+externalPort = 80
+
+[[ports]]
+localPort = 8082
+externalPort = 3001
+
+[[ports]]
+localPort = 18115
+externalPort = 3000
+
+[nix]
+channel = "stable-25_05"
+packages = ["eas-cli"]
+
+[userenv]
+
+[userenv.shared]
+CHAT_API_KEY = "f060cabdf98e8049d08257d9e04cdba2e4f047f579a49d6f997a40f4c4d2b8c6"
+EXPO_PUBLIC_CHAT_API_KEY = "f060cabdf98e8049d08257d9e04cdba2e4f047f579a49d6f997a40f4c4d2b8c6"

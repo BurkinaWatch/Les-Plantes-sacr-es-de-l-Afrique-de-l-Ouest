@@ -1,0 +1,72 @@
+pnpm install && pnpm --filter @workspace/mobile run build
+
+Scope: all 9 workspace projects
+
+Lockfile is up to date, resolution step is skipped
+
+Already up to date
+
+
+. preinstall$ sh -c 'rm -f package-lock.json yarn.lock; case "$npm_config_user_agent" in pnpm/*) ;; *) echo "Use pnpm instead" >&2; exit 1 ;; esac'
+
+. preinstall: Done
+
+Done in 1.7s using pnpm v10.26.1
+
+
+> @workspace/mobile@0.0.0 build /app/artifacts/mobile
+> node scripts/build.js
+
+
+Building static Expo Go deployment...
+
+Checking Expo package compatibility...
+
+All Expo packages are compatible.
+
+Preparing build directories...
+
+Build: 1782030790197-100
+
+Clearing Metro cache...
+
+Cache cleared
+
+Starting Metro...
+Setting EXPO_PUBLIC_DOMAIN=sacred-animals-west-production.up.railway.app
+
+[Metro] Starting project at /app/artifacts/mobile
+
+[Metro] React Compiler enabled
+
+[Metro] Metro is running in CI mode, reloads are disabled. Remove CI=true to enable watch mode.
+
+[Metro] Starting Metro Bundler
+
+[Metro] Waiting on http://localhost:8081
+
+[Metro] Logs for your project will appear below.
+
+Metro ready
+
+Downloading bundles and manifests...
+This may take several minutes for production builds...
+
+Fetching ios bundle...
+
+Downloading: http://localhost:8081/artifacts/mobile/node_modules/expo-router/entry.bundle?platform=ios&dev=false&hot=false&lazy=false&minify=true
+
+[Metro] iOS node_modules/.pnpm/expo-router@6.0.24_@types+react-dom@19.1.11_@types+react@19.1.17__@types+react@19.1.17__4094ee48018c5b5c8f1246009fce9036/node_modules/expo-router/entry.js ▓▓▓░░░░░░░░░░░░░ 21.3% (106/343)
+
+[Metro] iOS node_modules/.pnpm/expo-router@6.0.24_@types+react-dom@19.1.11_@types+react@19.1.17__@types+react@19.1.17__4094ee48018c5b5c8f1246009fce9036/node_modules/expo-router/entry.js ▓▓▓▓▓▓▓▓▓▓▓▓▓▓░░ 92.9% (1441/1495)
+
+[Metro] iOS Bundling failed 6246ms node_modules/.pnpm/expo-router@6.0.24_@types+react-dom@19.1.11_@types+react@19.1.17__@types+react@19.1.17__4094ee48018c5b5c8f1246009fce9036/node_modules/expo-router/entry.js (1608 modules)
+
+Metro bundle error (HTTP 500):
+{"type":"UnableToResolveError","originModulePath":"/app/artifacts/mobile/components/AnimalCard.tsx","targetModuleName":"@/assets/images/oryctérope.png","message":"Unable to resolve module @/assets/images/oryctérope.png from /app/artifacts/mobile/components/AnimalCard.tsx: @/assets/images/oryctérope.png could not be found within the project or in these directories:\n  node_modules\n  ../../node_modules\n  node_modules\n  ../../node_modules\n\u001b[0m \u001b[90m 78 |\u001b[39m   mangouste\u001b[33m:\u001b[39m require(\u001b[32m'@/assets/images/mangouste.png'\u001b[39m)\u001b[33m,\u001b[39m\n \u001b[90m 79 |\u001b[39m   \u001b[32m'phacochère'\u001b[39m\u001b[33m:\u001b[39m require(\u001b[32m'@/assets/images/phacochere.png'\u001b[39m)\u001b[33m,\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 80 |\u001b[39m   \u001b[32m'oryctérope'\u001b[39m\u001b[33m:\u001b[39m require(\u001b[32m'@/assets/images/oryctérope.png'\u001b[39m)\u001b[33m,\u001b[39m\n \u001b[90m    |\u001b[39m                          \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 81 |\u001b[39m }\u001b[33m;\u001b[39m\n \u001b[90m 82 |\u001b[39m\n \u001b[90m 83 |\u001b[39m \u001b[36mexport\u001b[39m \u001b[36mfunction\u001b[39m \u001b[33mAnimalCard\u001b[39m({ animal\u001b[33m,\u001b[39m compact \u001b[33m=\u001b[39m \u001b[36mfalse\u001b[39m\u001b[33m,\u001b[39m numColumns \u001b[33m=\u001b[39m \u001b[35m2\u001b[39m }\u001b[33m:\u001b[39m \u001b[33mProps\u001b[39m) {\u001b[0m","cause":{"dirPaths":["/app/artifacts/mobile/components/node_modules","/app/artifacts/mobile/node_modules","/app/artifacts/node_modules","/app/node_modules","/node_modules","/app/artifacts/mobile/node_modules","/app/node_modules"],"extraPaths":[],"_expoImportStack":"Import stack:\n\n artifacts/mobile/components/AnimalCard.tsx\n | import \"@/assets/images/oryctérope.png\"\n\n artifacts/mobile/app/(tabs)/profil.tsx\n | import \"@/components/AnimalCard\"\n\n artifacts/mobile/app (require.context)\n","name":"Error","message":"Module does not exist in the Haste module map or in these directories:\n  /app/artifacts/mobile/components/node_modules\n  /app/artifacts/mobile/node_modules\n  /app/artifacts/node_modules\n  /app/node_modules\n  /node_modules\n  /app/artifacts/mobile/node_modules\n  /app/node_modules\n","stack":"Error: Module does not exist in the Haste module map or in these directories:\n  /app/artifacts/mobile/components/node_modules\n  /app/artifacts/mobile/node_modules\n  /app/artifacts/node_modules\n  /app/node_modules\n  /node_modules\n  /app/artifacts/mobile/node_modules\n  /app/node_modules\n\n    at upstreamResolveRequest (/app/node_modules/.pnpm/metro-resolver@0.83.3/node_modules/metro-resolver/src/resolve.js:197:9)\n    at resolveRequest (/app/node_modules/.pnpm/@expo+cli@54.0.25_expo-router@6.0.24_expo@54.0.35_react-native@0.81.5_@babel+core@7.29._d2692a18a3c9d9eb24f2d1bd1f7e96db/node_modules/@expo/cli/src/start/server/metro/withMetroResolvers.ts:89:20)\n    at upstreamResolveRequest (/app/node_modules/.pnpm/metro-resolver@0.83.3/node_modules/metro-resolver/src/resolve.js:40:12)\n    at firstResolver (/app/node_modules/.pnpm/@expo+cli@54.0.25_expo-router@6.0.24_expo@54.0.35_react-native@0.81.5_@babel+core@7.29._d2692a18a3c9d9eb24f2d1bd1f7e96db/node_modules/@expo/cli/src/start/server/metro/withMetroResolvers.ts:89:20)\n    at firstResolver (/app/node_modules/.pnpm/@expo+cli@54.0.25_expo-router@6.0.24_expo@54.0.35_react-native@0.81.5_@babel+core@7.29._d2692a18a3c9d9eb24f2d1bd1f7e96db/node_modules/@expo/cli/src/start/server/metro/withMetroResolvers.ts:103:16)\n    at firstResolver (/app/node_modules/.pnpm/@expo+cli@54.0.25_expo-router@6.0.24_expo@54.0.35_react-native@0.81.5_@babel+core@7.29._d2692a18a3c9d9eb24f2d1bd1f7e96db/node_modules/@expo/cli/src/start/server/metro/withMetroResolvers.ts:132:16)\n    at resolveRequest (/app/node_modules/.pnpm/@expo+cli@54.0.25_expo-router@6.0.24_expo@54.0.35_react-native@0.81.5_@babel+core@7.29._d2692a18a3c9d9eb24f2d1bd1f7e96db/node_modules/@expo/cli/src/start/server/metro/withMetroErrorReportingResolver.ts:60:23)\n    at Object.resolve (/app/node_modules/.pnpm/metro-resolver@0.83.3/node_modules/metro-resolver/src/resolve.js:40:12)\n    at ModuleResolver.resolveDependency (/app/node_modules/.pnpm/metro@0.83.3/node_modules/metro/src/node-haste/DependencyGraph/ModuleResolution.js:96:31)\n    at DependencyGraph.resolveDependency (/app/node_modules/.pnpm/metro@0.83.3/node_modules/metro/src/node-haste/DependencyGraph.js:252:43)"},"name":"Error","stack":"Error: Unable to resolve module @/assets/images/oryctérope.png from /app/artifacts/mobile/components/AnimalCard.tsx: @/assets/images/oryctérope.png could not be found within the project or in these directories:\n  node_modules\n  ../../node_modules\n  node_modules\n  ../../node_modules\n\u001b[0m \u001b[90m 78 |\u001b[39m   mangouste\u001b[33m:\u001b[39m require(\u001b[32m'@/assets/images/mangouste.png'\u001b[39m)\u001b[33m,\u001b[39m\n \u001b[90m 79 |\u001b[39m   
+
+Download failed: HTTP 500
+
+/app/artifacts/mobile:
+ ERR_PNPM_RECURSIVE_RUN_FIRST_FAIL  @workspace/mobile@0.0.0 build: `node scripts/build.js`
+Exit status 1

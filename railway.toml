@@ -1,0 +1,7 @@
+[build]
+buildCommand = "pnpm install && pnpm --filter @workspace/mobile run build"
+
+[deploy]
+startCommand = "node artifacts/mobile/server/serve.js"
+healthcheckPath = "/"
+healthcheckTimeout = 300
