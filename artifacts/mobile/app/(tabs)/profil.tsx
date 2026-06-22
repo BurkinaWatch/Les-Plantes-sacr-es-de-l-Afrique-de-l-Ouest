@@ -14,10 +14,10 @@ import {
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { AnimalCard } from '@/components/AnimalCard';
+import { PlanteCard } from '@/components/PlanteCard';
 import { useApp } from '@/context/AppContext';
 import { useAuth } from '@/context/AuthContext';
-import { ANIMALS } from '@/data/animals';
+import { PLANTS } from '@/data/animals';
 import { TOTEM_RESULTS } from '@/data/quiz';
 import { useColors } from '@/hooks/useColors';
 import { useTranslation, LANG_CODES, LANG_NAMES, type LangCode } from '@/i18n';
@@ -32,7 +32,7 @@ export default function ProfilScreen() {
   const [showLogout, setShowLogout] = useState(false);
 
   const topPad = Platform.OS === 'web' ? Math.max(insets.top, 67) : insets.top;
-  const favoriteAnimals = ANIMALS.filter((a) => favorites.includes(a.id));
+  const favoritePlantes = PLANTS.filter((a) => favorites.includes(a.id));
   const totem = quizResult ? TOTEM_RESULTS[quizResult.primary] : null;
 
   if (!user) {
@@ -45,7 +45,7 @@ export default function ProfilScreen() {
         </LinearGradient>
         <View style={{ padding: 24, gap: 16 }}>
           <Text style={[{ color: colors.mutedForeground, fontSize: 14, textAlign: 'center', lineHeight: 22 }]}>
-            Connectez-vous pour accéder à votre profil, sauvegarder vos animaux favoris et retrouver votre totem.
+            Connectez-vous pour accéder à votre profil, sauvegarder vos plantes favorites et retrouver votre totem.
           </Text>
           <Pressable
             style={({ pressed }) => [{ opacity: pressed ? 0.88 : 1 }]}
@@ -89,7 +89,7 @@ export default function ProfilScreen() {
           {[
             { value: String(favorites.length), label: t.profile_favorites },
             { value: quizResult ? '1' : '0', label: t.profile_quiz_completed },
-            { value: String(ANIMALS.length), label: t.profile_animals_count },
+            { value: String(PLANTS.length), label: t.profile_animals_count },
           ].map((stat) => (
             <View key={stat.label} style={[styles.statItem, { backgroundColor: colors.card, borderColor: colors.border }]}>
               <Text style={[styles.statValue, { color: colors.gold }]}>{stat.value}</Text>
@@ -100,7 +100,7 @@ export default function ProfilScreen() {
 
         <View>
           <Text style={[styles.sectionLabel, { color: colors.gold }]}>{t.profile_my_favorites}</Text>
-          {favoriteAnimals.length === 0 ? (
+          {favoritePlantes.length === 0 ? (
             <View style={[styles.emptyFav, { backgroundColor: colors.card, borderColor: colors.border }]}>
               <Text style={[styles.emptyFavIcon, { color: colors.mutedForeground }]}>◇</Text>
               <Text style={[styles.emptyFavText, { color: colors.mutedForeground }]}>{t.profile_no_fav}</Text>
@@ -110,9 +110,9 @@ export default function ProfilScreen() {
             </View>
           ) : (
             <View style={styles.favGrid}>
-              {favoriteAnimals.map((animal) => (
-                <View key={animal.id} style={styles.favCardWrap}>
-                  <AnimalCard animal={animal} compact />
+              {favoritePlantes.map((plante) => (
+                <View key={plante.id} style={styles.favCardWrap}>
+                  <PlanteCard plante={plante} compact />
                 </View>
               ))}
             </View>

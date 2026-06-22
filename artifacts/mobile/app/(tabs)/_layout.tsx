@@ -117,7 +117,7 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-        name="mon-animal"
+        name="ma-plante"
         options={{
           title: t.tab_my_animal,
           tabBarIcon: tabIcon("crown.fill", "crown", "mci"),

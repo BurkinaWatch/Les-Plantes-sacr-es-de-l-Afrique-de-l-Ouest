@@ -20,7 +20,7 @@ import { Feather } from '@expo/vector-icons';
 
 import { useApp } from '@/context/AppContext';
 import { TOTEM_RESULTS } from '@/data/quiz';
-import { getAnimalById } from '@/data/animals';
+import { getPlanteById } from '@/data/animals';
 import { useColors } from '@/hooks/useColors';
 import { useTranslation } from '@/i18n';
 
@@ -98,10 +98,10 @@ export default function ChatTotemScreen() {
   const loadingAnim = useRef(new Animated.Value(0)).current;
 
   const totem = quizResult ? TOTEM_RESULTS[quizResult.primary] : null;
-  const animal = quizResult ? getAnimalById(quizResult.primary) : null;
+  const plante = quizResult ? getPlanteById(quizResult.primary) : null;
   const topPad = Platform.OS === 'web' ? Math.max(insets.top, 67) : insets.top;
 
-  const STORAGE_KEY = `@chat_sessions_${animal?.id ?? 'none'}`;
+  const STORAGE_KEY = `@chat_sessions_${plante?.id ?? 'none'}`;
 
   // ── Animate loading dots ──
   useEffect(() => {
@@ -120,7 +120,7 @@ export default function ChatTotemScreen() {
 
   // ── Load sessions ──
   useEffect(() => {
-    if (!animal) return;
+    if (!plante) return;
     (async () => {
       try {
         const raw = await AsyncStorage.getItem(STORAGE_KEY);
@@ -132,7 +132,7 @@ export default function ChatTotemScreen() {
         setMessages([]);
       } catch {}
     })();
-  }, [animal?.id]);
+  }, [plante?.id]);
 
   // ── Persist after each exchange ──
   const persistSession = useCallback(async (msgs: Message[], sessionId: string) => {
@@ -158,7 +158,7 @@ export default function ChatTotemScreen() {
   }, [STORAGE_KEY]);
 
   const sendMessage = useCallback(async () => {
-    if (!input.trim() || isLoading || !animal || !totem) return;
+    if (!input.trim() || isLoading || !plante || !totem) return;
 
     const userMsg: Message = {
       id: Date.now().toString(),
@@ -195,24 +195,24 @@ export default function ChatTotemScreen() {
           ...(chatApiKey ? { 'x-api-key': chatApiKey } : {}),
         },
         body: JSON.stringify({
-          animalId: animal.id,
-          animalData: {
-            nom: animal.nom,
-            nomScientifique: animal.nomScientifique,
-            element: animal.element,
-            categorie: animal.categorie,
-            regionOrigine: animal.regionOrigine,
-            description: animal.description,
-            symboliqueAfricaine: animal.symboliqueAfricaine,
-            symboliqueSpirirtuelle: animal.symboliqueSpirirtuelle,
-            qualites: animal.qualites,
-            defauts: animal.defauts,
-            pouvoirs: animal.pouvoirs,
-            enseignements: animal.enseignements,
-            citation: animal.citation,
-            proverbes: animal.proverbes,
-            conseilsDeVie: animal.conseilsDeVie,
-            niveauSpirituel: animal.niveauSpirituel,
+          planteId: plante.id,
+          planteData: {
+            nom: plante.nom,
+            nomScientifique: plante.nomScientifique,
+            element: plante.element,
+            categorie: plante.categorie,
+            regionOrigine: plante.regionOrigine,
+            description: plante.description,
+            symboliqueAfricaine: plante.symboliqueAfricaine,
+            symboliqueSpirirtuelle: plante.symboliqueSpirirtuelle,
+            qualites: plante.qualites,
+            defauts: plante.defauts,
+            pouvoirs: plante.pouvoirs,
+            enseignements: plante.enseignements,
+            citation: plante.citation,
+            proverbes: plante.proverbes,
+            conseilsDeVie: plante.conseilsDeVie,
+            niveauSpirituel: plante.niveauSpirituel,
           },
           messages: allMessages.map((m) => ({ role: m.role, content: m.content })),
           userLang: lang === 'fr' || lang === 'en' ? lang : 'fr',
@@ -248,7 +248,7 @@ export default function ChatTotemScreen() {
     } finally {
       setIsLoading(false);
     }
-  }, [input, isLoading, animal, totem, messages, lang, currentSessionId, persistSession]);
+  }, [input, isLoading, plante, totem, messages, lang, currentSessionId, persistSession]);
 
   const loadSession = (session: ChatSession) => {
     setMessages(session.messages);
@@ -271,7 +271,7 @@ export default function ChatTotemScreen() {
     if (currentSessionId === sessionId) newConversation();
   };
 
-  if (!quizResult || !totem || !animal) {
+  if (!quizResult || !totem || !plante) {
     return (
       <View style={[styles.container, { backgroundColor: colors.background }]}>
         <View style={[styles.emptyWrap, { paddingTop: topPad + 16 }]}>
@@ -320,7 +320,7 @@ export default function ChatTotemScreen() {
             <Text style={[styles.headerSup, { color: totemColor + '90' }]}>✦ DIALOGUE SACRÉ ✦</Text>
             <Text style={[styles.headerName, { color: colors.ivory }]}>{totem.nom}</Text>
             <Text style={[styles.headerSub, { color: colors.mutedForeground }]}>
-              {animal.element} · {animal.regionOrigine}
+              {plante.element} · {plante.regionOrigine}
             </Text>
           </View>
 
@@ -354,11 +354,11 @@ export default function ChatTotemScreen() {
             <View style={[styles.totemEmblem, { borderColor: totemColor + '50', backgroundColor: totemColor + '12' }]}>
               <Text style={[styles.totemEmblemChar, { color: totemColor }]}>✦</Text>
               <Text style={[styles.totemEmblemName, { color: colors.ivory }]}>{totem.nom}</Text>
-              <Text style={[styles.totemEmblemSci, { color: colors.mutedForeground }]}>{animal.nomScientifique}</Text>
+              <Text style={[styles.totemEmblemSci, { color: colors.mutedForeground }]}>{plante.nomScientifique}</Text>
             </View>
 
             <View style={[styles.citationCard, { backgroundColor: totemColor + '15', borderColor: totemColor + '40', borderLeftColor: totemColor }]}>
-              <Text style={[styles.citationText, { color: colors.ivory }]}>"{animal.citation}"</Text>
+              <Text style={[styles.citationText, { color: colors.ivory }]}>"{plante.citation}"</Text>
             </View>
 
             <Text style={[styles.suggestLabel, { color: colors.mutedForeground }]}>◆ COMMENCE PAR ◆</Text>
@@ -409,7 +409,7 @@ export default function ChatTotemScreen() {
                     <Text style={[styles.bubbleText, { color: colors.ivory }]}>{msg.content}</Text>
                     <View style={[styles.assistantFooter, { borderTopColor: colors.border }]}>
                       <Text style={[styles.assistantFooterText, { color: colors.mutedForeground }]}>
-                        {animal.element} · Niveau {animal.niveauSpirituel}/5
+                        {plante.element} · Niveau {plante.niveauSpirituel}/5
                       </Text>
                     </View>
                   </View>

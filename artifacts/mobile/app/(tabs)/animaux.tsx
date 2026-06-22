@@ -10,9 +10,9 @@ import {
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { AnimalCard } from '@/components/AnimalCard';
+import { PlanteCard } from '@/components/PlanteCard';
 import { CategoryFilter } from '@/components/CategoryFilter';
-import { ANIMALS, type AnimalCategorie } from '@/data/animals';
+import { PLANTS, type PlanteCategorie } from '@/data/animals';
 import { useColors } from '@/hooks/useColors';
 import { Feather } from '@expo/vector-icons';
 import { useTranslation } from '@/i18n';
@@ -23,7 +23,7 @@ export default function AnimauxScreen() {
   const { t } = useTranslation();
   const { width } = useWindowDimensions();
   const [search, setSearch] = useState('');
-  const [selectedCat, setSelectedCat] = useState<AnimalCategorie | null>(null);
+  const [selectedCat, setSelectedCat] = useState<PlanteCategorie | null>(null);
 
   const topPad = Platform.OS === 'web' ? Math.max(insets.top, 67) : insets.top;
 
@@ -31,7 +31,7 @@ export default function AnimauxScreen() {
 
   const filtered = useMemo(() => {
     const q = search.trim().toLowerCase();
-    return ANIMALS.filter((a) => {
+    return PLANTS.filter((a) => {
       const matchSearch =
         q === '' ||
         a.nom.toLowerCase().includes(q) ||
@@ -88,7 +88,7 @@ export default function AnimauxScreen() {
           contentContainerStyle={{ paddingHorizontal: 4, paddingBottom: 80 + insets.bottom, paddingTop: 4 }}
           renderItem={({ item }) => (
             <View style={styles.cardWrap}>
-              <AnimalCard animal={item} numColumns={numColumns} />
+              <PlanteCard plante={item} numColumns={numColumns} />
             </View>
           )}
         />

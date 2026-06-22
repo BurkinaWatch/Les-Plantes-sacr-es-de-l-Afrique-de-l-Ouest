@@ -17,7 +17,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { QuoteCard } from '@/components/QuoteCard';
 import { useApp } from '@/context/AppContext';
-import { ANIMALS } from '@/data/animals';
+import { PLANTS } from '@/data/animals';
 import { QUIZ_QUESTIONS } from '@/data/quiz';
 import { useColors } from '@/hooks/useColors';
 import { useTranslation } from '@/i18n';
@@ -39,8 +39,8 @@ export default function HomeScreen() {
   const glowAnim = useRef(new Animated.Value(0.5)).current;
   const carouselFade = useRef(new Animated.Value(1)).current;
 
-  const pickRandom = useCallback((exclude: string[] = []): typeof ANIMALS => {
-    const pool = ANIMALS.filter((a) => !exclude.includes(a.id));
+  const pickRandom = useCallback((exclude: string[] = []): typeof PLANTS => {
+    const pool = PLANTS.filter((a) => !exclude.includes(a.id));
     const shuffled = [...pool].sort(() => Math.random() - 0.5);
     return shuffled.slice(0, 5);
   }, []);

@@ -1,17 +1,17 @@
 import React from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 
-import type { AnimalCategorie } from '@/data/animals';
+import type { PlanteCategorie } from '@/data/animals';
 import { CATEGORIES } from '@/data/animals';
 import { useColors } from '@/hooks/useColors';
 import { useTranslation } from '@/i18n';
 
 interface Props {
-  selected: AnimalCategorie | null;
-  onSelect: (cat: AnimalCategorie | null) => void;
+  selected: PlanteCategorie | null;
+  onSelect: (cat: PlanteCategorie | null) => void;
 }
 
-const ICONS: Record<AnimalCategorie | 'all', string> = {
+const ICONS: Record<PlanteCategorie | 'all', string> = {
   all: '✦',
   'Arbres Sacrés': '🌳',
   'Plantes Médicinales': '🌿',
@@ -25,7 +25,7 @@ export function CategoryFilter({ selected, onSelect }: Props) {
   const colors = useColors();
   const { t } = useTranslation();
 
-  const CAT_LABELS: Record<AnimalCategorie, string> = {
+  const CAT_LABELS: Record<PlanteCategorie, string> = {
     'Arbres Sacrés': t.cat_mammals,
     'Plantes Médicinales': t.cat_birds,
     'Plantes Alimentaires': t.cat_reptiles,

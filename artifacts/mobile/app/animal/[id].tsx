@@ -16,7 +16,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Feather } from '@expo/vector-icons';
 
 import { useApp } from '@/context/AppContext';
-import { getAnimalById } from '@/data/animals';
+import { getPlanteById } from '@/data/animals';
 import type { Element } from '@/data/animals';
 import { useColors } from '@/hooks/useColors';
 
@@ -56,7 +56,7 @@ export default function PlanteDetailScreen() {
   const router = useRouter();
   const { isFavorite, toggleFavorite } = useApp();
 
-  const plante = getAnimalById(id ?? '');
+  const plante = getPlanteById(id ?? '');
   const topPad = Platform.OS === 'web' ? Math.max(insets.top, 67) : insets.top;
 
   if (!plante) {

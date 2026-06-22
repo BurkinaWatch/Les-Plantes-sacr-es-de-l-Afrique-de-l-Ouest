@@ -126,7 +126,7 @@ export default function QuizScreen() {
           </Pressable>
 
           {quizResult && (
-            <Pressable onPress={() => router.push('/(tabs)/mon-animal' as any)}>
+            <Pressable onPress={() => router.push('/(tabs)/ma-plante' as any)}>
               <Text style={[styles.previousResult, { color: colors.terracotta }]}>{t.quiz_prev_result}</Text>
             </Pressable>
           )}
@@ -298,7 +298,7 @@ export default function QuizScreen() {
 
           <Pressable
             style={({ pressed }) => [{ opacity: pressed ? 0.88 : 1 }]}
-            onPress={() => router.push('/(tabs)/mon-animal' as any)}
+            onPress={() => router.push('/(tabs)/ma-plante' as any)}
           >
             <LinearGradient colors={[colors.gold, colors.ochre]} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }} style={styles.startBtn}>
               <Text style={[styles.startBtnText, { color: colors.deepBrown }]}>{t.quiz_result_see_full}</Text>

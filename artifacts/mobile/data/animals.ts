@@ -1,4 +1,4 @@
-export type AnimalCategorie =
+export type PlanteCategorie =
   | 'Arbres Sacrés'
   | 'Plantes Médicinales'
   | 'Plantes Alimentaires'
@@ -6,14 +6,16 @@ export type AnimalCategorie =
   | 'Herbes & Graminées'
   | 'Palmiers';
 
+export type AnimalCategorie = PlanteCategorie;
+
 export type Element = 'Feu' | 'Eau' | 'Terre' | 'Air';
 
-export interface Animal {
+export interface Plante {
   id: string;
   nom: string;
   nomAnglais: string;
   nomScientifique: string;
-  categorie: AnimalCategorie;
+  categorie: PlanteCategorie;
   element: Element;
   description: string;
   symboliqueAfricaine: string;
@@ -36,7 +38,9 @@ export interface Animal {
   usagesTraditionnels?: string[];
 }
 
-export const ANIMALS: Animal[] = [
+export type Animal = Plante;
+
+export const PLANTS: Plante[] = [
 
   /* ═══════════════════════════════════════════════════════════
      ARBRES SACRÉS
@@ -1688,7 +1692,7 @@ export const ANIMALS: Animal[] = [
   },
 ];
 
-export const CATEGORIES: AnimalCategorie[] = [
+export const CATEGORIES: PlanteCategorie[] = [
   'Arbres Sacrés',
   'Plantes Médicinales',
   'Plantes Alimentaires',
@@ -1697,8 +1701,11 @@ export const CATEGORIES: AnimalCategorie[] = [
   'Palmiers',
 ];
 
-export function getAnimalById(id: string): Animal | undefined {
-  return ANIMALS.find((p) => p.id === id);
+export function getPlanteById(id: string): Plante | undefined {
+  return PLANTS.find((p) => p.id === id);
 }
 
-export const ANIMAL_CRIS: Record<string, { nom: string; description: string }> = {};
+export const getAnimalById = getPlanteById;
+export const ANIMALS = PLANTS;
+
+export const PLANT_CRIS: Record<string, { nom: string; description: string }> = {};
