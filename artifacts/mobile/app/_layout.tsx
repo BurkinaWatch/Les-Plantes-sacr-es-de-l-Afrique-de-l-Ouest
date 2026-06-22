@@ -1,4 +1,5 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import * as Font from "expo-font";
 import { Stack } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import React, { useEffect, useRef, useState } from "react";
@@ -157,10 +158,31 @@ function RootLayoutNav() {
 /* ── Root Layout ───────────────────────────────────────────────── */
 export default function RootLayout() {
   const [showSplash, setShowSplash] = useState(true);
+  const [fontsReady, setFontsReady] = useState(false);
 
   useEffect(() => {
     SplashScreen.hideAsync();
+
+    const loadFonts = async () => {
+      try {
+        await Promise.race([
+          Font.loadAsync({
+            Feather: require("@expo/vector-icons/build/vendor/react-native-vector-icons/Fonts/Feather.ttf"),
+            MaterialCommunityIcons: require("@expo/vector-icons/build/vendor/react-native-vector-icons/Fonts/MaterialCommunityIcons.ttf"),
+          }),
+          new Promise<void>((resolve) => setTimeout(resolve, 3000)),
+        ]);
+      } catch {
+        // Les icônes se dégradent gracieusement si les polices échouent
+      } finally {
+        setFontsReady(true);
+      }
+    };
+
+    loadFonts();
   }, []);
+
+  if (!fontsReady) return null;
 
   return (
     <SafeAreaProvider>
