@@ -201,8 +201,8 @@ export default function HomeScreen() {
 
       <View style={[styles.statsRow, { paddingHorizontal: 20 }]}>
         {[
-          { value: String(ANIMALS.length), label: t.home_stat_animals },
-          { value: String(new Set(ANIMALS.map((a) => a.categorie)).size), label: t.home_stat_categories },
+          { value: String(PLANTS.length), label: t.home_stat_animals },
+          { value: String(new Set(PLANTS.map((a) => a.categorie)).size), label: t.home_stat_categories },
           { value: String(QUIZ_QUESTIONS.length), label: t.home_stat_questions },
         ].map((stat) => (
           <View key={stat.label} style={[styles.statItem, { borderColor: colors.border }]}>

@@ -117,6 +117,12 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
+        name="mon-animal"
+        options={{
+          href: null,
+        }}
+      />
+      <Tabs.Screen
         name="ma-plante"
         options={{
           title: t.tab_my_animal,
