@@ -244,13 +244,15 @@ export default function RootLayout() {
 
     const loadFonts = async () => {
       try {
-        await Promise.race([
-          Font.loadAsync({
-            Feather: require("@expo/vector-icons/build/vendor/react-native-vector-icons/Fonts/Feather.ttf"),
-            MaterialCommunityIcons: require("@expo/vector-icons/build/vendor/react-native-vector-icons/Fonts/MaterialCommunityIcons.ttf"),
-          }),
-          new Promise<void>((resolve) => setTimeout(resolve, 3000)),
-        ]);
+        if (Platform.OS !== "web") {
+          await Promise.race([
+            Font.loadAsync({
+              Feather: require("@expo/vector-icons/build/vendor/react-native-vector-icons/Fonts/Feather.ttf"),
+              MaterialCommunityIcons: require("@expo/vector-icons/build/vendor/react-native-vector-icons/Fonts/MaterialCommunityIcons.ttf"),
+            }),
+            new Promise<void>((resolve) => setTimeout(resolve, 3000)),
+          ]);
+        }
       } catch {
         // Les icônes se dégradent gracieusement si les polices échouent
       } finally {

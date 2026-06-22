@@ -37,7 +37,7 @@ config.server = {
 
 ## Google Fonts / fontfaceobserver timeout
 
-`@expo-google-fonts/*` packages fetch fonts from Google CDN at runtime. In Replit's proxied environment, this times out (fontfaceobserver shows "Xms timeout exceeded" in the error debugger). Fix: preload icon fonts (Feather, MaterialCommunityIcons) in `_layout.tsx` using `Font.loadAsync` with a `Promise.race` timeout of 3000ms and a try/catch — render the app even if fonts fail.
+On **web**, Expo vector-icons (Feather, MaterialCommunityIcons) load automatically via CSS — calling `Font.loadAsync` for them on web triggers fontfaceobserver which rejects its internal promise asynchronously, appearing as an unhandled rejection in the debugger even if the app works. Fix: gate `Font.loadAsync` behind `Platform.OS !== "web"` — only load fonts explicitly on native. A `Promise.race` timeout of 3000ms + try/catch is still needed on native in case the TTF fetch is slow.
 
 ## expo-image-picker version compatibility
 
