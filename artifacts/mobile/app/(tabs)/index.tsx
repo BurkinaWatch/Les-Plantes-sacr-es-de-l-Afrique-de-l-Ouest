@@ -22,63 +22,13 @@ import { QUIZ_QUESTIONS } from '@/data/quiz';
 import { useColors } from '@/hooks/useColors';
 import { useTranslation } from '@/i18n';
 
-const ANIMAL_IMAGES: Record<string, any> = {
-  aigle: require('@/assets/images/aigle.png'),
-  ane: require('@/assets/images/ane.png'),
-  antilope: require('@/assets/images/antilope.png'),
-  araignee: require('@/assets/images/araignee.png'),
-  buffle: require('@/assets/images/buffle.png'),
-  calao: require('@/assets/images/calao.png'),
-  cameleon: require('@/assets/images/cameleon.png'),
-  cerf: require('@/assets/images/cerf.png'),
-  cheval: require('@/assets/images/cheval.png'),
-  chevre: require('@/assets/images/chevre.png'),
-  chien: require('@/assets/images/chien.png'),
-  cigogne: require('@/assets/images/cigogne.png'),
-  cochon: require('@/assets/images/cochon.png'),
-  colombe: require('@/assets/images/colombe.png'),
-  crocodile: require('@/assets/images/crocodile.png'),
-  cygne: require('@/assets/images/cygne.png'),
-  ecureuil: require('@/assets/images/ecureuil.png'),
-  elephant: require('@/assets/images/elephant.png'),
-  escargot: require('@/assets/images/escargot.png'),
-  flamant: require('@/assets/images/flamant.png'),
-  girafe: require('@/assets/images/girafe.png'),
-  gnou: require('@/assets/images/gnou.png'),
-  gorille: require('@/assets/images/gorille.png'),
-  grenouille: require('@/assets/images/grenouille.png'),
-  guepard: require('@/assets/images/guepard.png'),
-  heron: require('@/assets/images/heron.png'),
-  hippopotame: require('@/assets/images/hippopotame.png'),
-  hyene: require('@/assets/images/hyene.png'),
-  ibis: require('@/assets/images/ibis.png'),
-  iguane: require('@/assets/images/iguane.png'),
-  lapin: require('@/assets/images/lapin.png'),
-  leopard: require('@/assets/images/leopard.png'),
-  lezard: require('@/assets/images/lezard.png'),
-  lievre: require('@/assets/images/lievre.png'),
-  lion: require('@/assets/images/lion.png'),
-  mangouste: require('@/assets/images/mangouste.png'),
-  pangolin: require('@/assets/images/pangolin.png'),
-  panthere: require('@/assets/images/panthere.png'),
-  perroquet: require('@/assets/images/perroquet.png'),
-  phacochere: require('@/assets/images/phacochere.png'),
-  pigeon: require('@/assets/images/pigeon.png'),
-  pintade: require('@/assets/images/pintade.png'),
-  'poisson-chat': require('@/assets/images/poisson-chat.png'),
-  poisson: require('@/assets/images/poisson.png'),
-  'porc-epic': require('@/assets/images/porc-epic.png'),
-  poulet: require('@/assets/images/poulet.png'),
-  rat: require('@/assets/images/rat.png'),
-  rhinoceros: require('@/assets/images/rhinoceros.png'),
-  scorpion: require('@/assets/images/scorpion.png'),
-  serpent: require('@/assets/images/serpent.png'),
-  singe: require('@/assets/images/singe.png'),
-  souris: require('@/assets/images/souris.png'),
-  tatou: require('@/assets/images/tatou.png'),
-  tortue: require('@/assets/images/tortue.png'),
-  vautour: require('@/assets/images/vautour.png'),
-  zebre: require('@/assets/images/zebre.png'),
+const PLANT_ICONS: Record<string, string> = {
+  'Arbres Sacrés': '🌳',
+  'Plantes Médicinales': '🌿',
+  'Plantes Alimentaires': '🫘',
+  'Plantes Rituelles': '✦',
+  'Herbes & Graminées': '🌾',
+  'Palmiers': '🌴',
 };
 
 export default function HomeScreen() {
@@ -103,7 +53,7 @@ export default function HomeScreen() {
     return shuffled.slice(0, 5);
   }, []);
 
-  const [featuredAnimals, setFeaturedAnimals] = useState(() => pickRandom());
+  const [featuredPlantes, setFeaturedPlantes] = useState(() => pickRandom());
 
   useEffect(() => {
     Animated.parallel([
@@ -123,7 +73,7 @@ export default function HomeScreen() {
   useEffect(() => {
     const interval = setInterval(() => {
       Animated.timing(carouselFade, { toValue: 0, duration: 350, useNativeDriver: true }).start(() => {
-        setFeaturedAnimals((prev) => pickRandom(prev.map((a) => a.id)));
+        setFeaturedPlantes((prev) => pickRandom(prev.map((a) => a.id)));
         Animated.timing(carouselFade, { toValue: 1, duration: 450, useNativeDriver: true }).start();
       });
     }, 9000);
@@ -148,13 +98,11 @@ export default function HomeScreen() {
         style={[styles.hero, { height: heroHeight }]}
         resizeMode="cover"
       >
-        {/* gradient — lighter at top so eagle stays visible */}
         <LinearGradient
           colors={['rgba(10,4,1,0.72)', 'rgba(10,4,1,0.22)', 'rgba(10,4,1,0.04)', 'rgba(0,0,0,0)']}
           locations={[0, 0.28, 0.48, 1]}
           style={StyleSheet.absoluteFillObject}
         />
-        {/* subtle bottom vignette */}
         <LinearGradient
           colors={['rgba(0,0,0,0)', 'rgba(10,4,1,0.28)']}
           locations={[0.6, 1]}
@@ -162,34 +110,25 @@ export default function HomeScreen() {
         />
 
         <Animated.View style={[styles.heroContent, { paddingTop: topPad + 8, opacity: fadeAnim, transform: [{ translateY: slideAnim }] }]}>
-          {/* Logo with moonlight effect */}
           <View style={styles.logoWrapper}>
-            {/* Outer ambient glow — silver-blue halo */}
             <Animated.View style={[styles.logoGlowOuter, { opacity: glowAnim }]} />
-            {/* Inner glow ring */}
             <View style={styles.logoGlowInner} />
-            {/* Logo image */}
             <Image source={require('@/assets/images/icon.png')} style={styles.heroLogo} />
-            {/* Moonlight silver overlay */}
             <View style={styles.logoMoonOverlay} />
           </View>
 
-          {/* Tagline row */}
           <View style={styles.logoRow}>
             <View style={[styles.logoDivider, { backgroundColor: colors.gold }]} />
             <Text style={[styles.logoSub, { color: colors.gold }]}>✦ {t.home_tagline} ✦</Text>
             <View style={[styles.logoDivider, { backgroundColor: colors.gold }]} />
           </View>
 
-          {/* Main title — tighter to stay above the eagle */}
           <Text style={[styles.title, { color: colors.ivory }]}>
             {t.home_of_africa}
           </Text>
 
-          {/* Gold accent rule */}
           <View style={[styles.titleRule, { backgroundColor: colors.gold }]} />
 
-          {/* "DE L'OUEST" framed badge */}
           <View style={[styles.westBadge, { borderColor: colors.terracotta, backgroundColor: 'rgba(10,4,1,0.45)' }]}>
             <View style={[styles.westBadgeDot, { backgroundColor: colors.terracotta }]} />
             <Text style={[styles.titleSub, { color: colors.terracotta }]}>{t.home_of_west}</Text>
@@ -210,32 +149,28 @@ export default function HomeScreen() {
         <Text style={[styles.sectionTitle, { color: colors.ivory }]}>{t.home_guardians}</Text>
         <Animated.View style={{ opacity: carouselFade }}>
           <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.featuredScroll} contentContainerStyle={{ gap: isTablet ? 16 : 12, paddingVertical: 4 }}>
-            {featuredAnimals.map((animal) => (
+            {featuredPlantes.map((plante) => (
               <Pressable
-                key={animal.id}
+                key={plante.id}
                 style={({ pressed }) => [styles.featuredCard, { width: cardWidth, height: cardHeight, opacity: pressed ? 0.85 : 1 }]}
-                onPress={() => router.push(`/animal/${animal.id}` as any)}
+                onPress={() => router.push(`/animal/${plante.id}` as any)}
               >
                 <LinearGradient
-                  colors={[animal.couleur, animal.couleurSecondaire]}
+                  colors={[plante.couleur, plante.couleurSecondaire]}
                   style={styles.featuredGradient}
                 >
-                  {/* Animal image — fills upper 65% of card */}
-                  {ANIMAL_IMAGES[animal.id] && (
-                    <Image
-                      source={ANIMAL_IMAGES[animal.id]}
-                      style={[styles.featuredAnimalImg, { height: Math.round(cardHeight * 0.62) }]}
-                      resizeMode="contain"
-                    />
-                  )}
-                  {/* Bottom gradient overlay so text is always readable */}
+                  <View style={styles.featuredIconWrap}>
+                    <Text style={[styles.featuredIcon, { fontSize: isTablet ? 72 : 60 }]}>
+                      {PLANT_ICONS[plante.categorie] ?? '🌿'}
+                    </Text>
+                  </View>
                   <LinearGradient
                     colors={['transparent', 'rgba(0,0,0,0.55)']}
                     style={[StyleSheet.absoluteFillObject, { pointerEvents: 'none' }]}
                   />
                   <View style={styles.featuredTextBlock}>
-                    <Text style={[styles.featuredNom, isTablet && styles.featuredNomTablet]}>{animal.nom}</Text>
-                    <Text style={[styles.featuredPouvoir, isTablet && styles.featuredPouvoirTablet]}>{animal.pouvoirs[0]}</Text>
+                    <Text style={[styles.featuredNom, isTablet && styles.featuredNomTablet]}>{plante.nom}</Text>
+                    <Text style={[styles.featuredPouvoir, isTablet && styles.featuredPouvoirTablet]}>{plante.pouvoirs[0]}</Text>
                   </View>
                 </LinearGradient>
               </Pressable>
@@ -300,7 +235,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
 
-  /* ── Moonlight logo ── */
   logoWrapper: {
     width: 80,
     height: 80,
@@ -314,7 +248,6 @@ const styles = StyleSheet.create({
     height: 112,
     borderRadius: 56,
     backgroundColor: 'rgba(180,210,255,0.18)',
-    // web box-shadow via style (ignored on native, fine)
     ...Platform.select({
       web: { boxShadow: '0 0 28px 12px rgba(160,200,255,0.30)' },
     }),
@@ -437,12 +370,18 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-end',
     position: 'relative',
   },
-  featuredAnimalImg: {
-    width: '100%',
+  featuredIconWrap: {
     position: 'absolute',
     top: 0,
     left: 0,
     right: 0,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingTop: 20,
+    opacity: 0.35,
+  },
+  featuredIcon: {
+    fontSize: 60,
   },
   featuredTextBlock: {
     padding: 12,

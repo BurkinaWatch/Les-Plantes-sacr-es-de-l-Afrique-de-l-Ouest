@@ -1,7 +1,7 @@
 import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
 import React from 'react';
-import { Image, Platform, Pressable, StyleSheet, Text, View } from 'react-native';
+import { Platform, Pressable, StyleSheet, Text, View } from 'react-native';
 
 import { useColors } from '@/hooks/useColors';
 import type { Animal } from '@/data/animals';
@@ -13,83 +13,30 @@ interface Props {
 }
 
 const CATEGORY_LABELS: Record<string, string> = {
-  Mammifères: 'MAMMIFÈRE',
-  Oiseaux: 'OISEAU',
-  Reptiles: 'REPTILE',
-  Amphibiens: 'AMPHIBIEN',
-  Aquatiques: 'AQUATIQUE',
+  'Arbres Sacrés': 'ARBRE SACRÉ',
+  'Plantes Médicinales': 'MÉDICINAL',
+  'Plantes Alimentaires': 'ALIMENTAIRE',
+  'Plantes Rituelles': 'RITUELLE',
+  'Herbes & Graminées': 'HERBE',
+  'Palmiers': 'PALMIER',
 };
 
-const ANIMAL_IMAGES: Record<string, any> = {
-  lion: require('@/assets/images/lion.png'),
-  elephant: require('@/assets/images/elephant.png'),
-  leopard: require('@/assets/images/leopard.png'),
-  crocodile: require('@/assets/images/crocodile.png'),
-  aigle: require('@/assets/images/aigle.png'),
-  serpent: require('@/assets/images/serpent.png'),
-  grenouille: require('@/assets/images/grenouille.png'),
-  hippopotame: require('@/assets/images/hippopotame.png'),
-  panthere: require('@/assets/images/panthere.png'),
-  cigogne: require('@/assets/images/cigogne.png'),
-  tortue: require('@/assets/images/tortue.png'),
-  cameleon: require('@/assets/images/cameleon.png'),
-  vautour: require('@/assets/images/vautour.png'),
-  'poisson-chat': require('@/assets/images/poisson-chat.png'),
-  hyene: require('@/assets/images/hyene.png'),
-  lezard: require('@/assets/images/lezard.png'),
-  singe: require('@/assets/images/singe.png'),
-  souris: require('@/assets/images/souris.png'),
-  calao: require('@/assets/images/calao.png'),
-  cheval: require('@/assets/images/cheval.png'),
-  iguane: require('@/assets/images/iguane.png'),
-  chevre: require('@/assets/images/chevre.png'),
-  pintade: require('@/assets/images/pintade.png'),
-  lievre: require('@/assets/images/lievre.png'),
-  colombe: require('@/assets/images/colombe.png'),
-  poisson: require('@/assets/images/poisson.png'),
-  cerf: require('@/assets/images/cerf.png'),
-  chien: require('@/assets/images/chien.png'),
-  ane: require('@/assets/images/ane.png'),
-  antilope: require('@/assets/images/antilope.png'),
-  tatou: require('@/assets/images/tatou.png'),
-  poulet: require('@/assets/images/poulet.png'),
-  cochon: require('@/assets/images/cochon.png'),
-  pigeon: require('@/assets/images/pigeon.png'),
-  lapin: require('@/assets/images/lapin.png'),
-  'porc-epic': require('@/assets/images/porc-epic.png'),
-  rat: require('@/assets/images/rat.png'),
-  escargot: require('@/assets/images/escargot.png'),
-  ecureuil: require('@/assets/images/ecureuil.png'),
-  cygne: require('@/assets/images/cygne.png'),
-  gorille: require('@/assets/images/gorille.png'),
-  buffle: require('@/assets/images/buffle.png'),
-  rhinoceros: require('@/assets/images/rhinoceros.png'),
-  guepard: require('@/assets/images/guepard.png'),
-  gnou: require('@/assets/images/gnou.png'),
-  araignee: require('@/assets/images/araignee.png'),
-  scorpion: require('@/assets/images/scorpion.png'),
-  pangolin: require('@/assets/images/pangolin.png'),
-  perroquet: require('@/assets/images/perroquet.png'),
-  ibis: require('@/assets/images/ibis.png'),
-  flamant: require('@/assets/images/flamant.png'),
-  heron: require('@/assets/images/heron.png'),
-  zebre: require('@/assets/images/zebre.png'),
-  girafe: require('@/assets/images/girafe.png'),
-  mangouste: require('@/assets/images/mangouste.png'),
-  'phacochère': require('@/assets/images/phacochere.png'),
-  'oryctérope': require('@/assets/images/oryctelope.png'),
+const CATEGORY_ICONS: Record<string, string> = {
+  'Arbres Sacrés': '🌳',
+  'Plantes Médicinales': '🌿',
+  'Plantes Alimentaires': '🫘',
+  'Plantes Rituelles': '✦',
+  'Herbes & Graminées': '🌾',
+  'Palmiers': '🌴',
 };
 
 export function AnimalCard({ animal, compact = false, numColumns = 2 }: Props) {
   const colors = useColors();
   const router = useRouter();
-  const animalImage = ANIMAL_IMAGES[animal.id];
 
-  // Scale card dimensions based on number of columns
-  // More columns → smaller cards, so keep height proportional
   const cardHeight = compact ? 90 : numColumns >= 4 ? 105 : numColumns === 3 ? 120 : 115;
-  const imgSize = compact ? 60 : numColumns >= 4 ? 70 : numColumns === 3 ? 88 : 78;
   const nomSize = compact ? 14 : numColumns >= 4 ? 14 : numColumns === 3 ? 16 : 17;
+  const iconSize = compact ? 32 : numColumns >= 4 ? 38 : numColumns === 3 ? 44 : 42;
 
   return (
     <Pressable
@@ -108,13 +55,9 @@ export function AnimalCard({ animal, compact = false, numColumns = 2 }: Props) {
           <View style={[styles.diamond, { borderColor: 'rgba(255,255,255,0.12)' }]} />
         </View>
 
-        {animalImage && (
-          <Image
-            source={animalImage}
-            style={[styles.animalImage, { width: imgSize, height: imgSize }]}
-            resizeMode="contain"
-          />
-        )}
+        <Text style={[styles.planteIcon, { fontSize: iconSize, opacity: 0.22 }]}>
+          {CATEGORY_ICONS[animal.categorie] ?? '🌿'}
+        </Text>
 
         <View style={styles.content}>
           <View style={styles.badge}>
@@ -187,19 +130,10 @@ const styles = StyleSheet.create({
     ...StyleSheet.absoluteFillObject,
     overflow: 'hidden',
   },
-  animalImage: {
+  planteIcon: {
     position: 'absolute',
-    right: -4,
-    bottom: -6,
-    width: 78,
-    height: 78,
-    opacity: 0.22,
-  },
-  animalImageCompact: {
-    width: 60,
-    height: 60,
     right: -2,
-    bottom: -4,
+    bottom: -6,
   },
   circle1: {
     position: 'absolute',

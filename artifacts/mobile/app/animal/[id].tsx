@@ -2,7 +2,6 @@ import * as Haptics from 'expo-haptics';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import React from 'react';
-import { Image } from 'expo-image';
 import {
   Platform,
   Pressable,
@@ -15,70 +14,9 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Feather } from '@expo/vector-icons';
 
 import { useApp } from '@/context/AppContext';
-import { getAnimalById, ANIMAL_CRIS } from '@/data/animals';
+import { getAnimalById } from '@/data/animals';
 import type { Element } from '@/data/animals';
 import { useColors } from '@/hooks/useColors';
-import { useAnimalSound } from '@/hooks/useAnimalSound';
-
-const ANIMAL_IMAGES: Record<string, any> = {
-  lion: require('@/assets/images/lion.png'),
-  elephant: require('@/assets/images/elephant.png'),
-  leopard: require('@/assets/images/leopard.png'),
-  crocodile: require('@/assets/images/crocodile.png'),
-  aigle: require('@/assets/images/aigle.png'),
-  serpent: require('@/assets/images/serpent.png'),
-  grenouille: require('@/assets/images/grenouille.png'),
-  hippopotame: require('@/assets/images/hippopotame.png'),
-  panthere: require('@/assets/images/panthere.png'),
-  cigogne: require('@/assets/images/cigogne.png'),
-  tortue: require('@/assets/images/tortue.png'),
-  cameleon: require('@/assets/images/cameleon.png'),
-  vautour: require('@/assets/images/vautour.png'),
-  'poisson-chat': require('@/assets/images/poisson-chat.png'),
-  hyene: require('@/assets/images/hyene.png'),
-  lezard: require('@/assets/images/lezard.png'),
-  singe: require('@/assets/images/singe.png'),
-  souris: require('@/assets/images/souris.png'),
-  calao: require('@/assets/images/calao.png'),
-  cheval: require('@/assets/images/cheval.png'),
-  iguane: require('@/assets/images/iguane.png'),
-  chevre: require('@/assets/images/chevre.png'),
-  pintade: require('@/assets/images/pintade.png'),
-  lievre: require('@/assets/images/lievre.png'),
-  colombe: require('@/assets/images/colombe.png'),
-  poisson: require('@/assets/images/poisson.png'),
-  cerf: require('@/assets/images/cerf.png'),
-  chien: require('@/assets/images/chien.png'),
-  ane: require('@/assets/images/ane.png'),
-  antilope: require('@/assets/images/antilope.png'),
-  tatou: require('@/assets/images/tatou.png'),
-  poulet: require('@/assets/images/poulet.png'),
-  cochon: require('@/assets/images/cochon.png'),
-  pigeon: require('@/assets/images/pigeon.png'),
-  lapin: require('@/assets/images/lapin.png'),
-  'porc-epic': require('@/assets/images/porc-epic.png'),
-  rat: require('@/assets/images/rat.png'),
-  escargot: require('@/assets/images/escargot.png'),
-  ecureuil: require('@/assets/images/ecureuil.png'),
-  cygne: require('@/assets/images/cygne.png'),
-  gorille: require('@/assets/images/gorille.png'),
-  buffle: require('@/assets/images/buffle.png'),
-  rhinoceros: require('@/assets/images/rhinoceros.png'),
-  guepard: require('@/assets/images/guepard.png'),
-  gnou: require('@/assets/images/gnou.png'),
-  araignee: require('@/assets/images/araignee.png'),
-  scorpion: require('@/assets/images/scorpion.png'),
-  pangolin: require('@/assets/images/pangolin.png'),
-  perroquet: require('@/assets/images/perroquet.png'),
-  ibis: require('@/assets/images/ibis.png'),
-  flamant: require('@/assets/images/flamant.png'),
-  heron: require('@/assets/images/heron.png'),
-  zebre: require('@/assets/images/zebre.png'),
-  girafe: require('@/assets/images/girafe.png'),
-  mangouste: require('@/assets/images/mangouste.png'),
-  'phacochère': require('@/assets/images/phacochere.png'),
-  'oryctérope': require('@/assets/images/oryctelope.png'),
-};
 
 const ELEMENT_ICONS: Record<Element, string> = {
   Feu: '🔥',
@@ -94,26 +32,35 @@ const ELEMENT_COLORS: Record<Element, string> = {
   Air: '#7A9EC0',
 };
 
+const CATEGORY_ICONS: Record<string, string> = {
+  'Arbres Sacrés': '🌳',
+  'Plantes Médicinales': '🌿',
+  'Plantes Alimentaires': '🫘',
+  'Plantes Rituelles': '✦',
+  'Herbes & Graminées': '🌾',
+  'Palmiers': '🌴',
+};
+
 function Section({ label, color }: { label: string; color: string }) {
   return (
     <Text style={[styles.sectionLabel, { color }]}>{label}</Text>
   );
 }
 
-export default function AnimalDetailScreen() {
+export default function PlanteDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const colors = useColors();
   const insets = useSafeAreaInsets();
   const router = useRouter();
   const { isFavorite, toggleFavorite } = useApp();
 
-  const animal = getAnimalById(id ?? '');
+  const plante = getAnimalById(id ?? '');
   const topPad = Platform.OS === 'web' ? Math.max(insets.top, 67) : insets.top;
 
-  if (!animal) {
+  if (!plante) {
     return (
       <View style={[styles.notFound, { backgroundColor: colors.background }]}>
-        <Text style={[styles.notFoundText, { color: colors.ivory }]}>Animal introuvable</Text>
+        <Text style={[styles.notFoundText, { color: colors.ivory }]}>Plante introuvable</Text>
         <Pressable onPress={() => router.back()}>
           <Text style={[styles.backLink, { color: colors.gold }]}>← Retour</Text>
         </Pressable>
@@ -121,19 +68,13 @@ export default function AnimalDetailScreen() {
     );
   }
 
-  const fav = isFavorite(animal.id);
-  const hasImage = !!ANIMAL_IMAGES[animal.id];
-  const elemColor = ELEMENT_COLORS[animal.element];
-  const { play: playSound, isPlaying, isLoading: soundLoading } = useAnimalSound(animal.id);
+  const fav = isFavorite(plante.id);
+  const elemColor = ELEMENT_COLORS[plante.element];
+  const categoryIcon = CATEGORY_ICONS[plante.categorie] ?? '🌿';
 
   function handleFavorite() {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    toggleFavorite(animal!.id);
-  }
-
-  function handlePlaySound() {
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-    playSound();
+    toggleFavorite(plante!.id);
   }
 
   return (
@@ -145,7 +86,7 @@ export default function AnimalDetailScreen() {
       {/* ── HERO ── */}
       <View style={[styles.heroWrap, { paddingTop: topPad }]}>
         <LinearGradient
-          colors={[animal.couleur, animal.couleurSecondaire, colors.deepBrown]}
+          colors={[plante.couleur, plante.couleurSecondaire, colors.deepBrown]}
           style={styles.heroGrad}
         >
           <View style={styles.heroDecor}>
@@ -172,34 +113,25 @@ export default function AnimalDetailScreen() {
             </Pressable>
           </View>
 
-          {hasImage ? (
-            <Image
-              source={ANIMAL_IMAGES[animal.id]}
-              style={styles.animalImage}
-              contentFit="cover"
-              contentPosition="top"
-            />
-          ) : (
-            <View style={[styles.animalImagePlaceholder, { backgroundColor: 'rgba(0,0,0,0.2)' }]}>
-              <View style={styles.phInner}>
-                <View style={[styles.phCircle, { borderColor: 'rgba(255,255,255,0.3)' }]} />
-                <Text style={styles.phLetter}>{animal.nom[0]}</Text>
-              </View>
+          <View style={styles.planteImagePlaceholder}>
+            <View style={styles.phInner}>
+              <View style={[styles.phCircle, { borderColor: 'rgba(255,255,255,0.3)' }]} />
+              <Text style={styles.phIcon}>{categoryIcon}</Text>
             </View>
-          )}
+          </View>
 
           <LinearGradient
-            colors={['transparent', animal.couleurSecondaire, colors.deepBrown]}
+            colors={['transparent', plante.couleurSecondaire, colors.deepBrown]}
             style={styles.imageFade}
           />
 
           <View style={styles.heroInfo}>
             <Text style={[styles.categorie, { color: 'rgba(255,255,255,0.65)' }]}>
-              {animal.categorie.toUpperCase()}
+              {plante.categorie.toUpperCase()}
             </Text>
-            <Text style={[styles.animalNom, { color: '#FFFFFF' }]}>{animal.nom}</Text>
+            <Text style={[styles.planteNom, { color: '#FFFFFF' }]}>{plante.nom}</Text>
             <Text style={[styles.regionText, { color: 'rgba(255,255,255,0.6)' }]}>
-              {animal.regionOrigine}
+              {plante.regionOrigine}
             </Text>
 
             <View style={styles.levelRow}>
@@ -210,10 +142,10 @@ export default function AnimalDetailScreen() {
                     styles.levelDot,
                     {
                       backgroundColor:
-                        i < animal.niveauSpirituel
+                        i < plante.niveauSpirituel
                           ? 'rgba(255,255,255,0.9)'
                           : 'rgba(255,255,255,0.2)',
-                      width: i < animal.niveauSpirituel ? 22 : 8,
+                      width: i < plante.niveauSpirituel ? 22 : 8,
                     },
                   ]}
                 />
@@ -234,85 +166,83 @@ export default function AnimalDetailScreen() {
           <View style={styles.identityGrid}>
             <View style={styles.identityItem}>
               <Text style={[styles.identityKey, { color: colors.mutedForeground }]}>Français</Text>
-              <Text style={[styles.identityVal, { color: colors.ivory }]}>{animal.nom}</Text>
+              <Text style={[styles.identityVal, { color: colors.ivory }]}>{plante.nom}</Text>
             </View>
             <View style={styles.identityItem}>
               <Text style={[styles.identityKey, { color: colors.mutedForeground }]}>Anglais</Text>
-              <Text style={[styles.identityVal, { color: colors.ivory }]}>{animal.nomAnglais}</Text>
+              <Text style={[styles.identityVal, { color: colors.ivory }]}>{plante.nomAnglais}</Text>
             </View>
             <View style={[styles.identityItem, { flex: 2 }]}>
               <Text style={[styles.identityKey, { color: colors.mutedForeground }]}>Nom scientifique</Text>
-              <Text style={[styles.identityValItalic, { color: colors.ivory }]}>{animal.nomScientifique}</Text>
+              <Text style={[styles.identityValItalic, { color: colors.ivory }]}>{plante.nomScientifique}</Text>
             </View>
           </View>
         </View>
-
-        {/* ── CRI ── */}
-        {ANIMAL_CRIS[animal.id] && (
-          <Pressable
-            onPress={handlePlaySound}
-            style={({ pressed }) => [{ opacity: pressed ? 0.85 : 1 }]}
-          >
-            <LinearGradient
-              colors={[animal.couleur + '30', colors.card]}
-              style={[styles.criCard, { borderColor: isPlaying ? animal.couleur : animal.couleur + '60' }]}
-            >
-              <View style={[styles.criIconWrap, { backgroundColor: animal.couleur + (isPlaying ? 'FF' : '30') }]}>
-                {soundLoading ? (
-                  <Text style={styles.criEmoji}>⏳</Text>
-                ) : isPlaying ? (
-                  <Text style={styles.criEmoji}>🔊</Text>
-                ) : (
-                  <Feather name="volume-2" size={28} color={isPlaying ? '#FFF' : animal.couleur} />
-                )}
-              </View>
-              <View style={{ flex: 1 }}>
-                <Text style={[styles.criLabel, { color: animal.couleur }]}>CRI — APPUYER POUR ÉCOUTER</Text>
-                <Text style={[styles.criNom, { color: colors.ivory }]}>{ANIMAL_CRIS[animal.id].nom}</Text>
-                <Text style={[styles.criSon, { color: 'rgba(255,255,255,0.65)' }]}>{ANIMAL_CRIS[animal.id].description}</Text>
-              </View>
-            </LinearGradient>
-          </Pressable>
-        )}
 
         {/* ── ÉLÉMENT ── */}
         <LinearGradient
           colors={[elemColor + '30', colors.card]}
           style={[styles.elementCard, { borderColor: elemColor + '60' }]}
         >
-          <Text style={[styles.elementIcon]}>{ELEMENT_ICONS[animal.element]}</Text>
+          <Text style={styles.elementIcon}>{ELEMENT_ICONS[plante.element]}</Text>
           <View style={{ flex: 1 }}>
             <Text style={[styles.elementLabel, { color: elemColor }]}>ÉLÉMENT ASSOCIÉ</Text>
-            <Text style={[styles.elementName, { color: colors.ivory }]}>{animal.element}</Text>
+            <Text style={[styles.elementName, { color: colors.ivory }]}>{plante.element}</Text>
           </View>
         </LinearGradient>
+
+        {/* ── VERTUS MÉDICINALES ── */}
+        {plante.vertus && plante.vertus.length > 0 && (
+          <View style={[styles.card, { backgroundColor: '#5C7A3E15', borderColor: '#5C7A3E40' }]}>
+            <Section label="VERTUS & USAGES TRADITIONNELS" color="#5C7A3E" />
+            <View style={styles.chipsWrap}>
+              {plante.vertus.map((v) => (
+                <View key={v} style={[styles.chip, { backgroundColor: '#5C7A3E18', borderColor: '#5C7A3E50' }]}>
+                  <View style={[styles.chipDot, { backgroundColor: '#5C7A3E' }]} />
+                  <Text style={[styles.chipText, { color: colors.ivory }]}>{v}</Text>
+                </View>
+              ))}
+            </View>
+            {plante.usagesTraditionnels && plante.usagesTraditionnels.length > 0 && (
+              <>
+                <Text style={[styles.subSectionLabel, { color: colors.mutedForeground }]}>USAGES TRADITIONNELS</Text>
+                {plante.usagesTraditionnels.map((u, i) => (
+                  <View key={i} style={styles.usageItem}>
+                    <Text style={[styles.usageDot, { color: '#5C7A3E' }]}>◦</Text>
+                    <Text style={[styles.usageText, { color: colors.ivory }]}>{u}</Text>
+                  </View>
+                ))}
+              </>
+            )}
+          </View>
+        )}
 
         {/* ── DESCRIPTION ── */}
         <View style={[styles.card, { backgroundColor: colors.card, borderColor: colors.border }]}>
           <Section label="DESCRIPTION" color={colors.gold} />
-          <Text style={[styles.cardText, { color: colors.ivory }]}>{animal.description}</Text>
+          <Text style={[styles.cardText, { color: colors.ivory }]}>{plante.description}</Text>
         </View>
 
         {/* ── SYMBOLIQUE AFRICAINE ── */}
         <View style={[styles.card, { backgroundColor: colors.card, borderColor: colors.border }]}>
           <Section label="SYMBOLIQUE AFRICAINE" color={colors.gold} />
-          <Text style={[styles.cardText, { color: colors.ivory }]}>{animal.symboliqueAfricaine}</Text>
+          <Text style={[styles.cardText, { color: colors.ivory }]}>{plante.symboliqueAfricaine}</Text>
         </View>
 
         {/* ── SYMBOLIQUE SPIRITUELLE ── */}
         <LinearGradient
-          colors={[animal.couleur + '20', colors.card]}
-          style={[styles.card, { borderColor: animal.couleur + '40' }]}
+          colors={[plante.couleur + '20', colors.card]}
+          style={[styles.card, { borderColor: plante.couleur + '40' }]}
         >
-          <Section label="SYMBOLIQUE SPIRITUELLE" color={animal.couleur} />
-          <Text style={[styles.cardText, { color: colors.ivory }]}>{animal.symboliqueSpirirtuelle}</Text>
+          <Section label="SYMBOLIQUE SPIRITUELLE" color={plante.couleur} />
+          <Text style={[styles.cardText, { color: colors.ivory }]}>{plante.symboliqueSpirirtuelle}</Text>
         </LinearGradient>
 
         {/* ── QUALITÉS ── */}
         <View style={[styles.card, { backgroundColor: colors.card, borderColor: colors.border }]}>
           <Section label="QUALITÉS" color="#5DBF7A" />
           <View style={styles.chipsWrap}>
-            {animal.qualites.map((q) => (
+            {plante.qualites.map((q) => (
               <View key={q} style={[styles.chip, { backgroundColor: '#5DBF7A18', borderColor: '#5DBF7A50' }]}>
                 <View style={[styles.chipDot, { backgroundColor: '#5DBF7A' }]} />
                 <Text style={[styles.chipText, { color: colors.ivory }]}>{q}</Text>
@@ -325,7 +255,7 @@ export default function AnimalDetailScreen() {
         <View style={[styles.card, { backgroundColor: colors.card, borderColor: colors.border }]}>
           <Section label="DÉFIS & ZONES D'OMBRE" color="#D46B6B" />
           <View style={styles.chipsWrap}>
-            {animal.defauts.map((d) => (
+            {plante.defauts.map((d) => (
               <View key={d} style={[styles.chip, { backgroundColor: '#D46B6B18', borderColor: '#D46B6B50' }]}>
                 <View style={[styles.chipDot, { backgroundColor: '#D46B6B' }]} />
                 <Text style={[styles.chipText, { color: colors.ivory }]}>{d}</Text>
@@ -338,9 +268,9 @@ export default function AnimalDetailScreen() {
         <View style={[styles.card, { backgroundColor: colors.card, borderColor: colors.border }]}>
           <Section label="POUVOIRS SACRÉS" color={colors.gold} />
           <View style={styles.chipsWrap}>
-            {animal.pouvoirs.map((p) => (
-              <View key={p} style={[styles.chip, { backgroundColor: animal.couleur + '25', borderColor: animal.couleur + '55' }]}>
-                <View style={[styles.chipDot, { backgroundColor: animal.couleur }]} />
+            {plante.pouvoirs.map((p) => (
+              <View key={p} style={[styles.chip, { backgroundColor: plante.couleur + '25', borderColor: plante.couleur + '55' }]}>
+                <View style={[styles.chipDot, { backgroundColor: plante.couleur }]} />
                 <Text style={[styles.chipText, { color: colors.ivory }]}>{p}</Text>
               </View>
             ))}
@@ -350,8 +280,8 @@ export default function AnimalDetailScreen() {
         {/* ── PROVERBES ── */}
         <View style={[styles.card, { backgroundColor: colors.card, borderColor: colors.border }]}>
           <Section label="PROVERBES AFRICAINS" color={colors.gold} />
-          {animal.proverbes.map((p, i) => (
-            <View key={i} style={[styles.proverbeItem, { borderLeftColor: animal.couleur }]}>
+          {plante.proverbes.map((p, i) => (
+            <View key={i} style={[styles.proverbeItem, { borderLeftColor: plante.couleur }]}>
               <Text style={[styles.proverbeText, { color: colors.ivory }]}>"{p}"</Text>
             </View>
           ))}
@@ -360,9 +290,9 @@ export default function AnimalDetailScreen() {
         {/* ── LÉGENDES ── */}
         <View style={[styles.card, { backgroundColor: colors.card, borderColor: colors.border }]}>
           <Section label="LÉGENDES TRADITIONNELLES" color={colors.gold} />
-          {animal.legendes.map((l, i) => (
+          {plante.legendes.map((l, i) => (
             <View key={i} style={styles.legendeItem}>
-              <Text style={[styles.legendeNum, { color: animal.couleur }]}>
+              <Text style={[styles.legendeNum, { color: plante.couleur }]}>
                 {i === 0 ? '◈' : '◇'}
               </Text>
               <Text style={[styles.legendeText, { color: colors.ivory }]}>{l}</Text>
@@ -373,9 +303,9 @@ export default function AnimalDetailScreen() {
         {/* ── ENSEIGNEMENTS ── */}
         <View style={[styles.card, { backgroundColor: colors.card, borderColor: colors.border }]}>
           <Section label="ENSEIGNEMENTS" color={colors.gold} />
-          {animal.enseignements.map((e, i) => (
+          {plante.enseignements.map((e, i) => (
             <View key={i} style={styles.enseignementItem}>
-              <Text style={[styles.ensNum, { color: animal.couleur }]}>{String(i + 1).padStart(2, '0')}</Text>
+              <Text style={[styles.ensNum, { color: plante.couleur }]}>{String(i + 1).padStart(2, '0')}</Text>
               <Text style={[styles.ensText, { color: colors.ivory }]}>{e}</Text>
             </View>
           ))}
@@ -384,7 +314,7 @@ export default function AnimalDetailScreen() {
         {/* ── CONSEILS DE VIE ── */}
         <View style={[styles.card, { backgroundColor: colors.card, borderColor: colors.border }]}>
           <Section label="CONSEILS DE VIE" color={colors.terracotta} />
-          {animal.conseilsDeVie.map((c, i) => (
+          {plante.conseilsDeVie.map((c, i) => (
             <View key={i} style={styles.conseilItem}>
               <Text style={[styles.conseilBullet, { color: colors.terracotta }]}>✦</Text>
               <Text style={[styles.conseilText, { color: colors.ivory }]}>{c}</Text>
@@ -394,19 +324,19 @@ export default function AnimalDetailScreen() {
 
         {/* ── CITATION SACRÉE ── */}
         <LinearGradient
-          colors={[animal.couleur + '40', colors.card]}
-          style={[styles.citationCard, { borderColor: animal.couleur + '50' }]}
+          colors={[plante.couleur + '40', colors.card]}
+          style={[styles.citationCard, { borderColor: plante.couleur + '50' }]}
         >
-          <Text style={[styles.citationLabel, { color: animal.couleur }]}>CITATION SACRÉE</Text>
-          <Text style={[styles.citationText, { color: colors.ivory }]}>"{animal.citation}"</Text>
+          <Text style={[styles.citationLabel, { color: plante.couleur }]}>CITATION SACRÉE</Text>
+          <Text style={[styles.citationText, { color: colors.ivory }]}>"{plante.citation}"</Text>
         </LinearGradient>
 
         {/* ── ENSEIGNEMENT DU JOUR ── */}
-        <View style={[styles.card, { backgroundColor: animal.couleur + '15', borderColor: animal.couleur + '40' }]}>
-          <Text style={[styles.sectionLabel, { color: animal.couleur }]}>
-            CE QUE LE {animal.nom.toUpperCase()} VOUS ENSEIGNE AUJOURD'HUI
+        <View style={[styles.card, { backgroundColor: plante.couleur + '15', borderColor: plante.couleur + '40' }]}>
+          <Text style={[styles.sectionLabel, { color: plante.couleur }]}>
+            CE QUE LE {plante.nom.toUpperCase()} VOUS ENSEIGNE AUJOURD'HUI
           </Text>
-          <Text style={[styles.todayText, { color: colors.ivory }]}>{animal.enseignementDuJour}</Text>
+          <Text style={[styles.todayText, { color: colors.ivory }]}>{plante.enseignementDuJour}</Text>
         </View>
 
         {/* ── FAVORI ── */}
@@ -440,15 +370,14 @@ const styles = StyleSheet.create({
   hd3: { position: 'absolute', left: -60, bottom: 20, width: 200, height: 200, borderRadius: 100, borderWidth: 1 },
   navRow: { flexDirection: 'row', justifyContent: 'space-between', zIndex: 10 },
   navBtn: { width: 44, height: 44, borderRadius: 22, alignItems: 'center', justifyContent: 'center' },
-  animalImage: { width: '100%', height: 220, borderRadius: 18, marginTop: 16, zIndex: 1 },
-  animalImagePlaceholder: { width: '100%', height: 200, borderRadius: 18, marginTop: 16, alignItems: 'center', justifyContent: 'center' },
+  planteImagePlaceholder: { width: '100%', height: 200, borderRadius: 18, marginTop: 16, alignItems: 'center', justifyContent: 'center' },
   phInner: { alignItems: 'center', justifyContent: 'center' },
-  phCircle: { position: 'absolute', width: 100, height: 100, borderRadius: 50, borderWidth: 1.5 },
-  phLetter: { fontSize: 72, fontWeight: '800' as const, color: 'rgba(255,255,255,0.5)' },
+  phCircle: { position: 'absolute', width: 120, height: 120, borderRadius: 60, borderWidth: 1.5 },
+  phIcon: { fontSize: 80 },
   imageFade: { position: 'absolute', bottom: 0, left: 0, right: 0, height: 140, zIndex: 2 },
   heroInfo: { paddingBottom: 24, zIndex: 3 },
   categorie: { fontSize: 10, fontWeight: '700' as const, letterSpacing: 2.5, marginBottom: 4 },
-  animalNom: { fontSize: 44, fontWeight: '800' as const, letterSpacing: 1 },
+  planteNom: { fontSize: 44, fontWeight: '800' as const, letterSpacing: 1 },
   regionText: { fontSize: 13, marginTop: 4, fontWeight: '400' as const },
   levelRow: { flexDirection: 'row', alignItems: 'center', gap: 4, marginTop: 12 },
   levelDot: { height: 5, borderRadius: 2.5 },
@@ -456,6 +385,7 @@ const styles = StyleSheet.create({
 
   card: { borderRadius: 16, padding: 18, borderWidth: 1, gap: 12 },
   sectionLabel: { fontSize: 10, fontWeight: '700' as const, letterSpacing: 2.5 },
+  subSectionLabel: { fontSize: 9, fontWeight: '700' as const, letterSpacing: 2, marginTop: 8 },
   cardText: { fontSize: 15, lineHeight: 26, fontWeight: '400' as const },
 
   identityGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 16 },
@@ -464,17 +394,14 @@ const styles = StyleSheet.create({
   identityVal: { fontSize: 15, fontWeight: '600' as const },
   identityValItalic: { fontSize: 14, fontWeight: '400' as const, fontStyle: 'italic' },
 
-  criCard: { borderRadius: 16, padding: 18, borderWidth: 1.5, flexDirection: 'row', alignItems: 'center', gap: 16 },
-  criIconWrap: { width: 56, height: 56, borderRadius: 28, alignItems: 'center', justifyContent: 'center' },
-  criEmoji: { fontSize: 28 },
-  criLabel: { fontSize: 9, fontWeight: '700' as const, letterSpacing: 2, marginBottom: 3 },
-  criNom: { fontSize: 20, fontWeight: '700' as const },
-  criSon: { fontSize: 15, fontStyle: 'italic', marginTop: 2 },
-
   elementCard: { borderRadius: 16, padding: 18, borderWidth: 1, flexDirection: 'row', alignItems: 'center', gap: 16 },
   elementIcon: { fontSize: 36 },
   elementLabel: { fontSize: 10, fontWeight: '700' as const, letterSpacing: 2.5, marginBottom: 2 },
   elementName: { fontSize: 22, fontWeight: '700' as const },
+
+  usageItem: { flexDirection: 'row', gap: 10, alignItems: 'flex-start', paddingVertical: 2 },
+  usageDot: { fontSize: 14, fontWeight: '700' as const, width: 16 },
+  usageText: { flex: 1, fontSize: 13, lineHeight: 20 },
 
   chipsWrap: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
   chip: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 12, paddingVertical: 7, borderRadius: 20, borderWidth: 1, gap: 7 },

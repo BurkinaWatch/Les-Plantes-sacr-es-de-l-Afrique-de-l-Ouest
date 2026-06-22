@@ -1,11 +1,11 @@
 {
   "expo": {
-    "name": "Les Animaux Sacrés",
-    "slug": "animaux-sacres-afrique",
+    "name": "Les Plantes Sacrées",
+    "slug": "plantes-sacrees-afrique",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
-    "scheme": "animauxsacres",
+    "scheme": "plantessacrees",
     "userInterfaceStyle": "dark",
     "newArchEnabled": true,
     "splash": {
@@ -15,10 +15,10 @@
     },
     "ios": {
       "supportsTablet": false,
-      "bundleIdentifier": "com.ouedraogophillips.animauxsacres"
+      "bundleIdentifier": "com.ouedraogophillips.plantessacrees"
     },
     "android": {
-      "package": "com.ouedraogophillips.animauxsacres",
+      "package": "com.ouedraogophillips.plantessacrees",
       "versionCode": 1,
       "backgroundColor": "#120A05",
       "adaptiveIcon": {

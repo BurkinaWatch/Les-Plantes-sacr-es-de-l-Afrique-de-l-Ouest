@@ -138,7 +138,7 @@ export default function ProfilScreen() {
         <View style={[styles.infoSection, { backgroundColor: colors.card, borderColor: colors.border }]}>
           <Text style={[styles.infoLabel, { color: colors.gold }]}>{t.profile_about}</Text>
           {[
-            { title: t.profile_app_label, value: 'Les Animaux Sacrés' },
+            { title: t.profile_app_label, value: 'Les Plantes Sacrées' },
             { title: t.profile_version, value: '1.0.0' },
             { title: t.profile_language, value: LANG_NAMES[lang] },
             { title: t.profile_offline, value: t.profile_offline_value },

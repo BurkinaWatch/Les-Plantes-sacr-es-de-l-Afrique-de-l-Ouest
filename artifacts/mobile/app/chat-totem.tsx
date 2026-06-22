@@ -178,7 +178,7 @@ export default function ChatTotemScreen() {
       const offlineMsg: Message = {
         id: (Date.now() + 1).toString(),
         role: 'assistant',
-        content: '🌐 Le Chat Totem nécessite une connexion au serveur. Cette fonctionnalité sera disponible dans une prochaine version.',
+        content: '🌐 La Plante Totem nécessite une connexion au serveur. Cette fonctionnalité sera disponible dans une prochaine version.',
         timestamp: Date.now(),
       };
       setMessages([...allMessages, offlineMsg]);
@@ -280,7 +280,7 @@ export default function ChatTotemScreen() {
           </Pressable>
           <Text style={[styles.emptyTitle, { color: colors.ivory }]}>✦ Totem non révélé</Text>
           <Text style={[styles.emptyDesc, { color: colors.mutedForeground }]}>
-            Complète le quiz sacré pour découvrir ton animal totem et accéder à ce dialogue ancestral.
+            Complète le quiz sacré pour découvrir ta plante totem et accéder à ce dialogue ancestral.
           </Text>
           <Pressable onPress={() => router.push('/(tabs)/quiz' as any)}>
             <LinearGradient colors={[colors.gold, colors.ochre]} style={styles.emptyBtn}>

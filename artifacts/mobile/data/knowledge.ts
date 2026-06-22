@@ -182,7 +182,7 @@ const PHILLIPS_CHAPTERS: KnowledgeChapter[] = [
   },
   {
     id: 'textiles-afrique-ouest',
-    titre: 'Animaux Sacrés',
+    titre: 'Plantes Sacrées',
     sousTitre: 'Sur les Textiles Traditionnels',
     icon: '◆',
     page: 25,
@@ -272,8 +272,8 @@ const PHILLIPS_CHAPTERS: KnowledgeChapter[] = [
     ],
   },
   {
-    id: 'proteger-animaux-sacres',
-    titre: 'Protéger les Animaux Sacrés',
+    id: 'proteger-plantes-sacrees',
+    titre: 'Protéger les Plantes Sacrées',
     sousTitre: "Protéger l'Âme de la Nature",
     icon: '🌿',
     page: 39,

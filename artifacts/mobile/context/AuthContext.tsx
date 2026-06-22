@@ -1,8 +1,8 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import React, { createContext, useCallback, useContext, useEffect, useState } from 'react';
 
-const AUTH_USER_KEY = '@animaux_sacres_auth_user';
-const ACCOUNTS_KEY = '@animaux_sacres_accounts';
+const AUTH_USER_KEY = '@plantes_sacrees_auth_user';
+const ACCOUNTS_KEY = '@plantes_sacrees_accounts';
 
 interface AuthUser {
   id: number;

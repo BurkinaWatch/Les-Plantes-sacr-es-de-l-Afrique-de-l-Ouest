@@ -24,8 +24,8 @@ interface AppContextType {
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
 
-const FAVORITES_KEY = '@animaux_sacres_favorites';
-const QUIZ_RESULT_KEY = '@animaux_sacres_quiz_result';
+const FAVORITES_KEY = '@plantes_sacrees_favorites';
+const QUIZ_RESULT_KEY = '@plantes_sacrees_quiz_result';
 
 export function AppProvider({ children }: { children: React.ReactNode }) {
   const [favorites, setFavorites] = useState<string[]>([]);

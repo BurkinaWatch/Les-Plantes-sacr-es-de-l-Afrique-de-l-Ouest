@@ -157,7 +157,7 @@ export default function MonAnimalScreen() {
               style={styles.chatBtn}
             >
               <Feather name="message-circle" size={20} color="#FFF" />
-              <Text style={styles.chatBtnText}>Parler à mon {primaryTotem.nom}</Text>
+              <Text style={styles.chatBtnText}>Parler à ma plante {primaryTotem.nom}</Text>
             </LinearGradient>
           </Pressable>
 

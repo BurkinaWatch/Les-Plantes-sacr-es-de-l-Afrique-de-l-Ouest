@@ -13,12 +13,12 @@ interface Props {
 
 const ICONS: Record<AnimalCategorie | 'all', string> = {
   all: '✦',
-  Mammifères: '◈',
-  Oiseaux: '◇',
-  Reptiles: '◆',
-  Amphibiens: '◉',
-  Aquatiques: '◎',
-  Invertébrés: '◌',
+  'Arbres Sacrés': '🌳',
+  'Plantes Médicinales': '🌿',
+  'Plantes Alimentaires': '🫘',
+  'Plantes Rituelles': '◉',
+  'Herbes & Graminées': '🌾',
+  'Palmiers': '🌴',
 };
 
 export function CategoryFilter({ selected, onSelect }: Props) {
@@ -26,12 +26,12 @@ export function CategoryFilter({ selected, onSelect }: Props) {
   const { t } = useTranslation();
 
   const CAT_LABELS: Record<AnimalCategorie, string> = {
-    Mammifères: t.cat_mammals,
-    Oiseaux: t.cat_birds,
-    Reptiles: t.cat_reptiles,
-    Amphibiens: t.cat_amphibians,
-    Aquatiques: t.cat_aquatic,
-    Invertébrés: t.cat_invertebrates,
+    'Arbres Sacrés': t.cat_mammals,
+    'Plantes Médicinales': t.cat_birds,
+    'Plantes Alimentaires': t.cat_reptiles,
+    'Plantes Rituelles': t.cat_amphibians,
+    'Herbes & Graminées': t.cat_aquatic,
+    'Palmiers': t.cat_invertebrates,
   };
 
   const items: (AnimalCategorie | null)[] = [null, ...CATEGORIES];

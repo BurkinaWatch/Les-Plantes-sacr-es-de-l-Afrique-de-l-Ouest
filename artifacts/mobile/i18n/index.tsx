@@ -191,7 +191,7 @@ export interface Translations {
 
 const TRANSLATIONS: Record<LangCode, Translations> = { fr, en, mos, dyo, ful };
 
-const LANG_STORAGE_KEY = '@animaux_sacres_language';
+const LANG_STORAGE_KEY = '@plantes_sacrees_language';
 
 interface LanguageContextType {
   lang: LangCode;

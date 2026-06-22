@@ -123,7 +123,7 @@ function AnimatedSplash({ onFinish }: { onFinish: () => void }) {
 
       {/* Titre */}
       <Animated.View style={[styles.titleBlock, { opacity: titleOpacity }]}>
-        <Text style={styles.titleSmall}>✦  LES ANIMAUX SACRÉS  ✦</Text>
+        <Text style={styles.titleSmall}>✦  LES PLANTES SACRÉES  ✦</Text>
         <Text style={styles.titleBig}>D'AFRIQUE</Text>
         <Text style={styles.titleMid}>DE L'OUEST</Text>
       </Animated.View>
