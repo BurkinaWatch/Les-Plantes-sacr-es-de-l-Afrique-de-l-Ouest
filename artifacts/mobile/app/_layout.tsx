@@ -76,10 +76,10 @@ function AnimatedSplash({ onFinish }: { onFinish: () => void }) {
         duration: 500,
         useNativeDriver: native,
       }),
-      Animated.delay(2000),
+      Animated.delay(1200),
       Animated.timing(screenOpacity, {
         toValue: 0,
-        duration: 600,
+        duration: 500,
         useNativeDriver: native,
       }),
     ]).start(() => onFinish());
