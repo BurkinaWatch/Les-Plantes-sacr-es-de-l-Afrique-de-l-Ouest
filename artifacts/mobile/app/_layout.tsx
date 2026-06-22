@@ -115,7 +115,7 @@ function AnimatedSplash({ onFinish }: { onFinish: () => void }) {
         ]}
       >
         <Image
-          source={require("@/assets/images/icon.png")}
+          source={require("@/assets/images/icon-plants.png")}
           style={styles.logo}
           resizeMode="contain"
         />
@@ -189,7 +189,7 @@ export default function RootLayout() {
 const styles = StyleSheet.create({
   splashContainer: {
     flex: 1,
-    backgroundColor: "#120A05",
+    backgroundColor: "#0A1F0A",
     alignItems: "center",
     justifyContent: "center",
     paddingHorizontal: 32,
@@ -201,7 +201,7 @@ const styles = StyleSheet.create({
   patternSymbol: {
     position: "absolute",
     fontSize: 36,
-    color: "#D4A017",
+    color: "#C8A020",
     opacity: 0.07,
   },
   logoGlow: {
@@ -209,7 +209,7 @@ const styles = StyleSheet.create({
     width: width * 0.72,
     height: width * 0.72,
     borderRadius: (width * 0.72) / 2,
-    backgroundColor: "#D4A017",
+    backgroundColor: "#C8A020",
   },
   logoWrap: {
     width: width * 0.62,
@@ -230,14 +230,14 @@ const styles = StyleSheet.create({
   titleSmall: {
     fontSize: 11,
     letterSpacing: 4,
-    color: "#D4A017",
+    color: "#C8A020",
     fontWeight: "700",
     marginBottom: 6,
   },
   titleBig: {
     fontSize: 46,
     fontWeight: "900",
-    color: "#F5E6C8",
+    color: "#F0EAD6",
     letterSpacing: 3,
     lineHeight: 50,
   },
@@ -256,13 +256,13 @@ const styles = StyleSheet.create({
   divider: {
     width: 56,
     height: 1,
-    backgroundColor: "#D4A017",
+    backgroundColor: "#C8A020",
     opacity: 0.45,
     marginVertical: 8,
   },
   subtitle: {
     fontSize: 12,
-    color: "#D4A01799",
+    color: "#C8A02099",
     letterSpacing: 1.5,
     fontStyle: "italic",
   },
@@ -270,7 +270,7 @@ const styles = StyleSheet.create({
     position: "absolute",
     bottom: 50,
     fontSize: 10,
-    color: "#F5E6C850",
+    color: "#F0EAD650",
     letterSpacing: 2.5,
     textTransform: "uppercase",
   },

@@ -94,7 +94,7 @@ export default function HomeScreen() {
     >
       {/* HERO — full-bleed photo with overlay */}
       <ImageBackground
-        source={require('@/assets/images/hero.png')}
+        source={require('@/assets/images/hero-plants.png')}
         style={[styles.hero, { height: heroHeight }]}
         resizeMode="cover"
       >

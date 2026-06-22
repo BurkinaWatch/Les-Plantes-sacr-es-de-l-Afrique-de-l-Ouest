@@ -378,6 +378,18 @@ uri = "file://artifacts/mobile/assets/images/hero-v2.png"
 type = "image"
 title = "bright savanna watering hole giraffe zebra hippo flamingo sunset"
 
+[[generated]]
+id = "LmQe0FMa16qrnfUAsqJqg"
+uri = "file://artifacts/mobile/assets/images/hero-plants.png"
+type = "image"
+title = "sacred-plants-hero-totem"
+
+[[generated]]
+id = "aBvxyzDWKxSLZhHhok5Fk"
+uri = "file://artifacts/mobile/assets/images/icon-plants.png"
+type = "image"
+title = "sacred-plants-icon-medallion"
+
 [[outputs]]
 id = "a_w4uSYXiM09eT84cCfYU"
 uri = "file://artifacts/mobile/assets/sounds/elephant.mp3"
@@ -707,3 +719,15 @@ id = "IPkaaq0hKiP7v6mDYWylM"
 uri = "file://artifacts/mobile/assets/images/hero.png"
 type = "image"
 title = "Nouvelle image héro générée"
+
+[[outputs]]
+id = "y3erg_MNCLwIO6qz9V-23"
+uri = "file://artifacts/mobile/assets/images/hero-plants.png"
+type = "image"
+title = "Hero — Les Plantes Sacrées"
+
+[[outputs]]
+id = "lek2jb12d_NqRPYyp_MDX"
+uri = "file://artifacts/mobile/assets/images/icon-plants.png"
+type = "image"
+title = "Médaillon — Splash Screen Plantes"
