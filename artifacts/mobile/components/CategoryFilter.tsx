@@ -79,25 +79,25 @@ export function CategoryFilter({ selected, onSelect }: Props) {
 
 const styles = StyleSheet.create({
   scrollContent: {
-    paddingHorizontal: 16,
-    gap: 8,
-    paddingVertical: 4,
+    paddingHorizontal: 12,
+    gap: 6,
+    paddingVertical: 3,
   },
   chip: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: 14,
-    paddingVertical: 8,
-    borderRadius: 20,
+    paddingHorizontal: 11,
+    paddingVertical: 5,
+    borderRadius: 16,
     borderWidth: 1,
-    gap: 6,
+    gap: 5,
   },
   chipIcon: {
-    fontSize: 12,
+    fontSize: 11,
   },
   chipText: {
-    fontSize: 13,
+    fontSize: 11,
     fontWeight: '600' as const,
-    letterSpacing: 0.3,
+    letterSpacing: 0.2,
   },
 });

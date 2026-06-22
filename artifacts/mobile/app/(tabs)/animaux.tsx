@@ -47,12 +47,14 @@ export default function AnimauxScreen() {
 
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
-      <View style={[styles.header, { paddingTop: topPad + 16, backgroundColor: colors.background, borderBottomColor: colors.border }]}>
-        <Text style={[styles.headerSub, { color: colors.gold }]}>{t.animals_museum}</Text>
-        <Text style={[styles.headerTitle, { color: colors.ivory }]}>{t.animals_title}</Text>
+      <View style={[styles.header, { paddingTop: topPad + 8, backgroundColor: colors.background, borderBottomColor: colors.border }]}>
+        <View style={styles.titleRow}>
+          <Text style={[styles.headerSub, { color: colors.gold }]}>{t.animals_museum}</Text>
+          <Text style={[styles.headerTitle, { color: colors.ivory }]}>{t.animals_title}</Text>
+        </View>
 
         <View style={[styles.searchBar, { backgroundColor: colors.card, borderColor: colors.border }]}>
-          <Feather name="search" size={16} color={colors.mutedForeground} />
+          <Feather name="search" size={14} color={colors.mutedForeground} />
           <TextInput
             style={[styles.searchInput, { color: colors.ivory }]}
             placeholder={t.animals_search_placeholder}
@@ -62,7 +64,7 @@ export default function AnimauxScreen() {
             returnKeyType="search"
           />
           {search.length > 0 && (
-            <Feather name="x" size={16} color={colors.mutedForeground} onPress={() => setSearch('')} />
+            <Feather name="x" size={14} color={colors.mutedForeground} onPress={() => setSearch('')} />
           )}
         </View>
       </View>
@@ -83,7 +85,7 @@ export default function AnimauxScreen() {
           keyExtractor={(item) => item.id}
           numColumns={numColumns}
           key={numColumns}
-          contentContainerStyle={{ paddingHorizontal: 8, paddingBottom: 100 + insets.bottom, paddingTop: 8 }}
+          contentContainerStyle={{ paddingHorizontal: 4, paddingBottom: 80 + insets.bottom, paddingTop: 4 }}
           renderItem={({ item }) => (
             <View style={styles.cardWrap}>
               <AnimalCard animal={item} numColumns={numColumns} />
@@ -97,12 +99,13 @@ export default function AnimauxScreen() {
 
 const styles = StyleSheet.create({
   container: { flex: 1 },
-  header: { paddingHorizontal: 20, paddingBottom: 12, borderBottomWidth: StyleSheet.hairlineWidth, gap: 4 },
-  headerSub: { fontSize: 10, fontWeight: '700' as const, letterSpacing: 2.5 },
-  headerTitle: { fontSize: 34, fontWeight: '800' as const, letterSpacing: 0.5 },
-  searchBar: { flexDirection: 'row', alignItems: 'center', gap: 10, borderRadius: 14, borderWidth: 1, paddingHorizontal: 14, paddingVertical: 11, marginTop: 8 },
-  searchInput: { flex: 1, fontSize: 15, fontWeight: '400' as const },
-  filterWrap: { paddingVertical: 10 },
+  header: { paddingHorizontal: 16, paddingBottom: 8, borderBottomWidth: StyleSheet.hairlineWidth },
+  titleRow: { flexDirection: 'row', alignItems: 'center', gap: 10, marginBottom: 6 },
+  headerSub: { fontSize: 9, fontWeight: '700' as const, letterSpacing: 2 },
+  headerTitle: { fontSize: 20, fontWeight: '800' as const, letterSpacing: 0.3 },
+  searchBar: { flexDirection: 'row', alignItems: 'center', gap: 8, borderRadius: 12, borderWidth: 1, paddingHorizontal: 12, paddingVertical: 7 },
+  searchInput: { flex: 1, fontSize: 14, fontWeight: '400' as const },
+  filterWrap: { paddingVertical: 4 },
   empty: { flex: 1, alignItems: 'center', justifyContent: 'center', gap: 8, padding: 32 },
   emptyIcon: { fontSize: 36, marginBottom: 4 },
   emptyTitle: { fontSize: 18, fontWeight: '700' as const },

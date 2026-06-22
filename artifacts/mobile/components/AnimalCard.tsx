@@ -26,7 +26,7 @@ export function AnimalCard({ animal, compact = false, numColumns = 2 }: Props) {
   const colors = useColors();
   const router = useRouter();
 
-  const cardHeight = compact ? 90 : numColumns >= 4 ? 105 : numColumns === 3 ? 120 : 140;
+  const cardHeight = compact ? 90 : numColumns >= 4 ? 100 : numColumns === 3 ? 110 : 115;
   const nomSize = compact ? 14 : numColumns >= 4 ? 14 : numColumns === 3 ? 16 : 17;
 
   const plantImage = PLANT_IMAGES[animal.id];
@@ -91,8 +91,8 @@ export function AnimalCard({ animal, compact = false, numColumns = 2 }: Props) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    margin: 6,
-    borderRadius: 16,
+    margin: 4,
+    borderRadius: 14,
     overflow: 'hidden',
     ...Platform.select({
       web: { boxShadow: '0px 3px 10px rgba(0,0,0,0.40)' },
