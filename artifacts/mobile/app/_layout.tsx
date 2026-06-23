@@ -153,8 +153,43 @@ function ScannerFab() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const colors = useColors();
+  const pulseScale = useRef(new Animated.Value(1)).current;
+  const ringScale = useRef(new Animated.Value(1)).current;
+  const ringOpacity = useRef(new Animated.Value(0.7)).current;
 
   const isOnAccueil = segments[0] === "(tabs)" && (segments[1] === "index" || segments[1] === undefined);
+
+  useEffect(() => {
+    if (!isOnAccueil) return;
+
+    // Gentle breathing pulse on the button
+    const breath = Animated.loop(
+      Animated.sequence([
+        Animated.timing(pulseScale, { toValue: 1.08, duration: 1100, useNativeDriver: true }),
+        Animated.timing(pulseScale, { toValue: 1.0,  duration: 1100, useNativeDriver: true }),
+      ])
+    );
+
+    // Expanding glowing ring
+    const ring = Animated.loop(
+      Animated.sequence([
+        Animated.parallel([
+          Animated.timing(ringScale,   { toValue: 1.7,  duration: 1400, useNativeDriver: true }),
+          Animated.timing(ringOpacity, { toValue: 0,    duration: 1400, useNativeDriver: true }),
+        ]),
+        Animated.parallel([
+          Animated.timing(ringScale,   { toValue: 1.0,  duration: 0,    useNativeDriver: true }),
+          Animated.timing(ringOpacity, { toValue: 0.55, duration: 0,    useNativeDriver: true }),
+        ]),
+        Animated.delay(400),
+      ])
+    );
+
+    breath.start();
+    ring.start();
+    return () => { breath.stop(); ring.stop(); };
+  }, [isOnAccueil]);
+
   if (!isOnAccueil) return null;
 
   const tabBarH = Platform.OS === "web" ? 84 : 49 + insets.bottom;
@@ -164,35 +199,51 @@ function ScannerFab() {
     <View
       style={[fabStyles.row, { bottom: fabBottom, pointerEvents: "box-none" }]}
     >
-      <Pressable
-        onPress={() => router.push("/(tabs)/scanner")}
-        style={({ pressed }) => [
-          fabStyles.btn,
+      {/* Glowing ring */}
+      <Animated.View
+        style={[
+          fabStyles.ring,
           {
-            backgroundColor: colors.gold,
-            opacity: pressed ? 0.85 : 1,
-            transform: [{ scale: pressed ? 0.93 : 1 }],
+            borderColor: colors.gold,
+            opacity: ringOpacity,
+            transform: [{ scale: ringScale }],
           },
-          Platform.select({
-            ios: {
-              shadowColor: "#C8A020",
-              shadowOffset: { width: 0, height: 4 },
-              shadowOpacity: 0.55,
-              shadowRadius: 10,
-            },
-            android: {},
-            web: { boxShadow: "0 4px 20px rgba(200,160,32,0.6)" } as any,
-          }),
         ]}
-        accessibilityLabel="Scanner une plante"
-        accessibilityRole="button"
-      >
-        {Feather ? (
-          <Feather name="camera" size={26} color={colors.background} />
-        ) : (
-          <Text style={{ fontSize: 22 }}>📷</Text>
-        )}
-      </Pressable>
+        pointerEvents="none"
+      />
+
+      {/* Button with breathing scale */}
+      <Animated.View style={{ transform: [{ scale: pulseScale }] }}>
+        <Pressable
+          onPress={() => router.push("/(tabs)/scanner")}
+          style={({ pressed }) => [
+            fabStyles.btn,
+            {
+              backgroundColor: colors.gold,
+              opacity: pressed ? 0.85 : 1,
+              transform: [{ scale: pressed ? 0.93 : 1 }],
+            },
+            Platform.select({
+              ios: {
+                shadowColor: "#C8A020",
+                shadowOffset: { width: 0, height: 4 },
+                shadowOpacity: 0.55,
+                shadowRadius: 10,
+              },
+              android: {},
+              web: { boxShadow: "0 4px 20px rgba(200,160,32,0.6)" } as any,
+            }),
+          ]}
+          accessibilityLabel="Scanner une plante"
+          accessibilityRole="button"
+        >
+          {Feather ? (
+            <Feather name="camera" size={26} color={colors.background} />
+          ) : (
+            <Text style={{ fontSize: 22 }}>📷</Text>
+          )}
+        </Pressable>
+      </Animated.View>
     </View>
   );
 }
@@ -213,6 +264,13 @@ const fabStyles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     elevation: 12,
+  },
+  ring: {
+    position: "absolute",
+    width: FAB_SIZE,
+    height: FAB_SIZE,
+    borderRadius: FAB_SIZE / 2,
+    borderWidth: 2.5,
   },
 });
 
