@@ -42,7 +42,7 @@ export default function HomeScreen() {
   const pickRandom = useCallback((exclude: string[] = []): typeof PLANTS => {
     const pool = PLANTS.filter((a) => !exclude.includes(a.id));
     const shuffled = [...pool].sort(() => Math.random() - 0.5);
-    return shuffled.slice(0, 5);
+    return shuffled.slice(0, 8);
   }, []);
 
   const [featuredPlantes, setFeaturedPlantes] = useState(() => pickRandom());
@@ -73,8 +73,15 @@ export default function HomeScreen() {
   }, [pickRandom]);
 
   const isTablet = width >= 600;
-  const cardWidth = isTablet ? Math.round(width * 0.28) : 140;
-  const cardHeight = isTablet ? Math.round(cardWidth * 1.45) : 200;
+  // Show 4 cards simultaneously on mobile, with a small right-edge peek to hint at scrollability
+  const CARD_GAP = isTablet ? 14 : 8;
+  const SIDE_PAD = 20;
+  const RIGHT_PEEK = 6;
+  const CARDS_IN_ROW = isTablet ? 5 : 4;
+  const cardWidth = isTablet
+    ? Math.round(width * 0.18)
+    : Math.floor((width - SIDE_PAD - (CARDS_IN_ROW - 1) * CARD_GAP - RIGHT_PEEK) / CARDS_IN_ROW);
+  const cardHeight = Math.round(cardWidth * 1.55);
 
   const topPad = Platform.OS === 'web' ? Math.max(insets.top, 67) : insets.top;
 
@@ -140,7 +147,7 @@ export default function HomeScreen() {
         <Text style={[styles.sectionLabel, { color: colors.gold }]}>{t.home_sacred_animals_label}</Text>
         <Text style={[styles.sectionTitle, { color: colors.ivory }]}>{t.home_guardians}</Text>
         <Animated.View style={{ opacity: carouselFade }}>
-          <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.featuredScroll} contentContainerStyle={{ gap: isTablet ? 16 : 12, paddingVertical: 4 }}>
+          <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.featuredScroll} contentContainerStyle={{ gap: CARD_GAP, paddingVertical: 4 }}>
             {featuredPlantes.map((plante) => (
               <Pressable
                 key={plante.id}
@@ -370,14 +377,14 @@ const styles = StyleSheet.create({
     borderRadius: 18,
   },
   featuredTextBlock: {
-    padding: 12,
-    paddingBottom: 14,
+    padding: 8,
+    paddingBottom: 10,
     zIndex: 2,
   },
-  featuredNom: { color: '#FFFFFF', fontSize: 16, fontWeight: '800', letterSpacing: 0.3 },
-  featuredNomTablet: { fontSize: 20 },
-  featuredPouvoir: { color: 'rgba(255,255,255,0.82)', fontSize: 11, marginTop: 3, lineHeight: 15 },
-  featuredPouvoirTablet: { fontSize: 13, lineHeight: 18 },
+  featuredNom: { color: '#FFFFFF', fontSize: 12, fontWeight: '800', letterSpacing: 0.2 },
+  featuredNomTablet: { fontSize: 16 },
+  featuredPouvoir: { color: 'rgba(255,255,255,0.80)', fontSize: 9, marginTop: 2, lineHeight: 13 },
+  featuredPouvoirTablet: { fontSize: 12, lineHeight: 17 },
   ctaButton: {
     flexDirection: 'row',
     justifyContent: 'space-between',
