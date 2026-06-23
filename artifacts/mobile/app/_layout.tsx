@@ -154,8 +154,8 @@ function ScannerFab() {
   const insets = useSafeAreaInsets();
   const colors = useColors();
 
-  const isInTabs = segments[0] === "(tabs)" && segments[1] !== "scanner";
-  if (!isInTabs) return null;
+  const isOnAccueil = segments[0] === "(tabs)" && (segments[1] === "index" || segments[1] === undefined);
+  if (!isOnAccueil) return null;
 
   const tabBarH = Platform.OS === "web" ? 84 : 49 + insets.bottom;
   const fabBottom = tabBarH + 16;
