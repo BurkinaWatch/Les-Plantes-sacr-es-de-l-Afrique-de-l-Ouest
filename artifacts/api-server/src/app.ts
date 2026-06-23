@@ -6,6 +6,9 @@ import { logger } from "./lib/logger";
 
 const app: Express = express();
 
+// Trust the Replit reverse proxy so rate-limit can use the real client IP
+app.set('trust proxy', 1);
+
 const ALLOWED_ORIGINS: (string | RegExp)[] = [
   /^https:\/\/.*\.replit\.app$/,
   /^https:\/\/.*\.replit\.dev$/,

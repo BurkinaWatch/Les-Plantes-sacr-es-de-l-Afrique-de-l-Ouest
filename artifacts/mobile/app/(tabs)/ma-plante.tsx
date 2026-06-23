@@ -159,6 +159,17 @@ export default function MaPlanteScreen() {
             </LinearGradient>
           </Pressable>
 
+          <Pressable
+            style={({ pressed }) => [styles.progressionBtn, { borderColor: primaryTotem.couleur + '60', opacity: pressed ? 0.85 : 1 }]}
+            onPress={() => router.push('/progression-spirituelle' as any)}
+          >
+            <Feather name="trending-up" size={16} color={primaryTotem.couleur} />
+            <Text style={[styles.progressionBtnText, { color: primaryTotem.couleur }]}>
+              Ma progression spirituelle
+            </Text>
+            <Feather name="chevron-right" size={14} color={primaryTotem.couleur + '80'} />
+          </Pressable>
+
           {primaryPlante && (
             <Pressable
               style={({ pressed }) => [{ opacity: pressed ? 0.88 : 1 }]}
@@ -218,6 +229,12 @@ const styles = StyleSheet.create({
   mantraText: { fontSize: 16, fontStyle: 'italic', textAlign: 'center', lineHeight: 26, fontWeight: '500' as const },
   chatBtn: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 10, padding: 18, borderRadius: 16 },
   chatBtnText: { fontSize: 16, fontWeight: '700' as const, color: '#FFF' },
+  progressionBtn: {
+    flexDirection: 'row' as const, alignItems: 'center' as const, gap: 10,
+    padding: 14, borderRadius: 14, borderWidth: 1,
+    justifyContent: 'center' as const,
+  },
+  progressionBtnText: { fontSize: 14, fontWeight: '600' as const, flex: 1, textAlign: 'center' as const },
   retakeBtn: { alignItems: 'center', padding: 14, borderRadius: 14, borderWidth: 1 },
   retakeText: { fontSize: 14, fontWeight: '500' as const },
 });

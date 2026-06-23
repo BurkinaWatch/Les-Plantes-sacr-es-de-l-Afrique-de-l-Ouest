@@ -341,17 +341,25 @@ export default function ChatTotemScreen() {
             </Text>
           </View>
 
-          <Pressable
-            style={({ pressed }) => [styles.iconBtn, { opacity: pressed ? 0.7 : 1, borderColor: totemColor + '60' }]}
-            onPress={() => setShowArchives(true)}
-          >
-            <Feather name="archive" size={18} color={totemColor} />
-            {sessions.length > 0 && (
-              <View style={[styles.badge, { backgroundColor: totemColor }]}>
-                <Text style={styles.badgeText}>{Math.min(sessions.length, 9)}</Text>
-              </View>
-            )}
-          </Pressable>
+          <View style={{ flexDirection: 'row', gap: 8 }}>
+            <Pressable
+              style={({ pressed }) => [styles.iconBtn, { opacity: pressed ? 0.7 : 1, borderColor: totemColor + '60' }]}
+              onPress={() => router.push('/progression-spirituelle' as any)}
+            >
+              <Feather name="trending-up" size={16} color={totemColor} />
+            </Pressable>
+            <Pressable
+              style={({ pressed }) => [styles.iconBtn, { opacity: pressed ? 0.7 : 1, borderColor: totemColor + '60' }]}
+              onPress={() => setShowArchives(true)}
+            >
+              <Feather name="archive" size={18} color={totemColor} />
+              {sessions.length > 0 && (
+                <View style={[styles.badge, { backgroundColor: totemColor }]}>
+                  <Text style={styles.badgeText}>{Math.min(sessions.length, 9)}</Text>
+                </View>
+              )}
+            </Pressable>
+          </View>
         </View>
 
         {/* Adinkra strip */}
