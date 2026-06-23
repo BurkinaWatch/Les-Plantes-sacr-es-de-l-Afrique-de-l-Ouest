@@ -332,11 +332,12 @@ const styles = StyleSheet.create({
     marginBottom: 4,
   },
   titleSmall: {
-    fontSize: 11,
-    letterSpacing: 4,
+    fontSize: 15,
+    letterSpacing: 3,
     color: "#C8A020",
-    fontWeight: "700",
-    marginBottom: 6,
+    fontWeight: "800",
+    marginBottom: 8,
+    textAlign: "center",
   },
   titleBig: {
     fontSize: 46,
