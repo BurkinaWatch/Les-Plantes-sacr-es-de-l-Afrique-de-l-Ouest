@@ -25,6 +25,23 @@ import { LanguageProvider } from "@/i18n";
 let Feather: any = null;
 try { Feather = require("@expo/vector-icons").Feather; } catch {}
 
+// Suppress fontfaceobserver timeout errors on web (known Expo Web / vector-icons issue)
+if (Platform.OS === "web" && typeof window !== "undefined") {
+  window.addEventListener("unhandledrejection", (e) => {
+    const msg = String(e?.reason?.message ?? e?.reason ?? "");
+    // fontfaceobserver throws: '"FontName" font timed out.' or 'Xms timeout'
+    if (msg.includes("ms timeout") || msg.includes("font timed out") || msg.includes("fontface")) {
+      e.preventDefault();
+    }
+  });
+  const origError = window.onerror;
+  window.onerror = (msg, src, _line, _col, _err) => {
+    if (typeof src === "string" && src.includes("fontfaceobserver")) return true;
+    if (typeof msg === "string" && (msg.includes("ms timeout") || msg.includes("font timed out"))) return true;
+    return origError ? origError.apply(window, arguments as any) : false;
+  };
+}
+
 SplashScreen.preventAutoHideAsync();
 
 const queryClient = new QueryClient();
