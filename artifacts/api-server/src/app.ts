@@ -12,6 +12,7 @@ app.set('trust proxy', 1);
 const ALLOWED_ORIGINS: (string | RegExp)[] = [
   /^https:\/\/.*\.replit\.app$/,
   /^https:\/\/.*\.replit\.dev$/,
+  /^https:\/\/.*\.railway\.app$/,
   /^exp:\/\//,
 ];
 
