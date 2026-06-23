@@ -38,9 +38,26 @@ interface ChatSession {
   preview: string;
 }
 
-const API_BASE = process.env.EXPO_PUBLIC_DOMAIN
-  ? `https://${process.env.EXPO_PUBLIC_DOMAIN}/api`
-  : null;
+function getApiBase(): string | null {
+  if (process.env.EXPO_PUBLIC_DOMAIN) {
+    return `https://${process.env.EXPO_PUBLIC_DOMAIN}/api`;
+  }
+  // On Expo Web running in Replit, derive the API URL from the browser location.
+  // The API server is on port 8080 of the same host.
+  if (Platform.OS === 'web' && typeof window !== 'undefined') {
+    const host = window.location.hostname;
+    if (host.includes('replit.dev') || host.includes('replit.app')) {
+      return `https://${host}:8080/api`;
+    }
+    // Local dev fallback
+    if (host === 'localhost' || host === '127.0.0.1') {
+      return `http://${host}:8080/api`;
+    }
+  }
+  return null;
+}
+
+const API_BASE = getApiBase();
 
 const ADINKRA = ['◆', '▲', '◇', '△', '●', '○', '✦', '✧'];
 const KENTE_STRIP = ['#D4A017', '#C4622D', '#5C7A3E', '#CC7722', '#8B6914', '#D4A017'];

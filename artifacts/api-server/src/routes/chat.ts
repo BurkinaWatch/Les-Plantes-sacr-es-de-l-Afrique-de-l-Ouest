@@ -16,26 +16,31 @@ const chatLimiter = rateLimit({
   message: { error: "Trop de messages. Réessaye dans une minute." },
 });
 
+const planteDataSchema = z.object({
+  nom: z.string(),
+  nomScientifique: z.string(),
+  element: z.string(),
+  categorie: z.string(),
+  regionOrigine: z.string(),
+  description: z.string(),
+  symboliqueAfricaine: z.string(),
+  symboliqueSpirirtuelle: z.string(),
+  qualites: z.array(z.string()),
+  defauts: z.array(z.string()),
+  pouvoirs: z.array(z.string()),
+  enseignements: z.array(z.string()),
+  citation: z.string(),
+  proverbes: z.array(z.string()),
+  conseilsDeVie: z.array(z.string()),
+  niveauSpirituel: z.number(),
+});
+
 const chatSchema = z.object({
-  animalId: z.string().min(1),
-  animalData: z.object({
-    nom: z.string(),
-    nomScientifique: z.string(),
-    element: z.string(),
-    categorie: z.string(),
-    regionOrigine: z.string(),
-    description: z.string(),
-    symboliqueAfricaine: z.string(),
-    symboliqueSpirirtuelle: z.string(),
-    qualites: z.array(z.string()),
-    defauts: z.array(z.string()),
-    pouvoirs: z.array(z.string()),
-    enseignements: z.array(z.string()),
-    citation: z.string(),
-    proverbes: z.array(z.string()),
-    conseilsDeVie: z.array(z.string()),
-    niveauSpirituel: z.number(),
-  }),
+  // Accept both planteId/planteData (new) and animalId/animalData (legacy)
+  planteId: z.string().min(1).optional(),
+  animalId: z.string().min(1).optional(),
+  planteData: planteDataSchema.optional(),
+  animalData: planteDataSchema.optional(),
   messages: z.array(
     z.object({
       role: z.enum(["user", "assistant"]),
@@ -43,7 +48,10 @@ const chatSchema = z.object({
     })
   ).max(50),
   userLang: z.enum(["fr", "en", "wo"]).default("fr"),
-});
+}).refine(
+  (d) => (d.planteData ?? d.animalData) !== undefined,
+  { message: "planteData or animalData is required" }
+);
 
 function buildSystemPrompt(animal: z.infer<typeof chatSchema>["animalData"], lang: string): string {
   const langInstruction =
@@ -108,8 +116,9 @@ router.post("/totem", requireApiKey, chatLimiter, async (req, res) => {
     return res.status(400).json({ error: "Données invalides", details: parsed.error.issues });
   }
 
-  const { animalData, messages, userLang } = parsed.data;
-  const systemPrompt = buildSystemPrompt(animalData, userLang);
+  const { planteData, animalData, messages, userLang } = parsed.data;
+  const planteInfo = planteData ?? animalData!;
+  const systemPrompt = buildSystemPrompt(planteInfo, userLang);
 
   try {
     const completion = await groq.chat.completions.create({
