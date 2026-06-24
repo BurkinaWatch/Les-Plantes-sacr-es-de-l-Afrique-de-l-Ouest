@@ -594,6 +594,66 @@ uri = "file://artifacts/mobile/assets/images/plants/artemisia.png"
 type = "image"
 title = "artemisia wormwood Africa"
 
+[[generated]]
+id = "OfhXi3YaFoZLON_vVkrdD"
+uri = "file://artifacts/mobile/assets/images/plants/lion.png"
+type = "image"
+title = "generated_image"
+
+[[generated]]
+id = "dylwAhWVlwskfreWC9hdn"
+uri = "file://artifacts/mobile/assets/images/plants/elephant.png"
+type = "image"
+title = "generated_image"
+
+[[generated]]
+id = "WG5Q6vpxzCh-h6zBirt_s"
+uri = "file://artifacts/mobile/assets/images/plants/leopard.png"
+type = "image"
+title = "generated_image"
+
+[[generated]]
+id = "gNi4dJ385lLhF-dBewKvH"
+uri = "file://artifacts/mobile/assets/images/plants/hippopotame.png"
+type = "image"
+title = "generated_image"
+
+[[generated]]
+id = "YRinDqdJi7zALMwUNvGN-"
+uri = "file://artifacts/mobile/assets/images/plants/crocodile.png"
+type = "image"
+title = "generated_image"
+
+[[generated]]
+id = "z5M3V8SNUT1vbWQB1lCT4"
+uri = "file://artifacts/mobile/assets/images/plants/aigle.png"
+type = "image"
+title = "generated_image"
+
+[[generated]]
+id = "1AEwns1M1Uixht4bBHS3_"
+uri = "file://artifacts/mobile/assets/images/plants/hyene.png"
+type = "image"
+title = "generated_image"
+
+[[generated]]
+id = "eYkxVjZwO3M6XQqYS14vB"
+uri = "file://artifacts/mobile/assets/images/plants/python.png"
+type = "image"
+title = "generated_image"
+
+[[generated]]
+id = "WqH1BdkJruze105RAbUlu"
+uri = "file://artifacts/mobile/assets/images/plants/zebu.png"
+type = "image"
+title = "generated_image"
+
+[[generated]]
+id = "7qYbUSno3cfsmS7qDVl6Y"
+uri = "file://artifacts/mobile/assets/images/plants/belier.png"
+type = "image"
+title = "generated_image"
+
 [[outputs]]
 id = "a_w4uSYXiM09eT84cCfYU"
 uri = "file://artifacts/mobile/assets/sounds/elephant.mp3"
