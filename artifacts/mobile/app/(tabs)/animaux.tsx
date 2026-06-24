@@ -86,6 +86,10 @@ export default function AnimauxScreen() {
           numColumns={numColumns}
           key={numColumns}
           contentContainerStyle={{ paddingHorizontal: 4, paddingBottom: 80 + insets.bottom, paddingTop: 4 }}
+          removeClippedSubviews={false}
+          initialNumToRender={20}
+          maxToRenderPerBatch={10}
+          windowSize={5}
           renderItem={({ item }) => (
             <View style={styles.cardWrap}>
               <PlanteCard plante={item} numColumns={numColumns} />

@@ -1,6 +1,6 @@
 import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
-import React from 'react';
+import React, { memo } from 'react';
 import { ImageBackground, Platform, Pressable, StyleSheet, Text, View } from 'react-native';
 
 import { useColors } from '@/hooks/useColors';
@@ -22,7 +22,7 @@ const CATEGORY_LABELS: Record<string, string> = {
   'Palmiers': 'PALMIER',
 };
 
-export function PlanteCard({ plante, compact = false, numColumns = 2 }: Props) {
+export const PlanteCard = memo(function PlanteCard({ plante, compact = false, numColumns = 2 }: Props) {
   const colors = useColors();
   const router = useRouter();
 
@@ -41,6 +41,7 @@ export function PlanteCard({ plante, compact = false, numColumns = 2 }: Props) {
         style={[styles.card, { height: cardHeight }]}
         imageStyle={styles.cardImage}
         resizeMode="cover"
+        fadeDuration={0}
       >
         <LinearGradient
           colors={['rgba(0,0,0,0.08)', 'rgba(0,0,0,0.62)']}
@@ -86,7 +87,7 @@ export function PlanteCard({ plante, compact = false, numColumns = 2 }: Props) {
       </ImageBackground>
     </Pressable>
   );
-}
+});
 
 const styles = StyleSheet.create({
   container: {
