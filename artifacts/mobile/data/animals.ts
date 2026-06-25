@@ -1690,6 +1690,1343 @@ export const PLANTS: Plante[] = [
     vertus: ['Eau de coco électrolytes naturels', 'Huile de coco anti-microbienne', 'Chair nutritive', 'Acide laurique immuno-stimulant'],
     usagesTraditionnels: ['Eau de coco purifiante', 'Huile de coco cosmétique', 'Chair alimentaire', 'Huile pour rituels', 'Lait de coco en cuisine'],
   },
+
+  /* ═══════════════════════════════════════════════════════════
+     NOUVEAUX ARBRES SACRÉS
+  ═══════════════════════════════════════════════════════════ */
+
+  {
+    id: 'manguier',
+    nom: 'Manguier',
+    nomAnglais: 'Mango Tree',
+    nomScientifique: 'Mangifera indica',
+    categorie: 'Arbres Sacrés',
+    element: 'Feu',
+    description:
+      "Le Manguier est le roi des arbres fruitiers tropicaux, dont l'ombre bienfaisante protège les villages et les familles d'Afrique de l'Ouest depuis des générations. Son fruit doré est symbole de récompense après la longue attente de la saison sèche, et son tronc majestueux offre le lieu de rassemblement communautaire par excellence.",
+    symboliqueAfricaine:
+      "Dans les traditions mandingues et haoussa, le manguier est l'arbre de la prospérité partagée. Ses fruits abondants symbolisent la générosité divine — un arbre qui comble toute une communauté. Les palabres importants se tiennent à son ombre. Les jeunes filles y font des prières pour trouver un bon mari, car sa douceur représente la bonté du cœur.",
+    symboliqueSpirirtuelle:
+      "Le Manguier enseigne la patience dorée : ses fruits se forment lentement sous une chaleur intense, mais leur douceur compense toute attente. Il symbolise la récompense des efforts persévérants et la générosité qui ne s'épuise pas. Sa sève laiteuse représente la sagesse qui coule en silence avant de se révéler.",
+    symbolique: "Symbole de prospérité, de patience dorée et de générosité communautaire.",
+    qualites: ['Générosité abondante', 'Patience mûrissante', 'Douceur profonde', 'Protection familiale', 'Prospérité partagée'],
+    defauts: ['Jalousie des richesses', 'Lenteur à produire', 'Lourdeur après l\'abondance', 'Possessivité des fruits'],
+    pouvoirs: ['Abondance divine', 'Rassemblement communautaire', 'Protection de l\'ombre', 'Récompense du patient'],
+    enseignements: [
+      "Les fruits les plus doux demandent la plus longue patience",
+      "Partage ton abondance — l'arbre qui retient ses fruits pourrit",
+      "Ta douceur est ta force la plus puissante",
+      "L'ombre que tu offres est ton plus beau cadeau",
+    ],
+    citation: "Le manguier ne choisit pas ses convives — il nourrit celui qui tend la main.",
+    proverbes: [
+      "Le manguier ne choisit pas ses convives — il nourrit celui qui tend la main.",
+      "Avant la mangue dorée, il y a eu la fleur blanche que personne ne regardait.",
+      "L'arbre qui donne des mangues subit les lancers de pierres — c'est le prix de l'abondance.",
+    ],
+    legendes: [
+      "La légende bambara raconte qu'un jeune homme sans famille planta un manguier au centre du village. Pendant des années il l'arrosait seul. Quand il porta ses premiers fruits, tous vinrent manger. L'arbre lui avait construit sa famille — ceux qui partagent un repas deviennent frères.",
+      "Les Haoussa disent que le dieu du soleil, Uwar Gona, souffla dans la fleur du manguier pour y distiller sa lumière. C'est pourquoi le fruit est doré et sucré comme un rayon de soleil capturé.",
+    ],
+    conseilsDeVie: [
+      "Cultive ta patience — les plus belles réalisations se font attendre.",
+      "Offre généreusement les fruits de ton travail à ta communauté.",
+      "Ta douceur de caractère attire plus que ta force — sois comme la mangue.",
+    ],
+    niveauSpirituel: 4,
+    regionOrigine: "Toute l'Afrique de l'Ouest — du Sénégal au Nigeria",
+    couleur: '#F4A12E',
+    couleurSecondaire: '#C47A0A',
+    enseignementDuJour:
+      "Aujourd'hui, sois généreux comme le manguier. Offre quelque chose de doux à quelqu'un sans attendre de retour.",
+    vertus: ['Riche en vitamine C et A', 'Antioxydant puissant', 'Digestif naturel', 'Anti-inflammatoire', 'Renforce l\'immunité'],
+    usagesTraditionnels: ['Fruit frais et séché', 'Jus et jus fermenté', 'Feuilles en tisane antidiabétique', 'Écorce pour traiter la diarrhée', 'Graine pour l\'huile cosmétique'],
+  },
+
+  {
+    id: 'jujubier',
+    nom: 'Jujubier',
+    nomAnglais: 'Jujube Tree',
+    nomScientifique: 'Ziziphus mauritiana',
+    categorie: 'Arbres Sacrés',
+    element: 'Terre',
+    description:
+      "Le Jujubier est l'arbre de la résistance et de la survivance. Épineux et vigoureux, il pousse là où d'autres arbres refusent, s'enracine dans les terres arides les plus hostiles et produit ses petits fruits rouges avec une générosité farouche. C'est l'arbre du Sahel, gardien des terres ingrates et protecteur des villages les plus exposés.",
+    symboliqueAfricaine:
+      "Dans les traditions peules et touarègues, le jujubier est l'arbre de la résistance héroïque. Ses épines protègent les villages contre les esprits maléfiques. Ses fruits nourrissent les voyageurs épuisés dans le désert. On dit que l'arbre comprend la souffrance — il a lui-même survécu à tout. Les bergers y accrochent des amulettes pour protéger leurs troupeaux.",
+    symboliqueSpirirtuelle:
+      "Le Jujubier incarne la force née de l'adversité. Ses épines ne sont pas de la cruauté — elles sont la nécessité de se protéger pour survivre et continuer à donner. Il enseigne que la dureté extérieure peut coexister avec la douceur intérieure — ses fruits sont sucrés malgré l'hostilité de ses branches.",
+    symbolique: "Symbole de résistance héroïque, de survie dans l'adversité et de protection farouche.",
+    qualites: ['Résistance exceptionnelle', 'Générosité malgré la dureté', 'Protection farouche', 'Survie créatrice', 'Ancrage dans l\'impossible'],
+    defauts: ['Dureté défensive', 'Méfiance excessive', 'Repli protecteur', 'Difficulté d\'approche'],
+    pouvoirs: ['Protection contre le mal', 'Force dans l\'adversité', 'Nourriture des voyageurs', 'Résistance spirituelle'],
+    enseignements: [
+      "La force naît là où les conditions sont les plus dures",
+      "Protège-toi sans honte — les épines du jujubier sont son intelligence",
+      "Ta douceur intérieure n'est pas incompatible avec ta résistance extérieure",
+      "Prospère là où l'on te dit que c'est impossible",
+    ],
+    citation: "Le jujubier prospère dans le désert — il a appris que la dureté du sol nourrit la profondeur des racines.",
+    proverbes: [
+      "Le jujubier prospère dans le désert — il a appris que la dureté du sol nourrit la profondeur des racines.",
+      "Ne méprise pas le buisson épineux — c'est sous ses épines que se cachent les fruits les plus doux.",
+      "Celui qui traverse le jujubier sans se piquer n'en connaît pas le chemin.",
+    ],
+    legendes: [
+      "Les Peuls racontent qu'un esprit du désert, jaloux de la vie, maudit le jujubier pour qu'il ne puisse jamais pousser que dans les terres mortes. L'arbre accepta la malédiction et en fit sa force — et depuis, il verdit les terres que les autres abandonnent.",
+    ],
+    conseilsDeVie: [
+      "Utilise les obstacles comme des racines supplémentaires — ils t'ancrent plus profond.",
+      "Protège tes limites fermement. Tes épines ne sont pas de la méchanceté.",
+      "Sois doux à l'intérieur même quand le monde t'impose d'être dur à l'extérieur.",
+    ],
+    niveauSpirituel: 3,
+    regionOrigine: "Sahel et zones semi-arides — Sénégal, Mali, Niger, Burkina Faso",
+    couleur: '#8B6914',
+    couleurSecondaire: '#5C4208',
+    enseignementDuJour:
+      "Aujourd'hui, honore ta capacité à résister. Là où tu as survécu, tu as aussi grandi.",
+    vertus: ['Riche en vitamine C', 'Calmant nerveux', 'Anti-diarrhéique', 'Hypnotique doux', 'Antioxydant'],
+    usagesTraditionnels: ['Fruits comestibles frais et séchés', 'Feuilles contre la fièvre', 'Racines contre les maux de ventre', 'Bois dur pour outils', 'Haies protectrices'],
+  },
+
+  {
+    id: 'anacardier',
+    nom: 'Anacardier',
+    nomAnglais: 'Cashew Tree',
+    nomScientifique: 'Anacardium occidentale',
+    categorie: 'Arbres Sacrés',
+    element: 'Feu',
+    description:
+      "L'Anacardier est l'arbre paradoxal par excellence — son fruit précieux est caché sous sa pomme charnue, et sa noix contient une huile brûlante avant d'offrir sa douceur. C'est l'arbre qui enseigne que la vraie valeur nécessite une transformation, que rien de précieux ne se livre sans effort. En Afrique de l'Ouest, il représente la richesse industrieuse et la sagesse de discerner ce qui est précieux.",
+    symboliqueAfricaine:
+      "Dans les régions côtières de Guinée-Bissau, du Sénégal et de la Côte d'Ivoire, l'anacardier est devenu l'arbre de la prospérité économique. Ses noix exportées font vivre des familles entières. Les djola associent l'anacardier aux initiations — sa noix brûlante représente l'épreuve qui précède la révélation. On dit que celui qui comprend l'anacardier comprend que toute transformation est douloureuse avant d'être lumineuse.",
+    symboliqueSpirirtuelle:
+      "L'Anacardier incarne le paradoxe sacré : ce qui est le plus précieux est souvent caché dans ce qui semble être un danger. Son huile urticante enveloppe une noix divine. Il enseigne à ne pas fuir la transformation douloureuse — c'est précisément là que se trouve la valeur.",
+    symbolique: "Symbole de transformation, de valeur cachée et de richesse méritée.",
+    qualites: ['Persévérance transformatrice', 'Valeur cachée reconnue', 'Richesse industrieuse', 'Paradoxe créatif', 'Générosité complète'],
+    defauts: ['Brûlure des approches maladroites', 'Apparences trompeuses', 'Valeur méconnue', 'Impatience dans la transformation'],
+    pouvoirs: ['Révélation de la valeur cachée', 'Transformation par l\'épreuve', 'Prospérité méritée', 'Discernement du précieux'],
+    enseignements: [
+      "Ce qui est précieux se cache souvent derrière ce qui semble dangereux",
+      "Toute transformation vraie passe par une épreuve",
+      "Ne juge pas la valeur des choses à leur apparence extérieure",
+      "La prospérité réelle vient du travail de discernement",
+    ],
+    citation: "La noix de cajou dit : je suis précieuse, mais tu dois d'abord accepter ma brûlure pour me connaître.",
+    proverbes: [
+      "La noix de cajou dit : je suis précieuse, mais tu dois d'abord accepter ma brûlure pour me connaître.",
+      "L'or ne se révèle qu'après le feu — la noix de cajou l'a appris avant l'orfèvre.",
+      "Ne méprise pas la pomme de cajou douce — elle protège la noix la plus précieuse.",
+    ],
+    legendes: [
+      "Les Djola de Guinée-Bissau racontent que l'anacardier fut planté par un génie du feu qui voulait tester les hommes. Il cacha la sagesse dans une noix entourée d'huile brûlante. Seuls ceux qui acceptèrent la transformation par le feu — la torréfaction — accédèrent à la connaissance douce.",
+    ],
+    conseilsDeVie: [
+      "Cherche la valeur cachée derrière les apparences difficiles.",
+      "Accepte les transformations douloureuses — elles révèlent qui tu es vraiment.",
+      "Ta prospérité réelle est le fruit de ton discernement, pas de la chance.",
+    ],
+    niveauSpirituel: 3,
+    regionOrigine: "Guinée-Bissau, Sénégal, Côte d'Ivoire, Nigeria",
+    couleur: '#D4541A',
+    couleurSecondaire: '#A33510',
+    enseignementDuJour:
+      "Aujourd'hui, explore ce qui te semble difficile d'accès — la valeur que tu cherches y est peut-être cachée.",
+    vertus: ['Antioxydant puissant', 'Acides gras sains', 'Zinc et magnésium', 'Anti-inflammatoire', 'Énergie soutenue'],
+    usagesTraditionnels: ['Noix torréfiée comestible', 'Pomme de cajou jus et vin', 'Huile de cajou cosmétique', 'Feuilles contre les maux de dents', 'Écorce pour les dermatoses'],
+  },
+
+  {
+    id: 'flamboyant',
+    nom: 'Flamboyant',
+    nomAnglais: 'Flamboyant Tree',
+    nomScientifique: 'Delonix regia',
+    categorie: 'Arbres Sacrés',
+    element: 'Feu',
+    description:
+      "Le Flamboyant est l'explosion de beauté la plus spectaculaire de la végétation d'Afrique de l'Ouest. Quand il fleurit en saison sèche, il transforme les rues grises en rivières de flammes orangées et écarlates. C'est l'arbre de la passion, de l'art et de la beauté qui refuse de se cacher — un acte de bravoure esthétique qui embrasse le ciel.",
+    symboliqueAfricaine:
+      "Dans les villes d'Afrique de l'Ouest — Dakar, Abidjan, Cotonou — le flamboyant est l'arbre de la fête et du prestige. On le plante devant les palais et les lieux sacrés. Sa floraison coïncide avec les grandes cérémonies. Les artistes et musiciens lui vouent une dévotion particulière — il est la preuve que la beauté est un langage universel qui transcende toutes les frontières.",
+    symboliqueSpirirtuelle:
+      "Le Flamboyant incarne le courage de la beauté — il fleurit dans la saison la plus sèche, là où tout semble mort, pour rappeler que la vie et la grâce ne capitulent jamais. Il enseigne que l'expression de sa beauté intérieure est un acte de résistance et de foi.",
+    symbolique: "Symbole de beauté triomphante, de passion ardente et de résistance par la grâce.",
+    qualites: ['Beauté rayonnante', 'Passion créatrice', 'Générosité visuelle', 'Courage d\'expression', 'Joie explosive'],
+    defauts: ['Éclat éphémère', 'Brièveté de la floraison', 'Séduction superficielle', 'Demande d\'attention'],
+    pouvoirs: ['Inspiration artistique', 'Joie communautaire', 'Transformation du regard', 'Beauté comme médecine'],
+    enseignements: [
+      "Exprime ta beauté intérieure sans attendre le bon moment",
+      "La beauté est un acte de résistance face à la grisaille du monde",
+      "Fleuris dans les saisons les plus dures — c'est alors que la lumière est la plus précieuse",
+      "Partage ta joie — elle est contagieuse et guérisseuse",
+    ],
+    citation: "Le flamboyant ne demande pas la permission de fleurir — il offre au monde sa splendeur comme un cadeau.",
+    proverbes: [
+      "Le flamboyant ne demande pas la permission de fleurir — il offre au monde sa splendeur comme un cadeau.",
+      "Même en saison sèche, le flamboyant rappelle que la vie est plus forte que la mort.",
+      "La beauté du flamboyant dure peu — mais son souvenir brûle longtemps dans le cœur.",
+    ],
+    legendes: [
+      "La légende yoruba raconte que Sango, dieu du tonnerre, tomba amoureux d'un arbre si beau qu'il y captura une partie de sa foudre. L'arbre brûla mais ne mourut pas — et depuis, ses fleurs sont la couleur du feu sacré qui ne consume pas.",
+    ],
+    conseilsDeVie: [
+      "Exprime ta créativité et ta beauté — c'est ta contribution unique au monde.",
+      "Ne cache pas ta lumière intérieure par peur de paraître trop fort.",
+      "La joie est une forme de bravoure — partage-la sans retenue.",
+    ],
+    niveauSpirituel: 3,
+    regionOrigine: "Toutes les villes et savanes d'Afrique de l'Ouest",
+    couleur: '#E84615',
+    couleurSecondaire: '#A82E08',
+    enseignementDuJour:
+      "Aujourd'hui, exprime quelque chose de beau — une parole, un geste, une création. Le flamboyant ne demande pas la permission.",
+    vertus: ['Feuilles anti-inflammatoires', 'Anti-paludéen traditionnel', 'Antipyrétique', 'Antifongique'],
+    usagesTraditionnels: ['Tisane de feuilles contre le paludisme', 'Décoction d\'écorce pour la fièvre', 'Bois pour le charbon', 'Ombre dans les cours', 'Ornement des lieux sacrés'],
+  },
+
+  {
+    id: 'acajou',
+    nom: 'Acajou d\'Afrique',
+    nomAnglais: 'African Mahogany',
+    nomScientifique: 'Khaya senegalensis',
+    categorie: 'Arbres Sacrés',
+    element: 'Terre',
+    description:
+      "L'Acajou d'Afrique est le roi des bois africains, un arbre majestueux à la stature imposante dont le bois rouge-brun est parmi les plus précieux au monde. Géant de la forêt-galerie et de la savane boisée, il peut dépasser trente mètres de hauteur et vivre plusieurs siècles. Son écorce gris-rouge se détache en grandes plaques, révélant un bois d'une beauté et d'une dureté exceptionnelles.",
+    symboliqueAfricaine:
+      "Dans les traditions mandingues et bambaras, l'acajou est l'arbre de la royauté et du pouvoir légitime. Les trônes des chefs et les instruments de musique sacrés sont sculptés dans son bois. Son écorce est utilisée dans les rituels de force et de protection des guerriers. Les forgerons — caste sacrée — utilisent son charbon pour les fontes rituelles.",
+    symboliqueSpirirtuelle:
+      "L'Acajou incarne la noblesse tranquille — une grandeur qui ne cherche pas à s'imposer mais s'impose naturellement par sa seule présence. Son bois, le plus noble, se forme au cœur de l'arbre dans l'obscurité. Il enseigne que la vraie noblesse est intérieure, acquise dans la durée et la profondeur.",
+    symbolique: "Symbole de noblesse royale, de pouvoir légitime et de grandeur tranquille.",
+    qualites: ['Noblesse naturelle', 'Force intérieure', 'Durée et solidité', 'Majesté tranquille', 'Qualité intrinsèque'],
+    defauts: ['Hauteur inaccessible', 'Lenteur de croissance', 'Rigidité du caractère', 'Rareté qui isole'],
+    pouvoirs: ['Autorité naturelle', 'Protection royale', 'Force des guerriers', 'Art sacré'],
+    enseignements: [
+      "La vraie noblesse ne s'annonce pas — elle se révèle naturellement",
+      "La qualité profonde se forme dans le temps et l'obscurité",
+      "Sois une ressource précieuse pour ta communauté",
+      "La solidité est ta meilleure contribution au monde",
+    ],
+    citation: "L'acajou ne crie pas sa beauté — c'est l'artisan qui la découvre en travaillant son cœur.",
+    proverbes: [
+      "L'acajou ne crie pas sa beauté — c'est l'artisan qui la découvre en travaillant son cœur.",
+      "Le bois de l'acajou se révèle au ciseau — certaines grandeurs ne se voient qu'au travail.",
+      "Le chef vrai est comme l'acajou : solide au cœur, même quand l'écorce se détache.",
+    ],
+    legendes: [
+      "La légende mandingue raconte que les premiers forgerons reçurent l'acajou en cadeau du dieu du feu Nyalen. Son bois devint charbon sacré pour les fontes, et ses copeaux furent les premiers encens brûlés dans les forges rituelles.",
+    ],
+    conseilsDeVie: [
+      "Développe ta qualité intérieure — c'est elle qui dure et qui importe.",
+      "Ta présence naturelle est ton autorité — tu n'as pas besoin de l'imposer.",
+      "Investis dans ce qui est solide et durable plutôt que dans ce qui brille vite.",
+    ],
+    niveauSpirituel: 4,
+    regionOrigine: "Savane boisée et forêt-galerie — Sénégal, Mali, Guinée, Côte d'Ivoire",
+    couleur: '#7B3A1E',
+    couleurSecondaire: '#4A1E0A',
+    enseignementDuJour:
+      "Aujourd'hui, travaille sur ta qualité profonde — ce que tu construis dans le silence et la durée.",
+    vertus: ['Écorce antiparasitaire', 'Antipaludéen', 'Antifongique', 'Anti-inflammatoire', 'Tonique général'],
+    usagesTraditionnels: ['Bois d\'oeuvre noble', 'Décoction d\'écorce contre le paludisme', 'Charbon pour la forge', 'Sculpture rituelle', 'Teinture rouge naturelle'],
+  },
+
+  {
+    id: 'vene',
+    nom: 'Vène',
+    nomAnglais: 'African Rosewood',
+    nomScientifique: 'Pterocarpus erinaceus',
+    categorie: 'Arbres Sacrés',
+    element: 'Feu',
+    description:
+      "Le Vène, ou Palissandre d'Afrique, est un arbre majestueux de la savane soudano-sahélienne dont le tronc tortueux et la silhouette tourmentée racontent des siècles de résistance aux saisons sèches. Il déploie une couronne dense d'un vert profond et porte en saison des fleurs orange vif, un spectacle rare et précieux. Son bois rouge-brun aux veines dorées est l'un des plus recherchés d'Afrique.",
+    symboliqueAfricaine:
+      "Dans les traditions sénégalaises et maliennes, le vène est l'arbre du courage silencieux. Ses branches tortueuses symbolisent le chemin de vie avec ses épreuves et ses détours. Les luthiers sacrés fabriquent les koras et les balafons dans son bois — instruments qui portent la parole des ancêtres. Les guérisseurs récoltent sa sève rouge comme le sang pour les rituels de force.",
+    symboliqueSpirirtuelle:
+      "Le Vène incarne la beauté née de la souffrance acceptée. Sa forme torturée par les saisons sèches crée un bois aux veinures extraordinaires — chaque épreuve a sculpté en lui une beauté plus profonde. Il enseigne que les cicatrices de la vie sont des ornements de l'âme.",
+    symbolique: "Symbole de courage tortueux, de beauté née de l'épreuve et de musique sacrée.",
+    qualites: ['Courage silencieux', 'Beauté forgée par l\'épreuve', 'Résilience créatrice', 'Profondeur musicale', 'Noblesse tourmentée'],
+    defauts: ['Tortuosité du chemin', 'Difficulté d\'approche', 'Rareté précieuse', 'Vulnérabilité aux coupes'],
+    pouvoirs: ['Musique des ancêtres', 'Guérison par la beauté', 'Sève de force', 'Art de la résilience'],
+    enseignements: [
+      "Tes épreuves ne t'abîment pas — elles te sculptent",
+      "La beauté la plus profonde naît des saisons les plus dures",
+      "Chaque détour de ta vie dessine ta veinure unique",
+      "La musique est le langage des âmes qui ont souffert et survécu",
+    ],
+    citation: "Le vène est tordu par les saisons — c'est pourquoi son bois chante si bien dans la kora.",
+    proverbes: [
+      "Le vène est tordu par les saisons — c'est pourquoi son bois chante si bien dans la kora.",
+      "L'arbre qui souffre du vent devient le meilleur bois pour la musique.",
+      "Les veinures du vène sont les cicatrices de ses siècles — elles sont sa beauté.",
+    ],
+    legendes: [
+      "Les griots mandingues disent que la première kora fut taillée dans un vène frappé par la foudre. Le choc avait ouvert le bois au plus profond — et dans cette blessure, la musique trouva sa demeure. Depuis, le vène est l'arbre qui transforme la douleur en musique.",
+    ],
+    conseilsDeVie: [
+      "Tes expériences difficiles t'ont sculpté — reconnais-les comme des richesses.",
+      "Exprime-toi artistiquement — la créativité transforme la souffrance en beauté.",
+      "Ton chemin tortueux est unique et précieux — ne le compare pas aux chemins droits.",
+    ],
+    niveauSpirituel: 4,
+    regionOrigine: "Savane soudano-sahélienne — Sénégal, Guinée, Mali, Burkina Faso",
+    couleur: '#A0522D',
+    couleurSecondaire: '#6B2E10',
+    enseignementDuJour:
+      "Aujourd'hui, regarde tes épreuves passées comme le sculpteur qui voit la beauté dans le bois tordu.",
+    vertus: ['Sève astringente cicatrisante', 'Anti-diarrhéique', 'Antidiabétique traditionnel', 'Antipaludéen', 'Régulateur du transit'],
+    usagesTraditionnels: ['Bois d\'oeuvre et lutherie sacrée', 'Feuilles pour le bétail', 'Décoction contre le diabète', 'Sève pour les plaies', 'Racines contre la toux'],
+  },
+
+  {
+    id: 'dimb',
+    nom: 'Dimb',
+    nomAnglais: 'Senegal Plum',
+    nomScientifique: 'Cordyla pinnata',
+    categorie: 'Arbres Sacrés',
+    element: 'Eau',
+    description:
+      "Le Dimb est l'arbre sacré des Sérères, peuple côtier du Sénégal, gardien des cimetières et des lieux de mémoire ancestrale. Majestueux et longevif, il s'étend en une couronne massive qui couvre des espaces immenses. Ses fruits jaunes, appelés pommes de Cayor, nourrissent les familles et les animaux. C'est l'arbre de la réconciliation — sous son ombre se règlent les conflits graves.",
+    symboliqueAfricaine:
+      "Dans la cosmologie sérère, le Dimb est le lieu de résidence des pangols — les ancêtres divinisés. Planter un Dimb, c'est inviter un ancêtre à veiller sur la maison. Son ombre est sacrée : on y dépose les offrandes, on y prononce les serments de paix. Les villages sérères sont reconnaissables à leurs grands Dimb qui émergent au-dessus des toits.",
+    symboliqueSpirirtuelle:
+      "Le Dimb symbolise la mémoire vivante — il maintient le lien entre le monde des vivants et celui des ancêtres. Sa longévité extrême en fait un témoin silencieux de l'histoire. Il enseigne que honorer les morts est nourrir les vivants, que la mémoire collective est une source de force.",
+    symbolique: "Symbole de mémoire ancestrale, de réconciliation et de lien entre les mondes.",
+    qualites: ['Mémoire profonde', 'Réconciliation sage', 'Lien ancestral fort', 'Ombre médiatrice', 'Longévité gardienne'],
+    defauts: ['Attachement aux morts', 'Immobilité mémorielle', 'Poids du passé', 'Sacralité inaccessible'],
+    pouvoirs: ['Communication avec les ancêtres', 'Médiation des conflits', 'Protection spirituelle', 'Gardiennage de la mémoire'],
+    enseignements: [
+      "Honore tes ancêtres — ils continuent de te guider",
+      "L'ombre de la réconciliation est plus fraîche que celle de la vengeance",
+      "La mémoire collective est ta richesse la plus profonde",
+      "Résoudre les conflits sous un arbre sacré, c'est convoquer la sagesse",
+    ],
+    citation: "Le Dimb se souvient de tous ceux qui ont dormi sous son ombre — ils vivent encore en lui.",
+    proverbes: [
+      "Le Dimb se souvient de tous ceux qui ont dormi sous son ombre — ils vivent encore en lui.",
+      "Sous le Dimb, les ennemis deviennent frères — l'arbre sacré ne supporte pas la haine.",
+      "Plante un Dimb aujourd'hui — tes arrière-petits-enfants s'y réconcilieront.",
+    ],
+    legendes: [
+      "La légende sérère raconte que le premier Dimb naquit de la larme d'un ancêtre pleurant la discorde de ses enfants. En tombant dans la terre, la larme devint un arbre dont l'ombre était si apaisante que les enfants en querelle s'endormirent et se réveillèrent réconciliés.",
+    ],
+    conseilsDeVie: [
+      "Recherche la réconciliation — les querelles non résolues empoisonnent les générations.",
+      "Connecte-toi à ta lignée — tes ancêtres sont une source de sagesse.",
+      "Offre l'ombre de ta sagesse aux conflits autour de toi.",
+    ],
+    niveauSpirituel: 5,
+    regionOrigine: "Sénégal et Gambie — pays sérère et mandingue",
+    couleur: '#2E6B4F',
+    couleurSecondaire: '#164030',
+    enseignementDuJour:
+      "Aujourd'hui, pense à un conflit non résolu dans ta vie. Sous quel arbre accepterais-tu de parler ?",
+    vertus: ['Fruit comestible nutritif', 'Écorce tonique', 'Anti-inflammatoire', 'Antipaludéen'],
+    usagesTraditionnels: ['Fruit pomme de Cayor comestible', 'Ombre pour les cérémonies', 'Offrandes rituelles', 'Bois de construction', 'Lieu de palabres'],
+  },
+
+  /* ═══════════════════════════════════════════════════════════
+     NOUVELLES PLANTES MÉDICINALES
+  ═══════════════════════════════════════════════════════════ */
+
+  {
+    id: 'aloe-vera',
+    nom: 'Aloès d\'Afrique',
+    nomAnglais: 'African Aloe',
+    nomScientifique: 'Aloe barbadensis / Aloe vera',
+    categorie: 'Plantes Médicinales',
+    element: 'Eau',
+    description:
+      "L'Aloès d'Afrique est la plante guérisseuse par excellence, une succulente aux feuilles épaisses gorgées d'un gel translucide aux propriétés médicinales extraordinaires. Résistante à la sécheresse extrême, elle stocke l'eau de vie dans ses feuilles comme le guérisseur stocke la sagesse en lui — pour la partager au moment du besoin. C'est la pharmacie du désert, toujours disponible, toujours généreuse.",
+    symboliqueAfricaine:
+      "Dans les traditions de tout le Sahel, l'aloès est la plante de la guérisseuse — les femmes sages, les matrones, les rebouteuses l'utilisent depuis des millénaires. On en frotte les nouveau-nés pour les protéger des mauvais esprits. On en enduit les murs des maisons pour éloigner les serpents. Son gel est le premier remède appliqué sur toute blessure.",
+    symboliqueSpirirtuelle:
+      "L'Aloès incarne l'autonomie guérisseuse — il porte en lui toute la médecine dont il a besoin, même dans les déserts les plus arides. Il enseigne l'autosuffisance spirituelle : en toi se trouvent toutes les ressources pour ta guérison. Son amertume extérieure protège la douceur guérisseuse intérieure.",
+    symbolique: "Symbole d'autonomie guérisseuse, de résilience aquatique et de protection maternelle.",
+    qualites: ['Guérison naturelle', 'Résilience aquatique', 'Générosité médicinale', 'Protection instinctive', 'Douceur sous l\'amertume'],
+    defauts: ['Amertume défensive', 'Épines protectrices', 'Sécheresse apparente', 'Fermeture aux pluies excessives'],
+    pouvoirs: ['Guérison des blessures', 'Protection des nouveau-nés', 'Médecine du désert', 'Purification des espaces'],
+    enseignements: [
+      "Tu portes en toi les ressources de ta propre guérison",
+      "L'amertume de surface protège la douceur profonde",
+      "Stocke la sagesse pour les temps de sécheresse",
+      "La guérison des autres commence par la guérison de soi",
+    ],
+    citation: "L'aloès ne réclame pas la pluie — il porte son eau en lui pour les temps de sécheresse.",
+    proverbes: [
+      "L'aloès ne réclame pas la pluie — il porte son eau en lui pour les temps de sécheresse.",
+      "La guérisseuse ressemble à l'aloès : amère en apparence, mais douce pour celui qui souffre.",
+      "Couper l'aloès sans intention de guérir, c'est gaspiller la grâce.",
+    ],
+    legendes: [
+      "Les anciens du Sahel racontent que la déesse de la guérison Mawu-Lisa offrit l'aloès aux femmes pour compenser leur vulnérabilité. Elle mit dans ses feuilles tout ce dont une mère a besoin pour soigner : la douceur pour les blessures, l'amertume pour les infections, la force pour les moments de désespoir.",
+    ],
+    conseilsDeVie: [
+      "Fais confiance à ta capacité naturelle de guérison — le corps et l'âme savent se réparer.",
+      "Protège ta douceur intérieure avec des limites claires.",
+      "Sois une ressource pour les autres sans te vider — l'aloès ne se coupe pas jusqu'à la racine.",
+    ],
+    niveauSpirituel: 3,
+    regionOrigine: "Sahel et zones arides — du Sénégal au Sahara",
+    couleur: '#5BAF7A',
+    couleurSecondaire: '#2A7A4A',
+    enseignementDuJour:
+      "Aujourd'hui, fais confiance à ta guérison naturelle. Qu'est-ce qui en toi sait déjà comment se réparer ?",
+    vertus: ['Cicatrisant cutané puissant', 'Anti-inflammatoire', 'Hydratant intense', 'Laxatif doux', 'Antifongique', 'Immunostimulant'],
+    usagesTraditionnels: ['Gel sur les brûlures et plaies', 'Frottement des nouveau-nés', 'Jus laxatif', 'Hydratation cutanée', 'Traitement des dermatoses', 'Protection contre les serpents'],
+  },
+
+  {
+    id: 'guiera',
+    nom: 'Guiera',
+    nomAnglais: 'Guiera',
+    nomScientifique: 'Guiera senegalensis',
+    categorie: 'Plantes Médicinales',
+    element: 'Air',
+    description:
+      "Le Guiera est l'arbuste médicinal le plus répandu du Sahel — un buisson gris-vert, discret et tenace, qui couvre les terres dégradées et les bords de piste du Sénégal au Niger. Méprisé par les agriculteurs car jugé comme un envahisseur, il est pourtant l'une des plantes médicinales les plus précieuses de toute la pharmacopée sahélienne. Sa modestie est sa sagesse.",
+    symboliqueAfricaine:
+      "Dans les traditions peules et wolof, le guiera est la plante du guérisseur humble — celui qui soigne sans se montrer. On l'appelle ngélénu en wolof, signifiant 'qui pardonne'. Ses feuilles furent les premières à être brûlées comme encens dans les cases pour purifier l'air. Les femmes enceintes se baignent dans sa décoction pour protéger leur grossesse. Ses racines sont portées en amulette pour la protection quotidienne.",
+    symboliqueSpirirtuelle:
+      "Le Guiera enseigne l'humilité du serviteur — il est partout, il guérit silencieusement, il ne revendique rien. C'est la plante de ceux qui font le bien sans le proclamer. Sa résistance aux terres les plus ingrates symbolise la capacité à trouver une mission même dans les environnements les plus difficiles.",
+    symbolique: "Symbole d'humilité guérisseuse, de service silencieux et de résistance du quotidien.",
+    qualites: ['Humilité du service', 'Guérison discrète', 'Résistance quotidienne', 'Modestie précieuse', 'Disponibilité constante'],
+    defauts: ['Invisibilité méconnue', 'Sous-estimation fréquente', 'Discrétion mal interprétée', 'Valeur ignorée des ignorants'],
+    pouvoirs: ['Purification de l\'air', 'Protection de la grossesse', 'Guérison respiratoire', 'Service communautaire'],
+    enseignements: [
+      "Les plus grands services sont souvent rendus dans le silence",
+      "Ta valeur ne dépend pas de la reconnaissance des autres",
+      "Sois disponible et utile là où tu es — sans chercher un meilleur endroit",
+      "L'humilité n'est pas la faiblesse — c'est la sagesse qui se tait",
+    ],
+    citation: "Le guiera ne se plaint pas des terres ingrates — il les guérit en les habitant.",
+    proverbes: [
+      "Le guiera ne se plaint pas des terres ingrates — il les guérit en les habitant.",
+      "La plante qui pousse partout est rarement appréciée — jusqu'au jour où elle manque.",
+      "Le guérisseur humble ressemble au guiera : on ne le voit qu'au moment où on a besoin de lui.",
+    ],
+    legendes: [
+      "Les anciens Peuls racontent que le guiera fut créé par les génies du vent pour guérir les maladies de l'air — la toux, le rhume, la fièvre. Les génies lui apprirent à se rendre invisible pour que les hommes apprennent eux-mêmes à voir la valeur des choses modestes.",
+    ],
+    conseilsDeVie: [
+      "Rends service humblement — ta valeur ne dépend pas des applaudissements.",
+      "Sois utile là où tu es, même si l'endroit te semble ingrat.",
+      "Les personnes discrètes sont souvent les plus indispensables — remarque-les.",
+    ],
+    niveauSpirituel: 2,
+    regionOrigine: "Sahel — Sénégal, Mali, Niger, Burkina Faso, Nigeria",
+    couleur: '#8FAF6A',
+    couleurSecondaire: '#5A7A3A',
+    enseignementDuJour:
+      "Aujourd'hui, rends un service discret et significatif sans attendre de reconnaissance.",
+    vertus: ['Antipaludéen reconnu', 'Expectorant puissant', 'Antitussif', 'Antiparasitaire', 'Antimicrobien'],
+    usagesTraditionnels: ['Tisane feuilles contre le paludisme', 'Fumigation pour purifier l\'air', 'Bain de grossesse protecteur', 'Amulette de protection', 'Décoction contre la toux'],
+  },
+
+  {
+    id: 'piment',
+    nom: 'Piment Africain',
+    nomAnglais: 'African Chili',
+    nomScientifique: 'Capsicum frutescens',
+    categorie: 'Plantes Médicinales',
+    element: 'Feu',
+    description:
+      "Le Piment Africain est la flamme de la vie dans chaque cuisine et chaque remède d'Afrique de l'Ouest. Petit mais d'une puissance extraordinaire, ses fruits rouge vif brûlent la langue et enflamment l'énergie. C'est la plante du courage, de la vie qui s'intensifie, du feu intérieur qui chasse le froid de l'âme et les maladies du corps. Il n'est pas dans sa nature d'être timide.",
+    symboliqueAfricaine:
+      "Dans toutes les traditions d'Afrique de l'Ouest, le piment est à la fois aliment, médecine et protection spirituelle. On en frotte les seuils pour repousser les esprits malveillants. Les guerriers en consomment avant les batailles pour activer leur feu intérieur. Les femmes l'utilisent dans les envoûtements d'amour et dans les charmes de protection. Il est présent dans toutes les cuisines et dans tous les rituels de purification.",
+    symboliqueSpirirtuelle:
+      "Le Piment incarne le feu purificateur — il chasse ce qui est froid, mort ou maléfique. Sa brûlure n'est pas une punition mais une activation — il réveille les corps endormis, stimule la circulation, active la vie. Il enseigne que certaines vérités brûlent comme le piment, mais qu'elles guérissent.",
+    symbolique: "Symbole de feu purificateur, de courage ardent et de vitalité explosive.",
+    qualites: ['Courage ardent', 'Feu purificateur', 'Vitalité explosive', 'Protection active', 'Vérité brûlante'],
+    defauts: ['Excès de chaleur', 'Brûlure sans discernement', 'Irritabilité possible', 'Intensité difficile à maîtriser'],
+    pouvoirs: ['Purification spirituelle', 'Activation de l\'énergie', 'Protection des seuils', 'Courage des guerriers'],
+    enseignements: [
+      "Certaines vérités brûlent comme le piment — mais elles guérissent",
+      "Cultive ton feu intérieur pour ne pas laisser le froid envahir ton âme",
+      "La protection exige parfois une présence intense et affirmée",
+      "La vie s'intensifie quand on lui ajoute du feu",
+    ],
+    citation: "Le piment ne s'excuse pas de brûler — c'est sa mission sacrée.",
+    proverbes: [
+      "Le piment ne s'excuse pas de brûler — c'est sa mission sacrée.",
+      "Une vérité sans piment est fade comme un bouillon sans sel.",
+      "Celui qui ne connaît pas le piment ne connaît pas la vie.",
+    ],
+    legendes: [
+      "La légende fon du Bénin raconte que Lêgba, dieu des carrefours, créa le piment pour marquer la frontière entre les mondes. Là où le piment pousse, les esprits malveillants hésitent — car même eux ne supportent pas sa brûlure.",
+    ],
+    conseilsDeVie: [
+      "Dis tes vérités — même si elles brûlent, elles guérissent plus qu'elles ne blessent.",
+      "Cultive ton feu intérieur — l'enthousiasme est une forme de santé.",
+      "Protège ton espace avec une présence affirmée, pas agressive.",
+    ],
+    niveauSpirituel: 2,
+    regionOrigine: "Toute l'Afrique de l'Ouest — dans chaque cuisine et jardin",
+    couleur: '#E02020',
+    couleurSecondaire: '#A01010',
+    enseignementDuJour:
+      "Aujourd'hui, active ton feu intérieur. Qu'est-ce qui te rend passionné et vivant ?",
+    vertus: ['Analgésique topique', 'Anti-inflammatoire capsaïcine', 'Stimulant circulatoire', 'Antimicrobien', 'Digestif', 'Décongestionnant'],
+    usagesTraditionnels: ['Cuisine quotidienne', 'Frottement des seuils protecteur', 'Décoction contre les rhumatismes', 'Inhalation décongestionnante', 'Charme de protection'],
+  },
+
+  {
+    id: 'poivre-de-guinee',
+    nom: 'Poivre de Guinée',
+    nomAnglais: 'Guinea Pepper',
+    nomScientifique: 'Piper guineense',
+    categorie: 'Plantes Médicinales',
+    element: 'Feu',
+    description:
+      "Le Poivre de Guinée est l'épice secrète des saveurs d'Afrique de l'Ouest — une liane forestière dont les petites baies noires concentrent un arôme extraordinaire, plus complexe et plus poivré que le poivre noir ordinaire. Utilisé depuis des millénaires dans les cuisines et les pharmacopées traditionnelles, c'est l'épice des initiés, celle qui distingue un plat ordinaire d'un festin royal.",
+    symboliqueAfricaine:
+      "Dans les traditions yoruba et igbo du Nigeria, le poivre de Guinée est l'épice de la réconciliation et des serments. On en offre lors des cérémonies de fiançailles et des pactes de paix — sa saveur intense symbolise la profondeur de l'engagement. Les prêtres d'Ifa l'utilisent dans leurs rituels de divination et de protection. Son parfum est dit attirer les esprits bienveillants.",
+    symboliqueSpirirtuelle:
+      "Le Poivre de Guinée incarne la profondeur des engagements — une petite chose qui concentre une puissance extraordinaire. Il enseigne que la vraie force n'est pas dans la taille mais dans l'intensité. Sa complexité aromatique symbolise la richesse de ceux qui ont plusieurs dimensions cachées.",
+    symbolique: "Symbole d'engagements profonds, de puissance concentrée et de saveur des initiés.",
+    qualites: ['Profondeur d\'engagement', 'Puissance concentrée', 'Complexité cachée', 'Intensité sacrée', 'Fidélité des serments'],
+    defauts: ['Intensité excessive', 'Inaccessibilité des initiés', 'Rareté qui exclut', 'Brûlure des non-initiés'],
+    pouvoirs: ['Serments et pactes', 'Attraction des esprits bienveillants', 'Initiation sacrée', 'Profondeur des rituels'],
+    enseignements: [
+      "La vraie puissance n'est pas dans la taille mais dans l'intensité",
+      "Tes engagements profonds sont ta valeur la plus précieuse",
+      "La complexité n'est pas un défaut — c'est une richesse à révéler",
+      "Certaines saveurs ne se comprennent qu'à l'initiation",
+    ],
+    citation: "Le poivre de Guinée révèle sa puissance à qui sait l'utiliser — les autres ne le remarquent même pas.",
+    proverbes: [
+      "Le poivre de Guinée révèle sa puissance à qui sait l'utiliser — les autres ne le remarquent même pas.",
+      "Petite baie, grand serment — ce qui lie est souvent minuscule.",
+      "Celui qui connaît le poivre de Guinée sait que les meilleures choses se cachent.",
+    ],
+    legendes: [
+      "La légende yoruba raconte qu'Ogun, dieu du fer, planta le premier poivre de Guinée pour marquer les contrats des forgerons. Son intensité symbolise la dureté du fer — et comme le fer, le serment fait avec cette épice ne se brise pas.",
+    ],
+    conseilsDeVie: [
+      "Honore tes engagements avec la même intensité que le poivre de Guinée — profondément.",
+      "Révèle ta complexité à ceux qui méritent de te connaître vraiment.",
+      "Ne t'engage que dans ce que tu peux tenir — mais alors, tiens-le absolument.",
+    ],
+    niveauSpirituel: 3,
+    regionOrigine: "Forêts humides — Côte d'Ivoire, Nigeria, Cameroun, Ghana",
+    couleur: '#4A2010',
+    couleurSecondaire: '#2A1008',
+    enseignementDuJour:
+      "Aujourd'hui, réfléchis à un engagement que tu peux approfondir. La qualité vaut plus que la quantité.",
+    vertus: ['Aphrodisiaque traditionnel', 'Anti-inflammatoire', 'Stimulant digestif', 'Antimicrobien', 'Analgésique'],
+    usagesTraditionnels: ['Cuisine comme épice', 'Tisane aphrodisiaque', 'Décoction contre l\'infertilité', 'Rituel de pacte', 'Protection des maisons'],
+  },
+
+  {
+    id: 'grains-de-selim',
+    nom: 'Grains de Sélim',
+    nomAnglais: 'Grains of Selim',
+    nomScientifique: 'Xylopia aethiopica',
+    categorie: 'Plantes Médicinales',
+    element: 'Air',
+    description:
+      "Les Grains de Sélim sont l'épice royale des cuisines et des rituels d'Afrique de l'Ouest — de petites gousses ligneuses aux arômes complexes et envoûtants, mêlant poivre, eucalyptus et notes résineuses. Appelés 'poivre d'Éthiopie' ou 'kani' en mandingue, ils sont présents dans les bouillons les plus sophistiqués et les préparations médicinales les plus sacrées.",
+    symboliqueAfricaine:
+      "Dans les traditions mandingues, les grains de Sélim sont l'épice des ancêtres — on en jette quelques grains dans les feux des cérémonies funéraires pour parfumer le chemin de l'âme vers l'au-delà. Les marabouts les utilisent dans la préparation des talismans. Les sages-femmes les brûlent dans les cases des nouvelles mères pour purifier l'espace de naissance.",
+    symboliqueSpirirtuelle:
+      "Les Grains de Sélim symbolisent la connexion entre les mondes — leur fumée aromatique sert de véhicule entre le monde visible et invisible. Ils enseignent que certaines transitions nécessitent une préparation sensorielle, que parfumer le chemin est une forme de respect pour le voyage.",
+    symbolique: "Symbole de passage entre les mondes, de purification par le parfum et de connexion ancestrale.",
+    qualites: ['Connexion inter-mondes', 'Purification aromatique', 'Raffinement sensoriel', 'Sagesse ancestrale', 'Transition aidée'],
+    defauts: ['Hermétisme initiatique', 'Complexité inaccessible', 'Rareté élitiste', 'Mystère difficile'],
+    pouvoirs: ['Communication avec les morts', 'Purification des naissances', 'Protection talismanique', 'Parfum sacré'],
+    enseignements: [
+      "Les transitions importantes méritent une préparation consciente",
+      "Le parfum est une forme de prière — il porte l'intention dans les espaces invisibles",
+      "Honore les passages — naissance, mort, initiation — avec des rituels appropriés",
+      "Certaines connexions ne s'établissent que dans le raffinement",
+    ],
+    citation: "Les grains de Sélim parfument le chemin des âmes — pour que les ancêtres les reconnaissent de loin.",
+    proverbes: [
+      "Les grains de Sélim parfument le chemin des âmes — pour que les ancêtres les reconnaissent de loin.",
+      "Brûle le Sélim dans la case de la naissance — ainsi l'âme sait qu'elle est attendue.",
+      "L'épice rare est pour les moments rares — ne la gaspille pas en des jours ordinaires.",
+    ],
+    legendes: [
+      "Les anciens mandingues racontent que les grains de Sélim furent offerts par les génies de l'entre-deux — ni vivants ni morts, les êtres qui habitent les frontières. Ils les donnèrent aux humains pour faciliter les passages difficiles, pour adoucir les séparations.",
+    ],
+    conseilsDeVie: [
+      "Prépare consciemment tes grandes transitions — elles méritent de l'attention et du soin.",
+      "Crée des rituels personnels pour marquer les passages importants de ta vie.",
+      "Honore la mémoire de tes morts — leur connexion te nourrit.",
+    ],
+    niveauSpirituel: 4,
+    regionOrigine: "Forêts d'Afrique de l'Ouest — Sénégal, Guinée, Mali, Côte d'Ivoire",
+    couleur: '#6B4A1A',
+    couleurSecondaire: '#3A2808',
+    enseignementDuJour:
+      "Aujourd'hui, crée un moment de transition consciente dans ta journée — un rituel simple pour marquer un passage.",
+    vertus: ['Bronchodilatateur', 'Antitussif', 'Galactogène', 'Antidouleur', 'Carminatif', 'Antimicrobien'],
+    usagesTraditionnels: ['Épice dans les bouillons et ragoûts', 'Fumigation de purification', 'Préparation des talismans', 'Tisane contre la toux', 'Rituel de naissance'],
+  },
+
+  {
+    id: 'vernonia',
+    nom: 'Vernonia',
+    nomAnglais: 'Bitter Leaf',
+    nomScientifique: 'Vernonia amygdalina',
+    categorie: 'Plantes Médicinales',
+    element: 'Terre',
+    description:
+      "La Vernonia, connue comme 'feuilles amères' en français ou 'ewuro' en yoruba, est l'une des plantes médicinales les plus respectées d'Afrique subsaharienne. Ses feuilles d'un vert profond ont un goût amer intense qui choque au premier contact mais révèle la sagesse ancienne : l'amertume guérit ce que la douceur ne peut atteindre. C'est la médecine des maladies profondes.",
+    symboliqueAfricaine:
+      "Dans les traditions igbo et yoruba du Nigeria, la vernonia est associée à la vérité difficile — on dit que ses feuilles amères sont l'antidote à toutes les illusions douces mais néfastes. Les anciens l'utilisaient pour purifier le sang des guerriers avant les batailles. Les femmes l'ingèrent après l'accouchement pour nettoyer le sang et stimuler la lactation. C'est la plante de la purification profonde.",
+    symboliqueSpirirtuelle:
+      "La Vernonia enseigne l'acceptation de l'amertume nécessaire — certaines guérisons passent par des vérités et des remèdes amers que l'ego refuse d'abord. Elle symbolise le courage de prendre la médecine difficile pour guérir vraiment plutôt que de préférer le placebo doux.",
+    symbolique: "Symbole d'amertume salvatrice, de purification profonde et de vérités courageuses.",
+    qualites: ['Courage de la vérité amère', 'Purification profonde', 'Guérison radicale', 'Discernement des illusions', 'Honnêteté médicinale'],
+    defauts: ['Amertume rebutante', 'Directness difficile', 'Purification exigeante', 'Rejet des faux-semblants'],
+    pouvoirs: ['Purification sanguine', 'Guérison des maladies profondes', 'Dissolution des illusions', 'Force après l\'accouchement'],
+    enseignements: [
+      "Certaines guérisons nécessitent d'avaler des vérités amères",
+      "Préfère la médecine difficile qui guérit à l'illusion douce qui tue lentement",
+      "La purification vraie n'est jamais entièrement agréable",
+      "Le courage de l'honnêteté est la plus grande des médecines",
+    ],
+    citation: "La vernonia est amère comme la vérité — et comme la vérité, elle guérit ce que le mensonge entretient.",
+    proverbes: [
+      "La vernonia est amère comme la vérité — et comme la vérité, elle guérit ce que le mensonge entretient.",
+      "Celui qui refuse les feuilles amères refusera aussi la guérison.",
+      "L'amertume d'aujourd'hui est la santé de demain.",
+    ],
+    legendes: [
+      "La légende igbo raconte qu'un roi souffrant d'une maladie mystérieuse refusait toute médecine amère. Ses guérisseurs lui proposaient des remèdes de plus en plus doux — il empirait. Finalement, un enfant lui offrit des feuilles de vernonia sans lui dire leur goût. Le roi les prit, fit une grimace — et guérit. Il apprit que la bonne médecine n'a pas à plaire.",
+    ],
+    conseilsDeVie: [
+      "Accepte les vérités difficiles — elles sont la médecine que ton âme attend.",
+      "Ne fuis pas l'amertume des purifications nécessaires.",
+      "Sois honnête même quand la vérité est amère — c'est un cadeau.",
+    ],
+    niveauSpirituel: 3,
+    regionOrigine: "Zones humides — Nigeria, Ghana, Côte d'Ivoire, Cameroun",
+    couleur: '#2A5C1A',
+    couleurSecondaire: '#143A08',
+    enseignementDuJour:
+      "Aujourd'hui, quelle vérité amère as-tu besoin d'accepter pour avancer vers ta guérison ?",
+    vertus: ['Antidiabétique puissant', 'Antipaludéen', 'Anticancéreux étudié', 'Antihypertenseur', 'Galactogène', 'Antipyrétique'],
+    usagesTraditionnels: ['Soupe aux feuilles amères', 'Décoction antidiabétique', 'Purification post-partum', 'Traitement du paludisme', 'Tonique sanguin'],
+  },
+
+  {
+    id: 'corossolier',
+    nom: 'Corossolier',
+    nomAnglais: 'Soursop',
+    nomScientifique: 'Annona muricata',
+    categorie: 'Plantes Médicinales',
+    element: 'Eau',
+    description:
+      "Le Corossolier est l'arbre aux fruits paradoxaux — sa peau verte et épineuse cache une chair blanche crémeuse d'une douceur tropicale incomparable, à la saveur d'ananas et de fraise mêlés. Mais au-delà de sa délicieuse pulpe, cet arbre est devenu l'un des plus étudiés par la phytothérapie moderne pour ses propriétés anticancéreuses potentielles, connues depuis des siècles par les guérisseurs africains.",
+    symboliqueAfricaine:
+      "Dans les traditions côtières d'Afrique de l'Ouest, le corossolier est l'arbre de la guérison miraculeuse. Ses feuilles sont utilisées dans les tisanes des maladies graves, quand les autres remèdes ont échoué. On l'appelle parfois 'arbre de la dernière chance' — non pas parce qu'il soigne en désespoir de cause, mais parce que sa puissance est réservée aux cas extrêmes.",
+    symboliqueSpirirtuelle:
+      "Le Corossolier symbolise la guérison profonde qui nécessite le paradoxe — ce qui est doux à l'intérieur peut guérir les maladies les plus dures. Sa chair crémeuse représente la douceur de l'espoir qui persiste même face à la maladie. Il enseigne que les guérisons les plus profondes viennent souvent d'où on les attend le moins.",
+    symbolique: "Symbole de guérison paradoxale, d'espoir persistant et de douceur cachée sous les épines.",
+    qualites: ['Guérison inattendue', 'Espoir persistant', 'Douceur cachée', 'Puissance médicinale profonde', 'Don de la dernière chance'],
+    defauts: ['Épines protectrices intimidantes', 'Espoir parfois déçu', 'Dépendance au miracle', 'Attentes excessives'],
+    pouvoirs: ['Guérison des maladies graves', 'Espoir en dernier recours', 'Purification profonde', 'Douceur de l\'âme'],
+    enseignements: [
+      "Les guérisons les plus profondes viennent souvent d'où on les attendait le moins",
+      "Derrière les épines de la difficulté se cache souvent une douceur inconnue",
+      "Ne désespère jamais — la dernière chance est parfois la plus puissante",
+      "La guérison exige la foi autant que la médecine",
+    ],
+    citation: "Le corossolier est épineux dehors et crémeux dedans — comme toute vraie guérison.",
+    proverbes: [
+      "Le corossolier est épineux dehors et crémeux dedans — comme toute vraie guérison.",
+      "N'abandonne pas l'arbre aux fruits impossibles — c'est parfois lui qui guérit l'impossible.",
+      "La médecine la plus puissante est souvent aussi la plus douce.",
+    ],
+    legendes: [
+      "Les guérisseurs ivoiriens racontent qu'une femme dont l'enfant était condamné cueillit des feuilles de corossolier guidée par un rêve. Elle prépara une tisane qu'elle donna à son enfant sept nuits de suite. Au matin du huitième jour, l'enfant se leva guéri. L'arbre lui avait été envoyé par ses ancêtres guérisseurs.",
+    ],
+    conseilsDeVie: [
+      "Ne renonce pas aux possibilités de guérison — explore toutes les pistes.",
+      "Cherche la douceur derrière les apparences difficiles.",
+      "Garde l'espoir vivant — c'est lui-même une forme de médecine.",
+    ],
+    niveauSpirituel: 3,
+    regionOrigine: "Zones côtières et humides — Côte d'Ivoire, Ghana, Nigeria, Bénin",
+    couleur: '#3A7A2A',
+    couleurSecondaire: '#1A4A10',
+    enseignementDuJour:
+      "Aujourd'hui, explore un remède inattendu — une solution douce à un problème épineux.",
+    vertus: ['Anticancéreux étudié (acétogénines)', 'Antiparasitaire', 'Sédatif doux', 'Antidiabétique', 'Antibactérien', 'Hypotenseur'],
+    usagesTraditionnels: ['Fruit comestible', 'Tisane de feuilles anticancéreuse', 'Traitement de l\'insomnie', 'Décoction antiparasitaire', 'Remède des maladies graves'],
+  },
+
+  {
+    id: 'maniguette',
+    nom: 'Maniguette',
+    nomAnglais: 'Grains of Paradise',
+    nomScientifique: 'Aframomum melegueta',
+    categorie: 'Plantes Médicinales',
+    element: 'Feu',
+    description:
+      "La Maniguette, ou 'Graines du Paradis', est l'épice mythique d'Afrique de l'Ouest qui fit pendant des siècles la fortune des routes commerciales. Ses graines rouge-brun, à la saveur ardente mêlant poivre, cardamome et gingembre, étaient si précieuses qu'elles donnèrent leur nom à la 'Côte des Graines' — l'actuelle côte de la Sierra Leone au Liberia. C'est l'épice royale par excellence.",
+    symboliqueAfricaine:
+      "Dans les traditions akan et mandingues, la maniguette est l'épice de la royauté et de la prospérité. On l'offre aux chefs lors des intronisations. Les fêtes royales ne se tiennent pas sans ses graines parfumées. Les femmes l'utilisent pour attirer la prospérité et l'amour — ses graines sont portées en amulettes. C'est la plante qui transforme le commun en royal.",
+    symboliqueSpirirtuelle:
+      "La Maniguette incarne la transformation alchimique — elle prend quelque chose d'ordinaire (un repas, une cérémonie) et le transforme en quelque chose de royal par sa seule présence. Elle enseigne que la présence de l'excellence élève tout ce qui l'entoure.",
+    symbolique: "Symbole de royauté accessible, de transformation alchimique et de prospérité méritée.",
+    qualites: ['Excellence transformatrice', 'Présence royale', 'Prospérité attirée', 'Alchimie du quotidien', 'Valeur rare reconnue'],
+    defauts: ['Rareté qui exclut', 'Préciosité parfois excessive', 'Attentes de grandeur', 'Difficulté du quotidien'],
+    pouvoirs: ['Transformation du banal en royal', 'Attraction de la prospérité', 'Intronisation du pouvoir', 'Alchimie amoureuse'],
+    enseignements: [
+      "L'excellence de ta présence élève tout ce qui t'entoure",
+      "La vraie royauté se manifeste dans l'attention portée aux détails",
+      "La prospérité s'attire par la qualité de ta présence",
+      "Transforme le quotidien en royal par ton raffinement",
+    ],
+    citation: "La maniguette transforme le repas commun en festin royal — c'est le pouvoir de la qualité sur la quantité.",
+    proverbes: [
+      "La maniguette transforme le repas commun en festin royal — c'est le pouvoir de la qualité sur la quantité.",
+      "Les Graines du Paradis ne se trouvent pas n'importe où — elles choisissent leurs hôtes.",
+      "Celui qui connaît la maniguette comprend que le paradis commence dans la bouche.",
+    ],
+    legendes: [
+      "Les marchands arabes médiévaux racontaient que les grains de paradis tombaient directement du ciel sur les côtes d'Afrique — c'est pourquoi elles portaient ce nom. Les rois d'Afrique de l'Ouest savaient que ce mythe commercial leur permettait de vendre leur épice à prix d'or, et ils s'en amusaient.",
+    ],
+    conseilsDeVie: [
+      "Apporte l'excellence dans chaque chose que tu fais, même les plus petites.",
+      "Ta qualité de présence transforme les situations ordinaires.",
+      "Cultive le raffinement — non par snobisme, mais par respect de la beauté.",
+    ],
+    niveauSpirituel: 3,
+    regionOrigine: "Côte des Graines — Sierra Leone, Liberia, Côte d'Ivoire, Ghana",
+    couleur: '#C4501A',
+    couleurSecondaire: '#8A2E08',
+    enseignementDuJour:
+      "Aujourd'hui, transforme une situation ordinaire en quelque chose d'exceptionnel par ta présence et ton attention.",
+    vertus: ['Stimulant métabolique', 'Anti-inflammatoire', 'Aphrodisiaque traditionnel', 'Digestif', 'Antimicrobien', 'Perte de poids soutenue'],
+    usagesTraditionnels: ['Épice royale dans les plats', 'Amulette de prospérité', 'Boisson cérémonielle', 'Tisane métabolique', 'Rituel d\'intronisation'],
+  },
+
+  {
+    id: 'securidaca',
+    nom: 'Arbre Violet',
+    nomAnglais: 'Violet Tree',
+    nomScientifique: 'Securidaca longipedunculata',
+    categorie: 'Plantes Rituelles',
+    element: 'Air',
+    description:
+      "L'Arbre Violet ou Securidaca est l'une des plantes rituelles les plus puissantes et les plus respectées d'Afrique de l'Ouest. Petit arbre des savanes ouvertes, il se distingue par ses magnifiques fleurs violettes qui embaument l'air au moment de la floraison. Son parfum intense rappelant la violette lui a valu une place centrale dans les rituels de purification et de protection.",
+    symboliqueAfricaine:
+      "Dans les traditions bambaras, sonhraï et dogon, le Securidaca est l'arbre de la frontière — il marque les limites entre le monde des vivants et celui des esprits. Ses racines, à l'odeur caractéristique de salicylate de méthyle (similaire à la Wintergreen), sont utilisées par les devins et les guérisseurs pour créer des espaces protégés lors des rituels. C'est la plante qui purifie les espaces avant les cérémonies sacrées.",
+    symboliqueSpirirtuelle:
+      "Le Securidaca symbolise la frontière sacrée — la ligne entre deux mondes, deux états, deux temps. Il enseigne que certains espaces doivent être clairement délimités et protégés pour que la vie spirituelle soit possible. Son parfum est le signal que la cérémonie commence et que le monde ordinaire s'efface.",
+    symbolique: "Symbole de frontières sacrées, de purification rituelle et de passage conscient.",
+    qualites: ['Discernement des frontières', 'Purification consciente', 'Protection rituelle', 'Odeur qui éveille', 'Transition délimitée'],
+    defauts: ['Toxicité des ignorants', 'Frontières rigides', 'Exclusion des non-initiés', 'Accès dangereux sans connaissance'],
+    pouvoirs: ['Purification des espaces sacrés', 'Protection des rituels', 'Marquage des frontières', 'Ouverture des passages'],
+    enseignements: [
+      "Marque clairement les frontières de ton espace sacré",
+      "Toute cérémonie importante mérite une purification préalable",
+      "Certains passages ne s'ouvrent qu'à ceux qui connaissent le rituel",
+      "Le parfum est la première médecine de l'âme",
+    ],
+    citation: "Là où le Securidaca fleurit, les esprits savent qu'ils sont attendus.",
+    proverbes: [
+      "Là où le Securidaca fleurit, les esprits savent qu'ils sont attendus.",
+      "La frontière n'est pas une prison — c'est la protection de ce qui est sacré.",
+      "Purifier l'espace avant le rituel, c'est préparer une maison pour des invités divins.",
+    ],
+    legendes: [
+      "Les devins dogon racontent que l'Arbre Violet fut planté par Amma, le dieu créateur, aux quatre coins du monde pour marquer les frontières du visible et de l'invisible. Quand ses fleurs s'ouvrent, les deux mondes se rapprochent et la communication devient possible.",
+    ],
+    conseilsDeVie: [
+      "Purifies ton espace et ton esprit avant toute chose importante.",
+      "Respecte les frontières — les tiennes et celles des autres.",
+      "Crée des rituels de transition entre tes différents états de vie.",
+    ],
+    niveauSpirituel: 4,
+    regionOrigine: "Savane d'Afrique de l'Ouest — Burkina Faso, Mali, Guinée, Côte d'Ivoire",
+    couleur: '#6A3A8A',
+    couleurSecondaire: '#3A1A5A',
+    enseignementDuJour:
+      "Aujourd'hui, purifies un espace — physique ou mental — avant de commencer quelque chose d'important.",
+    vertus: ['Antiseptique puissant', 'Antidouleur', 'Antipaludéen', 'Anti-inflammatoire'],
+    usagesTraditionnels: ['Purification des espaces rituels', 'Fumigation des cases', 'Tisane anti-inflammatoire', 'Décoction antipaludéenne', 'Amulette protectrice'],
+  },
+
+  {
+    id: 'ylang-ylang',
+    nom: 'Ylang-Ylang',
+    nomAnglais: 'Ylang-Ylang',
+    nomScientifique: 'Cananga odorata',
+    categorie: 'Plantes Rituelles',
+    element: 'Eau',
+    description:
+      "L'Ylang-Ylang est l'arbre du parfum sacré — ses fleurs étoilées jaune-verdâtre dégagent l'un des parfums les plus envoûtants et les plus complexes du règne végétal. Introduit en Afrique de l'Ouest depuis l'Asie du Sud-Est mais profondément adopté par les traditions spirituelles côtières, il est devenu l'arbre des rituels d'amour, de beauté et d'harmonie.",
+    symboliqueAfricaine:
+      "Dans les traditions côtières d'Afrique de l'Ouest, l'ylang-ylang est l'arbre de Yemoja, déesse de la mer et de la fertilité. Ses fleurs parfumées sont offertes à la mer lors des cérémonies de propitiation. Les femmes s'enduisent de son huile lors des initiations féminines et des rituels de mariage. Son parfum est dit ouvrir le cœur à l'amour et harmoniser les relations.",
+    symboliqueSpirirtuelle:
+      "L'Ylang-Ylang incarne l'harmonie parfaite — son parfum complexe mêle des notes qui sembleraient discordantes séparément mais qui créent ensemble quelque chose de transcendant. Il enseigne que l'harmonie ne vient pas de l'uniformité mais de la juste proportion de toutes les différences.",
+    symbolique: "Symbole d'harmonie transcendante, d'amour sacré et de beauté rituelle.",
+    qualites: ['Harmonie naturelle', 'Beauté sensorielle', 'Amour sacré', 'Équilibre émotionnel', 'Attraction bienveillante'],
+    defauts: ['Intensité excessive du parfum', 'Ivresse sensorielle', 'Dépendance à la beauté', 'Lourdeur parfois envoûtante'],
+    pouvoirs: ['Ouverture du cœur', 'Harmonisation des relations', 'Rituel de mariage', 'Connexion marine'],
+    enseignements: [
+      "L'harmonie naît de la juste proportion de toutes les différences",
+      "La beauté sensorielle est un chemin valide vers le sacré",
+      "Ouvre ton cœur à l'amour — c'est ta nature profonde",
+      "Harmonise tes relations avec la même complexité que le parfum de l'ylang",
+    ],
+    citation: "L'ylang-ylang ne cache pas son parfum — il l'offre à tous les vents pour que tous se souviennent de l'amour.",
+    proverbes: [
+      "L'ylang-ylang ne cache pas son parfum — il l'offre à tous les vents pour que tous se souviennent de l'amour.",
+      "La fleur parfumée attire plus que la fleur criarde — la douceur est la plus grande séduction.",
+      "Harmoniser, c'est trouver la note que chacun peut chanter ensemble.",
+    ],
+    legendes: [
+      "La légende des pêcheurs fante du Ghana raconte que Yemoja, faisant le deuil de ses enfants noyés, planta l'ylang-ylang sur les rivages pour que son parfum les guide vers le paradis aquatique. Depuis, l'odeur de ses fleurs est la porte entre la mer des vivants et la mer des morts.",
+    ],
+    conseilsDeVie: [
+      "Cultive l'harmonie dans tes relations — cherche les notes qui s'accordent.",
+      "Laisse la beauté te toucher — c'est une forme de connexion au divin.",
+      "Offre de l'amour ouvertement — comme l'ylang-ylang offre son parfum.",
+    ],
+    niveauSpirituel: 3,
+    regionOrigine: "Côtes d'Afrique de l'Ouest — Côte d'Ivoire, Ghana, Bénin, Nigeria",
+    couleur: '#D4AF37',
+    couleurSecondaire: '#A07A10',
+    enseignementDuJour:
+      "Aujourd'hui, crée un moment de beauté intentionnelle — pour toi-même ou quelqu'un que tu aimes.",
+    vertus: ['Anxiolytique naturel', 'Régulateur du rythme cardiaque', 'Aphrodisiaque doux', 'Antidépresseur léger', 'Antiseptique'],
+    usagesTraditionnels: ['Huile essentielle de mariage', 'Offrandes à la mer', 'Rituel d\'initiation féminine', 'Parfum des cérémonies', 'Soin cosmétique et capillaire'],
+  },
+
+  /* ═══════════════════════════════════════════════════════════
+     NOUVELLES PLANTES ALIMENTAIRES
+  ═══════════════════════════════════════════════════════════ */
+
+  {
+    id: 'niebe',
+    nom: 'Niébé',
+    nomAnglais: 'Cowpea',
+    nomScientifique: 'Vigna unguiculata',
+    categorie: 'Plantes Alimentaires',
+    element: 'Terre',
+    description:
+      "Le Niébé est la légumineuse sacrée de l'Afrique de l'Ouest — un haricot robuste à l'œil noir caractéristique qui nourrit les populations sahéliennes depuis des millénaires. Première source de protéines végétales dans toute la région, il pousse là où peu d'autres plantes survivent. On le dit béni des dieux parce qu'il nourrit les plus pauvres avec une efficacité et une dignité remarquables.",
+    symboliqueAfricaine:
+      "Dans les traditions mandingues et haoussa, le niébé est 'la nourriture des humbles' mais aussi 'la force des travailleurs'. On dit que le guerrier peul qui mange du niébé chaque matin n'est jamais fatigué. Les femmes préparent le thiébou niébé pour les fêtes importantes — car partager le niébé, c'est partager sa force. Il est présent dans les cérémonies de mariage comme symbole de subsistance durable.",
+    symboliqueSpirirtuelle:
+      "Le Niébé symbolise la modestie nutritive — il donne beaucoup sans paraître extraordinaire. Sa richesse en protéines, cachée dans sa simplicité apparente, rappelle que les vraies ressources sont souvent invisibles pour ceux qui ne savent pas voir. Il enseigne la dignité du simple et la richesse cachée dans l'ordinaire.",
+    symbolique: "Symbole de force humble, de subsistance digne et de richesse cachée dans la simplicité.",
+    qualites: ['Force humble', 'Subsistance digne', 'Générosité simple', 'Richesse cachée', 'Endurance des travailleurs'],
+    defauts: ['Modestie mal interprétée', 'Sous-estimation fréquente', 'Apparence sans éclat', 'Méconnaissance des ignorants'],
+    pouvoirs: ['Force durable', 'Nourriture des familles', 'Résistance à la sécheresse', 'Fertilité des sols'],
+    enseignements: [
+      "La vraie richesse nourrit — elle ne se vante pas",
+      "Sois fier de la simplicité qui nourrit vraiment",
+      "Les ressources les plus précieuses sont souvent les plus modestes",
+      "La force durable vient de la constance, pas de l'éclat",
+    ],
+    citation: "Le niébé ne brille pas — mais il nourrit le village entier quand la saison est maigre.",
+    proverbes: [
+      "Le niébé ne brille pas — mais il nourrit le village entier quand la saison est maigre.",
+      "Méprise le niébé au marché — mange-le quand la faim frappe et comprends sa valeur.",
+      "La force du travailleur n'est pas dans ses muscles mais dans son bol de niébé.",
+    ],
+    legendes: [
+      "Les anciens peuls racontent que le niébé fut le premier don d'Ardo, le dieu des bergers, à ses enfants avant leur long voyage à travers le Sahel. 'Je vous donne ce qui est petit mais qui ne vous abandonnera jamais', dit-il. Et le niébé poussa dans les terres les plus sèches pour tenir sa promesse.",
+    ],
+    conseilsDeVie: [
+      "Ne méprise pas les ressources simples — elles sont souvent les plus fiables.",
+      "La constance dans l'effort modeste vaut plus que l'éclat dans l'exceptionnel.",
+      "Nourris-toi de ce qui te donne une force durable, pas de ce qui brille vite.",
+    ],
+    niveauSpirituel: 2,
+    regionOrigine: "Tout le Sahel et les savanes — Sénégal, Mali, Niger, Nigeria, Burkina Faso",
+    couleur: '#8B7540',
+    couleurSecondaire: '#5A4820',
+    enseignementDuJour:
+      "Aujourd'hui, reconnaît la valeur d'une ressource simple dans ta vie que tu as peut-être sous-estimée.",
+    vertus: ['Riche en protéines végétales', 'Fer et zinc', 'Régulation glycémique', 'Acide folique', 'Prébiotique'],
+    usagesTraditionnels: ['Plat de résistance', 'Soupe familiale', 'Farine de niébé pour le pain', 'Aliment de sevrage', 'Présent de mariage'],
+  },
+
+  {
+    id: 'mais',
+    nom: 'Maïs',
+    nomAnglais: 'Corn',
+    nomScientifique: 'Zea mays',
+    categorie: 'Plantes Alimentaires',
+    element: 'Terre',
+    description:
+      "Le Maïs est devenu en quelques siècles l'une des plantes les plus cultivées d'Afrique de l'Ouest, adoptée et sacralisée par les peuples qui l'ont faite leur. Ses épis dorés aux rangées serrées de grains symbolisent la communauté solidaire — des centaines de grains unis dans une organisation parfaite autour d'un même axe. C'est la plante de l'unité dans la diversité.",
+    symboliqueAfricaine:
+      "Dans les traditions akan et ewe du Ghana et du Togo, le maïs est l'aliment de la fête et de la communion. L'akpan, la pâte de maïs fermentée, est le premier aliment donné aux nourrissons lors des cérémonies de naming. Le pop-corn est offert aux ancêtres lors des libations. Le maïs représente la communauté — ses grains ne peuvent exister qu'ensemble sur l'épi.",
+    symboliqueSpirirtuelle:
+      "Le Maïs symbolise la communauté bien organisée — des milliers d'individus différents, solidement liés autour d'un axe commun, tous exposés à la même lumière. Il enseigne que la force de la communauté repose sur l'organisation et la solidarité, non sur l'uniformité.",
+    symbolique: "Symbole de communauté organisée, d'abondance dorée et de solidarité structurée.",
+    qualites: ['Esprit communautaire', 'Organisation solide', 'Abondance généreuse', 'Solidarité structurée', 'Adaptabilité remarquable'],
+    defauts: ['Dépendance au groupe', 'Uniformité imposée', 'Vulnérabilité des monocultures', 'Perte de l\'individuel'],
+    pouvoirs: ['Nourriture de la fête', 'Communion des vivants', 'Offrande aux ancêtres', 'Unité communautaire'],
+    enseignements: [
+      "La force réside dans l'union organisée, non dans l'accumulation désordonnée",
+      "Chaque membre de la communauté a sa place précise — respecte-la",
+      "L'abondance se partage — un épi de maïs ne se mange pas seul",
+      "Expose-toi à la même lumière que ta communauté — la croissance est collective",
+    ],
+    citation: "L'épi de maïs ne choisit pas ses grains — il les unit tous et c'est leur force.",
+    proverbes: [
+      "L'épi de maïs ne choisit pas ses grains — il les unit tous et c'est leur force.",
+      "Un seul grain de maïs ne fait pas une récolte — mais ensemble, ils nourrissent le village.",
+      "Celui qui quitte son rang sur l'épi devient facile à perdre.",
+    ],
+    legendes: [
+      "La légende akan raconte que le maïs fut un cadeau d'Anansi l'araignée, qui l'avait volé au soleil. Le soleil lui reprocha de voler sa lumière dorée — Anansi répondit qu'il la donnait aux hommes pour qu'ils aient toujours un peu du soleil à manger pendant la nuit.",
+    ],
+    conseilsDeVie: [
+      "Sois un membre actif de ta communauté — chaque grain compte sur l'épi.",
+      "L'organisation collective crée une abondance que l'individu seul ne peut atteindre.",
+      "Partage l'abondance que tu crées — c'est le sens de la récolte.",
+    ],
+    niveauSpirituel: 2,
+    regionOrigine: "Toute l'Afrique de l'Ouest — adapté à toutes les zones",
+    couleur: '#E8C040',
+    couleurSecondaire: '#B89010',
+    enseignementDuJour:
+      "Aujourd'hui, contribue activement à une communauté — ta place y est précieuse.",
+    vertus: ['Glucides énergétiques', 'Fibres digestives', 'Antioxydants caroténoïdes', 'Vitamine B', 'Magnésium'],
+    usagesTraditionnels: ['Farine et pâte (tô, akpan)', 'Pop-corn des cérémonies', 'Bouillie de sevrage', 'Bière de mil traditionnelle', 'Aliment de fête'],
+  },
+
+  {
+    id: 'plantain',
+    nom: 'Plantain',
+    nomAnglais: 'Plantain',
+    nomScientifique: 'Musa paradisiaca',
+    categorie: 'Plantes Alimentaires',
+    element: 'Terre',
+    description:
+      "Le Plantain est le roi des aliments de subsistance des zones forestières d'Afrique de l'Ouest — un cousin géant de la banane dont les fruits amidonnés, cuits de mille façons, constituent la base alimentaire de millions de personnes du Sénégal au Congo. Allôfètes, kelewele, aloco, attiéké — chaque peuple a su transformer ce fruit universel en mets uniques et identitaires.",
+    symboliqueAfricaine:
+      "Dans les traditions des peuples forestiers — Ashanti, Agni, Baoulé, Éwé — le plantain est l'arbre de la mère nourricière. Son régime abondant pend comme un bras chargé de cadeaux. On dit que le plantain est généreux 'comme une mère qui ne retient rien' — il donne tout son fruit, puis meurt et laisse ses rejets continuer son œuvre.",
+    symboliqueSpirirtuelle:
+      "Le Plantain incarne le don total et la transmission générationnelle — il donne tous ses fruits sans réserve, puis passe le relais à ses rejets. Il n'y a pas de mort dans le plantain, seulement une transformation. Il enseigne que la vraie générosité est sans calcul et que chaque fin prépare un commencement.",
+    symbolique: "Symbole de générosité totale, de transmission générationnelle et de don sans retenue.",
+    qualites: ['Générosité totale', 'Transmission fidèle', 'Don sans calcul', 'Nourriture universelle', 'Adaptabilité culinaire'],
+    defauts: ['Mort après le don', 'Dépendance de l\'entourage', 'Vulnerabilité aux maladies', 'Brièveté du cycle'],
+    pouvoirs: ['Nourriture des familles', 'Transmission générationnelle', 'Adaptabilité de la générosité', 'Alimentation des voyages'],
+    enseignements: [
+      "Donne tout ce que tu as à donner — tes rejets continueront ton œuvre",
+      "La mort d'une génération est la vie de la suivante",
+      "La générosité sans calcul est la plus grande des richesses",
+      "Adapte ton don à chaque contexte — le plantain se cuisine de mille façons",
+    ],
+    citation: "Le plantain donne tout son fruit, meurt, et laisse ses enfants continuer — c'est la générosité pure.",
+    proverbes: [
+      "Le plantain donne tout son fruit, meurt, et laisse ses enfants continuer — c'est la générosité pure.",
+      "Qui a un plantanier dans sa cour ne mourra pas de faim.",
+      "Le plantain ne demande pas pourquoi tu le coupes — il te nourrit et c'est assez.",
+    ],
+    legendes: [
+      "Les anciens ashanti racontent qu'Onyame, le dieu suprême, offrit le premier plantain à une veuve qui avait nourri un étranger affamé sans rien demander. Il planta son bâton dans la terre — et un plantain poussa, abondant et inépuisable. La générosité appelle la nourriture.",
+    ],
+    conseilsDeVie: [
+      "Donne sans calculer — la vraie générosité ne comptabilise pas.",
+      "Ce que tu laisses après toi est aussi important que ce que tu as accompli.",
+      "Nourris les autres avec ce que tu sais faire — c'est toujours assez.",
+    ],
+    niveauSpirituel: 2,
+    regionOrigine: "Zones forestières et côtières — Côte d'Ivoire, Ghana, Nigeria, Cameroun",
+    couleur: '#C8A835',
+    couleurSecondaire: '#8A7015',
+    enseignementDuJour:
+      "Aujourd'hui, donne quelque chose sans attendre de retour — nourriture, temps ou sagesse.",
+    vertus: ['Glucides complexes énergétiques', 'Potassium', 'Vitamine B6', 'Fibres digestives', 'Résistant à l\'insuline'],
+    usagesTraditionnels: ['Allôcos frits', 'Kelewele épicé', 'Foufou mixte', 'Plantain bouilli', 'Chips de plantain', 'Farine pour bouillies'],
+  },
+
+  {
+    id: 'pois-bambara',
+    nom: 'Pois Bambara',
+    nomAnglais: 'Bambara Groundnut',
+    nomScientifique: 'Vigna subterranea',
+    categorie: 'Plantes Alimentaires',
+    element: 'Terre',
+    description:
+      "Le Pois Bambara est l'une des rares plantes entièrement africaines — originaire d'Afrique de l'Ouest, il n'a pas été importé d'ailleurs. Cette légumineuse souterraine produit ses gousses dans le sol, invisible aux yeux des non-initiés. C'est la plante de l'autosuffisance absolue : complète en protéines, glucides et lipides, elle peut, à elle seule, sustenter une personne en bonne santé.",
+    symboliqueAfricaine:
+      "Dans les traditions bambaras du Mali — qui lui donnèrent leur nom — le pois bambara est l'aliment de l'indépendance. On dit qu'un peuple qui cultive le pois bambara ne peut pas mourir de faim. Les femmes en font le sôm, une pâte fermentée qui accompagne tout repas. C'est la nourriture des voyageurs courageux et des paysans sages qui planifient longtemps à l'avance.",
+    symboliqueSpirirtuelle:
+      "Le Pois Bambara incarne l'autosuffisance et la planification profonde — il cache ses trésors dans la terre, hors de vue, les protégeant patiemment jusqu'à la récolte. Il enseigne l'importance de construire des réserves invisibles, de ne pas tout exposer, de préparer l'avenir dans le secret de la profondeur.",
+    symbolique: "Symbole d'autosuffisance, de planification patiente et de richesse cachée dans la profondeur.",
+    qualites: ['Autosuffisance complète', 'Planification patiente', 'Discrétude stratégique', 'Richesse cachée', 'Indépendance nourricière'],
+    defauts: ['Invisibilité méconnue', 'Effort de récolte important', 'Lenteur de la préparation', 'Sous-estimation constante'],
+    pouvoirs: ['Autosuffisance alimentaire', 'Réserves stratégiques', 'Nourrit sans se montrer', 'Indépendance préservée'],
+    enseignements: [
+      "Construis des réserves invisibles pour les temps difficiles",
+      "L'autosuffisance est la plus haute forme de liberté",
+      "Ne montre pas tous tes atouts — certaines richesses se protègent dans l'ombre",
+      "Planifie pour les saisons futures, pas seulement pour aujourd'hui",
+    ],
+    citation: "Le pois bambara se cache dans la terre — mais c'est lui qui nourrit les peuples libres.",
+    proverbes: [
+      "Le pois bambara se cache dans la terre — mais c'est lui qui nourrit les peuples libres.",
+      "L'homme sage, comme le pois bambara, n'expose pas toutes ses réserves.",
+      "Plante le pois bambara pour tes enfants — il mûrit au moment où on en a le plus besoin.",
+    ],
+    legendes: [
+      "La légende bambara raconte que lors d'une grande famine, un village entier survécut grâce à une vieille femme qui avait caché des pois bambara sous sa maison. Quand tout fut consommé, elle partagea ses réserves secrètes. Depuis, on dit que la sagesse des anciens est cachée comme les pois — mais elle nourrit au bon moment.",
+    ],
+    conseilsDeVie: [
+      "Construis des réserves — financières, émotionnelles, relationnelles — pour les temps difficiles.",
+      "L'autosuffisance n'est pas l'isolement — c'est la liberté de donner sans contrainte.",
+      "Ne révèle pas toutes tes forces immédiatement — garde des profondeurs en réserve.",
+    ],
+    niveauSpirituel: 2,
+    regionOrigine: "Originaire d'Afrique de l'Ouest — Mali, Burkina Faso, Sénégal, Nigeria",
+    couleur: '#8B6040',
+    couleurSecondaire: '#5A3A20',
+    enseignementDuJour:
+      "Aujourd'hui, réfléchis à tes réserves invisibles. Qu'as-tu préparé pour les temps difficiles ?",
+    vertus: ['Protéines complètes rares', 'Glucides lents', 'Lipides bénéfiques', 'Fer et calcium', 'Acide folique'],
+    usagesTraditionnels: ['Pâte fermentée sôm', 'Bouillie de pois', 'Farine pour le pain', 'Plat de résistance', 'Aliment de voyage'],
+  },
+
+  {
+    id: 'patate-douce',
+    nom: 'Patate Douce',
+    nomAnglais: 'Sweet Potato',
+    nomScientifique: 'Ipomoea batatas',
+    categorie: 'Plantes Alimentaires',
+    element: 'Terre',
+    description:
+      "La Patate Douce est la tubercule de la douceur profonde — ses chairs orangées et violacées cachées sous terre concentrent des sucres naturels, des bêta-carotènes et une énergie lente qui nourrit sans épuiser. Ses feuilles rampantes couvrent le sol comme une cape protectrice, et ses fleurs violettes sont d'une délicatesse surprenante pour une plante si robuste.",
+    symboliqueAfricaine:
+      "Dans les traditions des savanes d'Afrique de l'Ouest, la patate douce est l'aliment des femmes enceintes et des enfants — on dit qu'elle 'donne du soleil dans le ventre'. Sa couleur orange, liée au caroténoïde, symbolise la chaleur nourricière du soleil stockée dans la terre. Les feuilles sont cuisinées en légumes verts par les plus pauvres — la plante entière se mange.",
+    symboliqueSpirirtuelle:
+      "La Patate Douce incarne la douceur nourricière profonde — un trésor caché dans la terre qui dévoile sa couleur de soleil à la coupe. Elle enseigne que la vraie douceur n'est pas superficielle mais vient des profondeurs, et qu'elle nourrit à la fois le corps et l'âme.",
+    symbolique: "Symbole de douceur profonde, de nourriture solaire et de trésor souterrain.",
+    qualites: ['Douceur nourrissante', 'Chaleur maternelle', 'Générosité complète', 'Adaptabilité totale', 'Soleil terrestre'],
+    defauts: ['Douceur parfois excessive', 'Attachement au sol', 'Lenteur de croissance', 'Fragilité à la chaleur'],
+    pouvoirs: ['Nourriture des grossesses', 'Protection des enfants', 'Soleil intérieur', 'Douceur thérapeutique'],
+    enseignements: [
+      "La vraie douceur vient des profondeurs — elle n'est pas superficielle",
+      "Nourris ceux qui sont en croissance avec une attention particulière",
+      "La chaleur que tu portes en toi est un soleil intérieur à partager",
+      "La générosité totale est de donner même les feuilles, pas seulement les fruits",
+    ],
+    citation: "La patate douce stocke le soleil dans la terre — pour le restituer à ceux qui en ont besoin en hiver.",
+    proverbes: [
+      "La patate douce stocke le soleil dans la terre — pour le restituer à ceux qui en ont besoin en hiver.",
+      "La mère est comme la patate douce : douce dedans, enracinée profond, nourrit entièrement.",
+      "Ce qui est caché dans la terre n'est pas perdu — il devient de la douceur.",
+    ],
+    legendes: [
+      "La légende peule raconte que la patate douce est le cadeau que la Terre-Mère fit aux femmes après la naissance difficile du premier enfant. Elle cacha le soleil dans ses chairs pour que les mères puissent nourrir la vie même en saison sèche.",
+    ],
+    conseilsDeVie: [
+      "Cultive ta douceur intérieure — elle est ta ressource la plus précieuse.",
+      "Prends soin des êtres en croissance autour de toi — ils ont besoin de ta chaleur.",
+      "Ne cache pas ta douceur — partage-la généreusement.",
+    ],
+    niveauSpirituel: 2,
+    regionOrigine: "Toute l'Afrique de l'Ouest — des côtes aux savanes",
+    couleur: '#D4701A',
+    couleurSecondaire: '#A04010',
+    enseignementDuJour:
+      "Aujourd'hui, offre quelque chose de doux à quelqu'un — un mot, un geste, un repas.",
+    vertus: ['Bêta-carotène antioxydant', 'Vitamine C et E', 'Antidiabétique doux', 'Anti-inflammatoire', 'Riche en fibres'],
+    usagesTraditionnels: ['Tubercule bouillie ou rôtie', 'Feuilles cuisinées en légumes', 'Aliment de grossesse', 'Bouillie de sevrage', 'Fécule pour cuisine'],
+  },
+
+  {
+    id: 'taro',
+    nom: 'Taro',
+    nomAnglais: 'Taro',
+    nomScientifique: 'Colocasia esculenta',
+    categorie: 'Plantes Alimentaires',
+    element: 'Eau',
+    description:
+      "Le Taro est la plante des zones humides et des rivières d'Afrique de l'Ouest — ses feuilles gigantesques en forme d'oreilles d'éléphant captent chaque goutte de pluie et la dirigent vers sa base comme une offrande. Ses cormes (tubercules) sont parmi les plus vieux aliments cultivés au monde. C'est la plante de la mémoire longue et de l'adaptation aux zones difficiles d'accès.",
+    symboliqueAfricaine:
+      "Dans les traditions des peuples forestiers et côtiers, le taro est l'aliment du peuple de l'eau — les pêcheurs, les habitants des deltas, ceux qui vivent entre la terre et la mer. Ses grandes feuilles sont utilisées pour envelopper les aliments lors de la cuisson rituelle. Dans certaines traditions, planter le taro marque un espace comme habité — c'est une déclaration de présence.",
+    symboliqueSpirirtuelle:
+      "Le Taro incarne la capacité à prospérer dans les zones de transition — là où la terre et l'eau se mêlent, là où les frontières sont floues. Il enseigne que les zones d'incertitude sont souvent les plus fertiles, que vivre entre deux mondes est une force et non une faiblesse.",
+    symbolique: "Symbole de prospérité dans les zones de transition, d'adaptabilité aux frontières et d'ancienne mémoire.",
+    qualites: ['Adaptabilité aux frontières', 'Prospérité dans l\'incertitude', 'Mémoire ancienne', 'Présence affirmée', 'Force des zones humides'],
+    defauts: ['Dépendance à l\'eau', 'Zones d\'accès difficile', 'Préparation complexe', 'Fragilité à la sécheresse'],
+    pouvoirs: ['Nourriture des zones de transition', 'Affirmation de présence', 'Enveloppe rituelle', 'Mémoire des origines'],
+    enseignements: [
+      "Les zones d'entre-deux sont souvent les plus fertiles",
+      "Affirme ta présence — planter le taro, c'est dire 'je suis là'",
+      "L'incertitude de la frontière est une richesse, non une faiblesse",
+      "La mémoire longue est une force — tes racines sont profondes",
+    ],
+    citation: "Le taro prospère là où la terre devient eau — il a appris que les frontières sont des espaces de richesse.",
+    proverbes: [
+      "Le taro prospère là où la terre devient eau — il a appris que les frontières sont des espaces de richesse.",
+      "Les feuilles du taro recueillent chaque goutte — rien n'est perdu pour celui qui sait recevoir.",
+      "Plante le taro là où tu veux rester — il dira aux autres que tu as choisi cet endroit.",
+    ],
+    legendes: [
+      "Les pêcheurs du delta du Niger racontent que le dieu de la rivière Oya donna le taro aux pêcheurs comme signe de sa bénédiction. Là où il pousse, l'eau est propre et les poissons abondants. Les pêcheurs plantent le taro sur les berges pour marquer les endroits bénis.",
+    ],
+    conseilsDeVie: [
+      "Apprivoise les zones d'incertitude — elles sont souvent les plus fertiles de ta vie.",
+      "Affirme ta présence dans les espaces importants pour toi.",
+      "Tire ta force de ta mémoire longue — tes racines te soutiennent.",
+    ],
+    niveauSpirituel: 2,
+    regionOrigine: "Zones humides et forestières — delta du Niger, côtes d'Afrique de l'Ouest",
+    couleur: '#5A8040',
+    couleurSecondaire: '#2A4A20',
+    enseignementDuJour:
+      "Aujourd'hui, explore une zone d'incertitude de ta vie — elle porte peut-être une richesse cachée.",
+    vertus: ['Glucides digestibles', 'Potassium', 'Fibres alimentaires', 'Calcium et fer', 'Faible indice glycémique'],
+    usagesTraditionnels: ['Cormes bouillis et pilés', 'Feuilles cuisinées', 'Emballage rituel des aliments', 'Fécule de taro', 'Colle traditionnelle'],
+  },
+
+  {
+    id: 'canne-a-sucre',
+    nom: 'Canne à Sucre',
+    nomAnglais: 'Sugar Cane',
+    nomScientifique: 'Saccharum officinarum',
+    categorie: 'Plantes Alimentaires',
+    element: 'Eau',
+    description:
+      "La Canne à Sucre est la plante de la douceur accessible — ses hautes tiges vertes et sucrées ont été mâchées par des générations d'enfants africains comme première rencontre avec la douceur naturelle du monde. Dans les champs ensoleillés d'Afrique de l'Ouest, ses hauts panaches souples se balancent comme des drapeaux de la joie.",
+    symboliqueAfricaine:
+      "Dans les traditions d'Afrique de l'Ouest, la canne à sucre est associée aux enfants et à la joie simple. On la plante aux abords des maisons pour que les enfants aient toujours quelque chose de doux à portée de main. Dans les cérémonies, le sucre de canne aromatise les boissons rituelles. Les guérisseurs l'utilisent pour 'adoucir' les remèdes amers — mélangeant l'amertume nécessaire à la douceur permissive.",
+    symboliqueSpirirtuelle:
+      "La Canne à Sucre symbolise la douceur qui se mérite — il faut traverser l'épaisseur de sa tige, mordre à travers son extérieur fibreux pour atteindre son jus sucré. Elle enseigne que les plaisirs durables et profonds demandent un effort, que la douceur facile n'est que la surface des choses.",
+    symbolique: "Symbole de douceur méritée, de joie accessible et de récompense de l'effort.",
+    qualites: ['Douceur accessible', 'Joie de l\'enfance', 'Récompense de l\'effort', 'Générosité sucrée', 'Équilibre des amertumes'],
+    defauts: ['Douceur excessive sans limite', 'Attachement aux plaisirs faciles', 'Épuisement du sol', 'Dépendance à la chaleur'],
+    pouvoirs: ['Adoucissement des remèdes', 'Joie cérémonielle', 'Nourriture des enfants', 'Équilibre gustatif'],
+    enseignements: [
+      "La vraie douceur se mérite — elle se cache sous l'écorce de l'effort",
+      "Adoucis les remèdes difficiles sans en atténuer l'efficacité",
+      "La joie simple est un cadeau à partager sans retenue",
+      "Équilibre les amertumes de la vie avec les douceurs qu'elle offre",
+    ],
+    citation: "La canne à sucre ne donne pas sa douceur facilement — mais à qui mord, elle offre tout.",
+    proverbes: [
+      "La canne à sucre ne donne pas sa douceur facilement — mais à qui mord, elle offre tout.",
+      "Donne du sucre de canne à l'enfant qui pleure — pas pour l'habituer à la douceur facile, mais pour lui rappeler que la vie en a.",
+      "La fête sans canne à sucre est une fête à moitié.",
+    ],
+    legendes: [
+      "La légende mandingue raconte qu'un génie du soleil voulut offrir aux hommes un cadeau pour adoucir leurs jours difficiles. Il ne pouvait pas leur donner le miel des abeilles — trop rare. Il planta alors la canne dans les terres ensoleillées et dit : 'Le sucre du soleil appartient à tous les enfants.'",
+    ],
+    conseilsDeVie: [
+      "Permets-toi les douceurs simples et méritées de la vie.",
+      "Adoucis les réalités difficiles sans les nier — c'est la sagesse de la canne à sucre.",
+      "Partage la joie — elle se multiplie quand on la partage.",
+    ],
+    niveauSpirituel: 1,
+    regionOrigine: "Zones humides et côtières — Guinée, Sierra Leone, Côte d'Ivoire, Nigeria",
+    couleur: '#7ABA50',
+    couleurSecondaire: '#4A8A20',
+    enseignementDuJour:
+      "Aujourd'hui, permets-toi une douceur simple. La joie n'a pas besoin d'être complexe pour être réelle.",
+    vertus: ['Énergie rapide', 'Minéraux naturels', 'Prébiotique du jus frais', 'Alcalinisant', 'Hydratant'],
+    usagesTraditionnels: ['Tige mâchée fraîche', 'Jus de canne naturel', 'Sucre artisanal', 'Boissons fermentées', 'Adoucissant des remèdes'],
+  },
+
+  {
+    id: 'amarante',
+    nom: 'Amarante Africaine',
+    nomAnglais: 'African Amaranth',
+    nomScientifique: 'Amaranthus hybridus',
+    categorie: 'Plantes Alimentaires',
+    element: 'Feu',
+    description:
+      "L'Amarante Africaine est la plante de la résurrection — son nom grec signifie 'qui ne se fane pas', et en effet cette herbe aux feuilles pourpres et vert foncé revient chaque saison avec une vigueur inépuisable. Spontanée, robuste, nutritive, elle pousse dans les champs et les jardins sans qu'on la plante, offrant généreusement ses feuilles riches en fer et en protéines aux familles qui savent la reconnaître.",
+    symboliqueAfricaine:
+      "Dans les traditions des femmes d'Afrique de l'Ouest, l'amarante est 'la feuille qui ne demande pas de permission' — elle pousse où elle veut, quand elle veut, et nourrit sans compter. Les femmes qui connaissent l'amarante ne souffrent jamais de pénurie de légumes verts. C'est la plante de l'indépendance féminine et de la connaissance botanique traditionnelle.",
+    symboliqueSpirirtuelle:
+      "L'Amarante symbolise la résilience qui revient toujours — impossible à éradiquer vraiment, elle réapparaît à chaque saison avec une puissance renouvelée. Elle enseigne que certaines forces de vie sont impossibles à détruire complètement, que la vraie résistance est dans le retour perpétuel.",
+    symbolique: "Symbole de résurrection perpétuelle, d'indépendance nourricière et de résilience indestructible.",
+    qualites: ['Résilience indestructible', 'Retour perpétuel', 'Indépendance nourricière', 'Générosité spontanée', 'Richesse discrète'],
+    defauts: ['Envahissement excessif', 'Indiscipline de croissance', 'Difficile à contrôler', 'Méconnaissance des ignorants'],
+    pouvoirs: ['Nutrition des familles', 'Résurrection perpétuelle', 'Indépendance alimentaire', 'Connaissance botanique'],
+    enseignements: [
+      "Certaines forces en toi sont impossibles à éradiquer — honore-les",
+      "La vraie résilience est dans le retour, pas dans la résistance",
+      "Connais les ressources qui t'entourent — la nature nourrit ceux qui savent regarder",
+      "L'indépendance nutritive est une forme de liberté",
+    ],
+    citation: "L'amarante n'a pas besoin qu'on la plante — elle choisit elle-même où pousser et nourrir.",
+    proverbes: [
+      "L'amarante n'a pas besoin qu'on la plante — elle choisit elle-même où pousser et nourrir.",
+      "La femme qui connaît l'amarante ne sera jamais sans légumes.",
+      "Ce qui revient toujours est plus fort que ce qui n'est jamais tombé.",
+    ],
+    legendes: [
+      "Les anciens wolof racontent que l'amarante poussa spontanément sur la tombe d'une femme guérisseuse après sa mort. Les villageois comprirent que son savoir végétal était passé dans la plante — et depuis, ils l'appellent 'la feuille de la guérisseuse immortelle'.",
+    ],
+    conseilsDeVie: [
+      "Reviens toujours — la résilience n'est pas de ne jamais tomber, c'est de se relever chaque fois.",
+      "Acquiers des connaissances pratiques sur la nature autour de toi.",
+      "L'indépendance est un chemin — commence par ce que tu peux maîtriser toi-même.",
+    ],
+    niveauSpirituel: 2,
+    regionOrigine: "Spontanée partout en Afrique de l'Ouest — jardins et champs",
+    couleur: '#8B1A4A',
+    couleurSecondaire: '#5A0A2A',
+    enseignementDuJour:
+      "Aujourd'hui, remarque une ressource naturelle autour de toi que tu n'avais pas vue. La nature nourrit ceux qui regardent.",
+    vertus: ['Fer végétal élevé', 'Protéines complètes', 'Calcium', 'Vitamine C et A', 'Acide folique'],
+    usagesTraditionnels: ['Feuilles cuisinées en légumes', 'Soupe de légumes verts', 'Graines consommées', 'Aliment anti-anémie', 'Légume de soudure'],
+  },
+
+  /* ═══════════════════════════════════════════════════════════
+     NOUVELLES HERBES & GRAMINÉES
+  ═══════════════════════════════════════════════════════════ */
+
+  {
+    id: 'herbe-de-guinee',
+    nom: 'Herbe de Guinée',
+    nomAnglais: 'Guinea Grass',
+    nomScientifique: 'Panicum maximum',
+    categorie: 'Herbes & Graminées',
+    element: 'Air',
+    description:
+      "L'Herbe de Guinée est la graminée tropicale la plus généreuse d'Afrique de l'Ouest — une graminée haute et vigoureuse dont les panaches plumeteux ondulent dans le vent de la savane. Source principale de fourrage pour le bétail, elle est la base de l'économie pastorale de toute la région. Ses tiges peuvent atteindre deux mètres, formant des prairies denses qui abritent une multitude de vie.",
+    symboliqueAfricaine:
+      "Dans les traditions peules — peuple pasteur par excellence — l'herbe de Guinée est la bénédiction divine accordée au bétail. Un champ d'herbe de Guinée est une promesse de vie et de prospérité pour le troupeau. Les bergers lisent l'état des prairies comme un livre — l'herbe verte abondante annonce une bonne saison, l'herbe sèche une période difficile. C'est le baromètre naturel de la vie pastorale.",
+    symboliqueSpirirtuelle:
+      "L'Herbe de Guinée incarne la générosité collective et le service discret — elle nourrit sans s'imposer, soutient les plus grands sans chercher à leur ressembler, et crée des espaces de vie pour d'innombrables êtres. Elle enseigne la valeur du rôle de support — pas toujours le plus visible, mais indispensable.",
+    symbolique: "Symbole de soutien généreux, de service pastoral et de vie collective vigoureuse.",
+    qualites: ['Générosité fourragère', 'Service discret', 'Soutien des grands', 'Vie collective abondante', 'Adaptabilité tropicale'],
+    defauts: ['Envahissement possible', 'Brûlage nécessaire', 'Dépendance à la pluie', 'Vulnérabilité à la sécheresse'],
+    pouvoirs: ['Nourriture du bétail', 'Prédiction des saisons', 'Création d\'habitats', 'Soutien de l\'économie pastorale'],
+    enseignements: [
+      "Le rôle de soutien est aussi noble que le rôle de leader",
+      "Nourrir ceux qui nourrissent les autres est une chaîne sacrée",
+      "La générosité collective crée des espaces de vie pour tous",
+      "Lis les signaux de la nature — elle parle à ceux qui savent écouter",
+    ],
+    citation: "L'herbe de Guinée ne se vante pas de nourrir les troupeaux — mais sans elle, le pasteur serait seul.",
+    proverbes: [
+      "L'herbe de Guinée ne se vante pas de nourrir les troupeaux — mais sans elle, le pasteur serait seul.",
+      "Un champ d'herbe verte est une prière exaucée pour le berger peul.",
+      "Même la plus grande savane commence par un brin d'herbe.",
+    ],
+    legendes: [
+      "La légende peule raconte qu'Ardo, le dieu des pasteurs, parsema la savane d'herbe de Guinée pour ses enfants nomades, comme un père qui prépare la route avant que ses enfants partent. Chaque brin d'herbe est une bénédiction plantée pour les troupeaux qui passent.",
+    ],
+    conseilsDeVie: [
+      "Le rôle de soutien est essentiel — honore ceux qui te soutiennent discrètement.",
+      "Crée des espaces nourriciers pour ceux qui en dépendent.",
+      "Lis les signaux de ton environnement — ils te parlent de l'avenir.",
+    ],
+    niveauSpirituel: 1,
+    regionOrigine: "Savanes d'Afrique de l'Ouest — présente dans tous les pays",
+    couleur: '#6BAA30',
+    couleurSecondaire: '#3A7A10',
+    enseignementDuJour:
+      "Aujourd'hui, honorez quelqu'un qui joue un rôle de soutien discret dans votre vie.",
+    vertus: ['Fourrage nutritif pour bétail', 'Protection des sols contre l\'érosion', 'Habitat faunique', 'Biomasse'],
+    usagesTraditionnels: ['Pâturage du bétail', 'Toiture des cases', 'Cordes tressées', 'Protection des berges', 'Baromètre saison'],
+  },
+
+  {
+    id: 'bambou',
+    nom: 'Bambou Africain',
+    nomAnglais: 'African Bamboo',
+    nomScientifique: 'Bambusa vulgaris',
+    categorie: 'Herbes & Graminées',
+    element: 'Air',
+    description:
+      "Le Bambou Africain est le géant des graminées — une plante extraordinaire qui peut pousser de trente centimètres par jour et atteindre vingt mètres de hauteur, tout en restant une herbe. Ses tiges creuses sont d'une solidité remarquable, combinant légèreté et résistance. Dans les villages d'Afrique de l'Ouest, le bambou est la matière première universelle — il construit, il clôture, il fait de la musique, il nourrit.",
+    symboliqueAfricaine:
+      "Dans les traditions des zones forestières, le bambou est l'arbre de la famille soudée — ses rhizomes souterrains interconnectent tous les plants d'un même bouquet, les nourrissant collectivement. Couper un seul bambou n'affaiblit pas le bouquet — il repoussera. On dit que la famille bambou ne meurt jamais vraiment, car ses racines restent vivantes même si les tiges tombent.",
+    symboliqueSpirirtuelle:
+      "Le Bambou incarne la flexibilité dans la solidité — ses tiges plient sous la tempête mais ne se brisent pas, et se redressent quand le vent passe. Il enseigne l'art de la résistance douce : ne pas s'opposer frontalement à la force, mais plier intelligemment pour revenir plus fort.",
+    symbolique: "Symbole de flexibilité dans la solidité, de famille interconnectée et de croissance explosive.",
+    qualites: ['Flexibilité intelligente', 'Solidité légère', 'Croissance explosive', 'Famille interconnectée', 'Polyvalence créatrice'],
+    defauts: ['Envahissement des rhizomes', 'Croissance parfois incontrôlable', 'Creux intérieur apparent', 'Fragile si sec'],
+    pouvoirs: ['Construction légère et solide', 'Musique sacrée', 'Famille indestructible', 'Croissance rapide'],
+    enseignements: [
+      "Plie sous la tempête plutôt que de te briser — la flexibilité est une force",
+      "Tes racines familiales sont plus profondes que ce qu'on voit",
+      "Croître vite nécessite des racines solides et interconnectées",
+      "La légèreté n'est pas la fragilité — elle est l'élégance de la force",
+    ],
+    citation: "Le bambou plie dans la tempête, mais ses racines tiennent tout le bouquet — il se redresse toujours.",
+    proverbes: [
+      "Le bambou plie dans la tempête, mais ses racines tiennent tout le bouquet — il se redresse toujours.",
+      "Coupe un bambou, il repousse — c'est la force des racines collectives.",
+      "La flûte de bambou est creuse — mais c'est ce vide qui fait la musique.",
+    ],
+    legendes: [
+      "Les forgerons dogon racontent que les premiers instruments de musique furent des flûtes de bambou offertes par les génies du vent. En soufflant dans le bambou creux, les génies apprirent aux hommes que le vide intérieur n'est pas un manque — c'est l'espace par lequel la musique peut naître.",
+    ],
+    conseilsDeVie: [
+      "Développe ta flexibilité — plier intelligemment n'est pas céder, c'est survivre.",
+      "Nourris tes connexions familiales et communautaires — elles sont tes racines.",
+      "Ton vide intérieur est un espace de créativité — ne le comble pas à la hâte.",
+    ],
+    niveauSpirituel: 3,
+    regionOrigine: "Zones humides et forestières de toute l'Afrique de l'Ouest",
+    couleur: '#5A9A40',
+    couleurSecondaire: '#2A6A20',
+    enseignementDuJour:
+      "Aujourd'hui, pratique la flexibilité face à une difficulté. Plie plutôt que résiste — et observe ce qui se passe.",
+    vertus: ['Jeunes pousses comestibles', 'Silice abondante', 'Antioxydant', 'Anti-inflammatoire', 'Tonique général'],
+    usagesTraditionnels: ['Construction de cases et meubles', 'Flûtes et instruments', 'Paniers et nattes', 'Clôtures de villages', 'Pousses consommées'],
+  },
+
+  /* ═══════════════════════════════════════════════════════════
+     NOUVEAU PALMIER
+  ═══════════════════════════════════════════════════════════ */
+
+  {
+    id: 'palmier-doum',
+    nom: 'Palmier Doum',
+    nomAnglais: 'Doum Palm',
+    nomScientifique: 'Hyphaene thebaica',
+    categorie: 'Palmiers',
+    element: 'Feu',
+    description:
+      "Le Palmier Doum est l'unique palmier qui se ramifie — tandis que tous ses cousins poussent droit vers le ciel, il ose se diviser en branches distinctes, créant une silhouette surréaliste et reconnaissable entre toutes dans les paysages sahéliens. Ses fruits ronds et orangés, appelés 'pain d'épice des pharaons', dégagent une saveur douce et sucrée évoquant le pain d'épice. C'est le palmier des carrefours et des choix.",
+    symboliqueAfricaine:
+      "Dans les traditions du Sahel, le palmier doum est l'arbre du carrefour — là où il pousse, les chemins se séparent. Les voyageurs s'y arrêtent pour décider de leur direction. Les devins l'utilisent dans leurs lectures : les branches du palmier doum représentent les chemins possibles d'une vie. C'est l'arbre de la décision, de la bifurcation et de la responsabilité des choix.",
+    symboliqueSpirirtuelle:
+      "Le Palmier Doum incarne le paradoxe de l'originalité — le seul palmier à se ramifier, à refuser la voie unique. Il enseigne que s'écarter de la norme n'est pas une erreur mais parfois une évolution. Sa division est sa force distinctive, son refus de la linéarité sa signature dans le paysage.",
+    symbolique: "Symbole de la décision audacieuse, de l'originalité assumée et du carrefour de vie.",
+    qualites: ['Originalité distinctive', 'Courage des bifurcations', 'Vision panoramique', 'Décision audacieuse', 'Signature unique'],
+    defauts: ['Division parfois dispersante', 'Indécision aux carrefours', 'Originalité mal comprise', 'Difficulté de l\'unique'],
+    pouvoirs: ['Guidance aux carrefours', 'Lecture des destins', 'Originalité sacrée', 'Vision à deux têtes'],
+    enseignements: [
+      "L'originalité est une force — être le seul à se ramifier est une signature divine",
+      "Aux carrefours de la vie, arrête-toi et réfléchis — la décision mérite cet honneur",
+      "Refuser la voie unique n'est pas de la confusion — c'est parfois de l'évolution",
+      "Ta singularité est ton cadeau au monde",
+    ],
+    citation: "Le palmier doum est le seul à se ramifier — il a compris que certains destins refusent d'être linéaires.",
+    proverbes: [
+      "Le palmier doum est le seul à se ramifier — il a compris que certains destins refusent d'être linéaires.",
+      "Au carrefour, arrête-toi sous le doum — c'est là que les décisions deviennent sagesse.",
+      "Celui qui se ramifie comme le doum couvre plus de ciel que celui qui monte droit.",
+    ],
+    legendes: [
+      "La légende songhraï raconte qu'un palmier orgueilleux de sa droiture fut puni par le dieu des jardins qui le divisa en deux. Humilié, le palmier comprit que la division était une bénédiction — il pouvait maintenant voir dans deux directions, protéger deux fois plus d'ombre, offrir deux fois plus de fruits.",
+    ],
+    conseilsDeVie: [
+      "Assume ton originalité — être différent est une force, pas un défaut.",
+      "Aux carrefours de ta vie, prends le temps de décider avec sagesse.",
+      "Ta singularité n'est pas un accident — c'est ta contribution unique.",
+    ],
+    niveauSpirituel: 3,
+    regionOrigine: "Sahel et zones arides — Niger, Mali, Sénégal, Mauritanie",
+    couleur: '#C48030',
+    couleurSecondaire: '#8A5010',
+    enseignementDuJour:
+      "Aujourd'hui, assume une originalité qui t'a peut-être fait douter. Le doum est le seul à se ramifier — et il en est plus beau.",
+    vertus: ['Fruit pain d\'épice énergétique', 'Feuilles pour nattes', 'Tronc pour construction', 'Noix dure pour sculpture'],
+    usagesTraditionnels: ['Fruit comestible sucré', 'Nattes et paniers de feuilles', 'Repère des carrefours', 'Divination des chemins', 'Ombre des voyageurs'],
+  },
 ];
 
 export const CATEGORIES: PlanteCategorie[] = [

@@ -33,6 +33,46 @@ const PLANT_IMAGES: Record<string, any> = {
   dattier:            require('@/assets/images/plants/dattier.png'),
   'palmier-huile':    require('@/assets/images/plants/palmier-huile.png'),
   cocotier:           require('@/assets/images/plants/cocotier.png'),
+
+  // Nouveaux Arbres Sacrés
+  manguier:           require('@/assets/images/plants/manguier.png'),
+  jujubier:           require('@/assets/images/plants/jujubier.png'),
+  anacardier:         require('@/assets/images/plants/anacardier.png'),
+  flamboyant:         require('@/assets/images/plants/flamboyant.png'),
+  acajou:             require('@/assets/images/plants/acajou.png'),
+  vene:               require('@/assets/images/plants/vene.png'),
+  dimb:               require('@/assets/images/plants/dimb.png'),
+
+  // Nouvelles Plantes Médicinales
+  'aloe-vera':        require('@/assets/images/plants/aloe-vera.png'),
+  guiera:             require('@/assets/images/plants/guiera.png'),
+  piment:             require('@/assets/images/plants/piment.png'),
+  'poivre-de-guinee': require('@/assets/images/plants/poivre-de-guinee.png'),
+  'grains-de-selim':  require('@/assets/images/plants/grains-de-selim.png'),
+  vernonia:           require('@/assets/images/plants/vernonia.png'),
+  corossolier:        require('@/assets/images/plants/corossolier.png'),
+  maniguette:         require('@/assets/images/plants/maniguette.png'),
+
+  // Nouvelles Plantes Rituelles
+  securidaca:         require('@/assets/images/plants/securidaca.png'),
+  'ylang-ylang':      require('@/assets/images/plants/ylang-ylang.png'),
+
+  // Nouvelles Plantes Alimentaires
+  niebe:              require('@/assets/images/plants/niebe.png'),
+  mais:               require('@/assets/images/plants/mais.png'),
+  plantain:           require('@/assets/images/plants/plantain.png'),
+  'pois-bambara':     require('@/assets/images/plants/pois-bambara.png'),
+  'patate-douce':     require('@/assets/images/plants/patate-douce.png'),
+  taro:               require('@/assets/images/plants/taro.png'),
+  'canne-a-sucre':    require('@/assets/images/plants/canne-a-sucre.png'),
+  amarante:           require('@/assets/images/plants/amarante.png'),
+
+  // Nouvelles Herbes & Graminées
+  'herbe-de-guinee':  require('@/assets/images/plants/herbe-de-guinee.png'),
+  bambou:             require('@/assets/images/plants/bambou.png'),
+
+  // Nouveau Palmier
+  'palmier-doum':     require('@/assets/images/plants/palmier-doum.png'),
 };
 
 export default PLANT_IMAGES;
