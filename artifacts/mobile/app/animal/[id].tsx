@@ -9,6 +9,7 @@ import {
   ScrollView,
   StyleSheet,
   Text,
+  useWindowDimensions,
   View,
 } from 'react-native';
 import PLANT_IMAGES from '@/constants/plantImages';
@@ -54,7 +55,11 @@ export default function PlanteDetailScreen() {
   const colors = useColors();
   const insets = useSafeAreaInsets();
   const router = useRouter();
+  const { width: screenWidth } = useWindowDimensions();
   const { isFavorite, toggleFavorite } = useApp();
+
+  // Carré 1:1, affiché entièrement sur tout support (téléphone et tablette).
+  const heroImgHeight = Math.min(Math.max(screenWidth * 0.82, 260), 460);
 
   const plante = getPlanteById(id ?? '');
   const topPad = Platform.OS === 'web' ? Math.max(insets.top, 67) : insets.top;
@@ -115,12 +120,12 @@ export default function PlanteDetailScreen() {
             </Pressable>
           </View>
 
-          <View style={styles.planteImagePlaceholder}>
+          <View style={[styles.planteImagePlaceholder, { height: heroImgHeight }]}>
             {PLANT_IMAGES[plante.id] ? (
               <Image
                 source={PLANT_IMAGES[plante.id]}
                 style={styles.planteImage}
-                resizeMode="cover"
+                resizeMode="contain"
               />
             ) : (
               <View style={styles.phInner}>
@@ -380,7 +385,7 @@ const styles = StyleSheet.create({
   hd3: { position: 'absolute', left: -60, bottom: 20, width: 200, height: 200, borderRadius: 100, borderWidth: 1 },
   navRow: { flexDirection: 'row', justifyContent: 'space-between', zIndex: 10 },
   navBtn: { width: 44, height: 44, borderRadius: 22, alignItems: 'center', justifyContent: 'center' },
-  planteImagePlaceholder: { width: '100%', height: 220, borderRadius: 18, marginTop: 16, alignItems: 'center', justifyContent: 'center', overflow: 'hidden' },
+  planteImagePlaceholder: { width: '100%', borderRadius: 18, marginTop: 16, alignItems: 'center', justifyContent: 'center', overflow: 'hidden', backgroundColor: 'rgba(0,0,0,0.18)' },
   planteImage: { width: '100%', height: '100%', borderRadius: 18 },
   phInner: { alignItems: 'center', justifyContent: 'center' },
   phCircle: { position: 'absolute', width: 120, height: 120, borderRadius: 60, borderWidth: 1.5 },

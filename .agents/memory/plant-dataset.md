@@ -29,6 +29,21 @@ The app's data lives in `artifacts/mobile/data/animals.ts` as `PLANTS: Plante[]`
 card image with no TS error. The misspelled field name is the most common TS-error
 trap when authoring entries.
 
+## "Some plants show no image" after adding entries
+Newly added static `require()` entries in `plantImages.ts` are NOT picked up by a
+running Metro bundler — they appear as missing images even though the key/file are
+correct. Restart the `artifacts/mobile: expo` workflow (it runs with `--clear`) to
+rebuild the asset map. Before assuming a real bug, verify ids↔keys↔files all match
+(they did: 77/77) — if they do, it is a cache/build staleness issue, not code.
+
+## Full illustration display (no cropping on tablets)
+Plant images are 1:1 squares. The detail hero (`app/animal/[id].tsx`) must use
+`resizeMode="contain"` with a responsive height (`screenWidth*0.82`, clamped) and a
+subtle dark panel bg so the whole illustration shows on any device. `cover` + a
+fixed-height full-width box crops squares badly on wide/tablet screens. Thumbnail
+cards (PlanteCard, home featured grid) intentionally keep `cover` (decorative tiles
+with text overlays).
+
 ## Note on type-checking
 `npx tsc --noEmit` in artifacts/mobile reports PRE-EXISTING errors unrelated to data
 (`_layout.tsx`, `progression-spirituelle.tsx`, `CategoryFilter.tsx`). Expo bundles
