@@ -73,6 +73,31 @@ const PLANT_IMAGES: Record<string, any> = {
 
   // Nouveau Palmier
   'palmier-doum':     require('@/assets/images/plants/palmier-doum.png'),
+
+  // Extension — Nouveaux Arbres Sacrés
+  kad:                require('@/assets/images/plants/kad.png'),
+  ditakh:             require('@/assets/images/plants/ditakh.png'),
+  soump:              require('@/assets/images/plants/soump.png'),
+  kapokier:           require('@/assets/images/plants/kapokier.png'),
+  ebene:              require('@/assets/images/plants/ebene.png'),
+
+  // Extension — Nouvelles Plantes Médicinales
+  'pomme-sodome':     require('@/assets/images/plants/pomme-sodome.png'),
+  pourghere:          require('@/assets/images/plants/pourghere.png'),
+  goyavier:           require('@/assets/images/plants/goyavier.png'),
+
+  // Extension — Nouvelles Plantes Alimentaires
+  'riz-africain':     require('@/assets/images/plants/riz-africain.png'),
+  'aubergine-africaine': require('@/assets/images/plants/aubergine-africaine.png'),
+  calebasse:          require('@/assets/images/plants/calebasse.png'),
+  madd:               require('@/assets/images/plants/madd.png'),
+
+  // Extension — Nouvelles Plantes Rituelles
+  henne:              require('@/assets/images/plants/henne.png'),
+  newbouldia:         require('@/assets/images/plants/newbouldia.png'),
+
+  // Extension — Nouvelle Herbe & Graminée
+  andropogon:         require('@/assets/images/plants/andropogon.png'),
 };
 
 export default PLANT_IMAGES;
