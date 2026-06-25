@@ -5,7 +5,17 @@ import rateLimit from "express-rate-limit";
 
 const router = Router();
 
-const groq = new Groq({ apiKey: process.env["GROQ_API_KEY"] });
+let groqClient: Groq | null = null;
+function getGroq(): Groq {
+  if (!groqClient) {
+    const apiKey = process.env["GROQ_API_KEY"];
+    if (!apiKey) {
+      throw new Error("GROQ_API_KEY_MISSING");
+    }
+    groqClient = new Groq({ apiKey });
+  }
+  return groqClient;
+}
 
 const recognitionLimiter = rateLimit({
   windowMs: 60 * 1000,
@@ -72,7 +82,7 @@ router.post("/", recognitionLimiter, async (req, res) => {
   const { imageBase64, lang } = parsed.data;
 
   try {
-    const completion = await groq.chat.completions.create({
+    const completion = await getGroq().chat.completions.create({
       model: "meta-llama/llama-4-scout-17b-16e-instruct",
       max_tokens: 1024,
       temperature: 0.2,
@@ -106,6 +116,10 @@ router.post("/", recognitionLimiter, async (req, res) => {
     const plantData = JSON.parse(jsonMatch[0]);
     return res.json({ plant: plantData });
   } catch (err: any) {
+    if (err?.message === "GROQ_API_KEY_MISSING") {
+      console.error("[plant-recognition] GROQ_API_KEY is not configured");
+      return res.status(503).json({ error: "Le service de reconnaissance n'est pas encore configuré (clé API manquante)." });
+    }
     console.error("[plant-recognition] Error:", err?.message, err?.status);
     if (err instanceof SyntaxError) {
       return res.status(500).json({ error: "La réponse de l'IA n'est pas du JSON valide" });

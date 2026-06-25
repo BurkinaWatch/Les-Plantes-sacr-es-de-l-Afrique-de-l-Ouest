@@ -6,7 +6,17 @@ import { requireApiKey } from "../lib/auth-middleware.js";
 
 const router = Router();
 
-const groq = new Groq({ apiKey: process.env["GROQ_API_KEY"] });
+let groqClient: Groq | null = null;
+function getGroq(): Groq {
+  if (!groqClient) {
+    const apiKey = process.env["GROQ_API_KEY"];
+    if (!apiKey) {
+      throw new Error("GROQ_API_KEY_MISSING");
+    }
+    groqClient = new Groq({ apiKey });
+  }
+  return groqClient;
+}
 
 const chatLimiter = rateLimit({
   windowMs: 60 * 1000,
@@ -121,7 +131,7 @@ router.post("/totem", requireApiKey, chatLimiter, async (req, res) => {
   const systemPrompt = buildSystemPrompt(planteInfo, userLang);
 
   try {
-    const completion = await groq.chat.completions.create({
+    const completion = await getGroq().chat.completions.create({
       model: "llama-3.3-70b-versatile",
       max_tokens: 512,
       messages: [
@@ -133,6 +143,10 @@ router.post("/totem", requireApiKey, chatLimiter, async (req, res) => {
     const content = completion.choices[0]?.message?.content ?? "";
     return res.json({ content });
   } catch (err: any) {
+    if (err?.message === "GROQ_API_KEY_MISSING") {
+      console.error("[chat/totem] GROQ_API_KEY is not configured");
+      return res.status(503).json({ error: "Le service de chat n'est pas encore configuré (clé API manquante)." });
+    }
     console.error("[chat/totem] Groq error:", err?.message, err?.status);
     return res.status(500).json({ error: "Erreur lors de la génération de la réponse" });
   }
