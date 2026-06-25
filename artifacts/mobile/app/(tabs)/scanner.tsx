@@ -37,9 +37,13 @@ interface PlantResult {
 const API_BASE = `https://${process.env.EXPO_PUBLIC_DOMAIN}/api`;
 
 async function recognizePlant(imageBase64: string, lang: string): Promise<PlantResult> {
+  const chatApiKey = process.env.EXPO_PUBLIC_CHAT_API_KEY ?? '';
   const response = await fetch(`${API_BASE}/plant-recognition`, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: {
+      'Content-Type': 'application/json',
+      ...(chatApiKey ? { 'x-api-key': chatApiKey } : {}),
+    },
     body: JSON.stringify({ imageBase64, lang }),
   });
 

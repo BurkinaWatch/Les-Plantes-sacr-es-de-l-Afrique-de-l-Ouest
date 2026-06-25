@@ -2,6 +2,7 @@ import { Router } from "express";
 import Groq from "groq-sdk";
 import { z } from "zod";
 import rateLimit from "express-rate-limit";
+import { requireApiKey } from "../lib/auth-middleware.js";
 
 const router = Router();
 
@@ -73,7 +74,7 @@ Si l'image ne montre pas clairement une plante ou que tu ne peux pas l'identifie
 Retourne UNIQUEMENT du JSON valide. Pas de markdown, pas d'explication, pas de blocs de code.`;
 }
 
-router.post("/", recognitionLimiter, async (req, res) => {
+router.post("/", requireApiKey, recognitionLimiter, async (req, res) => {
   const parsed = recognitionSchema.safeParse(req.body);
   if (!parsed.success) {
     return res.status(400).json({ error: "Données invalides", details: parsed.error.issues });
