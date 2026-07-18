@@ -189,6 +189,7 @@ export interface Translations {
   // ── RATE LIMIT
   rate_limit_exhausted: string;
   rate_limit_remaining: string;
+  rate_limit_reset_in: string;
 
   // ── AUTH
   auth_welcome_back: string;

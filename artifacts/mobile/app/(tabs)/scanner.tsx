@@ -1,7 +1,7 @@
 import { Feather } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
 import { LinearGradient } from 'expo-linear-gradient';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   ActivityIndicator,
   Alert,
@@ -69,7 +69,7 @@ async function recognizePlant(imageBase64: string, lang: string, token?: string 
   if (!response.ok) {
     if (response.status === 429) {
       const err: { error?: string; message?: string } = await response.json().catch(() => ({}));
-      throw Object.assign(new Error(err.error ?? err.message ?? 'rate_limit_exhausted'), { isRateLimit: true });
+      throw Object.assign(new Error(err.error ?? err.message ?? 'rate_limit_exhausted'), { isRateLimit: true, resetAt });
     }
     const err = await response.json().catch(() => ({}));
     throw new Error((err as { error?: string }).error ?? 'Erreur serveur');
@@ -178,6 +178,27 @@ export default function ScannerScreen() {
   const [result, setResult] = useState<PlantResult | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [rateLimitRemaining, setRateLimitRemaining] = useState<number | null>(null);
+  const [resetAt, setResetAt] = useState<number | null>(null);
+  const [countdown, setCountdown] = useState<number | null>(null);
+
+  // Live countdown when limit is exhausted
+  useEffect(() => {
+    if (rateLimitRemaining !== 0 || resetAt === null) {
+      setCountdown(null);
+      return;
+    }
+    const tick = () => {
+      const secs = Math.max(0, resetAt - Math.floor(Date.now() / 1000));
+      setCountdown(secs);
+      if (secs === 0) {
+        setRateLimitRemaining(null);
+        setResetAt(null);
+      }
+    };
+    tick();
+    const id = setInterval(tick, 1000);
+    return () => clearInterval(id);
+  }, [rateLimitRemaining, resetAt]);
 
   const topPad = Platform.OS === 'web' ? Math.max(insets.top, 67) : insets.top;
 
@@ -229,8 +250,9 @@ export default function ScannerScreen() {
     setResult(null);
     try {
       const apiLang = ['fr', 'en'].includes(lang) ? lang : 'fr';
-      const { plant, remaining } = await recognizePlant(b64, apiLang, token);
+      const { plant, remaining, resetAt: newResetAt } = await recognizePlant(b64, apiLang, token);
       if (remaining !== null) setRateLimitRemaining(remaining);
+      if (newResetAt !== null) setResetAt(newResetAt);
       if (plant.error) {
         setError(plant.message ?? t.scanner_error_no_plant);
       } else {
@@ -238,6 +260,10 @@ export default function ScannerScreen() {
       }
     } catch (err: any) {
       const isRateLimit = (err as any).isRateLimit === true;
+      if (isRateLimit) {
+        setRateLimitRemaining(0);
+        if (err.resetAt != null) setResetAt(err.resetAt);
+      }
       setError(isRateLimit ? t.rate_limit_exhausted : (err.message ?? t.scanner_error_generic));
     } finally {
       setLoading(false);
@@ -272,8 +298,8 @@ export default function ScannerScreen() {
                 { color: rateLimitRemaining === 0 ? '#E74C3C' : '#D4A017' }
               ]}>
                 {rateLimitRemaining === 0
-                  ? '⚠ 0'
-                  : `◆ ${rateLimitRemaining}`} {t.rate_limit_remaining}
+                  ? `⚠ ${t.rate_limit_reset_in} ${countdown !== null ? countdown + 's' : '…'}`
+                  : `◆ ${rateLimitRemaining} ${t.rate_limit_remaining}`}
               </Text>
             </View>
           )}

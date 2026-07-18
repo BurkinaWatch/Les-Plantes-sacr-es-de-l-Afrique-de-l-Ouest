@@ -211,4 +211,5 @@ export const en: Translations = {
 
   rate_limit_exhausted: 'Request limit reached. Please try again in a few minutes.',
   rate_limit_remaining: 'requests remaining',
+  rate_limit_reset_in: 'Resets in',
 };

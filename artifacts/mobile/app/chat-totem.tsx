@@ -114,6 +114,8 @@ export default function ChatTotemScreen() {
   const [isLoading, setIsLoading] = useState(false);
   const [showArchives, setShowArchives] = useState(false);
   const [rateLimitRemaining, setRateLimitRemaining] = useState<number | null>(null);
+  const [resetAt, setResetAt] = useState<number | null>(null);
+  const [countdown, setCountdown] = useState<number | null>(null);
   const scrollRef = useRef<ScrollView>(null);
   const loadingAnim = useRef(new Animated.Value(0)).current;
 
@@ -122,6 +124,25 @@ export default function ChatTotemScreen() {
   const topPad = Platform.OS === 'web' ? Math.max(insets.top, 67) : insets.top;
 
   const STORAGE_KEY = `@chat_sessions_${plante?.id ?? 'none'}`;
+
+  // ── Live countdown when rate limit exhausted ──
+  useEffect(() => {
+    if (rateLimitRemaining !== 0 || resetAt === null) {
+      setCountdown(null);
+      return;
+    }
+    const tick = () => {
+      const secs = Math.max(0, resetAt - Math.floor(Date.now() / 1000));
+      setCountdown(secs);
+      if (secs === 0) {
+        setRateLimitRemaining(null);
+        setResetAt(null);
+      }
+    };
+    tick();
+    const id = setInterval(tick, 1000);
+    return () => clearInterval(id);
+  }, [rateLimitRemaining, resetAt]);
 
   // ── Animate loading dots ──
   useEffect(() => {
@@ -242,7 +263,9 @@ export default function ChatTotemScreen() {
 
       // Read rate-limit headers regardless of success/failure
       const remaining = response.headers.get('RateLimit-Remaining') ?? response.headers.get('X-RateLimit-Remaining');
+      const reset = response.headers.get('RateLimit-Reset') ?? response.headers.get('X-RateLimit-Reset');
       if (remaining !== null) setRateLimitRemaining(parseInt(remaining, 10));
+      if (reset !== null) setResetAt(parseInt(reset, 10));
 
       if (!response.ok) {
         if (response.status === 429) {
@@ -500,7 +523,7 @@ export default function ChatTotemScreen() {
               { color: rateLimitRemaining === 0 ? '#E74C3C' : '#D4A017' }
             ]}>
               {rateLimitRemaining === 0
-                ? `⚠ ${t.rate_limit_exhausted}`
+                ? `⚠ ${t.rate_limit_reset_in} ${countdown !== null ? countdown + 's' : '…'}`
                 : `◆ ${rateLimitRemaining} ${t.rate_limit_remaining}`}
             </Text>
           </View>
