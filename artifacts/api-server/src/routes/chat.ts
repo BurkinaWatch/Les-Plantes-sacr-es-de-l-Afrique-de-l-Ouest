@@ -1,8 +1,13 @@
 import { Router } from "express";
 import Groq from "groq-sdk";
 import { z } from "zod";
-import rateLimit from "express-rate-limit";
-import { requireApiKey } from "../lib/auth-middleware.js";
+import { requireApiKey, optionalJwt } from "../lib/auth-middleware.js";
+import {
+  createUserRateLimiter,
+  monthlyQuotaMiddleware,
+  CHAT_RATE_LIMIT_MAX,
+  RATE_LIMIT_WINDOW_MS,
+} from "../lib/rate-limit.js";
 
 const router = Router();
 
@@ -18,11 +23,10 @@ function getGroq(): Groq {
   return groqClient;
 }
 
-const chatLimiter = rateLimit({
-  windowMs: 60 * 1000,
-  max: 20,
-  standardHeaders: true,
-  legacyHeaders: false,
+/** Per-user rate limiter — configurable via CHAT_RATE_LIMIT_MAX / RATE_LIMIT_WINDOW_MS. */
+const chatLimiter = createUserRateLimiter({
+  windowMs: RATE_LIMIT_WINDOW_MS,
+  max: CHAT_RATE_LIMIT_MAX,
   message: { error: "Trop de messages. Réessaye dans une minute." },
 });
 
@@ -120,7 +124,7 @@ ${animal.conseilsDeVie.join("\n")}
 9. ${langInstruction}`;
 }
 
-router.post("/totem", requireApiKey, chatLimiter, async (req, res) => {
+router.post("/totem", requireApiKey, optionalJwt, chatLimiter, monthlyQuotaMiddleware, async (req, res) => {
   const parsed = chatSchema.safeParse(req.body);
   if (!parsed.success) {
     return res.status(400).json({ error: "Données invalides", details: parsed.error.issues });

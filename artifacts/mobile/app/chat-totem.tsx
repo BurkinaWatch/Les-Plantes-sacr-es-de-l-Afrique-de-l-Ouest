@@ -23,6 +23,7 @@ import { TOTEM_RESULTS } from '@/data/quiz';
 import { getPlanteById } from '@/data/animals';
 import { useColors } from '@/hooks/useColors';
 import { useTranslation } from '@/i18n';
+import { useAuth } from '@/context/AuthContext';
 
 interface Message {
   id: string;
@@ -104,6 +105,7 @@ export default function ChatTotemScreen() {
   const router = useRouter();
   const { quizResult } = useApp();
   const { lang } = useTranslation();
+  const { token } = useAuth();
 
   const [messages, setMessages] = useState<Message[]>([]);
   const [sessions, setSessions] = useState<ChatSession[]>([]);
@@ -210,6 +212,7 @@ export default function ChatTotemScreen() {
         headers: {
           'Content-Type': 'application/json',
           ...(chatApiKey ? { 'x-api-key': chatApiKey } : {}),
+          ...(token ? { 'Authorization': `Bearer ${token}` } : {}),
         },
         body: JSON.stringify({
           planteId: plante.id,

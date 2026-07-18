@@ -1,8 +1,13 @@
 import { Router } from "express";
 import Groq from "groq-sdk";
 import { z } from "zod";
-import rateLimit from "express-rate-limit";
-import { requireApiKey } from "../lib/auth-middleware.js";
+import { requireApiKey, optionalJwt } from "../lib/auth-middleware.js";
+import {
+  createUserRateLimiter,
+  monthlyQuotaMiddleware,
+  RECOGNITION_RATE_LIMIT_MAX,
+  RATE_LIMIT_WINDOW_MS,
+} from "../lib/rate-limit.js";
 
 const router = Router();
 
@@ -18,11 +23,10 @@ function getGroq(): Groq {
   return groqClient;
 }
 
-const recognitionLimiter = rateLimit({
-  windowMs: 60 * 1000,
-  max: 10,
-  standardHeaders: true,
-  legacyHeaders: false,
+/** Per-user rate limiter — configurable via RECOGNITION_RATE_LIMIT_MAX / RATE_LIMIT_WINDOW_MS. */
+const recognitionLimiter = createUserRateLimiter({
+  windowMs: RATE_LIMIT_WINDOW_MS,
+  max: RECOGNITION_RATE_LIMIT_MAX,
   message: { error: "Trop de requêtes. Réessaye dans une minute." },
 });
 
@@ -74,7 +78,7 @@ Si l'image ne montre pas clairement une plante ou que tu ne peux pas l'identifie
 Retourne UNIQUEMENT du JSON valide. Pas de markdown, pas d'explication, pas de blocs de code.`;
 }
 
-router.post("/", requireApiKey, recognitionLimiter, async (req, res) => {
+router.post("/", requireApiKey, optionalJwt, recognitionLimiter, monthlyQuotaMiddleware, async (req, res) => {
   const parsed = recognitionSchema.safeParse(req.body);
   if (!parsed.success) {
     return res.status(400).json({ error: "Données invalides", details: parsed.error.issues });

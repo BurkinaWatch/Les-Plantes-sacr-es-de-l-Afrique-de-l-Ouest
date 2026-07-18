@@ -17,6 +17,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { useColors } from '@/hooks/useColors';
 import { useTranslation } from '@/i18n';
+import { useAuth } from '@/context/AuthContext';
 
 interface PlantResult {
   nom: string;
@@ -36,13 +37,14 @@ interface PlantResult {
 
 const API_BASE = `https://${process.env.EXPO_PUBLIC_DOMAIN}/api`;
 
-async function recognizePlant(imageBase64: string, lang: string): Promise<PlantResult> {
+async function recognizePlant(imageBase64: string, lang: string, token?: string | null): Promise<PlantResult> {
   const chatApiKey = process.env.EXPO_PUBLIC_CHAT_API_KEY ?? '';
   const response = await fetch(`${API_BASE}/plant-recognition`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
       ...(chatApiKey ? { 'x-api-key': chatApiKey } : {}),
+      ...(token ? { 'Authorization': `Bearer ${token}` } : {}),
     },
     body: JSON.stringify({ imageBase64, lang }),
   });
@@ -147,6 +149,7 @@ export default function ScannerScreen() {
   const colors = useColors();
   const insets = useSafeAreaInsets();
   const { t, lang } = useTranslation();
+  const { token } = useAuth();
 
   const [imageUri, setImageUri] = useState<string | null>(null);
   const [imageBase64, setImageBase64] = useState<string | null>(null);
@@ -204,7 +207,7 @@ export default function ScannerScreen() {
     setResult(null);
     try {
       const apiLang = ['fr', 'en'].includes(lang) ? lang : 'fr';
-      const plant = await recognizePlant(b64, apiLang);
+      const plant = await recognizePlant(b64, apiLang, token);
       if (plant.error) {
         setError(plant.message ?? t.scanner_error_no_plant);
       } else {
