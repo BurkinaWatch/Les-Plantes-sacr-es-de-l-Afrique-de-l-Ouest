@@ -16,6 +16,19 @@ if (Number.isNaN(port) || port <= 0) {
   throw new Error(`Invalid PORT value: "${rawPort}"`);
 }
 
+// Warn at startup if AI features will be unavailable due to missing secrets.
+// This surfaces the problem immediately in logs rather than only on first request.
+const REQUIRED_AI_KEYS: Array<{ key: string; feature: string }> = [
+  { key: "GROQ_API_KEY", feature: "plant recognition & totem chat" },
+];
+for (const { key, feature } of REQUIRED_AI_KEYS) {
+  if (!process.env[key]) {
+    logger.warn(`[startup] ${key} is not set — ${feature} will return 503. Set the secret and restart the server.`);
+  } else {
+    logger.info(`[startup] ${key} is configured — ${feature} available.`);
+  }
+}
+
 ensureSchema().then(() => {
   app.listen(port, (err) => {
     if (err) {
