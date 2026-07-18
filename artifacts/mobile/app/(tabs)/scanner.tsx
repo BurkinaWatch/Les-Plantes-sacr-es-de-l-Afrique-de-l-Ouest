@@ -37,7 +37,22 @@ interface PlantResult {
 
 const API_BASE = `https://${process.env.EXPO_PUBLIC_DOMAIN}/api`;
 
-async function recognizePlant(imageBase64: string, lang: string, token?: string | null): Promise<PlantResult> {
+interface PlantResponse {
+  plant: PlantResult;
+  remaining: number | null;
+  resetAt: number | null;
+}
+
+function parseRateLimitHeaders(response: Response): { remaining: number | null; resetAt: number | null } {
+  const remaining = response.headers.get('RateLimit-Remaining') ?? response.headers.get('X-RateLimit-Remaining');
+  const reset = response.headers.get('RateLimit-Reset') ?? response.headers.get('X-RateLimit-Reset');
+  return {
+    remaining: remaining !== null ? parseInt(remaining, 10) : null,
+    resetAt: reset !== null ? parseInt(reset, 10) : null,
+  };
+}
+
+async function recognizePlant(imageBase64: string, lang: string, token?: string | null): Promise<PlantResponse> {
   const chatApiKey = process.env.EXPO_PUBLIC_CHAT_API_KEY ?? '';
   const response = await fetch(`${API_BASE}/plant-recognition`, {
     method: 'POST',
@@ -49,13 +64,19 @@ async function recognizePlant(imageBase64: string, lang: string, token?: string 
     body: JSON.stringify({ imageBase64, lang }),
   });
 
+  const { remaining, resetAt } = parseRateLimitHeaders(response);
+
   if (!response.ok) {
+    if (response.status === 429) {
+      const err: { error?: string; message?: string } = await response.json().catch(() => ({}));
+      throw Object.assign(new Error(err.error ?? err.message ?? 'rate_limit_exhausted'), { isRateLimit: true });
+    }
     const err = await response.json().catch(() => ({}));
-    throw new Error(err.error ?? 'Erreur serveur');
+    throw new Error((err as { error?: string }).error ?? 'Erreur serveur');
   }
 
   const data = await response.json();
-  return data.plant as PlantResult;
+  return { plant: data.plant as PlantResult, remaining, resetAt };
 }
 
 async function pickImage(source: 'camera' | 'gallery'): Promise<string | null> {
@@ -156,6 +177,7 @@ export default function ScannerScreen() {
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<PlantResult | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [rateLimitRemaining, setRateLimitRemaining] = useState<number | null>(null);
 
   const topPad = Platform.OS === 'web' ? Math.max(insets.top, 67) : insets.top;
 
@@ -207,14 +229,16 @@ export default function ScannerScreen() {
     setResult(null);
     try {
       const apiLang = ['fr', 'en'].includes(lang) ? lang : 'fr';
-      const plant = await recognizePlant(b64, apiLang, token);
+      const { plant, remaining } = await recognizePlant(b64, apiLang, token);
+      if (remaining !== null) setRateLimitRemaining(remaining);
       if (plant.error) {
         setError(plant.message ?? t.scanner_error_no_plant);
       } else {
         setResult(plant);
       }
     } catch (err: any) {
-      setError(err.message ?? t.scanner_error_generic);
+      const isRateLimit = (err as any).isRateLimit === true;
+      setError(isRateLimit ? t.rate_limit_exhausted : (err.message ?? t.scanner_error_generic));
     } finally {
       setLoading(false);
     }
@@ -235,7 +259,25 @@ export default function ScannerScreen() {
     >
       {/* Header */}
       <View style={styles.header}>
-        <Text style={[styles.headerLabel, { color: colors.gold }]}>{t.scanner_title}</Text>
+        <View style={styles.headerTop}>
+          <Text style={[styles.headerLabel, { color: colors.gold }]}>{t.scanner_title}</Text>
+          {rateLimitRemaining !== null && rateLimitRemaining <= 3 && (
+            <View style={[
+              styles.rateLimitPill,
+              { backgroundColor: rateLimitRemaining === 0 ? '#2A0A0A' : '#1A1A00',
+                borderColor: rateLimitRemaining === 0 ? '#C0392B' : '#8B6914' }
+            ]}>
+              <Text style={[
+                styles.rateLimitText,
+                { color: rateLimitRemaining === 0 ? '#E74C3C' : '#D4A017' }
+              ]}>
+                {rateLimitRemaining === 0
+                  ? '⚠ 0'
+                  : `◆ ${rateLimitRemaining}`} {t.rate_limit_remaining}
+              </Text>
+            </View>
+          )}
+        </View>
         {!result && !loading && (
           <Text style={[styles.headerSub, { color: colors.mutedForeground }]}>
             {t.scanner_subtitle}
@@ -407,15 +449,26 @@ export default function ScannerScreen() {
 const styles = StyleSheet.create({
   container: { flex: 1 },
   header: { paddingHorizontal: 24, marginBottom: 24 },
+  headerTop: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 },
   headerLabel: {
     fontSize: 13,
     fontWeight: '700',
     letterSpacing: 4,
-    marginBottom: 8,
   },
   headerSub: {
     fontSize: 14,
     lineHeight: 20,
+    letterSpacing: 0.3,
+  },
+  rateLimitPill: {
+    borderWidth: 1,
+    borderRadius: 20,
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+  },
+  rateLimitText: {
+    fontSize: 11,
+    fontWeight: '600',
     letterSpacing: 0.3,
   },
 

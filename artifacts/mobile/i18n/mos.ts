@@ -213,4 +213,7 @@ export const mos: Translations = {
   auth_logout_no: 'Bas',
   auth_account_label: '✦ M TOOG',
   auth_member_since: 'Naoor',
+
+  rate_limit_exhausted: "Limite de requêtes atteinte. Réessayez dans quelques minutes.",
+  rate_limit_remaining: "requêtes restantes",
 };

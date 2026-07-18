@@ -208,4 +208,7 @@ export const en: Translations = {
   auth_logout_no: 'Cancel',
   auth_account_label: '✦ MY ACCOUNT',
   auth_member_since: 'Member since',
+
+  rate_limit_exhausted: 'Request limit reached. Please try again in a few minutes.',
+  rate_limit_remaining: 'requests remaining',
 };

@@ -213,4 +213,7 @@ export const ful: Translations = {
   auth_logout_no: 'Haay',
   auth_account_label: '✦ HESBU AM',
   auth_member_since: 'Saanga',
+
+  rate_limit_exhausted: "Limite de requêtes atteinte. Réessayez dans quelques minutes.",
+  rate_limit_remaining: "requêtes restantes",
 };

@@ -186,6 +186,10 @@ export interface Translations {
   profile_offline_value: string;
   profile_languages_label: string;
 
+  // ── RATE LIMIT
+  rate_limit_exhausted: string;
+  rate_limit_remaining: string;
+
   // ── AUTH
   auth_welcome_back: string;
   auth_login_subtitle: string;

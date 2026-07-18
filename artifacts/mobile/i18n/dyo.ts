@@ -213,4 +213,7 @@ export const dyo: Translations = {
   auth_logout_no: 'A lɔn',
   auth_account_label: '✦ N LƆGƆ',
   auth_member_since: 'San',
+
+  rate_limit_exhausted: "Limite de requêtes atteinte. Réessayez dans quelques minutes.",
+  rate_limit_remaining: "requêtes restantes",
 };
