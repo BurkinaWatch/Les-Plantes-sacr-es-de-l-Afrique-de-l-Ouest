@@ -333,6 +333,7 @@ function RootLayoutNav() {
       <Stack screenOptions={{ headerShown: false }}>
         <Stack.Screen name="(tabs)"      options={{ headerShown: false }} />
         <Stack.Screen name="animal/[id]" options={{ headerShown: false, presentation: "card" }} />
+        <Stack.Screen name="plant/[id]"  options={{ headerShown: false, presentation: "card" }} />
         <Stack.Screen name="(auth)"      options={{ headerShown: false }} />
         <Stack.Screen name="chat-totem"  options={{ headerShown: false, presentation: "card" }} />
         <Stack.Screen name="progression-spirituelle" options={{ headerShown: false, presentation: "card" }} />
