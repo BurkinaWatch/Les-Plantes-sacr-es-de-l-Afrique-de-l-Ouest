@@ -21,6 +21,7 @@ import { AppProvider } from "@/context/AppContext";
 import { AuthProvider, useAuth } from "@/context/AuthContext";
 import { useColors } from "@/hooks/useColors";
 import { LanguageProvider } from "@/i18n";
+import { useNotifications } from "@/hooks/useNotifications";
 
 let Feather: any = null;
 try { Feather = require("@expo/vector-icons").Feather; } catch {}
@@ -291,6 +292,37 @@ const fabStyles = StyleSheet.create({
   },
 });
 
+/* ── Notifications bootstrap ────────────────────────────────────── */
+/**
+ * Mounted once inside AppProvider. Requests notification permission on first
+ * launch and (silently) registers the Expo push token with the API server so
+ * the server can send remote notifications in the future.
+ */
+function NotificationsSetup() {
+  const { pushToken } = useNotifications();
+
+  useEffect(() => {
+    if (!pushToken) return;
+
+    const chatApiKey = process.env.EXPO_PUBLIC_CHAT_API_KEY ?? '';
+    const domain = process.env.EXPO_PUBLIC_DOMAIN;
+    if (!domain) return;
+
+    fetch(`https://${domain}/api/push-tokens`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        ...(chatApiKey ? { 'x-api-key': chatApiKey } : {}),
+      },
+      body: JSON.stringify({ token: pushToken, platform: Platform.OS }),
+    }).catch(() => {
+      // Non-critical — silently ignore network errors
+    });
+  }, [pushToken]);
+
+  return null;
+}
+
 /* ── Navigation ────────────────────────────────────────────────── */
 function RootLayoutNav() {
   const { isLoading } = useAuth();
@@ -349,6 +381,7 @@ export default function RootLayout() {
               <LanguageProvider>
                 <AuthProvider>
                   <AppProvider>
+                    <NotificationsSetup />
                     {showSplash ? (
                       <AnimatedSplash onFinish={() => setShowSplash(false)} />
                     ) : (

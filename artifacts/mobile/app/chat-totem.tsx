@@ -24,6 +24,7 @@ import { getPlanteById } from '@/data/animals';
 import { useColors } from '@/hooks/useColors';
 import { useTranslation } from '@/i18n';
 import { useAuth } from '@/context/AuthContext';
+import { useNotifications } from '@/hooks/useNotifications';
 
 interface Message {
   id: string;
@@ -106,6 +107,8 @@ export default function ChatTotemScreen() {
   const { quizResult } = useApp();
   const { lang, t } = useTranslation();
   const { token } = useAuth();
+
+  const { scheduleLocalNotification } = useNotifications();
 
   const [messages, setMessages] = useState<Message[]>([]);
   const [sessions, setSessions] = useState<ChatSession[]>([]);
@@ -294,6 +297,7 @@ export default function ChatTotemScreen() {
       const finalMessages = [...allMessages, assistantMsg];
       setMessages(finalMessages);
       await persistSession(finalMessages, currentSessionId);
+      await scheduleLocalNotification(t.notif_chat_title, t.notif_chat_body);
       setTimeout(() => scrollRef.current?.scrollToEnd({ animated: true }), 100);
     } catch (err: any) {
       const errorMsg: Message = {

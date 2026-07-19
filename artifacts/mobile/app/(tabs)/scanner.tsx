@@ -18,6 +18,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useColors } from '@/hooks/useColors';
 import { useTranslation } from '@/i18n';
 import { useAuth } from '@/context/AuthContext';
+import { useNotifications } from '@/hooks/useNotifications';
 
 interface PlantResult {
   nom: string;
@@ -171,6 +172,7 @@ export default function ScannerScreen() {
   const insets = useSafeAreaInsets();
   const { t, lang } = useTranslation();
   const { token } = useAuth();
+  const { scheduleLocalNotification } = useNotifications();
 
   const [imageUri, setImageUri] = useState<string | null>(null);
   const [imageBase64, setImageBase64] = useState<string | null>(null);
@@ -255,8 +257,10 @@ export default function ScannerScreen() {
       if (newResetAt !== null) setResetAt(newResetAt);
       if (plant.error) {
         setError(plant.message ?? t.scanner_error_no_plant);
+        await scheduleLocalNotification(t.notif_scan_title, t.notif_scan_error_body);
       } else {
         setResult(plant);
+        await scheduleLocalNotification(t.notif_scan_title, t.notif_scan_body);
       }
     } catch (err: any) {
       const isRateLimit = (err as any).isRateLimit === true;

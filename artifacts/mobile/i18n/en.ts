@@ -212,4 +212,10 @@ export const en: Translations = {
   rate_limit_exhausted: 'Request limit reached. Please try again in a few minutes.',
   rate_limit_remaining: 'requests remaining',
   rate_limit_reset_in: 'Resets in',
+
+  notif_scan_title: '🌿 Plant identified',
+  notif_scan_body: 'Your plant has been recognised. Discover its story and secrets.',
+  notif_scan_error_body: 'Identification was unsuccessful. Try again with another photo.',
+  notif_chat_title: '✦ Your Totem has replied',
+  notif_chat_body: 'A message from your totem plant is waiting for you.',
 };

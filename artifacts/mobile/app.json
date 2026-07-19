@@ -35,7 +35,9 @@
         "CAMERA",
         "READ_EXTERNAL_STORAGE",
         "WRITE_EXTERNAL_STORAGE",
-        "READ_MEDIA_IMAGES"
+        "READ_MEDIA_IMAGES",
+        "RECEIVE_BOOT_COMPLETED",
+        "POST_NOTIFICATIONS"
       ]
     },
     "web": {
@@ -51,6 +53,14 @@
           "photosPermission": "Utilisé pour sélectionner des photos de plantes depuis votre galerie.",
           "cameraPermission": "Utilisé pour prendre des photos de plantes afin de les identifier.",
           "microphonePermission": false
+        }
+      ],
+      [
+        "expo-notifications",
+        {
+          "icon": "./assets/images/icon.png",
+          "color": "#D4A017",
+          "sounds": []
         }
       ]
     ],
