@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 modules = ["nodejs-20", "web", "bash"]
+=======
+modules = ["nodejs-20", "web", "python-3.12"]
+>>>>>>> 6acac908ec2ef4d70b32918e5428785b0318d41e
 
 [deployment]
 router = "application"
@@ -19,46 +23,6 @@ expertMode = true
 path = "scripts/post-merge.sh"
 timeoutMs = 20000
 
-[[ports]]
-localPort = 8080
-externalPort = 8080
-
-[[ports]]
-localPort = 8081
-externalPort = 80
-
-[[ports]]
-localPort = 8082
-externalPort = 3001
-
-[[ports]]
-localPort = 8083
-externalPort = 4200
-
-[[ports]]
-localPort = 8084
-externalPort = 5000
-
-[[ports]]
-localPort = 8085
-externalPort = 5173
-
-[[ports]]
-localPort = 8086
-externalPort = 6000
-
-[[ports]]
-localPort = 8087
-externalPort = 6800
-
-[[ports]]
-localPort = 18115
-externalPort = 3000
-
-[[ports]]
-localPort = 18116
-externalPort = 3003
-
 [nix]
 channel = "stable-25_05"
 packages = ["eas-cli"]
@@ -66,5 +30,19 @@ packages = ["eas-cli"]
 [userenv]
 
 [userenv.shared]
-CHAT_API_KEY = "f060cabdf98e8049d08257d9e04cdba2e4f047f579a49d6f997a40f4c4d2b8c6"
-EXPO_PUBLIC_CHAT_API_KEY = "f060cabdf98e8049d08257d9e04cdba2e4f047f579a49d6f997a40f4c4d2b8c6"
+
+[[ports]]
+localPort = 8080
+externalPort = 80
+
+[[ports]]
+localPort = 8081
+externalPort = 8081
+
+[[ports]]
+localPort = 18115
+externalPort = 3000
+
+[[ports]]
+localPort = 18116
+externalPort = 3001

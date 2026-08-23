@@ -186,6 +186,18 @@ export interface Translations {
   profile_offline_value: string;
   profile_languages_label: string;
 
+  // ── RATE LIMIT
+  rate_limit_exhausted: string;
+  rate_limit_remaining: string;
+  rate_limit_reset_in: string;
+
+  // ── NOTIFICATIONS
+  notif_scan_title: string;
+  notif_scan_body: string;
+  notif_scan_error_body: string;
+  notif_chat_title: string;
+  notif_chat_body: string;
+
   // ── AUTH
   auth_welcome_back: string;
   auth_login_subtitle: string;

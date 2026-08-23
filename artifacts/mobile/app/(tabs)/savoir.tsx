@@ -6,6 +6,7 @@ import {
   ScrollView,
   StyleSheet,
   Text,
+  TextInput,
   View,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -13,20 +14,24 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useColors } from '@/hooks/useColors';
 import { RECIPES, type Recipe } from '@/data/recipes';
 import { ARTICLES, type Article } from '@/data/articles';
+import { PLANTES_MEDICINALES, searchPlantes, type PlanteMedicinale } from '@/data/plantes-medicinales';
 
-type Tab = 'recettes' | 'articles';
+type Tab = 'recettes' | 'articles' | 'plantes';
 
 const TABS: { key: Tab; label: string; emoji: string }[] = [
   { key: 'recettes', label: 'Recettes',  emoji: '🌿' },
   { key: 'articles', label: 'Articles',  emoji: '📰' },
+  { key: 'plantes',  label: 'Plantes',   emoji: '🌱' },
 ];
 
 export default function SavoirScreen() {
   const colors = useColors();
   const insets = useSafeAreaInsets();
-  const [activeTab, setActiveTab]       = useState<Tab>('recettes');
+  const [activeTab, setActiveTab]             = useState<Tab>('recettes');
   const [selectedRecipe,  setSelectedRecipe]  = useState<Recipe | null>(null);
   const [selectedArticle, setSelectedArticle] = useState<Article | null>(null);
+  const [selectedPlante,  setSelectedPlante]  = useState<PlanteMedicinale | null>(null);
+  const [planteSearch,    setPlanteSearch]    = useState('');
 
   const topPad = Platform.OS === 'web' ? Math.max(insets.top, 67) : insets.top;
 
@@ -253,16 +258,147 @@ export default function SavoirScreen() {
   }
 
   /* ════════════════════════════════════════════════════
+     PLANTE DETAIL VIEW
+  ═════════════════════════════════════════════════════*/
+  if (selectedPlante) {
+    const p = selectedPlante;
+    const nomsAfricainsEntries = Object.entries(p.nomsAfricains).filter(([, v]) => v);
+    return (
+      <View style={[styles.container, { backgroundColor: colors.background }]}>
+        {/* Hero */}
+        <LinearGradient
+          colors={[p.couleur + '60', colors.background]}
+          style={[styles.planteHero, { paddingTop: topPad + 12 }]}
+        >
+          <Pressable
+            onPress={() => setSelectedPlante(null)}
+            style={({ pressed }) => [styles.backBtn, { opacity: pressed ? 0.7 : 1 }]}
+          >
+            <Text style={[styles.backBtnText, { color: p.couleur }]}>← Plantes médicinales</Text>
+          </Pressable>
+
+          <View style={[styles.catBadge, {
+            backgroundColor: p.couleur + '30',
+            borderColor: p.couleur + '60',
+            alignSelf: 'flex-start',
+            marginBottom: 10,
+          }]}>
+            <Text style={[styles.catBadgeText, { color: p.couleur }]}>
+              {p.categorieTherapeutique.toUpperCase()}
+            </Text>
+          </View>
+
+          <View style={styles.planteHeroRow}>
+            <Text style={styles.planteHeroIcon}>{p.icone}</Text>
+            <View style={{ flex: 1 }}>
+              <Text style={[styles.planteHeroTitle, { color: colors.ivory }]}>{p.nomVulgaire}</Text>
+              <Text style={[styles.planteHeroScientific, { color: p.couleur }]}>{p.nomScientifique}</Text>
+              <Text style={[styles.planteHeroFamille, { color: colors.mutedForeground }]}>{p.famille}</Text>
+            </View>
+          </View>
+
+          {/* Noms africains */}
+          {nomsAfricainsEntries.length > 0 && (
+            <View style={[styles.nomsAfricainsBox, { backgroundColor: 'rgba(0,0,0,0.25)', borderColor: p.couleur + '50' }]}>
+              <Text style={[styles.nomsAfricainsLabel, { color: p.couleur }]}>🗣 NOMS AFRICAINS</Text>
+              <View style={styles.nomsAfricainsGrid}>
+                {nomsAfricainsEntries.map(([lang, nom]) => (
+                  <View key={lang} style={styles.nomAfricainItem}>
+                    <Text style={[styles.nomAfricainLang, { color: colors.mutedForeground }]}>
+                      {lang.charAt(0).toUpperCase() + lang.slice(1)}
+                    </Text>
+                    <Text style={[styles.nomAfricainVal, { color: colors.ivory }]}>{nom}</Text>
+                  </View>
+                ))}
+              </View>
+            </View>
+          )}
+        </LinearGradient>
+
+        <ScrollView
+          style={{ flex: 1 }}
+          contentContainerStyle={[styles.readingContent, { paddingBottom: 120 + insets.bottom }]}
+          showsVerticalScrollIndicator={false}
+        >
+          {/* Historique */}
+          <View style={[styles.sectionCard, { backgroundColor: colors.card, borderColor: p.couleur + '40' }]}>
+            <Text style={[styles.sectionCardTitle, { color: p.couleur }]}>📜 HISTORIQUE ET TRADITION</Text>
+            <Text style={[styles.paragraph, { color: colors.ivory, marginTop: 4 }]}>{p.historique}</Text>
+          </View>
+
+          {/* Description */}
+          <View style={[styles.sectionCard, { backgroundColor: colors.card, borderColor: colors.border }]}>
+            <Text style={[styles.sectionCardTitle, { color: p.couleur }]}>🌿 DESCRIPTION DE LA PLANTE</Text>
+            <Text style={[styles.paragraph, { color: colors.ivory, marginTop: 4 }]}>{p.descriptionPlante}</Text>
+          </View>
+
+          {/* Action curative */}
+          <View style={[styles.sectionCard, { backgroundColor: colors.card, borderColor: colors.border }]}>
+            <Text style={[styles.sectionCardTitle, { color: p.couleur }]}>⚗️ ACTION CURATIVE</Text>
+            <Text style={[styles.paragraph, { color: colors.ivory, marginTop: 4 }]}>{p.actionCurative}</Text>
+          </View>
+
+          {/* Parties utilisées */}
+          <View style={[styles.partiesRow, { backgroundColor: colors.card, borderColor: colors.border }]}>
+            <Text style={[styles.sectionCardTitle, { color: p.couleur }]}>🫚 PARTIES UTILISÉES</Text>
+            <View style={styles.partiesChips}>
+              {p.partiesUtilisees.map((partie, i) => (
+                <View key={i} style={[styles.partieChip, { backgroundColor: p.couleur + '20', borderColor: p.couleur + '50' }]}>
+                  <Text style={[styles.partieChipText, { color: p.couleur }]}>{partie}</Text>
+                </View>
+              ))}
+            </View>
+          </View>
+
+          {/* Emplois */}
+          <Text style={[styles.readingSubtitle, { color: p.couleur }]}>EMPLOIS PRATIQUES</Text>
+          {p.emplois.map((emploi, i) => (
+            <LinearGradient
+              key={i}
+              colors={[p.couleur + '20', p.couleur + '08']}
+              style={[styles.emploiBox, { borderColor: p.couleur + '50' }]}
+            >
+              <Text style={[styles.emploiIndication, { color: p.couleur }]}>{emploi.indication}</Text>
+              <Text style={[styles.emploiPreparation, { color: colors.ivory }]}>{emploi.preparation}</Text>
+            </LinearGradient>
+          ))}
+
+          {/* Précautions */}
+          {p.precautions && (
+            <View style={[styles.precautionsBox, { backgroundColor: '#FF6B0015', borderColor: '#FF6B0060' }]}>
+              <Text style={[styles.precautionsTitle, { color: '#E74C3C' }]}>⚠️ PRÉCAUTIONS</Text>
+              <Text style={[styles.precautionsText, { color: colors.ivory }]}>{p.precautions}</Text>
+            </View>
+          )}
+
+          {/* Source */}
+          <View style={[styles.sourceBox, { borderColor: colors.border, backgroundColor: colors.card }]}>
+            <Text style={[styles.sourceLabel, { color: colors.mutedForeground }]}>SOURCE</Text>
+            <Text style={[styles.sourceText, { color: colors.mutedForeground }]}>{p.source}</Text>
+            <Text style={[styles.sourceDisclaimer, { color: colors.mutedForeground }]}>
+              Ces informations sont à titre éducatif. Consultez un professionnel de santé avant tout usage thérapeutique.
+            </Text>
+          </View>
+        </ScrollView>
+      </View>
+    );
+  }
+
+  /* ════════════════════════════════════════════════════
      MAIN LIST VIEW
   ═════════════════════════════════════════════════════*/
+  const filteredPlantes = planteSearch.trim() ? searchPlantes(planteSearch) : PLANTES_MEDICINALES;
+
   const headerTitles: Record<Tab, string> = {
     recettes: 'Recettes de Plantes',
     articles: 'Articles & Savoirs',
+    plantes:  'Plantes Médicinales',
   };
 
   const headerSubs: Record<Tab, string> = {
     recettes: `${RECIPES.length} recettes · Plantes médicinales & cuisine`,
     articles: `${ARTICLES.length} articles · Ethnobotanique & culture`,
+    plantes:  `${PLANTES_MEDICINALES.length} plantes · Pharmacopée africaine`,
   };
 
   return (
@@ -296,6 +432,26 @@ export default function SavoirScreen() {
             );
           })}
         </View>
+
+        {/* Plante search bar */}
+        {activeTab === 'plantes' && (
+          <View style={[styles.searchBar, { backgroundColor: colors.card, borderColor: colors.border }]}>
+            <Text style={{ fontSize: 14 }}>🔍</Text>
+            <TextInput
+              style={[styles.searchInput, { color: colors.ivory }]}
+              placeholder="Rechercher une plante, indication..."
+              placeholderTextColor={colors.mutedForeground}
+              value={planteSearch}
+              onChangeText={setPlanteSearch}
+              returnKeyType="search"
+            />
+            {planteSearch.length > 0 && (
+              <Pressable onPress={() => setPlanteSearch('')}>
+                <Text style={[styles.searchClear, { color: colors.mutedForeground }]}>✕</Text>
+              </Pressable>
+            )}
+          </View>
+        )}
       </LinearGradient>
 
       {/* ════ RECETTES LIST ════ */}
@@ -401,6 +557,69 @@ export default function SavoirScreen() {
           ))}
         </ScrollView>
       )}
+
+      {/* ════ PLANTES LIST ════ */}
+      {activeTab === 'plantes' && (
+        <ScrollView
+          contentContainerStyle={[styles.listContent, { paddingBottom: 100 + insets.bottom }]}
+          showsVerticalScrollIndicator={false}
+        >
+          {filteredPlantes.length === 0 && (
+            <View style={styles.emptyState}>
+              <Text style={{ fontSize: 40 }}>🌿</Text>
+              <Text style={[styles.emptyText, { color: colors.mutedForeground }]}>
+                Aucune plante trouvée pour « {planteSearch} »
+              </Text>
+            </View>
+          )}
+          {filteredPlantes.map((plante) => (
+            <Pressable
+              key={plante.id}
+              style={({ pressed }) => [
+                styles.card,
+                { backgroundColor: colors.card, borderColor: plante.couleur + '50', opacity: pressed ? 0.88 : 1 },
+              ]}
+              onPress={() => setSelectedPlante(plante)}
+            >
+              <LinearGradient
+                colors={[plante.couleur + '22', 'transparent']}
+                start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}
+                style={StyleSheet.absoluteFillObject}
+              />
+              <View style={[styles.iconWrap, { backgroundColor: plante.couleur + '28' }]}>
+                <Text style={styles.iconText}>{plante.icone}</Text>
+              </View>
+              <View style={{ flex: 1, gap: 4 }}>
+                <View style={[styles.catChip, { backgroundColor: plante.couleur + '25', alignSelf: 'flex-start' }]}>
+                  <Text style={[styles.catChipText, { color: plante.couleur }]} numberOfLines={1}>
+                    {plante.categorieTherapeutique.toUpperCase()}
+                  </Text>
+                </View>
+                <Text style={[styles.cardTitle, { color: colors.ivory }]}>{plante.nomVulgaire}</Text>
+                <Text style={[styles.planteScientificSmall, { color: plante.couleur }]}>
+                  {plante.nomScientifique}
+                </Text>
+                <View style={styles.planteNomsRow}>
+                  {plante.nomsAfricains.wolof && (
+                    <Text style={[styles.planteNomTag, { color: colors.mutedForeground }]}>
+                      Wolof: {plante.nomsAfricains.wolof.split(',')[0].trim()}
+                    </Text>
+                  )}
+                  {plante.nomsAfricains.bambara && (
+                    <Text style={[styles.planteNomTag, { color: colors.mutedForeground }]}>
+                      Bambara: {plante.nomsAfricains.bambara.split(',')[0].trim()}
+                    </Text>
+                  )}
+                </View>
+                <Text style={[styles.cardDesc, { color: colors.mutedForeground }]} numberOfLines={2}>
+                  {plante.emplois[0]?.indication}
+                </Text>
+              </View>
+              <Text style={[styles.arrow, { color: plante.couleur }]}>›</Text>
+            </Pressable>
+          ))}
+        </ScrollView>
+      )}
     </View>
   );
 }
@@ -423,7 +642,16 @@ const styles = StyleSheet.create({
     padding: 3, marginTop: 8, gap: 3,
   },
   segmentBtn: { flex: 1, paddingVertical: 9, borderRadius: 9, alignItems: 'center' },
-  segmentText: { fontSize: 13, fontWeight: '700', letterSpacing: 0.3 },
+  segmentText: { fontSize: 11, fontWeight: '700', letterSpacing: 0.3 },
+
+  /* Search */
+  searchBar: {
+    flexDirection: 'row', alignItems: 'center', gap: 8,
+    borderRadius: 12, borderWidth: 1, paddingHorizontal: 12, paddingVertical: 9,
+    marginTop: 10,
+  },
+  searchInput: { flex: 1, fontSize: 14, fontWeight: '500' },
+  searchClear: { fontSize: 14, paddingHorizontal: 4 },
 
   /* Lists */
   listContent: { padding: 16, gap: 12 },
@@ -444,7 +672,7 @@ const styles = StyleSheet.create({
   cardDesc: { fontSize: 11, lineHeight: 16 },
   cardBottomRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
   catChip: { paddingHorizontal: 8, paddingVertical: 2, borderRadius: 8 },
-  catChipText: { fontSize: 9, fontWeight: '700', letterSpacing: 1 },
+  catChipText: { fontSize: 9, fontWeight: '700', letterSpacing: 0.8 },
   diffBadge: { paddingHorizontal: 8, paddingVertical: 2, borderRadius: 8 },
   diffText: { fontSize: 9, fontWeight: '700' },
 
@@ -452,6 +680,15 @@ const styles = StyleSheet.create({
   articleTitleRow: { flexDirection: 'row', alignItems: 'flex-start', gap: 8 },
   articleCardIcon: { fontSize: 22, marginTop: 1 },
   articleAuthor: { fontSize: 10, fontWeight: '500', fontStyle: 'italic' },
+
+  /* Plante list specifics */
+  planteScientificSmall: { fontSize: 11, fontStyle: 'italic', fontWeight: '600' },
+  planteNomsRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 6 },
+  planteNomTag: { fontSize: 9, fontWeight: '500' },
+
+  /* Empty state */
+  emptyState: { alignItems: 'center', paddingTop: 60, gap: 16 },
+  emptyText: { fontSize: 14, textAlign: 'center', fontStyle: 'italic' },
 
   /* Back button */
   backBtn: { marginBottom: 12 },
@@ -513,9 +750,31 @@ const styles = StyleSheet.create({
   tagChip: { paddingHorizontal: 10, paddingVertical: 4, borderRadius: 10, borderWidth: 1 },
   tagText: { fontSize: 10, fontWeight: '700' },
 
+  /* Plante detail */
+  planteHero: { paddingHorizontal: 20, paddingBottom: 16, gap: 8 },
+  planteHeroRow: { flexDirection: 'row', gap: 14, alignItems: 'flex-start' },
+  planteHeroIcon: { fontSize: 46, marginTop: 4 },
+  planteHeroTitle: { fontSize: 24, fontWeight: '800', lineHeight: 30, marginTop: 4 },
+  planteHeroScientific: { fontSize: 14, fontStyle: 'italic', fontWeight: '600', marginTop: 2 },
+  planteHeroFamille: { fontSize: 11, fontWeight: '500', marginTop: 2 },
+  nomsAfricainsBox: { borderRadius: 12, borderWidth: 1, padding: 12, gap: 8 },
+  nomsAfricainsLabel: { fontSize: 9, fontWeight: '800', letterSpacing: 2 },
+  nomsAfricainsGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 12 },
+  nomAfricainItem: { minWidth: 100 },
+  nomAfricainLang: { fontSize: 9, fontWeight: '700', letterSpacing: 1, textTransform: 'uppercase' },
+  nomAfricainVal: { fontSize: 12, fontStyle: 'italic', fontWeight: '600' },
+  partiesRow: { borderRadius: 14, borderWidth: 1, padding: 14, gap: 10 },
+  partiesChips: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
+  partieChip: { paddingHorizontal: 10, paddingVertical: 5, borderRadius: 10, borderWidth: 1 },
+  partieChipText: { fontSize: 11, fontWeight: '600' },
+  emploiBox: { borderRadius: 14, borderWidth: 1, padding: 16, gap: 8 },
+  emploiIndication: { fontSize: 13, fontWeight: '800', letterSpacing: 0.5 },
+  emploiPreparation: { fontSize: 14, lineHeight: 22 },
+
   /* Source */
   sourceBox: { borderRadius: 12, borderWidth: 1, padding: 14, gap: 8, marginTop: 4 },
   sourceLabel: { fontSize: 9, fontWeight: '800', letterSpacing: 2 },
   sourceText: { fontSize: 12, lineHeight: 18, fontStyle: 'italic' },
   sourceRef: { fontSize: 11, lineHeight: 18, fontStyle: 'italic' },
+  sourceDisclaimer: { fontSize: 10, lineHeight: 16, marginTop: 4, fontStyle: 'italic' },
 });

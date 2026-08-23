@@ -15,7 +15,12 @@
     },
     "ios": {
       "supportsTablet": false,
-      "bundleIdentifier": "com.ouedraogophillips.plantessacrees"
+      "bundleIdentifier": "com.ouedraogophillips.plantessacrees",
+      "infoPlist": {
+        "NSCameraUsageDescription": "Utilisé pour prendre des photos de plantes afin de les identifier.",
+        "NSPhotoLibraryUsageDescription": "Utilisé pour sélectionner des photos de plantes depuis votre galerie.",
+        "NSMicrophoneUsageDescription": "Utilisé pour la lecture audio des méditations et contenus sonores."
+      }
     },
     "android": {
       "package": "com.ouedraogophillips.plantessacrees",
@@ -26,7 +31,13 @@
         "backgroundColor": "#120A05"
       },
       "permissions": [
-        "VIBRATE"
+        "VIBRATE",
+        "CAMERA",
+        "READ_EXTERNAL_STORAGE",
+        "WRITE_EXTERNAL_STORAGE",
+        "READ_MEDIA_IMAGES",
+        "RECEIVE_BOOT_COMPLETED",
+        "POST_NOTIFICATIONS"
       ]
     },
     "web": {
@@ -35,7 +46,23 @@
     "plugins": [
       "expo-router",
       "expo-font",
-      "expo-web-browser"
+      "expo-web-browser",
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "Utilisé pour sélectionner des photos de plantes depuis votre galerie.",
+          "cameraPermission": "Utilisé pour prendre des photos de plantes afin de les identifier.",
+          "microphonePermission": false
+        }
+      ],
+      [
+        "expo-notifications",
+        {
+          "icon": "./assets/images/icon.png",
+          "color": "#D4A017",
+          "sounds": []
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true,

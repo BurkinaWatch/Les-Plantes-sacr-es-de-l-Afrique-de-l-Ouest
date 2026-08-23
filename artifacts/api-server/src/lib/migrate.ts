@@ -12,6 +12,22 @@ export async function ensureSchema() {
         created_at TIMESTAMP DEFAULT NOW() NOT NULL
       )
     `);
+
+    await client.query(`
+      CREATE TABLE IF NOT EXISTS push_tokens (
+        id SERIAL PRIMARY KEY,
+        user_id INTEGER REFERENCES users(id) ON DELETE SET NULL,
+        token TEXT NOT NULL UNIQUE,
+        platform TEXT,
+        created_at TIMESTAMP DEFAULT NOW() NOT NULL,
+        updated_at TIMESTAMP DEFAULT NOW() NOT NULL
+      )
+    `);
+
+    await client.query(`
+      CREATE INDEX IF NOT EXISTS push_tokens_user_id_idx ON push_tokens(user_id)
+    `);
+
     logger.info("Database schema is ready");
   } catch (err) {
     logger.error({ err }, "Failed to ensure database schema");

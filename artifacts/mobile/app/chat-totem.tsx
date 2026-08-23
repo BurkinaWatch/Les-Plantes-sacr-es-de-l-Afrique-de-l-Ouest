@@ -23,6 +23,8 @@ import { TOTEM_RESULTS } from '@/data/quiz';
 import { getPlanteById } from '@/data/animals';
 import { useColors } from '@/hooks/useColors';
 import { useTranslation } from '@/i18n';
+import { useAuth } from '@/context/AuthContext';
+import { useNotifications } from '@/hooks/useNotifications';
 
 interface Message {
   id: string;
@@ -103,7 +105,10 @@ export default function ChatTotemScreen() {
   const insets = useSafeAreaInsets();
   const router = useRouter();
   const { quizResult } = useApp();
-  const { lang } = useTranslation();
+  const { lang, t } = useTranslation();
+  const { token } = useAuth();
+
+  const { scheduleLocalNotification } = useNotifications();
 
   const [messages, setMessages] = useState<Message[]>([]);
   const [sessions, setSessions] = useState<ChatSession[]>([]);
@@ -111,6 +116,9 @@ export default function ChatTotemScreen() {
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [showArchives, setShowArchives] = useState(false);
+  const [rateLimitRemaining, setRateLimitRemaining] = useState<number | null>(null);
+  const [resetAt, setResetAt] = useState<number | null>(null);
+  const [countdown, setCountdown] = useState<number | null>(null);
   const scrollRef = useRef<ScrollView>(null);
   const loadingAnim = useRef(new Animated.Value(0)).current;
 
@@ -119,6 +127,25 @@ export default function ChatTotemScreen() {
   const topPad = Platform.OS === 'web' ? Math.max(insets.top, 67) : insets.top;
 
   const STORAGE_KEY = `@chat_sessions_${plante?.id ?? 'none'}`;
+
+  // ── Live countdown when rate limit exhausted ──
+  useEffect(() => {
+    if (rateLimitRemaining !== 0 || resetAt === null) {
+      setCountdown(null);
+      return;
+    }
+    const tick = () => {
+      const secs = Math.max(0, resetAt - Math.floor(Date.now() / 1000));
+      setCountdown(secs);
+      if (secs === 0) {
+        setRateLimitRemaining(null);
+        setResetAt(null);
+      }
+    };
+    tick();
+    const id = setInterval(tick, 1000);
+    return () => clearInterval(id);
+  }, [rateLimitRemaining, resetAt]);
 
   // ── Animate loading dots ──
   useEffect(() => {
@@ -210,6 +237,7 @@ export default function ChatTotemScreen() {
         headers: {
           'Content-Type': 'application/json',
           ...(chatApiKey ? { 'x-api-key': chatApiKey } : {}),
+          ...(token ? { 'Authorization': `Bearer ${token}` } : {}),
         },
         body: JSON.stringify({
           planteId: plante.id,
@@ -236,7 +264,24 @@ export default function ChatTotemScreen() {
         }),
       });
 
+      // Read rate-limit headers regardless of success/failure
+      const remaining = response.headers.get('RateLimit-Remaining') ?? response.headers.get('X-RateLimit-Remaining');
+      const reset = response.headers.get('RateLimit-Reset') ?? response.headers.get('X-RateLimit-Reset');
+      if (remaining !== null) setRateLimitRemaining(parseInt(remaining, 10));
+      if (reset !== null) setResetAt(parseInt(reset, 10));
+
       if (!response.ok) {
+        if (response.status === 429) {
+          const errorMsg: Message = {
+            id: (Date.now() + 1).toString(),
+            role: 'assistant',
+            content: `⚠️ ${t.rate_limit_exhausted}`,
+            timestamp: Date.now(),
+          };
+          setMessages([...allMessages, errorMsg]);
+          setIsLoading(false);
+          return;
+        }
         const err = await response.json().catch(() => ({}));
         throw new Error((err as any).error ?? 'Erreur réseau');
       }
@@ -252,6 +297,7 @@ export default function ChatTotemScreen() {
       const finalMessages = [...allMessages, assistantMsg];
       setMessages(finalMessages);
       await persistSession(finalMessages, currentSessionId);
+      await scheduleLocalNotification(t.notif_chat_title, t.notif_chat_body);
       setTimeout(() => scrollRef.current?.scrollToEnd({ animated: true }), 100);
     } catch (err: any) {
       const errorMsg: Message = {
@@ -470,6 +516,22 @@ export default function ChatTotemScreen() {
       {/* ══ INPUT BAR ══ */}
       <View style={[styles.inputWrap, { backgroundColor: colors.warmBrown, borderTopColor: totemColor + '30', paddingBottom: insets.bottom + 8 }]}>
         <KenteStrip />
+        {rateLimitRemaining !== null && rateLimitRemaining <= 3 && (
+          <View style={[
+            styles.rateLimitBanner,
+            { backgroundColor: rateLimitRemaining === 0 ? '#2A0A0A' : '#1A1500',
+              borderColor: rateLimitRemaining === 0 ? '#C0392B40' : '#D4A01740' }
+          ]}>
+            <Text style={[
+              styles.rateLimitBannerText,
+              { color: rateLimitRemaining === 0 ? '#E74C3C' : '#D4A017' }
+            ]}>
+              {rateLimitRemaining === 0
+                ? `⚠ ${t.rate_limit_reset_in} ${countdown !== null ? countdown + 's' : '…'}`
+                : `◆ ${rateLimitRemaining} ${t.rate_limit_remaining}`}
+            </Text>
+          </View>
+        )}
         <View style={styles.inputRow}>
           <TextInput
             style={[styles.input, { color: colors.ivory, backgroundColor: colors.card, borderColor: totemColor + '40' }]}
@@ -655,6 +717,17 @@ const styles = StyleSheet.create({
   assistantFooterText: { fontSize: 10, letterSpacing: 0.5 },
   dotsRow: { flexDirection: 'row', gap: 6, paddingVertical: 4 },
   dot: { width: 8, height: 8, borderRadius: 4 },
+
+  // Rate limit
+  rateLimitBanner: {
+    marginHorizontal: 12,
+    marginTop: 6,
+    borderWidth: 1,
+    borderRadius: 8,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+  },
+  rateLimitBannerText: { fontSize: 12, fontWeight: '600' as const, letterSpacing: 0.3 },
 
   // Input
   inputWrap: { borderTopWidth: 1 },

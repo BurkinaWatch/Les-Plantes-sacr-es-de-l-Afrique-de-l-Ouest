@@ -53,6 +53,7 @@
   },
   "dependencies": {
     "expo-audio": "~1.1.1",
-    "expo-image-picker": "^17.0.11"
+    "expo-image-picker": "^17.0.11",
+    "expo-notifications": "^57.0.6"
   }
 }

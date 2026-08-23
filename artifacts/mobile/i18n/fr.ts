@@ -208,4 +208,14 @@ export const fr: Translations = {
   auth_logout_no: "Annuler",
   auth_account_label: "✦ MON COMPTE",
   auth_member_since: "Membre depuis",
+
+  rate_limit_exhausted: "Limite de requêtes atteinte. Réessayez dans quelques minutes.",
+  rate_limit_remaining: "requêtes restantes",
+  rate_limit_reset_in: "Réinitialise dans",
+
+  notif_scan_title: "🌿 Plante identifiée",
+  notif_scan_body: "Votre plante a été reconnue. Découvrez son histoire et ses secrets.",
+  notif_scan_error_body: "L'identification n'a pas abouti. Réessayez avec une autre photo.",
+  notif_chat_title: "✦ Votre Totem vous répond",
+  notif_chat_body: "Un message de votre plante totem vous attend.",
 };
