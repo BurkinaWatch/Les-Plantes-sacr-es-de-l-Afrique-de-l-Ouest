@@ -12,7 +12,7 @@ import {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { useColors } from '@/hooks/useColors';
-import { RECIPES, type Recipe } from '@/data/recipes';
+import { CARNET_RECETTES, RECIPES, type Recipe } from '@/data/recipes';
 import { ARTICLES, type Article } from '@/data/articles';
 import {
   PLANTES_MEDICINALES,
@@ -465,6 +465,31 @@ export default function SavoirScreen() {
           contentContainerStyle={[styles.listContent, { paddingBottom: 100 + insets.bottom }]}
           showsVerticalScrollIndicator={false}
         >
+          <View style={[styles.documentIntro, { backgroundColor: colors.card, borderColor: colors.terracotta + '55' }]}>
+            <View style={styles.documentIntroHeading}>
+              <View style={[styles.documentIntroMark, { backgroundColor: colors.terracotta + '22' }]}>
+                <Text style={[styles.documentIntroIcon, { color: colors.terracotta }]}>✦</Text>
+              </View>
+              <View style={{ flex: 1 }}>
+                <Text style={[styles.documentIntroKicker, { color: colors.terracotta }]}>CARNET DE TRANSMISSION</Text>
+                <Text style={[styles.documentIntroTitle, { color: colors.ivory }]}>{CARNET_RECETTES.titre}</Text>
+              </View>
+            </View>
+            <Text style={[styles.documentIntroText, { color: colors.mutedForeground }]}>
+              {CARNET_RECETTES.introduction}
+            </Text>
+            <View style={styles.reperesList}>
+              {CARNET_RECETTES.principes.map((principe, index) => (
+                <View key={index} style={[styles.repereRow, { borderTopColor: colors.border }]}>
+                  <View style={[styles.repereDot, { backgroundColor: colors.terracotta }]} />
+                  <Text style={[styles.repereText, { color: colors.ivory, flex: 1 }]}>{principe}</Text>
+                </View>
+              ))}
+            </View>
+            <Text style={[styles.documentSource, { color: colors.mutedForeground }]}>
+              {CARNET_RECETTES.source}
+            </Text>
+          </View>
           {RECIPES.map((recipe) => (
             <Pressable
               key={recipe.id}

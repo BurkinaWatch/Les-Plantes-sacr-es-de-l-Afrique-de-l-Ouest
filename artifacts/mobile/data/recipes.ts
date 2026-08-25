@@ -24,6 +24,29 @@ export interface Recipe {
   precautions?: string;
 }
 
+export interface CarnetRecettes {
+  titre: string;
+  introduction: string;
+  principes: string[];
+  source: string;
+}
+
+/**
+ * Fil conducteur éditorial du « Grand livre des recettes traditionnelles africaines ».
+ * Les recettes restent consultables comme des gestes de cuisine, pas comme des prescriptions.
+ */
+export const CARNET_RECETTES: CarnetRecettes = {
+  titre: 'Cuisine, soin et transmission',
+  introduction:
+    'Dans les traditions africaines, une recette peut nourrir, rafraîchir, apaiser et réunir. Ce carnet fait dialoguer les préparations du quotidien avec les plantes médicinales, sans séparer le goût du geste et de la transmission.',
+  principes: [
+    'Privilégier des ingrédients propres, bien identifiés et correctement conservés.',
+    'Commencer par de petites quantités : un remède traditionnel n’est pas anodin parce qu’il est naturel.',
+    'Distinguer les recettes alimentaires des préparations thérapeutiques et respecter les précautions de chaque fiche.',
+  ],
+  source: 'Inspiré de « T2 — Le grand livre des recettes traditionnelles africaines — 100% santé »',
+};
+
 export const RECIPES: Recipe[] = [
   {
     id: 'tisane-kinkeliba',
