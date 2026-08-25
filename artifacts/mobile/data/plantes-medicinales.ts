@@ -39,48 +39,6 @@ export interface PlanteMedicinale {
   source: string;
 }
 
-export interface ReperePharmacopee {
-  id: string;
-  titre: string;
-  texte: string;
-  couleur: string;
-}
-
-/**
- * Repères de lecture tirés de l'introduction de l'ouvrage.
- * Ils donnent le contexte et les limites du savoir avant les fiches pratiques.
- */
-export const REPÈRES_PHARMACOPÉE: ReperePharmacopee[] = [
-  {
-    id: 'un-savoir-vivant',
-    titre: 'Un savoir vivant',
-    texte:
-      'Dans le Sahel, les plantes se reconnaissent dans leur milieu, se nomment dans les langues locales et se transmettent de génération en génération. Une fiche ne remplace pas la personne qui sait observer, identifier et accompagner.',
-    couleur: '#C8A020',
-  },
-  {
-    id: 'trois-preparations',
-    titre: 'Trois gestes de préparation',
-    texte:
-      'Décoction : faire bouillir les parties solides. Infusion : verser l’eau chaude sur les feuilles ou fleurs. Macération : laisser la plante dans l’eau froide le temps indiqué. La partie utilisée compte autant que la plante.',
-    couleur: '#6B9E5E',
-  },
-  {
-    id: 'prudence-avant-tout',
-    titre: 'La prudence avant tout',
-    texte:
-      'La récolte, la saison et la partie employée font varier l’action d’une plante. Le document écarte les espèces trop toxiques ou difficiles à préparer ; en cas de grossesse, maladie persistante ou traitement en cours, demander conseil à un professionnel de santé.',
-    couleur: '#D47A45',
-  },
-  {
-    id: 'de-la-cueillette-au-soin',
-    titre: 'De la cueillette au soin',
-    texte:
-      'Identifier avec certitude, choisir un endroit préservé, récolter au bon moment puis sécher et conserver à l’abri de l’humidité : la qualité du geste compte avant même la préparation. Une plante mal identifiée ou mal conservée peut devenir dangereuse.',
-    couleur: '#8B6914',
-  },
-];
-
 export const PLANTES_MEDICINALES: PlanteMedicinale[] = [
   // ─── 1 ───────────────────────────────────────────────
   {
@@ -1157,6 +1115,67 @@ export const PLANTES_MEDICINALES: PlanteMedicinale[] = [
     precautions:
       'Ne pas substituer à un traitement antipaludéen conventionnel en cas de paludisme grave. Consulter un médecin.',
     source: 'Pharmacopée africaine de l\'O.U.A., 1985',
+  },
+
+  // ─── Fiches complémentaires — Sophie Lacoste ─────────
+  {
+    id: 'angelica-archangelica',
+    nomVulgaire: 'Angélique',
+    nomScientifique: 'Angelica archangelica',
+    famille: 'Apiaceae',
+    nomsAfricains: {},
+    categorieTherapeutique: 'Digestif – Usage externe traditionnel',
+    couleur: '#B68B40',
+    icone: '🌿',
+    historique:
+      'Dans « Les plantes qui guérissent », Sophie Lacoste présente l’angélique parmi les plantes médicinales d’ici et d’ailleurs, en reliant la fiche à la reconnaissance de la plante, à sa culture et à la préparation des parties utilisées.',
+    descriptionPlante:
+      'Grande plante bisannuelle, l’angélique développe une tige robuste et des ombelles de petites fleurs. L’ouvrage insiste sur l’identification de la plante et sur la puissance de son suc, qui peut être irritant pour la peau.',
+    actionCurative:
+      'L’ouvrage rapporte des usages traditionnels de la décoction pour certains troubles digestifs, des inconforts ORL et des règles douloureuses. En usage externe, des compresses ou frictions sont mentionnées pour les douleurs musculaires et articulaires ; la plante est aussi décrite dans des usages cutanés et capillaires.',
+    emplois: [
+      {
+        indication: 'Douleurs musculaires ou articulaires — usage externe traditionnel',
+        preparation:
+          'Employer la décoction en compresses ou en friction locale, sans appliquer sur une peau lésée. Tester une petite zone et interrompre en cas d’irritation.',
+      },
+      {
+        indication: 'Rinçage capillaire traditionnel',
+        preparation:
+          'L’ouvrage mentionne une décoction d’angélique associée à l’ortie après le shampoing. Rincer soigneusement et éviter le contact avec les yeux.',
+      },
+    ],
+    partiesUtilisees: ['racine', 'feuilles', 'tige'],
+    precautions:
+      'Le suc peut être fortement irritant. Ne pas utiliser sans identification certaine ; éviter l’exposition solaire après contact avec la plante et demander un avis professionnel en cas de grossesse, traitement ou problème persistant.',
+    source: 'Lacoste, Sophie, « Les plantes qui guérissent », Repères-Santé, 2004',
+  },
+  {
+    id: 'betula-alba',
+    nomVulgaire: 'Bouleau blanc',
+    nomScientifique: 'Betula alba',
+    famille: 'Betulaceae',
+    nomsAfricains: {},
+    categorieTherapeutique: 'Traditions botaniques – Usage externe',
+    couleur: '#8E9A78',
+    icone: '🌳',
+    historique:
+      'Sophie Lacoste décrit le bouleau blanc et le bouleau barbu, leur répartition, leurs usages anciens et la place de l’arbre dans les traditions européennes, notamment les bains de vapeur.',
+    descriptionPlante:
+      'Arbre reconnaissable à son écorce blanche qui se détache en lanières, ses rameaux souples et ses feuilles triangulaires ou losangées. Le bouleau blanc peut atteindre une trentaine de mètres.',
+    actionCurative:
+      'Le livre rapporte la réputation médicinale ancienne du bouleau et cite une action cicatrisante attribuée aux fleurs dans la tradition médiévale. Les usages décrits ici sont historiques et ne constituent pas une indication de traitement.',
+    emplois: [
+      {
+        indication: 'Tradition de soin externe',
+        preparation:
+          'Consulter un professionnel avant toute préparation médicinale à base de bouleau ; l’ouvrage documente surtout l’histoire et les usages traditionnels de l’arbre.',
+      },
+    ],
+    partiesUtilisees: ['feuilles', 'fleurs', 'écorce'],
+    precautions:
+      'Ne pas appliquer de préparation maison sur une plaie ou remplacer un soin médical par une pratique traditionnelle. Prudence en cas d’allergie connue au bouleau ou de traitement en cours.',
+    source: 'Lacoste, Sophie, « Les plantes qui guérissent », Repères-Santé, 2004',
   },
 ];
 

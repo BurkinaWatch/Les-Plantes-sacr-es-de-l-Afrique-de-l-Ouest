@@ -12,11 +12,10 @@ import {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { useColors } from '@/hooks/useColors';
-import { CARNET_RECETTES, RECIPES, type Recipe } from '@/data/recipes';
+import { RECIPES, type Recipe } from '@/data/recipes';
 import { ARTICLES, type Article } from '@/data/articles';
 import {
   PLANTES_MEDICINALES,
-  REPÈRES_PHARMACOPÉE,
   searchPlantes,
   type PlanteMedicinale,
 } from '@/data/plantes-medicinales';
@@ -465,31 +464,6 @@ export default function SavoirScreen() {
           contentContainerStyle={[styles.listContent, { paddingBottom: 100 + insets.bottom }]}
           showsVerticalScrollIndicator={false}
         >
-          <View style={[styles.documentIntro, { backgroundColor: colors.card, borderColor: colors.terracotta + '55' }]}>
-            <View style={styles.documentIntroHeading}>
-              <View style={[styles.documentIntroMark, { backgroundColor: colors.terracotta + '22' }]}>
-                <Text style={[styles.documentIntroIcon, { color: colors.terracotta }]}>✦</Text>
-              </View>
-              <View style={{ flex: 1 }}>
-                <Text style={[styles.documentIntroKicker, { color: colors.terracotta }]}>CARNET DE TRANSMISSION</Text>
-                <Text style={[styles.documentIntroTitle, { color: colors.ivory }]}>{CARNET_RECETTES.titre}</Text>
-              </View>
-            </View>
-            <Text style={[styles.documentIntroText, { color: colors.mutedForeground }]}>
-              {CARNET_RECETTES.introduction}
-            </Text>
-            <View style={styles.reperesList}>
-              {CARNET_RECETTES.principes.map((principe, index) => (
-                <View key={index} style={[styles.repereRow, { borderTopColor: colors.border }]}>
-                  <View style={[styles.repereDot, { backgroundColor: colors.terracotta }]} />
-                  <Text style={[styles.repereText, { color: colors.ivory, flex: 1 }]}>{principe}</Text>
-                </View>
-              ))}
-            </View>
-            <Text style={[styles.documentSource, { color: colors.mutedForeground }]}>
-              {CARNET_RECETTES.source}
-            </Text>
-          </View>
           {RECIPES.map((recipe) => (
             <Pressable
               key={recipe.id}
@@ -594,37 +568,6 @@ export default function SavoirScreen() {
           contentContainerStyle={[styles.listContent, { paddingBottom: 100 + insets.bottom }]}
           showsVerticalScrollIndicator={false}
         >
-          {/* La porte d'entrée éditoriale du document : contexte avant pratique */}
-          {!planteSearch.trim() && (
-            <View style={[styles.documentIntro, { backgroundColor: colors.card, borderColor: colors.gold + '55' }]}>
-              <View style={styles.documentIntroHeading}>
-                <View style={[styles.documentIntroMark, { backgroundColor: colors.gold + '22' }]}>
-                  <Text style={styles.documentIntroIcon}>✦</Text>
-                </View>
-                <View style={{ flex: 1 }}>
-                  <Text style={[styles.documentIntroKicker, { color: colors.gold }]}>CARNET DE TRANSMISSION</Text>
-                  <Text style={[styles.documentIntroTitle, { color: colors.ivory }]}>Lire la plante avant de l’utiliser</Text>
-                </View>
-              </View>
-              <Text style={[styles.documentIntroText, { color: colors.mutedForeground }]}>
-                Ces repères accompagnent les fiches inspirées de l’ouvrage de Jean-Louis Pousset. Ils relient le geste traditionnel, l’observation et la prudence.
-              </Text>
-              <View style={styles.reperesList}>
-                {REPÈRES_PHARMACOPÉE.map((repere) => (
-                  <View key={repere.id} style={[styles.repereRow, { borderTopColor: colors.border }]}>
-                    <View style={[styles.repereDot, { backgroundColor: repere.couleur }]} />
-                    <View style={{ flex: 1 }}>
-                      <Text style={[styles.repereTitle, { color: repere.couleur }]}>{repere.titre}</Text>
-                      <Text style={[styles.repereText, { color: colors.ivory }]}>{repere.texte}</Text>
-                    </View>
-                  </View>
-                ))}
-              </View>
-              <Text style={[styles.documentSource, { color: colors.mutedForeground }]}>
-                Repères adaptés de Pousset, « Plantes médicinales africaines — Utilisation pratique », et de Sophie Lacoste, « Les plantes qui guérissent » (Repères-Santé)
-              </Text>
-            </View>
-          )}
           {filteredPlantes.length === 0 && (
             <View style={styles.emptyState}>
               <Text style={{ fontSize: 40 }}>🌿</Text>
