@@ -39,6 +39,41 @@ export interface PlanteMedicinale {
   source: string;
 }
 
+export interface ReperePharmacopee {
+  id: string;
+  titre: string;
+  texte: string;
+  couleur: string;
+}
+
+/**
+ * Repères de lecture tirés de l'introduction de l'ouvrage.
+ * Ils donnent le contexte et les limites du savoir avant les fiches pratiques.
+ */
+export const REPÈRES_PHARMACOPÉE: ReperePharmacopee[] = [
+  {
+    id: 'un-savoir-vivant',
+    titre: 'Un savoir vivant',
+    texte:
+      'Dans le Sahel, les plantes se reconnaissent dans leur milieu, se nomment dans les langues locales et se transmettent de génération en génération. Une fiche ne remplace pas la personne qui sait observer, identifier et accompagner.',
+    couleur: '#C8A020',
+  },
+  {
+    id: 'trois-preparations',
+    titre: 'Trois gestes de préparation',
+    texte:
+      'Décoction : faire bouillir les parties solides. Infusion : verser l’eau chaude sur les feuilles ou fleurs. Macération : laisser la plante dans l’eau froide le temps indiqué. La partie utilisée compte autant que la plante.',
+    couleur: '#6B9E5E',
+  },
+  {
+    id: 'prudence-avant-tout',
+    titre: 'La prudence avant tout',
+    texte:
+      'La récolte, la saison et la partie employée font varier l’action d’une plante. Le document écarte les espèces trop toxiques ou difficiles à préparer ; en cas de grossesse, maladie persistante ou traitement en cours, demander conseil à un professionnel de santé.',
+    couleur: '#D47A45',
+  },
+];
+
 export const PLANTES_MEDICINALES: PlanteMedicinale[] = [
   // ─── 1 ───────────────────────────────────────────────
   {

@@ -14,7 +14,12 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useColors } from '@/hooks/useColors';
 import { RECIPES, type Recipe } from '@/data/recipes';
 import { ARTICLES, type Article } from '@/data/articles';
-import { PLANTES_MEDICINALES, searchPlantes, type PlanteMedicinale } from '@/data/plantes-medicinales';
+import {
+  PLANTES_MEDICINALES,
+  REPÈRES_PHARMACOPÉE,
+  searchPlantes,
+  type PlanteMedicinale,
+} from '@/data/plantes-medicinales';
 
 type Tab = 'recettes' | 'articles' | 'plantes';
 
@@ -564,6 +569,37 @@ export default function SavoirScreen() {
           contentContainerStyle={[styles.listContent, { paddingBottom: 100 + insets.bottom }]}
           showsVerticalScrollIndicator={false}
         >
+          {/* La porte d'entrée éditoriale du document : contexte avant pratique */}
+          {!planteSearch.trim() && (
+            <View style={[styles.documentIntro, { backgroundColor: colors.card, borderColor: colors.gold + '55' }]}>
+              <View style={styles.documentIntroHeading}>
+                <View style={[styles.documentIntroMark, { backgroundColor: colors.gold + '22' }]}>
+                  <Text style={styles.documentIntroIcon}>✦</Text>
+                </View>
+                <View style={{ flex: 1 }}>
+                  <Text style={[styles.documentIntroKicker, { color: colors.gold }]}>CARNET DE TRANSMISSION</Text>
+                  <Text style={[styles.documentIntroTitle, { color: colors.ivory }]}>Lire la plante avant de l’utiliser</Text>
+                </View>
+              </View>
+              <Text style={[styles.documentIntroText, { color: colors.mutedForeground }]}>
+                Ces repères accompagnent les fiches inspirées de l’ouvrage de Jean-Louis Pousset. Ils relient le geste traditionnel, l’observation et la prudence.
+              </Text>
+              <View style={styles.reperesList}>
+                {REPÈRES_PHARMACOPÉE.map((repere) => (
+                  <View key={repere.id} style={[styles.repereRow, { borderTopColor: colors.border }]}>
+                    <View style={[styles.repereDot, { backgroundColor: repere.couleur }]} />
+                    <View style={{ flex: 1 }}>
+                      <Text style={[styles.repereTitle, { color: repere.couleur }]}>{repere.titre}</Text>
+                      <Text style={[styles.repereText, { color: colors.ivory }]}>{repere.texte}</Text>
+                    </View>
+                  </View>
+                ))}
+              </View>
+              <Text style={[styles.documentSource, { color: colors.mutedForeground }]}>
+                Repères adaptés de l’introduction · Pousset, « Plantes médicinales africaines — Utilisation pratique »
+              </Text>
+            </View>
+          )}
           {filteredPlantes.length === 0 && (
             <View style={styles.emptyState}>
               <Text style={{ fontSize: 40 }}>🌿</Text>
@@ -689,6 +725,21 @@ const styles = StyleSheet.create({
   /* Empty state */
   emptyState: { alignItems: 'center', paddingTop: 60, gap: 16 },
   emptyText: { fontSize: 14, textAlign: 'center', fontStyle: 'italic' },
+
+  /* Document introduction */
+  documentIntro: { borderRadius: 18, borderWidth: 1, padding: 16, gap: 14, marginBottom: 2 },
+  documentIntroHeading: { flexDirection: 'row', alignItems: 'center', gap: 12 },
+  documentIntroMark: { width: 42, height: 42, borderRadius: 14, alignItems: 'center', justifyContent: 'center' },
+  documentIntroIcon: { color: '#C8A020', fontSize: 22 },
+  documentIntroKicker: { fontSize: 9, fontWeight: '800', letterSpacing: 2 },
+  documentIntroTitle: { fontSize: 17, fontWeight: '800', lineHeight: 22, marginTop: 3 },
+  documentIntroText: { fontSize: 12, lineHeight: 19 },
+  reperesList: { gap: 0 },
+  repereRow: { flexDirection: 'row', alignItems: 'flex-start', gap: 10, borderTopWidth: 1, paddingTop: 12, paddingBottom: 2 },
+  repereDot: { width: 7, height: 7, borderRadius: 4, marginTop: 5 },
+  repereTitle: { fontSize: 12, fontWeight: '800', marginBottom: 3 },
+  repereText: { fontSize: 12, lineHeight: 18 },
+  documentSource: { fontSize: 10, lineHeight: 15, fontStyle: 'italic' },
 
   /* Back button */
   backBtn: { marginBottom: 12 },
