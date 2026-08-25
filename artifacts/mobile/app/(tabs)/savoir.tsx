@@ -621,7 +621,7 @@ export default function SavoirScreen() {
                 ))}
               </View>
               <Text style={[styles.documentSource, { color: colors.mutedForeground }]}>
-                Repères adaptés de l’introduction · Pousset, « Plantes médicinales africaines — Utilisation pratique »
+                Repères adaptés de Pousset, « Plantes médicinales africaines — Utilisation pratique », et de Sophie Lacoste, « Les plantes qui guérissent » (Repères-Santé)
               </Text>
             </View>
           )}

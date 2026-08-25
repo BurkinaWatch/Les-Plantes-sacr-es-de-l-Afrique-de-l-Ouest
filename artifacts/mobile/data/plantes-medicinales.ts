@@ -72,6 +72,13 @@ export const REPÈRES_PHARMACOPÉE: ReperePharmacopee[] = [
       'La récolte, la saison et la partie employée font varier l’action d’une plante. Le document écarte les espèces trop toxiques ou difficiles à préparer ; en cas de grossesse, maladie persistante ou traitement en cours, demander conseil à un professionnel de santé.',
     couleur: '#D47A45',
   },
+  {
+    id: 'de-la-cueillette-au-soin',
+    titre: 'De la cueillette au soin',
+    texte:
+      'Identifier avec certitude, choisir un endroit préservé, récolter au bon moment puis sécher et conserver à l’abri de l’humidité : la qualité du geste compte avant même la préparation. Une plante mal identifiée ou mal conservée peut devenir dangereuse.',
+    couleur: '#8B6914',
+  },
 ];
 
 export const PLANTES_MEDICINALES: PlanteMedicinale[] = [
