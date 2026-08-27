@@ -1,5 +1,6 @@
 import { BlurView } from "expo-blur";
 import { Tabs } from "expo-router";
+import { Feather, MaterialCommunityIcons } from "@expo/vector-icons";
 import React from "react";
 import { Platform, StyleSheet, View, useColorScheme } from "react-native";
 
@@ -9,14 +10,6 @@ import { useTranslation } from "@/i18n";
 let SymbolView: any = null;
 try {
   SymbolView = require("expo-symbols").SymbolView;
-} catch {}
-
-let MaterialCommunityIcons: any = null;
-let Feather: any = null;
-try {
-  const icons = require("@expo/vector-icons");
-  MaterialCommunityIcons = icons.MaterialCommunityIcons;
-  Feather = icons.Feather;
 } catch {}
 
 export default function TabLayout() {
@@ -37,19 +30,16 @@ export default function TabLayout() {
       if (isIOS && SymbolView) {
         return <SymbolView name={sfName} tintColor={color} size={size} />;
       }
-      if (androidIconSet === "mci" && MaterialCommunityIcons) {
+      if (androidIconSet === "mci") {
         return (
           <MaterialCommunityIcons
-            name={androidIcon}
+            name={androidIcon as any}
             size={size}
             color={color}
           />
         );
       }
-      if (Feather) {
-        return <Feather name={androidIcon} size={size} color={color} />;
-      }
-      return null;
+      return <Feather name={androidIcon as any} size={size} color={color} />;
     };
 
   return (

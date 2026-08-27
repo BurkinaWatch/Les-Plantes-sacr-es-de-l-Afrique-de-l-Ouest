@@ -2,6 +2,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import * as Font from "expo-font";
 import { Stack, useRouter, useSegments } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
+import { Feather } from "@expo/vector-icons";
 import React, { useEffect, useRef, useState } from "react";
 import {
   Animated,
@@ -21,9 +22,6 @@ import { AuthProvider, useAuth } from "@/context/AuthContext";
 import { useColors } from "@/hooks/useColors";
 import { LanguageProvider } from "@/i18n";
 import { useNotifications } from "@/hooks/useNotifications";
-
-let Feather: any = null;
-try { Feather = require("@expo/vector-icons").Feather; } catch {}
 
 // Suppress fontfaceobserver timeout errors on web (known Expo Web / vector-icons issue)
 if (Platform.OS === "web" && typeof window !== "undefined") {

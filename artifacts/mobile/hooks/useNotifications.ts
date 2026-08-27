@@ -9,6 +9,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { Platform } from 'react-native';
 import * as Notifications from 'expo-notifications';
+import Constants, { AppOwnership, ExecutionEnvironment } from 'expo-constants';
 
 // How delivered notifications appear while the app is in the foreground
 Notifications.setNotificationHandler({
@@ -37,7 +38,13 @@ export function useNotifications(): UseNotificationsReturn {
 
   useEffect(() => {
     // Notifications are not supported on web
-    if (Platform.OS === 'web') {
+    // Expo Go no longer supports remote push notifications. Local
+    // notifications remain available, so only skip the remote-token setup.
+    const isExpoGo =
+      Constants.appOwnership === AppOwnership.Expo ||
+      Constants.executionEnvironment === ExecutionEnvironment.StoreClient;
+
+    if (Platform.OS === 'web' || isExpoGo) {
       setPushToken(null);
       return;
     }
@@ -77,9 +84,13 @@ export function useNotifications(): UseNotificationsReturn {
 
         // Retrieve the Expo push token (requires a physical device or simulator with push support)
         try {
-          const tokenData = await Notifications.getExpoPushTokenAsync({
-            projectId: 'ed9dd362-3b1f-4207-9a47-48059ecaf683',
-          });
+          const projectId = Constants.expoConfig?.extra?.eas?.projectId;
+          if (!projectId) {
+            if (!cancelled) setPushToken(null);
+            return;
+          }
+
+          const tokenData = await Notifications.getExpoPushTokenAsync({ projectId });
           if (!cancelled) setPushToken(tokenData.data);
         } catch {
           // Simulators and Expo Go on some platforms don't support remote push tokens
