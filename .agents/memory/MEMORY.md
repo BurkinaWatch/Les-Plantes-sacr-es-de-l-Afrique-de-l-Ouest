@@ -3,3 +3,4 @@
 - [Expo Replit config](expo-replit-config.md) — REACT_NATIVE_PACKAGER_HOSTNAME must be $REPLIT_EXPO_DEV_DOMAIN; Google Fonts timeout fix; metro.config.js CORS setup
 - [Plant dataset](plant-dataset.md) — adding plants to animals.ts; image key MUST equal id; field misspelled `symboliqueSpirirtuelle`; pre-existing tsc errors unrelated
 - [AI services config](ai-services-config.md) — totem chat + plant recognition use Groq; lazy-init client or api-server crashes at startup; both auth-protected via x-api-key/CHAT_API_KEY
+- [Package firewall compatibility](package-firewall.md) — Replit package installs may reject an older transitive tar release; use a latest-compatible pnpm override when needed
