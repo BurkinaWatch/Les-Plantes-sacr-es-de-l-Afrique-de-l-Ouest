@@ -14,18 +14,18 @@ import {
 } from 'react-native';
 import PLANT_IMAGES from '@/constants/plantImages';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { Feather } from '@expo/vector-icons';
 
 import { useApp } from '@/context/AppContext';
+import { SacredIcon, iconForCategory, type SacredIconName } from '@/components/SacredIcon';
 import { getPlanteById } from '@/data/animals';
 import type { Element } from '@/data/animals';
 import { useColors } from '@/hooks/useColors';
 
-const ELEMENT_ICONS: Record<Element, string> = {
-  Feu: '🔥',
-  Eau: '💧',
-  Terre: '🌿',
-  Air: '💨',
+const ELEMENT_ICONS: Record<Element, SacredIconName> = {
+  Feu: 'flame',
+  Eau: 'water',
+  Terre: 'leaf',
+  Air: 'wind',
 };
 
 const ELEMENT_COLORS: Record<Element, string> = {
@@ -33,15 +33,6 @@ const ELEMENT_COLORS: Record<Element, string> = {
   Eau: '#2E7DB5',
   Terre: '#5C7A3E',
   Air: '#7A9EC0',
-};
-
-const CATEGORY_ICONS: Record<string, string> = {
-  'Arbres Sacrés': '🌳',
-  'Plantes Médicinales': '🌿',
-  'Plantes Alimentaires': '🫘',
-  'Plantes Rituelles': '✦',
-  'Herbes & Graminées': '🌾',
-  'Palmiers': '🌴',
 };
 
 function Section({ label, color }: { label: string; color: string }) {
@@ -69,7 +60,10 @@ export default function PlanteDetailScreen() {
       <View style={[styles.notFound, { backgroundColor: colors.background }]}>
         <Text style={[styles.notFoundText, { color: colors.ivory }]}>Plante introuvable</Text>
         <Pressable onPress={() => router.back()}>
-          <Text style={[styles.backLink, { color: colors.gold }]}>← Retour</Text>
+         <View style={styles.backLinkRow}>
+           <SacredIcon name="arrow-left" size={17} color={colors.gold} />
+           <Text style={[styles.backLink, { color: colors.gold }]}>Retour</Text>
+         </View>
         </Pressable>
       </View>
     );
@@ -77,7 +71,7 @@ export default function PlanteDetailScreen() {
 
   const fav = isFavorite(plante.id);
   const elemColor = ELEMENT_COLORS[plante.element];
-  const categoryIcon = CATEGORY_ICONS[plante.categorie] ?? '🌿';
+  const categoryIcon = iconForCategory(plante.categorie);
 
   function handleFavorite() {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
@@ -107,7 +101,7 @@ export default function PlanteDetailScreen() {
               style={({ pressed }) => [styles.navBtn, { backgroundColor: 'rgba(0,0,0,0.3)', opacity: pressed ? 0.7 : 1 }]}
               onPress={() => router.back()}
             >
-              <Feather name="arrow-left" size={20} color="#FFFFFF" />
+              <SacredIcon name="arrow-left" size={20} color="#FFFFFF" />
             </Pressable>
             <Pressable
               style={({ pressed }) => [
@@ -116,7 +110,7 @@ export default function PlanteDetailScreen() {
               ]}
               onPress={handleFavorite}
             >
-              <Feather name="heart" size={20} color={fav ? colors.deepBrown : '#FFFFFF'} />
+              <SacredIcon name="heart" size={20} color={fav ? colors.deepBrown : '#FFFFFF'} />
             </Pressable>
           </View>
 
@@ -130,7 +124,7 @@ export default function PlanteDetailScreen() {
             ) : (
               <View style={styles.phInner}>
                 <View style={[styles.phCircle, { borderColor: 'rgba(255,255,255,0.3)' }]} />
-                <Text style={styles.phIcon}>{categoryIcon}</Text>
+                <SacredIcon name={categoryIcon} size={80} color="rgba(255,255,255,0.85)" />
               </View>
             )}
           </View>
@@ -199,7 +193,7 @@ export default function PlanteDetailScreen() {
           colors={[elemColor + '30', colors.card]}
           style={[styles.elementCard, { borderColor: elemColor + '60' }]}
         >
-          <Text style={styles.elementIcon}>{ELEMENT_ICONS[plante.element]}</Text>
+          <SacredIcon name={ELEMENT_ICONS[plante.element]} size={38} color={elemColor} accessibilityLabel={plante.element} />
           <View style={{ flex: 1 }}>
             <Text style={[styles.elementLabel, { color: elemColor }]}>ÉLÉMENT ASSOCIÉ</Text>
             <Text style={[styles.elementName, { color: colors.ivory }]}>{plante.element}</Text>
@@ -223,7 +217,7 @@ export default function PlanteDetailScreen() {
                 <Text style={[styles.subSectionLabel, { color: colors.mutedForeground }]}>USAGES TRADITIONNELS</Text>
                 {plante.usagesTraditionnels.map((u, i) => (
                   <View key={i} style={styles.usageItem}>
-                    <Text style={[styles.usageDot, { color: '#5C7A3E' }]}>◦</Text>
+                    <SacredIcon name="circle" size={9} color="#5C7A3E" />
                     <Text style={[styles.usageText, { color: colors.ivory }]}>{u}</Text>
                   </View>
                 ))}
@@ -307,9 +301,7 @@ export default function PlanteDetailScreen() {
           <Section label="LÉGENDES TRADITIONNELLES" color={colors.gold} />
           {plante.legendes.map((l, i) => (
             <View key={i} style={styles.legendeItem}>
-              <Text style={[styles.legendeNum, { color: plante.couleur }]}>
-                {i === 0 ? '◈' : '◇'}
-              </Text>
+                <SacredIcon name={i === 0 ? 'sparkles' : 'circle'} size={18} color={plante.couleur} />
               <Text style={[styles.legendeText, { color: colors.ivory }]}>{l}</Text>
             </View>
           ))}
@@ -331,7 +323,7 @@ export default function PlanteDetailScreen() {
           <Section label="CONSEILS DE VIE" color={colors.terracotta} />
           {plante.conseilsDeVie.map((c, i) => (
             <View key={i} style={styles.conseilItem}>
-              <Text style={[styles.conseilBullet, { color: colors.terracotta }]}>✦</Text>
+              <SacredIcon name="sparkles" size={15} color={colors.terracotta} />
               <Text style={[styles.conseilText, { color: colors.ivory }]}>{c}</Text>
             </View>
           ))}
@@ -360,7 +352,7 @@ export default function PlanteDetailScreen() {
           onPress={handleFavorite}
         >
           <View style={[styles.favBtn, { backgroundColor: fav ? colors.gold + '20' : colors.card, borderColor: fav ? colors.gold : colors.border }]}>
-            <Feather name="heart" size={18} color={fav ? colors.gold : colors.mutedForeground} />
+            <SacredIcon name="heart" size={18} color={fav ? colors.gold : colors.mutedForeground} />
             <Text style={[styles.favBtnText, { color: fav ? colors.gold : colors.mutedForeground }]}>
               {fav ? 'Retirer des favoris' : 'Ajouter aux favoris'}
             </Text>
@@ -376,6 +368,7 @@ const styles = StyleSheet.create({
   notFound: { flex: 1, alignItems: 'center', justifyContent: 'center', gap: 16 },
   notFoundText: { fontSize: 18, fontWeight: '600' as const },
   backLink: { fontSize: 16, fontWeight: '600' as const },
+  backLinkRow: { flexDirection: 'row', alignItems: 'center', gap: 7 },
 
   heroWrap: { overflow: 'hidden' },
   heroGrad: { paddingHorizontal: 20, paddingBottom: 0, overflow: 'hidden', position: 'relative', minHeight: 380 },

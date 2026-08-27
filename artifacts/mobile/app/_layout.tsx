@@ -17,6 +17,7 @@ import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { SafeAreaProvider, useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { ErrorBoundary } from "@/components/ErrorBoundary";
+import { SacredIcon } from "@/components/SacredIcon";
 import { AppProvider } from "@/context/AppContext";
 import { AuthProvider, useAuth } from "@/context/AuthContext";
 import { useColors } from "@/hooks/useColors";
@@ -110,7 +111,7 @@ function AnimatedSplash({ onFinish }: { onFinish: () => void }) {
       {/* Motif de fond */}
       <View style={[styles.bgPattern, { pointerEvents: 'none' }]}>
         {Array.from({ length: 24 }).map((_, i) => (
-          <Text
+          <View
             key={i}
             style={[
               styles.patternSymbol,
@@ -120,8 +121,8 @@ function AnimatedSplash({ onFinish }: { onFinish: () => void }) {
               },
             ]}
           >
-            ✦
-          </Text>
+            <SacredIcon name="sparkles" size={36} color="#C8A020" />
+          </View>
         ))}
       </View>
 
@@ -130,7 +131,11 @@ function AnimatedSplash({ onFinish }: { onFinish: () => void }) {
 
       {/* Titre */}
       <Animated.View style={[styles.titleBlock, { opacity: titleOpacity }]}>
-        <Text style={styles.titleSmall}>✦  LES PLANTES SACRÉES  ✦</Text>
+        <View style={styles.titleSmallRow}>
+          <SacredIcon name="sparkles" size={14} color="#C8A020" />
+          <Text style={styles.titleSmall}>LES PLANTES SACRÉES</Text>
+          <SacredIcon name="sparkles" size={14} color="#C8A020" />
+        </View>
         <Text style={styles.titleBig}>D'AFRIQUE</Text>
         <Text style={styles.titleMid}>DE L'OUEST</Text>
       </Animated.View>
@@ -238,11 +243,7 @@ function ScannerFab() {
           accessibilityLabel="Scanner une plante"
           accessibilityRole="button"
         >
-          {Feather ? (
-            <Feather name="camera" size={26} color={colors.background} />
-          ) : (
-            <Text style={{ fontSize: 22 }}>📷</Text>
-          )}
+          <SacredIcon name="camera" size={26} color={colors.background} />
         </Pressable>
       </Animated.View>
     </View>
@@ -396,8 +397,6 @@ const styles = StyleSheet.create({
   },
   patternSymbol: {
     position: "absolute",
-    fontSize: 36,
-    color: "#C8A020",
     opacity: 0.07,
   },
   logoGlow: {
@@ -430,6 +429,11 @@ const styles = StyleSheet.create({
     fontWeight: "800",
     marginBottom: 8,
     textAlign: "center",
+  },
+  titleSmallRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
   },
   titleBig: {
     fontSize: 46,

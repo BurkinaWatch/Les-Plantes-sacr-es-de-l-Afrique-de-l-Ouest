@@ -725,6 +725,7 @@ const styles = StyleSheet.create({
 
   /* Header */
   header: { paddingHorizontal: 24, paddingBottom: 12, gap: 4 },
+  headerLabelRow: { flexDirection: 'row', alignItems: 'center', gap: 7 },
   headerLabel: { fontSize: 10, fontWeight: '700', letterSpacing: 2.5, marginBottom: 4 },
   headerTitle: { fontSize: 30, fontWeight: '800', letterSpacing: 0.5 },
   headerSub: { fontSize: 12, marginTop: 2, marginBottom: 10 },
@@ -735,6 +736,7 @@ const styles = StyleSheet.create({
     padding: 3, marginTop: 8, gap: 3,
   },
   segmentBtn: { flex: 1, paddingVertical: 9, borderRadius: 9, alignItems: 'center' },
+  segmentContent: { flexDirection: 'row', alignItems: 'center', gap: 5 },
   segmentText: { fontSize: 11, fontWeight: '700', letterSpacing: 0.3 },
 
   /* Search */
@@ -800,6 +802,7 @@ const styles = StyleSheet.create({
 
   /* Back button */
   backBtn: { marginBottom: 12 },
+  backBtnRow: { flexDirection: 'row', alignItems: 'center', gap: 7 },
   backBtnText: { fontSize: 14, fontWeight: '700', letterSpacing: 0.5 },
 
   /* Reading */
@@ -825,6 +828,7 @@ const styles = StyleSheet.create({
   recipeHeroTitle: { fontSize: 22, fontWeight: '800', lineHeight: 28, marginTop: 4 },
   recipeHeroPlante: { fontSize: 12, fontWeight: '600', fontStyle: 'italic' },
   recipeMetaRow: { flexDirection: 'row', gap: 8, flexWrap: 'wrap' },
+  metaInline: { flexDirection: 'row', alignItems: 'center', gap: 5 },
   metaChip: { paddingHorizontal: 10, paddingVertical: 5, borderRadius: 10 },
   metaChipText: { fontSize: 11, fontWeight: '600' },
   catBadge: { paddingHorizontal: 10, paddingVertical: 4, borderRadius: 10, borderWidth: 1 },

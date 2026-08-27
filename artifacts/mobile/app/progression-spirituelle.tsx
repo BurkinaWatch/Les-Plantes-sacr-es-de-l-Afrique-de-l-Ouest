@@ -11,9 +11,9 @@ import {
   View,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { Feather } from '@expo/vector-icons';
 
 import { useApp } from '@/context/AppContext';
+import { SacredIcon, type SacredIconName } from '@/components/SacredIcon';
 import { TOTEM_RESULTS } from '@/data/quiz';
 import { getPlanteById } from '@/data/animals';
 import { useColors } from '@/hooks/useColors';
@@ -32,12 +32,12 @@ interface ChatSession {
   preview: string;
 }
 
-const DIMENSION_META: Record<string, { label: string; desc: string; icon: string }> = {
-  E: { label: 'Leadership', desc: 'Énergie sociale & influence', icon: '◈' },
-  O: { label: 'Intuition', desc: 'Ouverture spirituelle', icon: '◎' },
-  C: { label: 'Endurance', desc: 'Discipline & persévérance', icon: '◆' },
-  A: { label: 'Communauté', desc: 'Soutien & ancêtres', icon: '◇' },
-  S: { label: 'Transformation', desc: 'Stabilité en crise', icon: '△' },
+const DIMENSION_META: Record<string, { label: string; desc: string; icon: SacredIconName }> = {
+  E: { label: 'Leadership', desc: 'Énergie sociale & influence', icon: 'sun' },
+  O: { label: 'Intuition', desc: 'Ouverture spirituelle', icon: 'compass' },
+  C: { label: 'Endurance', desc: 'Discipline & persévérance', icon: 'target' },
+  A: { label: 'Communauté', desc: 'Soutien & ancêtres', icon: 'heart' },
+  S: { label: 'Transformation', desc: 'Stabilité en crise', icon: 'sparkles' },
 };
 
 const SPIRITUAL_KEYWORDS: Record<string, string[]> = {
@@ -153,9 +153,12 @@ export default function ProgressionSpirituelleScreen() {
       <View style={[styles.container, { backgroundColor: colors.background }]}>
         <View style={[styles.emptyWrap, { paddingTop: topPad + 24 }]}>
           <Pressable onPress={() => router.back()} style={styles.backBtn}>
-            <Feather name="arrow-left" size={20} color={colors.gold} />
+            <SacredIcon name="arrow-left" size={20} color={colors.gold} />
           </Pressable>
-          <Text style={[styles.emptyTitle, { color: colors.ivory }]}>✦ Totem non révélé</Text>
+          <View style={styles.titleIconRow}>
+            <SacredIcon name="sparkles" size={20} color={colors.gold} />
+            <Text style={[styles.emptyTitle, { color: colors.ivory }]}>Totem non révélé</Text>
+          </View>
           <Text style={[styles.emptyDesc, { color: colors.mutedForeground }]}>
             Complète le quiz sacré pour débloquer ta progression spirituelle.
           </Text>
@@ -182,10 +185,14 @@ export default function ProgressionSpirituelleScreen() {
             style={({ pressed }) => [styles.iconBtn, { borderColor: totemColor + '60', opacity: pressed ? 0.7 : 1 }]}
             onPress={() => router.back()}
           >
-            <Feather name="arrow-left" size={18} color={totemColor} />
+            <SacredIcon name="arrow-left" size={18} color={totemColor} />
           </Pressable>
           <View style={styles.headerCenter}>
-            <Text style={[styles.headerSup, { color: totemColor + '90' }]}>✦ PROGRESSION SPIRITUELLE ✦</Text>
+            <View style={styles.headerSupRow}>
+              <SacredIcon name="sparkles" size={12} color={totemColor + '90'} />
+              <Text style={[styles.headerSup, { color: totemColor + '90' }]}>PROGRESSION SPIRITUELLE</Text>
+              <SacredIcon name="sparkles" size={12} color={totemColor + '90'} />
+            </View>
             <Text style={[styles.headerName, { color: colors.ivory }]}>{totem.nom}</Text>
             <Text style={[styles.headerSub, { color: colors.mutedForeground }]}>
               {plante.element} · Niveau {plante.niveauSpirituel}/5
@@ -194,8 +201,8 @@ export default function ProgressionSpirituelleScreen() {
           <View style={[styles.iconBtn, { borderColor: 'transparent' }]} />
         </View>
         <View style={[styles.adinkraRow]}>
-          {['◆', '▲', '◇', '△', '●', '○', '✦', '✧'].map((s, i) => (
-            <Text key={i} style={[styles.adinkraChar, { color: totemColor + '60' }]}>{s}</Text>
+          {(['sparkles', 'sun', 'circle', 'compass', 'star', 'circle', 'leaf', 'flower'] as SacredIconName[]).map((name, i) => (
+            <SacredIcon key={i} name={name} size={12} color={totemColor + '60'} />
           ))}
         </View>
       </LinearGradient>
@@ -223,7 +230,10 @@ export default function ProgressionSpirituelleScreen() {
 
         {stats && (
           <View style={[styles.firstContactCard, { backgroundColor: colors.card, borderColor: colors.border, borderLeftColor: totemColor }]}>
-            <Text style={[styles.firstContactLabel, { color: colors.mutedForeground }]}>◆ Premier dialogue</Text>
+            <View style={styles.metaInline}>
+              <SacredIcon name="circle" size={9} color={colors.mutedForeground} />
+              <Text style={[styles.firstContactLabel, { color: colors.mutedForeground }]}>Premier dialogue</Text>
+            </View>
             <Text style={[styles.firstContactDate, { color: colors.ivory }]}>
               {formatDateFull(stats.firstSession.startedAt)}
             </Text>
@@ -244,7 +254,7 @@ export default function ProgressionSpirituelleScreen() {
             return (
               <View key={dim} style={styles.dimRow}>
                 <View style={styles.dimLabelCol}>
-                  <Text style={[styles.dimIcon, { color: totemColor }]}>{meta.icon}</Text>
+                  <SacredIcon name={meta.icon} size={18} color={totemColor} />
                   <View>
                     <Text style={[styles.dimLabel, { color: colors.ivory }]}>{meta.label}</Text>
                     <Text style={[styles.dimDesc, { color: colors.mutedForeground }]}>{meta.desc}</Text>
@@ -345,7 +355,7 @@ export default function ProgressionSpirituelleScreen() {
         {/* ── EMPTY STATE ── */}
         {sessions.length === 0 && !loading && (
           <View style={[styles.emptyChat, { borderColor: totemColor + '30', backgroundColor: totemColor + '0A' }]}>
-            <Text style={[styles.emptyChatIcon, { color: totemColor }]}>✦</Text>
+            <SacredIcon name="sparkles" size={38} color={totemColor} accessibilityLabel="Ton parcours commence ici" />
             <Text style={[styles.emptyChatTitle, { color: colors.ivory }]}>
               Ton parcours commence ici
             </Text>
@@ -362,7 +372,7 @@ export default function ProgressionSpirituelleScreen() {
                 end={{ x: 1, y: 0 }}
                 style={styles.emptyChatBtn}
               >
-                <Feather name="message-circle" size={15} color={colors.deepBrown} />
+                <SacredIcon name="message" size={15} color={colors.deepBrown} />
                 <Text style={[styles.emptyChatBtnText, { color: colors.deepBrown }]}>
                   Ouvrir le dialogue
                 </Text>
@@ -391,13 +401,15 @@ export default function ProgressionSpirituelleScreen() {
                         backgroundColor: isPrimary ? t.couleur : t.couleur + '40',
                         borderColor: t.couleur,
                       }]} />
-                      <Text style={[
-                        styles.affinityName,
-                        { color: isPrimary ? colors.ivory : colors.mutedForeground, fontWeight: isPrimary ? '700' : '400' },
-                      ]}>
-                        {t.nom}
-                        {isPrimary ? ' ✦' : ''}
-                      </Text>
+                      <View style={styles.affinityNameRow}>
+                        <Text style={[
+                          styles.affinityName,
+                          { color: isPrimary ? colors.ivory : colors.mutedForeground, fontWeight: isPrimary ? '700' : '400' },
+                        ]}>
+                          {t.nom}
+                        </Text>
+                        {isPrimary && <SacredIcon name="sparkles" size={11} color={t.couleur} />}
+                      </View>
                       <View style={styles.affinityBarWrap}>
                         <View style={[styles.affinityBarTrack, { backgroundColor: colors.midBrown }]}>
                           <View
@@ -429,7 +441,11 @@ function SectionTitle({ title, color }: { title: string; color: string }) {
   return (
     <View style={styles.sectionTitleRow}>
       <View style={[styles.sectionLine, { backgroundColor: color + '60' }]} />
-      <Text style={[styles.sectionTitle, { color }]}>◆ {title.toUpperCase()} ◆</Text>
+      <View style={styles.sectionTitleContent}>
+        <SacredIcon name="sparkles" size={11} color={color} />
+        <Text style={[styles.sectionTitle, { color }]}>{title.toUpperCase()}</Text>
+        <SacredIcon name="sparkles" size={11} color={color} />
+      </View>
       <View style={[styles.sectionLine, { backgroundColor: color + '60' }]} />
     </View>
   );
@@ -440,6 +456,7 @@ const styles = StyleSheet.create({
 
   emptyWrap: { flex: 1, padding: 28, gap: 16 },
   backBtn: { marginBottom: 20 },
+  titleIconRow: { flexDirection: 'row', alignItems: 'center', gap: 10 },
   emptyTitle: { fontSize: 26, fontWeight: '800' },
   emptyDesc: { fontSize: 15, lineHeight: 24 },
   emptyBtn: { padding: 16, borderRadius: 14, alignItems: 'center', marginTop: 8 },
@@ -448,12 +465,12 @@ const styles = StyleSheet.create({
   header: { paddingBottom: 0 },
   headerRow: { flexDirection: 'row', alignItems: 'center', gap: 12, paddingHorizontal: 14, paddingVertical: 12 },
   headerCenter: { flex: 1, alignItems: 'center' },
+  headerSupRow: { flexDirection: 'row', alignItems: 'center', gap: 6 },
   headerSup: { fontSize: 9, fontWeight: '800', letterSpacing: 2.5, marginBottom: 2 },
   headerName: { fontSize: 20, fontWeight: '800', letterSpacing: 0.5 },
   headerSub: { fontSize: 11, marginTop: 2 },
   iconBtn: { width: 36, height: 36, borderRadius: 18, borderWidth: 1, alignItems: 'center', justifyContent: 'center' },
   adinkraRow: { flexDirection: 'row', justifyContent: 'space-around', paddingVertical: 6, paddingHorizontal: 8 },
-  adinkraChar: { fontSize: 11, fontWeight: '700' },
 
   scroll: { flex: 1 },
   scrollContent: { padding: 16, gap: 0 },
@@ -483,7 +500,6 @@ const styles = StyleSheet.create({
 
   dimRow: { gap: 8 },
   dimLabelCol: { flexDirection: 'row', alignItems: 'center', gap: 10 },
-  dimIcon: { fontSize: 16, width: 20, textAlign: 'center' },
   dimLabel: { fontSize: 13, fontWeight: '700' },
   dimDesc: { fontSize: 11 },
   dimBarWrap: { flexDirection: 'row', alignItems: 'center', gap: 8 },
@@ -512,7 +528,6 @@ const styles = StyleSheet.create({
     borderRadius: 16, borderWidth: 1,
     padding: 28, alignItems: 'center', gap: 12, marginTop: 8,
   },
-  emptyChatIcon: { fontSize: 36 },
   emptyChatTitle: { fontSize: 18, fontWeight: '700', textAlign: 'center' },
   emptyChatDesc: { fontSize: 14, textAlign: 'center', lineHeight: 22 },
   emptyChatBtn: {
@@ -523,9 +538,12 @@ const styles = StyleSheet.create({
 
   affinityRow: { flexDirection: 'row', alignItems: 'center', gap: 10 },
   affinityDot: { width: 8, height: 8, borderRadius: 4, borderWidth: 1 },
-  affinityName: { fontSize: 13, width: 90 },
+  affinityNameRow: { width: 90, flexDirection: 'row', alignItems: 'center', gap: 4 },
+  affinityName: { fontSize: 13 },
   affinityBarWrap: { flex: 1, flexDirection: 'row', alignItems: 'center', gap: 8 },
   affinityBarTrack: { flex: 1, height: 5, borderRadius: 3, overflow: 'hidden' },
   affinityBarFill: { height: '100%', borderRadius: 3 },
   affinityScore: { fontSize: 11, fontWeight: '700', width: 36, textAlign: 'right' },
+  metaInline: { flexDirection: 'row', alignItems: 'center', gap: 6 },
+  sectionTitleContent: { flexDirection: 'row', alignItems: 'center', gap: 6 },
 });

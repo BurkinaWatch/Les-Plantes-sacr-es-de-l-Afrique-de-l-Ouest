@@ -9,7 +9,6 @@ import {
   Text,
   View,
 } from 'react-native';
-import { Feather } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { SacredIcon } from '@/components/SacredIcon';
