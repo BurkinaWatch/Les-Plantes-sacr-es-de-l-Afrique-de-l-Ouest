@@ -15,11 +15,12 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { useApp } from '@/context/AppContext';
 import { QUIZ_QUESTIONS, TOTEM_RESULTS, calculateTotem, type LikertValue, type QuizAnswers } from '@/data/quiz';
+import { SacredIcon, type SacredIconName } from '@/components/SacredIcon';
 import { useColors } from '@/hooks/useColors';
 import { useTranslation } from '@/i18n';
 
-const DIM_ICONS: Record<string, string> = {
-  E: '☀', O: '◎', C: '⬟', A: '◈', S: '∞',
+const DIM_ICONS: Record<string, SacredIconName> = {
+  E: 'sun', O: 'compass', C: 'target', A: 'heart', S: 'sparkles',
 };
 
 const LIKERT_VALUES: LikertValue[] = [1, 2, 3, 4, 5];
@@ -109,12 +110,12 @@ export default function QuizScreen() {
 
         <View style={{ padding: 24, gap: 16 }}>
           {[
-            { icon: '◈', title: t.quiz_feat1_title, desc: t.quiz_feat1_desc },
-            { icon: '◇', title: t.quiz_feat2_title, desc: t.quiz_feat2_desc },
-            { icon: '◉', title: t.quiz_feat3_title, desc: t.quiz_feat3_desc },
+             { icon: 'sparkles' as SacredIconName, title: t.quiz_feat1_title, desc: t.quiz_feat1_desc },
+             { icon: 'leaf' as SacredIconName, title: t.quiz_feat2_title, desc: t.quiz_feat2_desc },
+             { icon: 'compass' as SacredIconName, title: t.quiz_feat3_title, desc: t.quiz_feat3_desc },
           ].map((item) => (
             <View key={item.title} style={[styles.featureItem, { backgroundColor: colors.card, borderColor: colors.border }]}>
-              <Text style={[styles.featureIcon, { color: colors.gold }]}>{item.icon}</Text>
+              <SacredIcon name={item.icon} size={24} color={colors.gold} accessibilityLabel={item.title} />
               <View style={{ flex: 1 }}>
                 <Text style={[styles.featureTitle, { color: colors.ivory }]}>{item.title}</Text>
                 <Text style={[styles.featureDesc, { color: colors.mutedForeground }]}>{item.desc}</Text>
@@ -155,7 +156,7 @@ export default function QuizScreen() {
           colors={[colors.deepBrown, '#1A0E08']}
           style={[styles.charteHero, { paddingTop: topPad + 24 }]}
         >
-          <Text style={[styles.charteIcon, { color: colors.gold }]}>◎</Text>
+          <SacredIcon name="compass" size={38} color={colors.gold} accessibilityLabel={t.quiz_charte_title} />
           <Text style={[styles.charteTitle, { color: colors.ivory }]}>{t.quiz_charte_title}</Text>
           <Text style={[styles.charteSubtitle, { color: colors.mutedForeground }]}>{t.quiz_charte_subtitle}</Text>
         </LinearGradient>
@@ -188,7 +189,7 @@ export default function QuizScreen() {
             <Text style={[styles.charteCardTitle, { color: colors.gold }]}>{t.quiz_charte_cultural_label}</Text>
             {t.quiz_charte_cultural_items.map((ref, i) => (
               <View key={i} style={styles.refRow}>
-                <Text style={[styles.refDot, { color: colors.gold }]}>◦</Text>
+                <SacredIcon name="circle" size={10} color={colors.gold} />
                 <Text style={[styles.refText, { color: colors.mutedForeground }]}>{ref}</Text>
               </View>
             ))}
@@ -198,7 +199,7 @@ export default function QuizScreen() {
             <Text style={[styles.charteCardTitle, { color: colors.terracotta }]}>{t.quiz_charte_limits_label}</Text>
             {t.quiz_charte_limits_items.map((limit, i) => (
               <View key={i} style={styles.refRow}>
-                <Text style={[styles.refDot, { color: colors.terracotta }]}>!</Text>
+                <SacredIcon name="alert" size={16} color={colors.terracotta} />
                 <Text style={[styles.refText, { color: colors.ivory }]}>{limit}</Text>
               </View>
             ))}
@@ -336,7 +337,10 @@ export default function QuizScreen() {
             {currentQ + 1} / {QUIZ_QUESTIONS.length}
           </Text>
           <View style={[styles.dimPill, { backgroundColor: colors.gold + '20', borderColor: colors.gold + '30' }]}>
-            <Text style={[styles.dimPillText, { color: colors.gold }]}>{dimInfo.icon} {dimInfo.label}</Text>
+            <View style={styles.dimPillContent}>
+              <SacredIcon name={dimInfo.icon} size={14} color={colors.gold} />
+              <Text style={[styles.dimPillText, { color: colors.gold }]}>{dimInfo.label}</Text>
+            </View>
           </View>
         </View>
         <View style={[styles.progressTrack, { backgroundColor: colors.card }]}>
@@ -471,6 +475,7 @@ const styles = StyleSheet.create({
   quizHeaderRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 },
   quizCounter: { fontSize: 13, fontWeight: '500' as const, letterSpacing: 0.5 },
   dimPill: { paddingHorizontal: 10, paddingVertical: 4, borderRadius: 20, borderWidth: 1 },
+  dimPillContent: { flexDirection: 'row', alignItems: 'center', gap: 5 },
   dimPillText: { fontSize: 11, fontWeight: '700' as const, letterSpacing: 0.5 },
   progressTrack: { height: 4, borderRadius: 2, overflow: 'hidden' },
   progressFill: { height: '100%', borderRadius: 2 },

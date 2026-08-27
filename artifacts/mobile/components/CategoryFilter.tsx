@@ -3,6 +3,7 @@ import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 
 import type { PlanteCategorie } from '@/data/animals';
 import { CATEGORIES } from '@/data/animals';
+import { SacredIcon, iconForCategory } from '@/components/SacredIcon';
 import { useColors } from '@/hooks/useColors';
 import { useTranslation } from '@/i18n';
 
@@ -10,16 +11,6 @@ interface Props {
   selected: PlanteCategorie | null;
   onSelect: (cat: PlanteCategorie | null) => void;
 }
-
-const ICONS: Record<PlanteCategorie | 'all', string> = {
-  all: '✦',
-  'Arbres Sacrés': '🌳',
-  'Plantes Médicinales': '🌿',
-  'Plantes Alimentaires': '🫘',
-  'Plantes Rituelles': '◉',
-  'Herbes & Graminées': '🌾',
-  'Palmiers': '🌴',
-};
 
 export function CategoryFilter({ selected, onSelect }: Props) {
   const colors = useColors();
@@ -34,7 +25,7 @@ export function CategoryFilter({ selected, onSelect }: Props) {
     'Palmiers': t.cat_invertebrates,
   };
 
-  const items: (AnimalCategorie | null)[] = [null, ...CATEGORIES];
+  const items: (PlanteCategorie | null)[] = [null, ...CATEGORIES];
 
   return (
     <ScrollView
@@ -44,7 +35,6 @@ export function CategoryFilter({ selected, onSelect }: Props) {
     >
       {items.map((cat) => {
         const isActive = selected === cat;
-        const icon = cat ? ICONS[cat] : ICONS['all'];
         const label = cat ? CAT_LABELS[cat] : t.cat_all;
         return (
           <Pressable
@@ -59,9 +49,12 @@ export function CategoryFilter({ selected, onSelect }: Props) {
             ]}
             onPress={() => onSelect(cat)}
           >
-            <Text style={[styles.chipIcon, { color: isActive ? colors.deepBrown : colors.gold }]}>
-              {icon}
-            </Text>
+            <SacredIcon
+              name={cat ? iconForCategory(cat) : 'sparkles'}
+              size={16}
+              color={isActive ? colors.deepBrown : colors.gold}
+              accessibilityLabel={label}
+            />
             <Text
               style={[
                 styles.chipText,

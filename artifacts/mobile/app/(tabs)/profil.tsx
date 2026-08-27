@@ -15,6 +15,7 @@ import {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { PlanteCard } from '@/components/PlanteCard';
+import { SacredIcon } from '@/components/SacredIcon';
 import { useApp } from '@/context/AppContext';
 import { useAuth } from '@/context/AuthContext';
 import { PLANTS } from '@/data/animals';
@@ -102,7 +103,7 @@ export default function ProfilScreen() {
           <Text style={[styles.sectionLabel, { color: colors.gold }]}>{t.profile_my_favorites}</Text>
           {favoritePlantes.length === 0 ? (
             <View style={[styles.emptyFav, { backgroundColor: colors.card, borderColor: colors.border }]}>
-              <Text style={[styles.emptyFavIcon, { color: colors.mutedForeground }]}>◇</Text>
+              <SacredIcon name="heart" size={30} color={colors.mutedForeground} accessibilityLabel={t.profile_no_fav} />
               <Text style={[styles.emptyFavText, { color: colors.mutedForeground }]}>{t.profile_no_fav}</Text>
               <Pressable onPress={() => router.push('/(tabs)/animaux' as any)}>
                 <Text style={[styles.emptyFavCta, { color: colors.terracotta }]}>{t.profile_no_fav_cta}</Text>
@@ -231,7 +232,6 @@ const styles = StyleSheet.create({
   statLabel: { fontSize: 11, marginTop: 2, textAlign: 'center', fontWeight: '500' as const },
   sectionLabel: { fontSize: 10, fontWeight: '700' as const, letterSpacing: 2.5, marginBottom: 14 },
   emptyFav: { borderRadius: 16, padding: 24, borderWidth: 1, alignItems: 'center', gap: 10 },
-  emptyFavIcon: { fontSize: 28 },
   emptyFavText: { fontSize: 14, textAlign: 'center', lineHeight: 20, fontWeight: '400' as const },
   emptyFavCta: { fontSize: 14, fontWeight: '600' as const },
   favGrid: { flexDirection: 'row', flexWrap: 'wrap', marginHorizontal: -4 },

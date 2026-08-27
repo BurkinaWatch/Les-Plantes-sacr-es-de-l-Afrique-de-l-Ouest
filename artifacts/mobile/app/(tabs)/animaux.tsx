@@ -12,9 +12,9 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { PlanteCard } from '@/components/PlanteCard';
 import { CategoryFilter } from '@/components/CategoryFilter';
+import { SacredIcon } from '@/components/SacredIcon';
 import { PLANTS, type PlanteCategorie } from '@/data/animals';
 import { useColors } from '@/hooks/useColors';
-import { Feather } from '@expo/vector-icons';
 import { useTranslation } from '@/i18n';
 
 export default function AnimauxScreen() {
@@ -54,7 +54,7 @@ export default function AnimauxScreen() {
         </View>
 
         <View style={[styles.searchBar, { backgroundColor: colors.card, borderColor: colors.border }]}>
-          <Feather name="search" size={14} color={colors.mutedForeground} />
+          <SacredIcon name="search" size={16} color={colors.mutedForeground} />
           <TextInput
             style={[styles.searchInput, { color: colors.ivory }]}
             placeholder={t.animals_search_placeholder}
@@ -64,7 +64,9 @@ export default function AnimauxScreen() {
             returnKeyType="search"
           />
           {search.length > 0 && (
-            <Feather name="x" size={14} color={colors.mutedForeground} onPress={() => setSearch('')} />
+            <Pressable onPress={() => setSearch('')} accessibilityLabel="Effacer la recherche">
+              <SacredIcon name="close" size={16} color={colors.mutedForeground} />
+            </Pressable>
           )}
         </View>
       </View>
@@ -75,7 +77,7 @@ export default function AnimauxScreen() {
 
       {filtered.length === 0 ? (
         <View style={styles.empty}>
-          <Text style={[styles.emptyIcon, { color: colors.mutedForeground }]}>◇</Text>
+          <SacredIcon name="search" size={40} color={colors.mutedForeground} accessibilityLabel={t.animals_none_found} />
           <Text style={[styles.emptyTitle, { color: colors.ivory }]}>{t.animals_none_found}</Text>
           <Text style={[styles.emptyText, { color: colors.mutedForeground }]}>{t.animals_none_hint}</Text>
         </View>
@@ -111,7 +113,6 @@ const styles = StyleSheet.create({
   searchInput: { flex: 1, fontSize: 14, fontWeight: '400' as const },
   filterWrap: { paddingVertical: 4 },
   empty: { flex: 1, alignItems: 'center', justifyContent: 'center', gap: 8, padding: 32 },
-  emptyIcon: { fontSize: 36, marginBottom: 4 },
   emptyTitle: { fontSize: 18, fontWeight: '700' as const },
   emptyText: { fontSize: 14, textAlign: 'center', lineHeight: 20 },
   cardWrap: { flex: 1 },

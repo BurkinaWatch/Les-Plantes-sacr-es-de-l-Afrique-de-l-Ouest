@@ -12,6 +12,7 @@ import {
 import { Feather } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
+import { SacredIcon } from '@/components/SacredIcon';
 import { useApp } from '@/context/AppContext';
 import { TOTEM_RESULTS } from '@/data/quiz';
 import { getPlanteById } from '@/data/animals';
@@ -36,7 +37,7 @@ export default function MaPlanteScreen() {
           showsVerticalScrollIndicator={false}
         >
           <View style={styles.emptyContent}>
-            <Text style={[styles.emptySymbol, { color: colors.gold }]}>◎</Text>
+            <SacredIcon name="compass" size={56} color={colors.gold} accessibilityLabel={t.my_animal_empty_title1} />
             <Text style={[styles.emptyTitle, { color: colors.ivory }]}>{t.my_animal_empty_title1}</Text>
             <Text style={[styles.emptyTitle2, { color: colors.ivory }]}>{t.my_animal_empty_title2}</Text>
             <Text style={[styles.emptyDesc, { color: colors.mutedForeground }]}>{t.my_animal_empty_desc}</Text>
@@ -154,7 +155,7 @@ export default function MaPlanteScreen() {
               end={{ x: 1, y: 0 }}
               style={styles.chatBtn}
             >
-              <Feather name="message-circle" size={20} color="#FFF" />
+              <SacredIcon name="message" size={20} color="#FFF" />
               <Text style={styles.chatBtnText}>Parler à ma plante {primaryTotem.nom}</Text>
             </LinearGradient>
           </Pressable>
@@ -163,11 +164,11 @@ export default function MaPlanteScreen() {
             style={({ pressed }) => [styles.progressionBtn, { borderColor: primaryTotem.couleur + '60', opacity: pressed ? 0.85 : 1 }]}
             onPress={() => router.push('/progression-spirituelle' as any)}
           >
-            <Feather name="trending-up" size={16} color={primaryTotem.couleur} />
+            <SacredIcon name="trending" size={16} color={primaryTotem.couleur} />
             <Text style={[styles.progressionBtnText, { color: primaryTotem.couleur }]}>
               Ma progression spirituelle
             </Text>
-            <Feather name="chevron-right" size={14} color={primaryTotem.couleur + '80'} />
+            <SacredIcon name="chevron-right" size={14} color={primaryTotem.couleur + '80'} />
           </Pressable>
 
           {primaryPlante && (
@@ -197,7 +198,6 @@ const styles = StyleSheet.create({
   emptyBg: { ...StyleSheet.absoluteFillObject },
   emptyScroll: { flexGrow: 1, justifyContent: 'center' },
   emptyContent: { padding: 32, alignItems: 'center', gap: 12, width: '100%' },
-  emptySymbol: { fontSize: 52, marginBottom: 8 },
   emptyTitle: { fontSize: 32, fontWeight: '800' as const, letterSpacing: 0.5 },
   emptyTitle2: { fontSize: 32, fontWeight: '800' as const, letterSpacing: 0.5, marginTop: -12 },
   emptyDesc: { fontSize: 15, lineHeight: 24, textAlign: 'center', fontWeight: '400' as const, marginTop: 8 },

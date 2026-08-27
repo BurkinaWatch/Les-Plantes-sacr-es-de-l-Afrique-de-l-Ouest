@@ -19,13 +19,14 @@ import {
   searchPlantes,
   type PlanteMedicinale,
 } from '@/data/plantes-medicinales';
+import { SacredIcon, iconForGlyph, type SacredIconName } from '@/components/SacredIcon';
 
 type Tab = 'recettes' | 'articles' | 'plantes';
 
-const TABS: { key: Tab; label: string; emoji: string }[] = [
-  { key: 'recettes', label: 'Recettes',  emoji: '🌿' },
-  { key: 'articles', label: 'Articles',  emoji: '📰' },
-  { key: 'plantes',  label: 'Plantes',   emoji: '🌱' },
+const TABS: { key: Tab; label: string; icon: SacredIconName }[] = [
+  { key: 'recettes', label: 'Recettes',  icon: 'leaf' },
+  { key: 'articles', label: 'Articles',  icon: 'newspaper' },
+  { key: 'plantes', label: 'Plantes',   icon: 'sprout' },
 ];
 
 export default function SavoirScreen() {
@@ -54,11 +55,14 @@ export default function SavoirScreen() {
             onPress={() => setSelectedRecipe(null)}
             style={({ pressed }) => [styles.backBtn, { opacity: pressed ? 0.7 : 1 }]}
           >
-            <Text style={[styles.backBtnText, { color: r.couleur }]}>← Recettes</Text>
+            <View style={styles.backBtnRow}>
+              <SacredIcon name="arrow-left" size={17} color={r.couleur} />
+              <Text style={[styles.backBtnText, { color: r.couleur }]}>Recettes</Text>
+            </View>
           </Pressable>
 
           <View style={styles.recipeHeroRow}>
-            <Text style={styles.recipeHeroIcon}>{r.planteIcon}</Text>
+            <SacredIcon name={iconForGlyph(r.planteIcon)} size={46} color={r.couleur} accessibilityLabel={r.plante} />
             <View style={{ flex: 1 }}>
               <View style={[styles.catBadge, { backgroundColor: r.couleur + '30', borderColor: r.couleur + '60' }]}>
                 <Text style={[styles.catBadgeText, { color: r.couleur }]}>{r.categorieLabel}</Text>
@@ -70,13 +74,22 @@ export default function SavoirScreen() {
 
           <View style={styles.recipeMetaRow}>
             <View style={[styles.metaChip, { backgroundColor: colors.card }]}>
-              <Text style={[styles.metaChipText, { color: colors.mutedForeground }]}>⏱ {r.duree}</Text>
+              <View style={styles.metaInline}>
+                <SacredIcon name="clock" size={13} color={colors.mutedForeground} />
+                <Text style={[styles.metaChipText, { color: colors.mutedForeground }]}>{r.duree}</Text>
+              </View>
             </View>
             <View style={[styles.metaChip, { backgroundColor: colors.card }]}>
-              <Text style={[styles.metaChipText, { color: colors.mutedForeground }]}>🎯 {r.difficulte}</Text>
+              <View style={styles.metaInline}>
+                <SacredIcon name="target" size={13} color={colors.mutedForeground} />
+                <Text style={[styles.metaChipText, { color: colors.mutedForeground }]}>{r.difficulte}</Text>
+              </View>
             </View>
             <View style={[styles.metaChip, { backgroundColor: colors.card }]}>
-              <Text style={[styles.metaChipText, { color: colors.mutedForeground }]}>📍 {r.region.split(',')[0]}</Text>
+              <View style={styles.metaInline}>
+                <SacredIcon name="pin" size={13} color={colors.mutedForeground} />
+                <Text style={[styles.metaChipText, { color: colors.mutedForeground }]}>{r.region.split(',')[0]}</Text>
+              </View>
             </View>
           </View>
 
@@ -92,7 +105,10 @@ export default function SavoirScreen() {
         >
           {/* Bienfaits */}
           <View style={[styles.sectionCard, { backgroundColor: colors.card, borderColor: r.couleur + '40' }]}>
-            <Text style={[styles.sectionCardTitle, { color: r.couleur }]}>✦ BIENFAITS</Text>
+            <View style={styles.iconLabelRow}>
+              <SacredIcon name="sparkles" size={14} color={r.couleur} />
+              <Text style={[styles.sectionCardTitle, { color: r.couleur, marginBottom: 0 }]}>BIENFAITS</Text>
+            </View>
             {r.bienfaits.map((b, i) => (
               <View key={i} style={styles.listRow}>
                 <View style={[styles.listDot, { backgroundColor: r.couleur }]} />
@@ -103,7 +119,10 @@ export default function SavoirScreen() {
 
           {/* Ingrédients */}
           <View style={[styles.sectionCard, { backgroundColor: colors.card, borderColor: colors.border }]}>
-            <Text style={[styles.sectionCardTitle, { color: r.couleur }]}>🌿 INGRÉDIENTS</Text>
+            <View style={styles.iconLabelRow}>
+              <SacredIcon name="leaf" size={14} color={r.couleur} />
+              <Text style={[styles.sectionCardTitle, { color: r.couleur, marginBottom: 0 }]}>INGRÉDIENTS</Text>
+            </View>
             {r.ingredients.map((ing, i) => (
               <View key={i} style={styles.ingredientRow}>
                 <View style={[styles.quantityBadge, { backgroundColor: r.couleur + '20' }]}>
@@ -135,14 +154,20 @@ export default function SavoirScreen() {
             colors={[r.couleur + '25', r.couleur + '08']}
             style={[styles.conseilsBox, { borderColor: r.couleur + '50' }]}
           >
-            <Text style={[styles.conseilsTitle, { color: r.couleur }]}>💡 CONSEILS DU SAVOIR ANCESTRAL</Text>
+            <View style={styles.iconLabelRow}>
+              <SacredIcon name="lightbulb" size={15} color={r.couleur} />
+              <Text style={[styles.conseilsTitle, { color: r.couleur }]}>CONSEILS DU SAVOIR ANCESTRAL</Text>
+            </View>
             <Text style={[styles.conseilsText, { color: colors.ivory }]}>{r.conseils}</Text>
           </LinearGradient>
 
           {/* Précautions */}
           {r.precautions && (
             <View style={[styles.precautionsBox, { backgroundColor: '#FF6B0015', borderColor: '#FF6B0060' }]}>
-              <Text style={[styles.precautionsTitle, { color: '#E74C3C' }]}>⚠️ PRÉCAUTIONS</Text>
+              <View style={styles.iconLabelRow}>
+                <SacredIcon name="alert" size={15} color="#E74C3C" />
+                <Text style={[styles.precautionsTitle, { color: '#E74C3C' }]}>PRÉCAUTIONS</Text>
+              </View>
               <Text style={[styles.precautionsText, { color: colors.ivory }]}>{r.precautions}</Text>
             </View>
           )}
@@ -173,22 +198,31 @@ export default function SavoirScreen() {
             onPress={() => setSelectedArticle(null)}
             style={({ pressed }) => [styles.backBtn, { opacity: pressed ? 0.7 : 1 }]}
           >
-            <Text style={[styles.backBtnText, { color: a.couleur }]}>← Articles</Text>
+            <View style={styles.backBtnRow}>
+              <SacredIcon name="arrow-left" size={17} color={a.couleur} />
+              <Text style={[styles.backBtnText, { color: a.couleur }]}>Articles</Text>
+            </View>
           </Pressable>
 
           <View style={[styles.catBadge, { backgroundColor: a.couleur + '30', borderColor: a.couleur + '60', alignSelf: 'flex-start', marginBottom: 8 }]}>
             <Text style={[styles.catBadgeText, { color: a.couleur }]}>{a.categorieLabel}</Text>
           </View>
 
-          <Text style={styles.articleHeroIcon}>{a.planteIcon}</Text>
+          <SacredIcon name={iconForGlyph(a.planteIcon)} size={42} color={a.couleur} accessibilityLabel={a.titre} />
           <Text style={[styles.articleHeroTitle, { color: colors.ivory }]}>{a.titre}</Text>
           {a.sousTitre && (
             <Text style={[styles.articleHeroSub, { color: a.couleur }]}>{a.sousTitre}</Text>
           )}
 
           <View style={styles.articleHeroMeta}>
-            <Text style={[styles.articleMetaText, { color: colors.mutedForeground }]}>✍️ {a.auteur}</Text>
-            <Text style={[styles.articleMetaText, { color: colors.mutedForeground }]}>📖 {a.duree} de lecture</Text>
+            <View style={styles.metaInline}>
+              <SacredIcon name="user" size={13} color={colors.mutedForeground} />
+              <Text style={[styles.articleMetaText, { color: colors.mutedForeground }]}>{a.auteur}</Text>
+            </View>
+            <View style={styles.metaInline}>
+              <SacredIcon name="book" size={13} color={colors.mutedForeground} />
+              <Text style={[styles.articleMetaText, { color: colors.mutedForeground }]}>{a.duree} de lecture</Text>
+            </View>
           </View>
         </LinearGradient>
 
@@ -278,7 +312,10 @@ export default function SavoirScreen() {
             onPress={() => setSelectedPlante(null)}
             style={({ pressed }) => [styles.backBtn, { opacity: pressed ? 0.7 : 1 }]}
           >
-            <Text style={[styles.backBtnText, { color: p.couleur }]}>← Plantes médicinales</Text>
+            <View style={styles.backBtnRow}>
+              <SacredIcon name="arrow-left" size={17} color={p.couleur} />
+              <Text style={[styles.backBtnText, { color: p.couleur }]}>Plantes médicinales</Text>
+            </View>
           </Pressable>
 
           <View style={[styles.catBadge, {
@@ -293,7 +330,7 @@ export default function SavoirScreen() {
           </View>
 
           <View style={styles.planteHeroRow}>
-            <Text style={styles.planteHeroIcon}>{p.icone}</Text>
+            <SacredIcon name={iconForGlyph(p.icone)} size={48} color={p.couleur} accessibilityLabel={p.nomVulgaire} />
             <View style={{ flex: 1 }}>
               <Text style={[styles.planteHeroTitle, { color: colors.ivory }]}>{p.nomVulgaire}</Text>
               <Text style={[styles.planteHeroScientific, { color: p.couleur }]}>{p.nomScientifique}</Text>
@@ -304,7 +341,10 @@ export default function SavoirScreen() {
           {/* Noms africains */}
           {nomsAfricainsEntries.length > 0 && (
             <View style={[styles.nomsAfricainsBox, { backgroundColor: 'rgba(0,0,0,0.25)', borderColor: p.couleur + '50' }]}>
-              <Text style={[styles.nomsAfricainsLabel, { color: p.couleur }]}>🗣 NOMS AFRICAINS</Text>
+              <View style={styles.iconLabelRow}>
+                <SacredIcon name="message" size={14} color={p.couleur} />
+                <Text style={[styles.nomsAfricainsLabel, { color: p.couleur }]}>NOMS AFRICAINS</Text>
+              </View>
               <View style={styles.nomsAfricainsGrid}>
                 {nomsAfricainsEntries.map(([lang, nom]) => (
                   <View key={lang} style={styles.nomAfricainItem}>
@@ -326,25 +366,37 @@ export default function SavoirScreen() {
         >
           {/* Historique */}
           <View style={[styles.sectionCard, { backgroundColor: colors.card, borderColor: p.couleur + '40' }]}>
-            <Text style={[styles.sectionCardTitle, { color: p.couleur }]}>📜 HISTORIQUE ET TRADITION</Text>
+            <View style={styles.iconLabelRow}>
+              <SacredIcon name="history" size={14} color={p.couleur} />
+              <Text style={[styles.sectionCardTitle, { color: p.couleur, marginBottom: 0 }]}>HISTORIQUE ET TRADITION</Text>
+            </View>
             <Text style={[styles.paragraph, { color: colors.ivory, marginTop: 4 }]}>{p.historique}</Text>
           </View>
 
           {/* Description */}
           <View style={[styles.sectionCard, { backgroundColor: colors.card, borderColor: colors.border }]}>
-            <Text style={[styles.sectionCardTitle, { color: p.couleur }]}>🌿 DESCRIPTION DE LA PLANTE</Text>
+            <View style={styles.iconLabelRow}>
+              <SacredIcon name="leaf" size={14} color={p.couleur} />
+              <Text style={[styles.sectionCardTitle, { color: p.couleur, marginBottom: 0 }]}>DESCRIPTION DE LA PLANTE</Text>
+            </View>
             <Text style={[styles.paragraph, { color: colors.ivory, marginTop: 4 }]}>{p.descriptionPlante}</Text>
           </View>
 
           {/* Action curative */}
           <View style={[styles.sectionCard, { backgroundColor: colors.card, borderColor: colors.border }]}>
-            <Text style={[styles.sectionCardTitle, { color: p.couleur }]}>⚗️ ACTION CURATIVE</Text>
+            <View style={styles.iconLabelRow}>
+              <SacredIcon name="mortar" size={14} color={p.couleur} />
+              <Text style={[styles.sectionCardTitle, { color: p.couleur, marginBottom: 0 }]}>ACTION CURATIVE</Text>
+            </View>
             <Text style={[styles.paragraph, { color: colors.ivory, marginTop: 4 }]}>{p.actionCurative}</Text>
           </View>
 
           {/* Parties utilisées */}
           <View style={[styles.partiesRow, { backgroundColor: colors.card, borderColor: colors.border }]}>
-            <Text style={[styles.sectionCardTitle, { color: p.couleur }]}>🫚 PARTIES UTILISÉES</Text>
+            <View style={styles.iconLabelRow}>
+              <SacredIcon name="root" size={14} color={p.couleur} />
+              <Text style={[styles.sectionCardTitle, { color: p.couleur, marginBottom: 0 }]}>PARTIES UTILISÉES</Text>
+            </View>
             <View style={styles.partiesChips}>
               {p.partiesUtilisees.map((partie, i) => (
                 <View key={i} style={[styles.partieChip, { backgroundColor: p.couleur + '20', borderColor: p.couleur + '50' }]}>
@@ -370,7 +422,10 @@ export default function SavoirScreen() {
           {/* Précautions */}
           {p.precautions && (
             <View style={[styles.precautionsBox, { backgroundColor: '#FF6B0015', borderColor: '#FF6B0060' }]}>
-              <Text style={[styles.precautionsTitle, { color: '#E74C3C' }]}>⚠️ PRÉCAUTIONS</Text>
+              <View style={styles.iconLabelRow}>
+                <SacredIcon name="alert" size={15} color="#E74C3C" />
+                <Text style={[styles.precautionsTitle, { color: '#E74C3C' }]}>PRÉCAUTIONS</Text>
+              </View>
               <Text style={[styles.precautionsText, { color: colors.ivory }]}>{p.precautions}</Text>
             </View>
           )}
