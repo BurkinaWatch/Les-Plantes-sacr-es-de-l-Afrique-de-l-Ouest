@@ -52,6 +52,20 @@ const plant = {
   enseignementDuJour: "La patience porte ses fruits.",
 };
 
+const recognizedPlant = {
+  nom: "Baobab",
+  nomScientifique: "Adansonia digitata",
+  famille: "Malvaceae",
+  description: "Un arbre emblématique.",
+  origineGeographique: "Afrique de l'Ouest",
+  utilisationsTraditionnelles: ["Remède traditionnel"],
+  proprietesMediacinales: ["Soutien digestif"],
+  symboliqueAfricaine: "Un symbole de résilience.",
+  conseils: ["Respecter les usages traditionnels."],
+  curiosite: "Le baobab peut vivre plusieurs siècles.",
+  confidence: "high",
+};
+
 const totem = {
   id: "baobab",
   nom: "Baobab",
@@ -307,6 +321,70 @@ test("Scanner shows unavailable recovery UI for incomplete plant data and retrie
     assert.equal(fetchCalls.length, 2);
     assert.equal(findTextNodes(renderer, unavailableMessage).length, 1);
     assert.equal(renderer.root.findAllByType("ActivityIndicator").length, 0);
+  } finally {
+    restoreModules();
+    globalThis.fetch = originalFetch;
+  }
+});
+
+test("Scanner ignores a delayed response from an older retry", async () => {
+  process.env.EXPO_PUBLIC_DOMAIN = "example.test";
+  process.env.EXPO_PUBLIC_CHAT_API_KEY = "screen-test-key";
+  const restoreModules = mockModules();
+  const originalFetch = globalThis.fetch;
+  const pendingResponses = [];
+  globalThis.fetch = async () => new Promise((resolve) => {
+    pendingResponses.push(resolve);
+  });
+
+  try {
+    const { default: ScannerScreen } = require(path.join(screenDist, "app/(tabs)/scanner.js"));
+    let renderer;
+    await act(async () => {
+      renderer = TestRenderer.create(React.createElement(ScannerScreen));
+    });
+
+    const galleryButton = findPressableWithText(renderer, galleryLabel);
+    await act(async () => {
+      galleryButton.props.onPress();
+      await Promise.resolve();
+    });
+    assert.equal(pendingResponses.length, 1);
+
+    // Keep the first retry handler so two requests can be in flight at once.
+    await act(async () => {
+      pendingResponses[0](mockJsonResponse({ plant: { nom: "Ancien résultat" } }));
+      await Promise.resolve();
+    });
+    const retryButton = findPressableWithText(renderer, retryLabel);
+
+    await act(async () => {
+      retryButton.props.onPress();
+      retryButton.props.onPress();
+      await Promise.resolve();
+    });
+    assert.equal(pendingResponses.length, 3);
+
+    await act(async () => {
+      pendingResponses[2](mockJsonResponse({ plant: recognizedPlant }));
+      await Promise.resolve();
+    });
+    assert.equal(findTextNodes(renderer, "Baobab").length > 0, true);
+    assert.equal(findTextNodes(renderer, unavailableMessage).length, 0);
+
+    await act(async () => {
+      pendingResponses[1](mockJsonResponse({ plant: { nom: "Ancien résultat" } }));
+      await Promise.resolve();
+    });
+    assert.equal(findTextNodes(renderer, "Baobab").length > 0, true);
+    assert.equal(findTextNodes(renderer, "Ancien résultat").length, 0);
+    assert.equal(findTextNodes(renderer, unavailableMessage).length, 0);
+
+    await act(async () => {
+      findPressableWithText(renderer, "scanner_new_scan").props.onPress();
+      await Promise.resolve();
+    });
+    assert.equal(findPressableWithText(renderer, galleryLabel).props.disabled, undefined);
   } finally {
     restoreModules();
     globalThis.fetch = originalFetch;

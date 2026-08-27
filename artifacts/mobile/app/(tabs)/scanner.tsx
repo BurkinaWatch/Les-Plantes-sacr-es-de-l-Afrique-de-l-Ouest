@@ -1,7 +1,7 @@
 import { Feather } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
 import { LinearGradient } from 'expo-linear-gradient';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import {
   ActivityIndicator,
   Alert,
@@ -137,6 +137,14 @@ export default function ScannerScreen() {
   const [rateLimitRemaining, setRateLimitRemaining] = useState<number | null>(null);
   const [resetAt, setResetAt] = useState<number | null>(null);
   const [countdown, setCountdown] = useState<number | null>(null);
+  const scanGeneration = useRef(0);
+
+  const beginScan = () => {
+    scanGeneration.current += 1;
+    return scanGeneration.current;
+  };
+
+  const isCurrentScan = (generation: number) => scanGeneration.current === generation;
 
   // Live countdown when limit is exhausted
   useEffect(() => {
@@ -160,6 +168,7 @@ export default function ScannerScreen() {
   const topPad = Platform.OS === 'web' ? Math.max(insets.top, 67) : insets.top;
 
   const handlePick = async (source: 'camera' | 'gallery') => {
+    const generation = beginScan();
     setResult(null);
     setError(null);
     setImageUri(null);
@@ -192,16 +201,16 @@ export default function ScannerScreen() {
 
     const asset = pickerResult.assets[0];
     if (!asset.base64) {
-      setError(t.scanner_error_generic);
+      if (isCurrentScan(generation)) setError(t.scanner_error_generic);
       return;
     }
 
     setImageUri(asset.uri);
     setImageBase64(asset.base64);
-    await analyze(asset.base64);
+    await analyze(asset.base64, generation);
   };
 
-  const analyze = async (b64: string) => {
+  const analyze = async (b64: string, generation = beginScan()) => {
     setLoading(true);
     setError(null);
     setResult(null);
@@ -214,6 +223,7 @@ export default function ScannerScreen() {
         lang: apiLang,
         token,
       });
+      if (!isCurrentScan(generation)) return;
       if (remaining !== null) setRateLimitRemaining(remaining);
       if (newResetAt !== null) setResetAt(newResetAt);
       if (plant.error) {
@@ -224,6 +234,7 @@ export default function ScannerScreen() {
         await scheduleLocalNotification(t.notif_scan_title, t.notif_scan_body);
       }
     } catch (err: any) {
+      if (!isCurrentScan(generation)) return;
       if (err instanceof ApiRequestError) {
         const errorMessage =
           err.code === 'missing_key'
@@ -241,11 +252,12 @@ export default function ScannerScreen() {
       }
       setError(isRateLimit ? t.rate_limit_exhausted : t.api_error_unavailable);
     } finally {
-      setLoading(false);
+      if (isCurrentScan(generation)) setLoading(false);
     }
   };
 
   const reset = () => {
+    beginScan();
     setImageUri(null);
     setImageBase64(null);
     setResult(null);
