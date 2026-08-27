@@ -13,6 +13,14 @@
       "resizeMode": "contain",
       "backgroundColor": "#120A05"
     },
+    "updates": {
+      "url": "https://u.expo.dev/ed9dd362-3b1f-4207-9a47-48059ecaf683",
+      "checkAutomatically": "ON_LOAD",
+      "fallbackToCacheTimeout": 3000
+    },
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
     "ios": {
       "supportsTablet": false,
       "bundleIdentifier": "com.ouedraogophillips.plantessacrees",
