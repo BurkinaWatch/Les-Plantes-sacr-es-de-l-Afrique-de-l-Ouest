@@ -8,7 +8,7 @@
     "build": "node scripts/build.js",
     "serve": "node server/serve.js",
     "typecheck": "tsc -p tsconfig.json --noEmit",
-    "test": "rm -rf .test-dist && tsc --target ES2022 --module ES2022 --moduleResolution Bundler --lib ES2022,DOM --skipLibCheck --outDir .test-dist lib/ai-api.ts && printf '{\"type\":\"module\"}' > .test-dist/package.json && node --test tests/*.test.mjs"
+    "test": "rm -rf .test-dist .screen-test-dist && tsc --target ES2022 --module ES2022 --moduleResolution Bundler --lib ES2022,DOM --skipLibCheck --outDir .test-dist lib/ai-api.ts && printf '{\"type\":\"module\"}' > .test-dist/package.json && node scripts/build-screen-tests.js && node --test tests/*.test.mjs"
   },
   "devDependencies": {
     "@babel/core": "^7.25.2",
@@ -48,6 +48,7 @@
     "react-native-svg": "15.12.1",
     "react-native-web": "^0.21.0",
     "react-native-worklets": "0.5.1",
+    "react-test-renderer": "19.1.0",
     "typescript": "~5.9.2",
     "zod": "catalog:",
     "zod-validation-error": "^3.4.0"
