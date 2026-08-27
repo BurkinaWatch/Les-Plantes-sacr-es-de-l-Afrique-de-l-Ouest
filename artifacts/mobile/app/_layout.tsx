@@ -6,7 +6,6 @@ import React, { useEffect, useRef, useState } from "react";
 import {
   Animated,
   Dimensions,
-  Image,
   Platform,
   Pressable,
   StyleSheet,
@@ -130,20 +129,6 @@ function AnimatedSplash({ onFinish }: { onFinish: () => void }) {
 
       {/* Halo doré animé */}
       <Animated.View style={[styles.logoGlow, { opacity: shimmerOpacity }]} />
-
-      {/* Logo */}
-      <Animated.View
-        style={[
-          styles.logoWrap,
-          { opacity: logoOpacity, transform: [{ scale: logoScale }] },
-        ]}
-      >
-        <Image
-          source={require("@/assets/images/icon-plants.png")}
-          style={styles.logo}
-          resizeMode="contain"
-        />
-      </Animated.View>
 
       {/* Titre */}
       <Animated.View style={[styles.titleBlock, { opacity: titleOpacity }]}>
