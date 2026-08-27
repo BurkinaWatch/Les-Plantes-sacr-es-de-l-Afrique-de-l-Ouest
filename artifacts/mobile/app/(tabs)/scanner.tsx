@@ -217,7 +217,7 @@ export default function ScannerScreen() {
       if (remaining !== null) setRateLimitRemaining(remaining);
       if (newResetAt !== null) setResetAt(newResetAt);
       if (plant.error) {
-        setError(plant.message ?? t.scanner_error_no_plant);
+        setError(t.scanner_error_no_plant);
         await scheduleLocalNotification(t.notif_scan_title, t.notif_scan_error_body);
       } else {
         setResult(plant);

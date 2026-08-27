@@ -31,9 +31,9 @@ export const ful: Translations = {
   scanner_confidence_low: 'Wanngii',
   scanner_error_no_plant: 'Leɗe nattaama yiyeede. Natal goɗɗo waddu.',
   scanner_error_generic: 'Juumre waɗii. Coodu kadi.',
-  api_error_missing_key: "Service indisponible : la clé d'accès de l'application est manquante. Contactez le support.",
-  api_error_invalid_key: "Clé d'accès invalide. Fermez puis rouvrez l'application ou contactez le support.",
-  api_error_unavailable: 'Impossible de joindre le service. Vérifiez votre connexion et réessayez.',
+  api_error_missing_key: 'Gollal ngal waawaa: bolle jaaɓnirgal ngal alaa. Noddu ballal.',
+  api_error_invalid_key: 'Bolle jaaɓnirgal ngal moƴƴaani. Uddu jaaɓnirgal ngal, uddit ngal kadi, walla noddu ballal.',
+  api_error_unavailable: 'Mi waawaa heɓde gollal ngal. Ƴeewto jokkondiral maa, coodu kadi.',
   scanner_retry: 'Coodu kadi',
   scanner_new_scan: 'Miijirde kewe',
 
