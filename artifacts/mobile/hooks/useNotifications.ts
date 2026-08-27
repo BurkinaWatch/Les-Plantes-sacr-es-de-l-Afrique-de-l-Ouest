@@ -66,9 +66,10 @@ export function useNotifications(): UseNotificationsReturn {
       setPushToken(null);
       return;
     }
+    const nativeNotifications = notifications;
 
     // How delivered notifications appear while the app is in the foreground.
-    notifications.setNotificationHandler({
+    nativeNotifications.setNotificationHandler({
       handleNotification: async () => ({
         shouldShowAlert: true,
         shouldPlaySound: true,
@@ -85,11 +86,11 @@ export function useNotifications(): UseNotificationsReturn {
         // Request permission
         // Cast to any because PermissionResponse from 'expo' may not resolve in
         // all TypeScript configs; the runtime shape always has `granted: boolean`.
-         const existingPerms = await notifications.getPermissionsAsync() as any;
+         const existingPerms = await nativeNotifications.getPermissionsAsync() as any;
         let granted: boolean = existingPerms.granted as boolean;
 
         if (!granted) {
-           const newPerms = await notifications.requestPermissionsAsync() as any;
+            const newPerms = await nativeNotifications.requestPermissionsAsync() as any;
           granted = newPerms.granted as boolean;
         }
 
@@ -102,9 +103,9 @@ export function useNotifications(): UseNotificationsReturn {
 
         // Android: create a notification channel
         if (Platform.OS === 'android') {
-           await notifications.setNotificationChannelAsync('plantes-sacrees', {
+           await nativeNotifications.setNotificationChannelAsync('plantes-sacrees', {
             name: 'Plantes Sacrées',
-            importance: notifications.AndroidImportance.HIGH,
+            importance: nativeNotifications.AndroidImportance.HIGH,
             vibrationPattern: [0, 250, 250, 250],
             lightColor: '#D4A017',
             sound: 'default',
@@ -119,7 +120,7 @@ export function useNotifications(): UseNotificationsReturn {
             return;
           }
 
-          const tokenData = await notifications.getExpoPushTokenAsync({ projectId });
+          const tokenData = await nativeNotifications.getExpoPushTokenAsync({ projectId });
           if (!cancelled) setPushToken(tokenData.data);
         } catch {
           // Simulators and Expo Go on some platforms don't support remote push tokens
@@ -133,7 +134,7 @@ export function useNotifications(): UseNotificationsReturn {
     setup();
 
     // Listen for notification taps (brings app to foreground)
-    listenerRef.current = notifications.addNotificationResponseReceivedListener(
+    listenerRef.current = nativeNotifications.addNotificationResponseReceivedListener(
       (_response) => {
         // Future: navigate to the relevant screen based on response.notification.request.content.data
       }
