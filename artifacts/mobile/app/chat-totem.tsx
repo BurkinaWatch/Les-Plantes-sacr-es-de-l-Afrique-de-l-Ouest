@@ -25,6 +25,7 @@ import { useColors } from '@/hooks/useColors';
 import { useTranslation } from '@/i18n';
 import { useAuth } from '@/context/AuthContext';
 import { useNotifications } from '@/hooks/useNotifications';
+import { ApiRateLimitError, ApiRequestError, requestTotem } from '@/lib/ai-api';
 
 interface Message {
   id: string;
@@ -244,14 +245,11 @@ export default function ChatTotemScreen() {
     }
 
     try {
-      const response = await fetch(`${API_BASE}/chat/totem`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'x-api-key': CHAT_API_KEY,
-          ...(token ? { 'Authorization': `Bearer ${token}` } : {}),
-        },
-        body: JSON.stringify({
+      const { content, remaining, resetAt: newResetAt } = await requestTotem({
+        apiBase: API_BASE,
+        apiKey: CHAT_API_KEY,
+        token,
+        body: {
           planteId: plante.id,
           planteData: {
             nom: plante.nom,
@@ -273,43 +271,16 @@ export default function ChatTotemScreen() {
           },
           messages: allMessages.map((m) => ({ role: m.role, content: m.content })),
           userLang: lang === 'fr' || lang === 'en' ? lang : 'fr',
-        }),
+        },
       });
 
       // Read rate-limit headers regardless of success/failure
-      const remaining = response.headers.get('RateLimit-Remaining') ?? response.headers.get('X-RateLimit-Remaining');
-      const reset = response.headers.get('RateLimit-Reset') ?? response.headers.get('X-RateLimit-Reset');
-      if (remaining !== null) setRateLimitRemaining(parseInt(remaining, 10));
-      if (reset !== null) setResetAt(parseInt(reset, 10));
-
-      if (!response.ok) {
-        if (response.status === 429) {
-          const errorMsg: Message = {
-            id: (Date.now() + 1).toString(),
-            role: 'assistant',
-            content: `⚠️ ${t.rate_limit_exhausted}`,
-            timestamp: Date.now(),
-          };
-          setMessages([...allMessages, errorMsg]);
-          setIsLoading(false);
-          return;
-        }
-        const err = await response.json().catch(() => ({}));
-        const errorMsg: Message = {
-          id: (Date.now() + 1).toString(),
-          role: 'assistant',
-          content: `⚠️ ${response.status === 401 ? t.api_error_invalid_key : (err as any).error ?? t.api_error_unavailable}`,
-          timestamp: Date.now(),
-        };
-        setMessages([...allMessages, errorMsg]);
-        return;
-      }
-
-      const data = await response.json();
+      if (remaining !== null) setRateLimitRemaining(remaining);
+      if (newResetAt !== null) setResetAt(newResetAt);
       const assistantMsg: Message = {
         id: (Date.now() + 1).toString(),
         role: 'assistant',
-        content: data.content ?? '',
+        content,
         timestamp: Date.now(),
       };
 
@@ -319,6 +290,32 @@ export default function ChatTotemScreen() {
       await scheduleLocalNotification(t.notif_chat_title, t.notif_chat_body);
       setTimeout(() => scrollRef.current?.scrollToEnd({ animated: true }), 100);
     } catch (err: any) {
+      if (err instanceof ApiRequestError) {
+        const errorMessage =
+          err.code === 'missing_key'
+            ? t.api_error_missing_key
+            : err.code === 'invalid_key'
+            ? t.api_error_invalid_key
+            : t.api_error_unavailable;
+        setMessages([...allMessages, {
+          id: (Date.now() + 1).toString(),
+          role: 'assistant',
+          content: `⚠️ ${errorMessage}`,
+          timestamp: Date.now(),
+        }]);
+        return;
+      }
+      if (err instanceof ApiRateLimitError) {
+        setRateLimitRemaining(0);
+        if (err.resetAt !== null) setResetAt(err.resetAt);
+        setMessages([...allMessages, {
+          id: (Date.now() + 1).toString(),
+          role: 'assistant',
+          content: `⚠️ ${t.rate_limit_exhausted}`,
+          timestamp: Date.now(),
+        }]);
+        return;
+      }
       const errorMsg: Message = {
         id: (Date.now() + 1).toString(),
         role: 'assistant',

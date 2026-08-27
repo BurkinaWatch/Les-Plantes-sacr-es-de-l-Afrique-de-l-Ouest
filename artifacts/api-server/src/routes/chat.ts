@@ -9,10 +9,10 @@ import {
   RATE_LIMIT_WINDOW_MS,
 } from "../lib/rate-limit.js";
 
-const router = Router();
+type ChatClient = Pick<Groq, "chat">;
 
-let groqClient: Groq | null = null;
-function getGroq(): Groq {
+let groqClient: ChatClient | null = null;
+function getGroq(): ChatClient {
   if (!groqClient) {
     const apiKey = process.env["GROQ_API_KEY"];
     if (!apiKey) {
@@ -67,7 +67,7 @@ const chatSchema = z.object({
   { message: "planteData or animalData is required" }
 );
 
-function buildSystemPrompt(animal: z.infer<typeof chatSchema>["animalData"], lang: string): string {
+function buildSystemPrompt(animal: NonNullable<z.infer<typeof chatSchema>["animalData"]>, lang: string): string {
   const langInstruction =
     lang === "en"
       ? "Always respond in English."
@@ -124,7 +124,10 @@ ${animal.conseilsDeVie.join("\n")}
 9. ${langInstruction}`;
 }
 
-router.post("/totem", requireApiKey, optionalJwt, chatLimiter, monthlyQuotaMiddleware, async (req, res) => {
+export function createChatRouter(getClient: () => ChatClient = getGroq): Router {
+  const router = Router();
+
+  router.post("/totem", requireApiKey, optionalJwt, chatLimiter, monthlyQuotaMiddleware, async (req, res) => {
   const parsed = chatSchema.safeParse(req.body);
   if (!parsed.success) {
     return res.status(400).json({ error: "Données invalides", details: parsed.error.issues });
@@ -135,7 +138,7 @@ router.post("/totem", requireApiKey, optionalJwt, chatLimiter, monthlyQuotaMiddl
   const systemPrompt = buildSystemPrompt(planteInfo, userLang);
 
   try {
-    const completion = await getGroq().chat.completions.create({
+    const completion = await getClient().chat.completions.create({
       model: "qwen/qwen3.8-27b",
       max_tokens: 512,
       messages: [
@@ -154,6 +157,9 @@ router.post("/totem", requireApiKey, optionalJwt, chatLimiter, monthlyQuotaMiddl
     console.error("[chat/totem] Groq error:", err?.message, err?.status);
     return res.status(500).json({ error: "Erreur lors de la génération de la réponse" });
   }
-});
+  });
 
-export default router;
+  return router;
+}
+
+export default createChatRouter();

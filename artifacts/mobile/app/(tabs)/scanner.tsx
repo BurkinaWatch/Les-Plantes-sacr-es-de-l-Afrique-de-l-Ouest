@@ -19,22 +19,13 @@ import { useColors } from '@/hooks/useColors';
 import { useTranslation } from '@/i18n';
 import { useAuth } from '@/context/AuthContext';
 import { useNotifications } from '@/hooks/useNotifications';
+import {
+  ApiRequestError,
+  requestPlantRecognition,
+  type PlantRecognitionResult,
+} from '@/lib/ai-api';
 
-interface PlantResult {
-  nom: string;
-  nomScientifique: string;
-  famille: string;
-  description: string;
-  origineGeographique: string;
-  utilisationsTraditionnelles: string[];
-  proprietesMediacinales: string[];
-  symboliqueAfricaine: string;
-  conseils: string[];
-  curiosite: string;
-  confidence: 'high' | 'medium' | 'low';
-  error?: boolean;
-  message?: string;
-}
+type PlantResult = PlantRecognitionResult;
 
 function getApiBase(): string | null {
   const domain = process.env.EXPO_PUBLIC_DOMAIN;
@@ -43,60 +34,6 @@ function getApiBase(): string | null {
 
 const API_BASE = getApiBase();
 const CHAT_API_KEY = process.env.EXPO_PUBLIC_CHAT_API_KEY ?? '';
-
-type ApiErrorCode = 'missing_key' | 'invalid_key' | 'unavailable';
-
-class ApiRequestError extends Error {
-  constructor(public readonly code: ApiErrorCode) {
-    super(code);
-    this.name = 'ApiRequestError';
-  }
-}
-
-interface PlantResponse {
-  plant: PlantResult;
-  remaining: number | null;
-  resetAt: number | null;
-}
-
-function parseRateLimitHeaders(response: Response): { remaining: number | null; resetAt: number | null } {
-  const remaining = response.headers.get('RateLimit-Remaining') ?? response.headers.get('X-RateLimit-Remaining');
-  const reset = response.headers.get('RateLimit-Reset') ?? response.headers.get('X-RateLimit-Reset');
-  return {
-    remaining: remaining !== null ? parseInt(remaining, 10) : null,
-    resetAt: reset !== null ? parseInt(reset, 10) : null,
-  };
-}
-
-async function recognizePlant(imageBase64: string, lang: string, token?: string | null): Promise<PlantResponse> {
-  if (!API_BASE) throw new ApiRequestError('unavailable');
-  if (!CHAT_API_KEY) throw new ApiRequestError('missing_key');
-
-  const response = await fetch(`${API_BASE}/plant-recognition`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'x-api-key': CHAT_API_KEY,
-      ...(token ? { 'Authorization': `Bearer ${token}` } : {}),
-    },
-    body: JSON.stringify({ imageBase64, lang }),
-  });
-
-  const { remaining, resetAt } = parseRateLimitHeaders(response);
-
-  if (!response.ok) {
-    if (response.status === 429) {
-      const err: { error?: string; message?: string } = await response.json().catch(() => ({}));
-      throw Object.assign(new Error(err.error ?? err.message ?? 'rate_limit_exhausted'), { isRateLimit: true, resetAt });
-    }
-    const err = await response.json().catch(() => ({}));
-    if (response.status === 401) throw new ApiRequestError('invalid_key');
-    throw new Error((err as { error?: string }).error ?? 'Erreur serveur');
-  }
-
-  const data = await response.json();
-  return { plant: data.plant as PlantResult, remaining, resetAt };
-}
 
 async function pickImage(source: 'camera' | 'gallery'): Promise<string | null> {
   if (source === 'camera') {
@@ -270,7 +207,13 @@ export default function ScannerScreen() {
     setResult(null);
     try {
       const apiLang = ['fr', 'en'].includes(lang) ? lang : 'fr';
-      const { plant, remaining, resetAt: newResetAt } = await recognizePlant(b64, apiLang, token);
+      const { plant, remaining, resetAt: newResetAt } = await requestPlantRecognition({
+        apiBase: API_BASE,
+        apiKey: CHAT_API_KEY,
+        imageBase64: b64,
+        lang: apiLang,
+        token,
+      });
       if (remaining !== null) setRateLimitRemaining(remaining);
       if (newResetAt !== null) setResetAt(newResetAt);
       if (plant.error) {
@@ -291,7 +234,7 @@ export default function ScannerScreen() {
         setError(errorMessage);
         return;
       }
-      const isRateLimit = (err as any).isRateLimit === true;
+      const isRateLimit = (err as any).name === 'ApiRateLimitError';
       if (isRateLimit) {
         setRateLimitRemaining(0);
         if (err.resetAt != null) setResetAt(err.resetAt);

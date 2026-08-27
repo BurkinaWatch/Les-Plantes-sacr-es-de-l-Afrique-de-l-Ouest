@@ -9,10 +9,10 @@ import {
   RATE_LIMIT_WINDOW_MS,
 } from "../lib/rate-limit.js";
 
-const router = Router();
+type ChatClient = Pick<Groq, "chat">;
 
-let groqClient: Groq | null = null;
-function getGroq(): Groq {
+let groqClient: ChatClient | null = null;
+function getGroq(): ChatClient {
   if (!groqClient) {
     const apiKey = process.env["GROQ_API_KEY"];
     if (!apiKey) {
@@ -78,7 +78,10 @@ Si l'image ne montre pas clairement une plante ou que tu ne peux pas l'identifie
 Retourne UNIQUEMENT du JSON valide. Pas de markdown, pas d'explication, pas de blocs de code.`;
 }
 
-router.post("/", requireApiKey, optionalJwt, recognitionLimiter, monthlyQuotaMiddleware, async (req, res) => {
+export function createPlantRecognitionRouter(getClient: () => ChatClient = getGroq): Router {
+  const router = Router();
+
+  router.post("/", requireApiKey, optionalJwt, recognitionLimiter, monthlyQuotaMiddleware, async (req, res) => {
   const parsed = recognitionSchema.safeParse(req.body);
   if (!parsed.success) {
     return res.status(400).json({ error: "Données invalides", details: parsed.error.issues });
@@ -87,7 +90,7 @@ router.post("/", requireApiKey, optionalJwt, recognitionLimiter, monthlyQuotaMid
   const { imageBase64, lang } = parsed.data;
 
   try {
-    const completion = await getGroq().chat.completions.create({
+    const completion = await getClient().chat.completions.create({
       model: "qwen/qwen3.8-27b",
       max_tokens: 1024,
       temperature: 0.2,
@@ -131,6 +134,9 @@ router.post("/", requireApiKey, optionalJwt, recognitionLimiter, monthlyQuotaMid
     }
     return res.status(500).json({ error: "Erreur lors de l'analyse de la plante" });
   }
-});
+  });
 
-export default router;
+  return router;
+}
+
+export default createPlantRecognitionRouter();
