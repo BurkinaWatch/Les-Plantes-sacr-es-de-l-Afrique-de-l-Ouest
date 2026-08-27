@@ -231,7 +231,7 @@ export function SacredIcon({
       height={size}
       viewBox="0 0 24 24"
       fill="none"
-      accessible={Boolean(accessibilityLabel)}
+      accessible={accessibilityLabel ? true : undefined}
       accessibilityLabel={accessibilityLabel}
     >
       <IconPaths name={name} color={color} strokeWidth={strokeWidth} />
