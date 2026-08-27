@@ -136,7 +136,7 @@ router.post("/totem", requireApiKey, optionalJwt, chatLimiter, monthlyQuotaMiddl
 
   try {
     const completion = await getGroq().chat.completions.create({
-      model: "llama-3.3-70b-versatile",
+      model: "qwen/qwen3.8-27b",
       max_tokens: 512,
       messages: [
         { role: "system", content: systemPrompt },

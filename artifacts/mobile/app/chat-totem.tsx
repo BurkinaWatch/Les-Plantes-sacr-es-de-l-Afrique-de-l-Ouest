@@ -60,6 +60,7 @@ function getApiBase(): string | null {
 }
 
 const API_BASE = getApiBase();
+const CHAT_API_KEY = process.env.EXPO_PUBLIC_CHAT_API_KEY ?? '';
 
 const ADINKRA = ['◆', '▲', '◇', '△', '●', '○', '✦', '✧'];
 const KENTE_STRIP = ['#D4A017', '#C4622D', '#5C7A3E', '#CC7722', '#8B6914', '#D4A017'];
@@ -222,7 +223,7 @@ export default function ChatTotemScreen() {
       const offlineMsg: Message = {
         id: (Date.now() + 1).toString(),
         role: 'assistant',
-        content: '🌐 La Plante Totem nécessite une connexion au serveur. Cette fonctionnalité sera disponible dans une prochaine version.',
+        content: `⚠️ ${t.api_error_unavailable}`,
         timestamp: Date.now(),
       };
       setMessages([...allMessages, offlineMsg]);
@@ -230,13 +231,24 @@ export default function ChatTotemScreen() {
       return;
     }
 
+    if (!CHAT_API_KEY) {
+      const missingKeyMsg: Message = {
+        id: (Date.now() + 1).toString(),
+        role: 'assistant',
+        content: `⚠️ ${t.api_error_missing_key}`,
+        timestamp: Date.now(),
+      };
+      setMessages([...allMessages, missingKeyMsg]);
+      setIsLoading(false);
+      return;
+    }
+
     try {
-      const chatApiKey = process.env.EXPO_PUBLIC_CHAT_API_KEY ?? '';
       const response = await fetch(`${API_BASE}/chat/totem`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          ...(chatApiKey ? { 'x-api-key': chatApiKey } : {}),
+          'x-api-key': CHAT_API_KEY,
           ...(token ? { 'Authorization': `Bearer ${token}` } : {}),
         },
         body: JSON.stringify({
@@ -283,7 +295,14 @@ export default function ChatTotemScreen() {
           return;
         }
         const err = await response.json().catch(() => ({}));
-        throw new Error((err as any).error ?? 'Erreur réseau');
+        const errorMsg: Message = {
+          id: (Date.now() + 1).toString(),
+          role: 'assistant',
+          content: `⚠️ ${response.status === 401 ? t.api_error_invalid_key : (err as any).error ?? t.api_error_unavailable}`,
+          timestamp: Date.now(),
+        };
+        setMessages([...allMessages, errorMsg]);
+        return;
       }
 
       const data = await response.json();
@@ -303,7 +322,7 @@ export default function ChatTotemScreen() {
       const errorMsg: Message = {
         id: (Date.now() + 1).toString(),
         role: 'assistant',
-        content: '⚠️ Une erreur est survenue. Réessaie.',
+        content: `⚠️ ${t.api_error_unavailable}`,
         timestamp: Date.now(),
       };
       const finalMessages = [...allMessages, errorMsg];
@@ -311,7 +330,7 @@ export default function ChatTotemScreen() {
     } finally {
       setIsLoading(false);
     }
-  }, [input, isLoading, plante, totem, messages, lang, currentSessionId, persistSession]);
+  }, [input, isLoading, plante, totem, messages, lang, currentSessionId, persistSession, token, scheduleLocalNotification, t]);
 
   const loadSession = (session: ChatSession) => {
     setMessages(session.messages);

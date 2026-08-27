@@ -31,6 +31,9 @@ export const mos: Translations = {
   scanner_confidence_low: 'Bilf',
   scanner_error_no_plant: 'Yɩɩga ka yãt ye. Paam foto sẽn noom wʋsgo.',
   scanner_error_generic: 'Tʋʋmd ka maan ye. Ges tɩ f leb n maan.',
+  api_error_missing_key: "Service indisponible : la clé d'accès de l'application est manquante. Contactez le support.",
+  api_error_invalid_key: "Clé d'accès invalide. Fermez puis rouvrez l'application ou contactez le support.",
+  api_error_unavailable: 'Impossible de joindre le service. Vérifiez votre connexion et réessayez.',
   scanner_retry: 'Leb n maan',
   scanner_new_scan: 'Yɩiga yɩɩga',
 

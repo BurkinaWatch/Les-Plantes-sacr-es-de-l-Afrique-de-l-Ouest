@@ -36,7 +36,22 @@ interface PlantResult {
   message?: string;
 }
 
-const API_BASE = `https://${process.env.EXPO_PUBLIC_DOMAIN}/api`;
+function getApiBase(): string | null {
+  const domain = process.env.EXPO_PUBLIC_DOMAIN;
+  return domain ? `https://${domain}/api` : null;
+}
+
+const API_BASE = getApiBase();
+const CHAT_API_KEY = process.env.EXPO_PUBLIC_CHAT_API_KEY ?? '';
+
+type ApiErrorCode = 'missing_key' | 'invalid_key' | 'unavailable';
+
+class ApiRequestError extends Error {
+  constructor(public readonly code: ApiErrorCode) {
+    super(code);
+    this.name = 'ApiRequestError';
+  }
+}
 
 interface PlantResponse {
   plant: PlantResult;
@@ -54,12 +69,14 @@ function parseRateLimitHeaders(response: Response): { remaining: number | null; 
 }
 
 async function recognizePlant(imageBase64: string, lang: string, token?: string | null): Promise<PlantResponse> {
-  const chatApiKey = process.env.EXPO_PUBLIC_CHAT_API_KEY ?? '';
+  if (!API_BASE) throw new ApiRequestError('unavailable');
+  if (!CHAT_API_KEY) throw new ApiRequestError('missing_key');
+
   const response = await fetch(`${API_BASE}/plant-recognition`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      ...(chatApiKey ? { 'x-api-key': chatApiKey } : {}),
+      'x-api-key': CHAT_API_KEY,
       ...(token ? { 'Authorization': `Bearer ${token}` } : {}),
     },
     body: JSON.stringify({ imageBase64, lang }),
@@ -73,6 +90,7 @@ async function recognizePlant(imageBase64: string, lang: string, token?: string 
       throw Object.assign(new Error(err.error ?? err.message ?? 'rate_limit_exhausted'), { isRateLimit: true, resetAt });
     }
     const err = await response.json().catch(() => ({}));
+    if (response.status === 401) throw new ApiRequestError('invalid_key');
     throw new Error((err as { error?: string }).error ?? 'Erreur serveur');
   }
 
@@ -263,12 +281,22 @@ export default function ScannerScreen() {
         await scheduleLocalNotification(t.notif_scan_title, t.notif_scan_body);
       }
     } catch (err: any) {
+      if (err instanceof ApiRequestError) {
+        const errorMessage =
+          err.code === 'missing_key'
+            ? t.api_error_missing_key
+            : err.code === 'invalid_key'
+            ? t.api_error_invalid_key
+            : t.api_error_unavailable;
+        setError(errorMessage);
+        return;
+      }
       const isRateLimit = (err as any).isRateLimit === true;
       if (isRateLimit) {
         setRateLimitRemaining(0);
         if (err.resetAt != null) setResetAt(err.resetAt);
       }
-      setError(isRateLimit ? t.rate_limit_exhausted : (err.message ?? t.scanner_error_generic));
+      setError(isRateLimit ? t.rate_limit_exhausted : t.api_error_unavailable);
     } finally {
       setLoading(false);
     }

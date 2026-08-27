@@ -26,6 +26,9 @@ export const fr: Translations = {
   scanner_confidence_low: "Faible",
   scanner_error_no_plant: "Plante non identifiable. Essayez avec une photo plus nette ou un angle différent.",
   scanner_error_generic: "Erreur lors de l'analyse. Veuillez réessayer.",
+  api_error_missing_key: "Service indisponible : la clé d'accès de l'application est manquante. Contactez le support.",
+  api_error_invalid_key: "Clé d'accès invalide. Fermez puis rouvrez l'application ou contactez le support.",
+  api_error_unavailable: "Impossible de joindre le service. Vérifiez votre connexion et réessayez.",
   scanner_retry: "Réessayer",
   scanner_new_scan: "Nouvelle analyse",
 

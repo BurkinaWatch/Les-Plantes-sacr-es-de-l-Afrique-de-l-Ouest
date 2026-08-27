@@ -31,6 +31,9 @@ export const dyo: Translations = {
   scanner_confidence_low: 'Dɔɔni',
   scanner_error_no_plant: 'Yiri ma sɔrɔ ye. Foto wɛrɛ ta.',
   scanner_error_generic: 'Fili sɔrɔra. A lɔn tuma.',
+  api_error_missing_key: "Service indisponible : la clé d'accès de l'application est manquante. Contactez le support.",
+  api_error_invalid_key: "Clé d'accès invalide. Fermez puis rouvrez l'application ou contactez le support.",
+  api_error_unavailable: 'Impossible de joindre le service. Vérifiez votre connexion et réessayez.',
   scanner_retry: 'A lɔn',
   scanner_new_scan: 'Yiri kura dɔn',
 

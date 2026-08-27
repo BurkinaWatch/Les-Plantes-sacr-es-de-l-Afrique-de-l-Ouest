@@ -88,7 +88,7 @@ router.post("/", requireApiKey, optionalJwt, recognitionLimiter, monthlyQuotaMid
 
   try {
     const completion = await getGroq().chat.completions.create({
-      model: "meta-llama/llama-4-scout-17b-16e-instruct",
+      model: "qwen/qwen3.8-27b",
       max_tokens: 1024,
       temperature: 0.2,
       messages: [

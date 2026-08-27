@@ -92,11 +92,11 @@ if (!BASE_URL) {
    *   - 2xx → key was accepted (unexpected with dummy body, but still fine)
    *   - 5xx → server error (surfaces misconfiguration)
    */
-  async function probeRoute({ label, path, withKey }) {
+  async function probeRoute({ label, path, key }) {
     const url = `${BASE_URL}${path}`;
     const headers = { "Content-Type": "application/json" };
-    if (withKey && CHAT_API_KEY) {
-      headers["x-api-key"] = CHAT_API_KEY;
+    if (key) {
+      headers["x-api-key"] = key;
     }
 
     let status;
@@ -124,12 +124,12 @@ if (!BASE_URL) {
   ];
 
   for (const route of routes) {
-    // (a) With key — must NOT be 401 or 5xx
-    const statusWith = await probeRoute({ ...route, label: `${route.label} (with key)`, withKey: true });
+    // (a) With the key bundled into the Expo app — must NOT be 401 or 5xx.
+    const statusWith = await probeRoute({ ...route, label: `${route.label} (with Expo key)`, key: EXPO_PUBLIC_CHAT_API_KEY });
     if (statusWith !== null) {
       if (statusWith === 401) {
-        fail(`${route.label}: server returned 401 even though x-api-key was sent.`);
-        fail("  → CHAT_API_KEY on the server does not match the key in this environment.");
+        fail(`${route.label}: server returned 401 even though the Expo key was sent.`);
+        fail("  → EXPO_PUBLIC_CHAT_API_KEY does not match the server's CHAT_API_KEY.");
         fail("  → Redeploy after aligning both secrets.");
       } else if (statusWith >= 500) {
         fail(`${route.label}: server returned ${statusWith} — possible startup misconfiguration (check server logs).`);
@@ -139,14 +139,28 @@ if (!BASE_URL) {
       }
     }
 
-    // (b) Without key — must be 401 (confirms auth IS enforced)
-    const statusWithout = await probeRoute({ ...route, label: `${route.label} (no key)`, withKey: false });
+    // (b) Without key — must be 401 (confirms auth IS enforced).
+    const statusWithout = await probeRoute({ ...route, label: `${route.label} (no key)`, key: null });
     if (statusWithout !== null) {
       if (statusWithout === 401) {
         pass(`${route.label}: auth enforced — unauthenticated request correctly rejected.`);
       } else {
         fail(`${route.label}: unauthenticated request returned ${statusWithout} instead of 401.`);
         fail("  → The route is not protected — CHAT_API_KEY may not be loaded by the server.");
+      }
+    }
+
+    // (c) With an invalid key — must be 401 (confirms invalid mobile keys fail clearly).
+    const statusInvalid = await probeRoute({
+      ...route,
+      label: `${route.label} (invalid key)`,
+      key: "invalid-key-for-smoke-test",
+    });
+    if (statusInvalid !== null) {
+      if (statusInvalid === 401) {
+        pass(`${route.label}: invalid key correctly rejected.`);
+      } else {
+        fail(`${route.label}: invalid key returned ${statusInvalid} instead of 401.`);
       }
     }
   }
