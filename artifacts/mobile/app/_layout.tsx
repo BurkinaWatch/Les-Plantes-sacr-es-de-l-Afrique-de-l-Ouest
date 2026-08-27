@@ -37,7 +37,7 @@ if (Platform.OS === "web" && typeof window !== "undefined") {
   window.onerror = (msg, src, _line, _col, _err) => {
     if (typeof src === "string" && src.includes("fontfaceobserver")) return true;
     if (typeof msg === "string" && (msg.includes("ms timeout") || msg.includes("font timed out"))) return true;
-    return origError ? origError.apply(window, arguments as any) : false;
+    return origError ? origError(msg, src, _line, _col, _err) : false;
   };
 }
 
@@ -163,7 +163,7 @@ function ScannerFab() {
   const ringScale = useRef(new Animated.Value(1)).current;
   const ringOpacity = useRef(new Animated.Value(0.7)).current;
 
-  const isOnAccueil = segments[0] === "(tabs)" && (segments[1] === "index" || segments[1] === undefined);
+  const isOnAccueil = segments[0] === "(tabs)" && segments[1] === undefined;
 
   useEffect(() => {
     if (!isOnAccueil) return;

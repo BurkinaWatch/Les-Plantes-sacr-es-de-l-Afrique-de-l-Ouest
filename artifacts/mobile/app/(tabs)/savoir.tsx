@@ -807,6 +807,7 @@ const styles = StyleSheet.create({
 
   /* Reading */
   readingContent: { padding: 20, gap: 18 },
+  iconLabelRow: { flexDirection: 'row', alignItems: 'center', gap: 7 },
   paragraph: { fontSize: 15, lineHeight: 26, fontWeight: '400' },
   readingSubtitle: { fontSize: 11, fontWeight: '800', letterSpacing: 2, marginTop: 4 },
   quoteBlock: { borderLeftWidth: 3, borderRadius: 6, paddingVertical: 12, paddingHorizontal: 16 },

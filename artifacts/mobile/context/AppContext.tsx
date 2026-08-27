@@ -9,6 +9,8 @@ interface QuizResult {
   primary: TotemAnimalId;
   secondary: TotemAnimalId;
   completedAt: string;
+  scores?: Record<TotemAnimalId, number>;
+  dimensionScores?: Record<'E' | 'O' | 'C' | 'A' | 'S', number>;
 }
 
 interface AppContextType {

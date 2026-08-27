@@ -75,6 +75,8 @@ export default function QuizScreen() {
           primary: calc.primary,
           secondary: calc.secondary,
           completedAt: new Date().toISOString(),
+          scores: calc.scores,
+          dimensionScores: calc.dimensionScores,
         });
         setTimeout(() => setScreen('result'), 300);
       }

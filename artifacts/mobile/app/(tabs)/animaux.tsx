@@ -2,6 +2,7 @@ import React, { useMemo, useState } from 'react';
 import {
   FlatList,
   Platform,
+  Pressable,
   StyleSheet,
   Text,
   TextInput,
