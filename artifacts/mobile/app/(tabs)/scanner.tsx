@@ -22,10 +22,10 @@ import { useNotifications } from '@/hooks/useNotifications';
 import {
   ApiRequestError,
   requestPlantRecognition,
-  type PlantRecognitionResult,
+  type PlantRecognitionSuccess,
 } from '@/lib/ai-api';
 
-type PlantResult = PlantRecognitionResult;
+type PlantResult = PlantRecognitionSuccess;
 
 function getApiBase(): string | null {
   const domain = process.env.EXPO_PUBLIC_DOMAIN;
@@ -344,7 +344,11 @@ export default function ScannerScreen() {
         <View style={[styles.errorBox, { backgroundColor: '#2A0A0A', borderColor: '#C0392B' }]}>
           <Feather name="alert-circle" size={18} color="#E74C3C" />
           <Text style={styles.errorText}>{error}</Text>
-          <Pressable style={[styles.retryBtn, { borderColor: colors.gold }]} onPress={reset}>
+          <Pressable
+            style={[styles.retryBtn, { borderColor: colors.gold }]}
+            onPress={() => imageBase64 ? analyze(imageBase64) : reset()}
+            disabled={loading}
+          >
             <Text style={[styles.retryText, { color: colors.gold }]}>{t.scanner_retry}</Text>
           </Pressable>
         </View>

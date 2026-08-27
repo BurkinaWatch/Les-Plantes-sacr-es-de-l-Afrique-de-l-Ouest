@@ -26,7 +26,7 @@ export interface TotemRequest {
   userLang: 'fr' | 'en';
 }
 
-export interface PlantRecognitionResult {
+export interface PlantRecognitionSuccess {
   nom: string;
   nomScientifique: string;
   famille: string;
@@ -38,8 +38,45 @@ export interface PlantRecognitionResult {
   conseils: string[];
   curiosite: string;
   confidence: 'high' | 'medium' | 'low';
-  error?: boolean;
-  message?: string;
+  error?: false;
+}
+
+export interface PlantRecognitionFailure {
+  error: true;
+  message: string;
+}
+
+export type PlantRecognitionResult = PlantRecognitionSuccess | PlantRecognitionFailure;
+
+function isNonEmptyString(value: unknown): value is string {
+  return typeof value === 'string' && value.trim().length > 0;
+}
+
+function isStringArray(value: unknown): value is string[] {
+  return Array.isArray(value) && value.every(isNonEmptyString);
+}
+
+function isPlantRecognitionResult(value: unknown): value is PlantRecognitionResult {
+  if (typeof value !== 'object' || value === null) return false;
+
+  const candidate = value as Record<string, unknown>;
+  if (candidate.error === true) {
+    return isNonEmptyString(candidate.message);
+  }
+
+  return (
+    isNonEmptyString(candidate.nom) &&
+    isNonEmptyString(candidate.nomScientifique) &&
+    isNonEmptyString(candidate.famille) &&
+    isNonEmptyString(candidate.description) &&
+    isNonEmptyString(candidate.origineGeographique) &&
+    isStringArray(candidate.utilisationsTraditionnelles) &&
+    isStringArray(candidate.proprietesMediacinales) &&
+    isNonEmptyString(candidate.symboliqueAfricaine) &&
+    isStringArray(candidate.conseils) &&
+    isNonEmptyString(candidate.curiosite) &&
+    (candidate.confidence === 'high' || candidate.confidence === 'medium' || candidate.confidence === 'low')
+  );
 }
 
 export interface PlantResponse {
@@ -110,7 +147,10 @@ export async function requestTotem(
     args.body,
     args.fetchImpl ?? fetch,
   );
-  return { content: data.content ?? '', remaining, resetAt };
+  if (!isNonEmptyString(data?.content)) {
+    throw new ApiRequestError('unavailable');
+  }
+  return { content: data.content, remaining, resetAt };
 }
 
 export async function requestPlantRecognition(
@@ -123,7 +163,7 @@ export async function requestPlantRecognition(
     fetchImpl?: FetchLike;
   },
 ): Promise<PlantResponse> {
-  const { data, remaining, resetAt } = await postAiRequest<{ plant: PlantRecognitionResult }>(
+  const { data, remaining, resetAt } = await postAiRequest<{ plant?: unknown }>(
     '/plant-recognition',
     args.apiBase,
     args.apiKey,
@@ -131,5 +171,8 @@ export async function requestPlantRecognition(
     { imageBase64: args.imageBase64, lang: args.lang },
     args.fetchImpl ?? fetch,
   );
+  if (!isPlantRecognitionResult(data?.plant)) {
+    throw new ApiRequestError('unavailable');
+  }
   return { plant: data.plant, remaining, resetAt };
 }

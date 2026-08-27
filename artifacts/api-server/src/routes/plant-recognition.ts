@@ -35,6 +35,30 @@ const recognitionSchema = z.object({
   lang: z.enum(["fr", "en", "mos", "dyo", "ful"]).default("fr"),
 });
 
+const plantRecognitionDataSchema = z.object({
+  nom: z.string().trim().min(1),
+  nomScientifique: z.string().trim().min(1),
+  famille: z.string().trim().min(1),
+  description: z.string().trim().min(1),
+  origineGeographique: z.string().trim().min(1),
+  utilisationsTraditionnelles: z.array(z.string().trim().min(1)),
+  proprietesMediacinales: z.array(z.string().trim().min(1)),
+  symboliqueAfricaine: z.string().trim().min(1),
+  conseils: z.array(z.string().trim().min(1)),
+  curiosite: z.string().trim().min(1),
+  confidence: z.enum(["high", "medium", "low"]),
+});
+
+const plantRecognitionErrorSchema = z.object({
+  error: z.literal(true),
+  message: z.string().trim().min(1),
+});
+
+const plantRecognitionResponseSchema = z.union([
+  plantRecognitionDataSchema,
+  plantRecognitionErrorSchema,
+]);
+
 function buildPrompt(lang: string): string {
   const isEn = lang === "en";
   return isEn
@@ -113,16 +137,22 @@ export function createPlantRecognitionRouter(getClient: () => ChatClient = getGr
       ],
     });
 
-    const raw = completion.choices[0]?.message?.content ?? "";
+    const rawContent = completion.choices[0]?.message?.content;
+    const raw = typeof rawContent === "string" ? rawContent : "";
 
     const jsonMatch = raw.match(/\{[\s\S]*\}/);
     if (!jsonMatch) {
       console.error("[plant-recognition] No JSON in response:", raw.slice(0, 200));
-      return res.status(500).json({ error: "Réponse invalide du modèle IA" });
+      return res.status(502).json({ error: "Réponse invalide du modèle IA. Réessaie dans un instant." });
     }
 
-    const plantData = JSON.parse(jsonMatch[0]);
-    return res.json({ plant: plantData });
+    const plantData = plantRecognitionResponseSchema.safeParse(JSON.parse(jsonMatch[0]));
+    if (!plantData.success) {
+      console.error("[plant-recognition] Incomplete model response:", plantData.error.issues);
+      return res.status(502).json({ error: "Réponse incomplète du modèle IA. Réessaie dans un instant." });
+    }
+
+    return res.json({ plant: plantData.data });
   } catch (err: any) {
     if (err?.message === "GROQ_API_KEY_MISSING") {
       console.error("[plant-recognition] GROQ_API_KEY is not configured");
@@ -130,7 +160,7 @@ export function createPlantRecognitionRouter(getClient: () => ChatClient = getGr
     }
     console.error("[plant-recognition] Error:", err?.message, err?.status);
     if (err instanceof SyntaxError) {
-      return res.status(500).json({ error: "La réponse de l'IA n'est pas du JSON valide" });
+      return res.status(502).json({ error: "La réponse de l'IA n'est pas du JSON valide. Réessaie dans un instant." });
     }
     return res.status(500).json({ error: "Erreur lors de l'analyse de la plante" });
   }

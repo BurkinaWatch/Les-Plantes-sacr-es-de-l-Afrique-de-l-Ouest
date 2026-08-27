@@ -47,3 +47,11 @@ For **Expo SDK 54** (`expo@~54.0.27`), the correct version is `expo-image-picker
 - `~56.x` or later → too new, crashes with `createPermissionHook is not a function`
 
 **Why:** Expo uses `createPermissionHook` from the `expo` package internally. Mismatched versions cause a runtime crash at module load time before any screen renders.
+
+## Static build package checks
+
+The mobile static build validates installed Expo package versions against the SDK's expected patch versions and refuses to continue when they are outdated, even if Metro development mode starts successfully.
+
+**Why:** The static export bundles native-compatible packages, so a working development preview does not guarantee a deployable Expo Go build.
+
+**How to apply:** When the static build reports outdated Expo packages, align them with the exact versions requested by the installed SDK before treating the build as deployable.

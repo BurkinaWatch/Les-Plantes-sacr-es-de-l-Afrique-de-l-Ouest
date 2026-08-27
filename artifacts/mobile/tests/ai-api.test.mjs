@@ -30,6 +30,20 @@ const totemBody = {
   userLang: "fr",
 };
 
+const validPlant = {
+  nom: "Baobab",
+  nomScientifique: "Adansonia digitata",
+  famille: "Malvaceae",
+  description: "Un arbre emblématique des savanes.",
+  origineGeographique: "Afrique de l'Ouest",
+  utilisationsTraditionnelles: ["Alimentation"],
+  proprietesMediacinales: ["Riche en vitamine C"],
+  symboliqueAfricaine: "Un symbole de résilience.",
+  conseils: ["Respecter l'arbre."],
+  curiosite: "Son tronc peut stocker beaucoup d'eau.",
+  confidence: "high",
+};
+
 test("Totem client returns a successful mocked response and sends the API key", async () => {
   const mock = fakeFetch(response(200, { content: "Je t'écoute." }, {
     "RateLimit-Remaining": "19",
@@ -51,7 +65,7 @@ test("Totem client returns a successful mocked response and sends the API key", 
 });
 
 test("Plant recognition client returns a successful mocked response", async () => {
-  const plant = { nom: "Baobab", confidence: "high" };
+  const plant = validPlant;
   const mock = fakeFetch(response(200, { plant }));
   const result = await requestPlantRecognition({
     apiBase: "https://example.test/api",
@@ -67,6 +81,50 @@ test("Plant recognition client returns a successful mocked response", async () =
     imageBase64: "fake-image",
     lang: "fr",
   });
+});
+
+test("Totem client rejects a successful response with no usable content", async () => {
+  const mock = fakeFetch(response(200, { content: "  " }));
+
+  await assert.rejects(
+    requestTotem({
+      apiBase: "https://example.test/api",
+      apiKey: "mobile-test-key",
+      body: totemBody,
+      fetchImpl: mock.fetchImpl,
+    }),
+    (error) => error instanceof ApiRequestError && error.code === "unavailable",
+  );
+});
+
+test("Plant recognition client rejects an incomplete successful payload", async () => {
+  const mock = fakeFetch(response(200, { plant: { nom: "Baobab" } }));
+
+  await assert.rejects(
+    requestPlantRecognition({
+      apiBase: "https://example.test/api",
+      apiKey: "mobile-test-key",
+      imageBase64: "fake-image",
+      lang: "fr",
+      fetchImpl: mock.fetchImpl,
+    }),
+    (error) => error instanceof ApiRequestError && error.code === "unavailable",
+  );
+});
+
+test("Plant recognition client preserves a valid unable-to-identify response", async () => {
+  const plant = { error: true, message: "Impossible d'identifier la plante." };
+  const mock = fakeFetch(response(200, { plant }));
+
+  const result = await requestPlantRecognition({
+    apiBase: "https://example.test/api",
+    apiKey: "mobile-test-key",
+    imageBase64: "fake-image",
+    lang: "fr",
+    fetchImpl: mock.fetchImpl,
+  });
+
+  assert.deepEqual(result.plant, plant);
 });
 
 for (const request of [

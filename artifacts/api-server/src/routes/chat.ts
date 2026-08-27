@@ -147,7 +147,12 @@ export function createChatRouter(getClient: () => ChatClient = getGroq): Router 
       ],
     });
 
-    const content = completion.choices[0]?.message?.content ?? "";
+    const rawContent = completion.choices[0]?.message?.content;
+    const content = typeof rawContent === "string" ? rawContent : "";
+    if (!content.trim()) {
+      console.error("[chat/totem] Model returned no usable content");
+      return res.status(502).json({ error: "Réponse indisponible du modèle IA. Réessaie dans un instant." });
+    }
     return res.json({ content });
   } catch (err: any) {
     if (err?.message === "GROQ_API_KEY_MISSING") {

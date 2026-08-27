@@ -27,7 +27,7 @@ const plantData = {
   niveauSpirituel: 5,
 };
 
-function createMockGroq() {
+function createMockGroq({ chatContent, plantContent } = {}) {
   const calls = [];
   return {
     calls,
@@ -40,7 +40,7 @@ function createMockGroq() {
               return {
                 choices: [{
                   message: {
-                    content: JSON.stringify({
+                    content: plantContent ?? JSON.stringify({
                       nom: "Baobab",
                       nomScientifique: "Adansonia digitata",
                       famille: "Malvaceae",
@@ -57,7 +57,7 @@ function createMockGroq() {
                 }],
               };
             }
-            return { choices: [{ message: { content: "Je suis là, au cœur de tes racines." } }] };
+            return { choices: [{ message: { content: chatContent ?? "Je suis là, au cœur de tes racines." } }] };
           },
         },
       },
@@ -124,6 +124,41 @@ test("Plant recognition returns the mocked structured plant response", async () 
     assert.equal(mock.calls[0].messages[0].content[0].image_url.url, "data:image/jpeg;base64,fake-image-bytes");
   });
 });
+
+test("Totem chat returns a retryable error when the model has no usable content", async () => {
+  const mock = createMockGroq({ chatContent: "   " });
+  await withApp(mock, async (baseUrl) => {
+    const result = await post(baseUrl, "/api/chat/totem", {
+      planteId: "baobab",
+      planteData: plantData,
+      messages: [{ role: "user", content: "Que peux-tu m'apprendre ?" }],
+      userLang: "fr",
+    });
+
+    assert.equal(result.response.status, 502);
+    assert.match(result.body.error, /indisponible|Réponse/i);
+    assert.equal(mock.calls.length, 1);
+  });
+});
+
+for (const [description, plantContent] of [
+  ["non-JSON content", "Je ne peux pas identifier cette plante."],
+  ["incomplete JSON content", JSON.stringify({ nom: "Baobab", confidence: "high" })],
+]) {
+  test(`Plant recognition returns a retryable error for ${description}`, async () => {
+    const mock = createMockGroq({ plantContent });
+    await withApp(mock, async (baseUrl) => {
+      const result = await post(baseUrl, "/api/plant-recognition", {
+        imageBase64: "fake-image-bytes",
+        lang: "fr",
+      });
+
+      assert.equal(result.response.status, 502);
+      assert.match(result.body.error, /Réponse|JSON/i);
+      assert.equal(mock.calls.length, 1);
+    });
+  });
+}
 
 for (const path of ["/api/chat/totem", "/api/plant-recognition"]) {
   test(`${path} clearly rejects a missing API key`, async () => {
