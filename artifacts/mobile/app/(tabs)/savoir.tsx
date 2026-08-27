@@ -467,7 +467,10 @@ export default function SavoirScreen() {
         colors={[colors.deepBrown, colors.background]}
         style={[styles.header, { paddingTop: topPad + 8 }]}
       >
-        <Text style={[styles.headerLabel, { color: colors.gold }]}>✦ SAVOIR ANCESTRAL</Text>
+        <View style={styles.headerLabelRow}>
+          <SacredIcon name="sparkles" size={14} color={colors.gold} />
+          <Text style={[styles.headerLabel, { color: colors.gold, marginBottom: 0 }]}>SAVOIR ANCESTRAL</Text>
+        </View>
         <Text style={[styles.headerTitle, { color: colors.ivory }]}>{headerTitles[activeTab]}</Text>
         <Text style={[styles.headerSub, { color: colors.mutedForeground }]}>{headerSubs[activeTab]}</Text>
 
@@ -481,12 +484,19 @@ export default function SavoirScreen() {
                 style={[styles.segmentBtn, isActive && { backgroundColor: colors.gold }]}
                 onPress={() => setActiveTab(tab.key)}
               >
-                <Text style={[
-                  styles.segmentText,
-                  { color: isActive ? colors.deepBrown : colors.mutedForeground },
-                ]}>
-                  {tab.emoji} {tab.label}
-                </Text>
+                <View style={styles.segmentContent}>
+                  <SacredIcon
+                    name={tab.icon}
+                    size={14}
+                    color={isActive ? colors.deepBrown : colors.mutedForeground}
+                  />
+                  <Text style={[
+                    styles.segmentText,
+                    { color: isActive ? colors.deepBrown : colors.mutedForeground },
+                  ]}>
+                    {tab.label}
+                  </Text>
+                </View>
               </Pressable>
             );
           })}
@@ -495,7 +505,7 @@ export default function SavoirScreen() {
         {/* Plante search bar */}
         {activeTab === 'plantes' && (
           <View style={[styles.searchBar, { backgroundColor: colors.card, borderColor: colors.border }]}>
-            <Text style={{ fontSize: 14 }}>🔍</Text>
+            <SacredIcon name="search" size={17} color={colors.mutedForeground} />
             <TextInput
               style={[styles.searchInput, { color: colors.ivory }]}
               placeholder="Rechercher une plante, indication..."
@@ -506,7 +516,7 @@ export default function SavoirScreen() {
             />
             {planteSearch.length > 0 && (
               <Pressable onPress={() => setPlanteSearch('')}>
-                <Text style={[styles.searchClear, { color: colors.mutedForeground }]}>✕</Text>
+                <SacredIcon name="close" size={16} color={colors.mutedForeground} />
               </Pressable>
             )}
           </View>
@@ -534,14 +544,22 @@ export default function SavoirScreen() {
                 style={StyleSheet.absoluteFillObject}
               />
               <View style={[styles.iconWrap, { backgroundColor: recipe.couleur + '28' }]}>
-                <Text style={styles.iconText}>{recipe.planteIcon}</Text>
+                <SacredIcon
+                  name={iconForGlyph(recipe.planteIcon)}
+                  size={30}
+                  color={recipe.couleur}
+                  accessibilityLabel={recipe.plante}
+                />
               </View>
               <View style={{ flex: 1, gap: 4 }}>
                 <View style={styles.cardMetaRow}>
                   <View style={[styles.catChip, { backgroundColor: recipe.couleur + '25' }]}>
                     <Text style={[styles.catChipText, { color: recipe.couleur }]}>{recipe.categorieLabel}</Text>
                   </View>
-                  <Text style={[styles.cardDur, { color: colors.mutedForeground }]}>⏱ {recipe.duree}</Text>
+                  <View style={styles.metaInline}>
+                    <SacredIcon name="clock" size={12} color={colors.mutedForeground} />
+                    <Text style={[styles.cardDur, { color: colors.mutedForeground }]}>{recipe.duree}</Text>
+                  </View>
                 </View>
                 <Text style={[styles.cardTitle, { color: colors.ivory }]}>{recipe.titre}</Text>
                 <Text style={[styles.cardSub, { color: recipe.couleur }]} numberOfLines={1}>{recipe.plante}</Text>
@@ -560,7 +578,7 @@ export default function SavoirScreen() {
                   </View>
                 </View>
               </View>
-              <Text style={[styles.arrow, { color: recipe.couleur }]}>›</Text>
+              <SacredIcon name="chevron-right" size={20} color={recipe.couleur} />
             </Pressable>
           ))}
         </ScrollView>
@@ -591,10 +609,18 @@ export default function SavoirScreen() {
                   <View style={[styles.catChip, { backgroundColor: article.couleur + '25' }]}>
                     <Text style={[styles.catChipText, { color: article.couleur }]}>{article.categorieLabel}</Text>
                   </View>
-                  <Text style={[styles.cardDur, { color: colors.mutedForeground }]}>📖 {article.duree}</Text>
+                  <View style={styles.metaInline}>
+                    <SacredIcon name="book" size={12} color={colors.mutedForeground} />
+                    <Text style={[styles.cardDur, { color: colors.mutedForeground }]}>{article.duree}</Text>
+                  </View>
                 </View>
                 <View style={styles.articleTitleRow}>
-                  <Text style={styles.articleCardIcon}>{article.planteIcon}</Text>
+                  <SacredIcon
+                    name={iconForGlyph(article.planteIcon)}
+                    size={24}
+                    color={article.couleur}
+                    accessibilityLabel={article.titre}
+                  />
                   <Text style={[styles.cardTitle, { color: colors.ivory, flex: 1 }]} numberOfLines={2}>
                     {article.titre}
                   </Text>
@@ -607,11 +633,14 @@ export default function SavoirScreen() {
                 <Text style={[styles.cardDesc, { color: colors.mutedForeground }]} numberOfLines={2}>
                   {article.resume}
                 </Text>
-                <Text style={[styles.articleAuthor, { color: colors.mutedForeground }]}>
-                  ✍️ {article.auteur} · {article.annee}
-                </Text>
+                <View style={styles.metaInline}>
+                  <SacredIcon name="user" size={12} color={colors.mutedForeground} />
+                  <Text style={[styles.articleAuthor, { color: colors.mutedForeground }]}>
+                    {article.auteur} · {article.annee}
+                  </Text>
+                </View>
               </View>
-              <Text style={[styles.arrow, { color: article.couleur }]}>›</Text>
+              <SacredIcon name="chevron-right" size={20} color={article.couleur} />
             </Pressable>
           ))}
         </ScrollView>
@@ -625,7 +654,7 @@ export default function SavoirScreen() {
         >
           {filteredPlantes.length === 0 && (
             <View style={styles.emptyState}>
-              <Text style={{ fontSize: 40 }}>🌿</Text>
+              <SacredIcon name="leaf" size={42} color={colors.mutedForeground} accessibilityLabel="Aucune plante trouvée" />
               <Text style={[styles.emptyText, { color: colors.mutedForeground }]}>
                 Aucune plante trouvée pour « {planteSearch} »
               </Text>
@@ -646,7 +675,12 @@ export default function SavoirScreen() {
                 style={StyleSheet.absoluteFillObject}
               />
               <View style={[styles.iconWrap, { backgroundColor: plante.couleur + '28' }]}>
-                <Text style={styles.iconText}>{plante.icone}</Text>
+                <SacredIcon
+                  name={iconForGlyph(plante.icone)}
+                  size={30}
+                  color={plante.couleur}
+                  accessibilityLabel={plante.nomVulgaire}
+                />
               </View>
               <View style={{ flex: 1, gap: 4 }}>
                 <View style={[styles.catChip, { backgroundColor: plante.couleur + '25', alignSelf: 'flex-start' }]}>
@@ -674,7 +708,7 @@ export default function SavoirScreen() {
                   {plante.emplois[0]?.indication}
                 </Text>
               </View>
-              <Text style={[styles.arrow, { color: plante.couleur }]}>›</Text>
+              <SacredIcon name="chevron-right" size={20} color={plante.couleur} />
             </Pressable>
           ))}
         </ScrollView>
