@@ -9,44 +9,6 @@ args = ["pnpm", "store", "prune"]
 env = { "CI" = "true" }
 
 [workflows]
-runButton = "Project"
-
-[[workflows.workflow]]
-name = "Project"
-mode = "parallel"
-author = "agent"
-
-[[workflows.workflow.tasks]]
-task = "workflow.run"
-args = "Mobile app"
-
-[[workflows.workflow.tasks]]
-task = "workflow.run"
-args = "API server"
-
-[[workflows.workflow]]
-name = "Mobile app"
-author = "agent"
-
-[[workflows.workflow.tasks]]
-task = "shell.exec"
-args = "(flock -x 200; pnpm install) 200>/tmp/pnpm-install.lock && PORT=5173 pnpm --filter @workspace/mobile run dev"
-waitForPort = 5173
-
-[workflows.workflow.metadata]
-outputType = "webview"
-
-[[workflows.workflow]]
-name = "API server"
-author = "agent"
-
-[[workflows.workflow.tasks]]
-task = "shell.exec"
-args = "(flock -x 200; pnpm install) 200>/tmp/pnpm-install.lock && PORT=8080 pnpm --filter @workspace/api-server run dev"
-waitForPort = 8080
-
-[workflows.workflow.metadata]
-outputType = "console"
 
 [agent]
 stack = "PNPM_WORKSPACE"
