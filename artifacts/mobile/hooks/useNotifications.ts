@@ -8,19 +8,33 @@
  */
 import { useEffect, useRef, useState } from 'react';
 import { Platform } from 'react-native';
-import * as Notifications from 'expo-notifications';
 import Constants, { AppOwnership, ExecutionEnvironment } from 'expo-constants';
+import type * as Notifications from 'expo-notifications';
 
-// How delivered notifications appear while the app is in the foreground
-Notifications.setNotificationHandler({
-  handleNotification: async () => ({
-    shouldShowAlert: true,
-    shouldPlaySound: true,
-    shouldSetBadge: false,
-    shouldShowBanner: true,
-    shouldShowList: true,
-  }),
-});
+type NotificationsApi = typeof Notifications;
+
+let notificationsApi: NotificationsApi | null = null;
+
+function loadNotificationsApi(): NotificationsApi | null {
+  if (notificationsApi) return notificationsApi;
+
+  try {
+    // Keep the native module out of Expo Go: Android remote notifications are
+    // unavailable there and the module logs an error during import.
+    notificationsApi = require('expo-notifications') as NotificationsApi;
+  } catch {
+    notificationsApi = null;
+  }
+
+  return notificationsApi;
+}
+
+function isExpoGo() {
+  return (
+    Constants.appOwnership === AppOwnership.Expo ||
+    Constants.executionEnvironment === ExecutionEnvironment.StoreClient
+  );
+}
 
 export interface UseNotificationsReturn {
   /** Expo push token — undefined until retrieved, null if unavailable */
@@ -40,14 +54,29 @@ export function useNotifications(): UseNotificationsReturn {
     // Notifications are not supported on web
     // Expo Go no longer supports remote push notifications. Local
     // notifications remain available, so only skip the remote-token setup.
-    const isExpoGo =
-      Constants.appOwnership === AppOwnership.Expo ||
-      Constants.executionEnvironment === ExecutionEnvironment.StoreClient;
+    const runningInExpoGo = isExpoGo();
 
-    if (Platform.OS === 'web' || isExpoGo) {
+    if (Platform.OS === 'web' || runningInExpoGo) {
       setPushToken(null);
       return;
     }
+
+    const notifications = loadNotificationsApi();
+    if (!notifications) {
+      setPushToken(null);
+      return;
+    }
+
+    // How delivered notifications appear while the app is in the foreground.
+    notifications.setNotificationHandler({
+      handleNotification: async () => ({
+        shouldShowAlert: true,
+        shouldPlaySound: true,
+        shouldSetBadge: false,
+        shouldShowBanner: true,
+        shouldShowList: true,
+      }),
+    });
 
     let cancelled = false;
 
@@ -56,11 +85,11 @@ export function useNotifications(): UseNotificationsReturn {
         // Request permission
         // Cast to any because PermissionResponse from 'expo' may not resolve in
         // all TypeScript configs; the runtime shape always has `granted: boolean`.
-        const existingPerms = await Notifications.getPermissionsAsync() as any;
+         const existingPerms = await notifications.getPermissionsAsync() as any;
         let granted: boolean = existingPerms.granted as boolean;
 
         if (!granted) {
-          const newPerms = await Notifications.requestPermissionsAsync() as any;
+           const newPerms = await notifications.requestPermissionsAsync() as any;
           granted = newPerms.granted as boolean;
         }
 
@@ -73,9 +102,9 @@ export function useNotifications(): UseNotificationsReturn {
 
         // Android: create a notification channel
         if (Platform.OS === 'android') {
-          await Notifications.setNotificationChannelAsync('plantes-sacrees', {
+           await notifications.setNotificationChannelAsync('plantes-sacrees', {
             name: 'Plantes Sacrées',
-            importance: Notifications.AndroidImportance.HIGH,
+            importance: notifications.AndroidImportance.HIGH,
             vibrationPattern: [0, 250, 250, 250],
             lightColor: '#D4A017',
             sound: 'default',
@@ -90,7 +119,7 @@ export function useNotifications(): UseNotificationsReturn {
             return;
           }
 
-          const tokenData = await Notifications.getExpoPushTokenAsync({ projectId });
+          const tokenData = await notifications.getExpoPushTokenAsync({ projectId });
           if (!cancelled) setPushToken(tokenData.data);
         } catch {
           // Simulators and Expo Go on some platforms don't support remote push tokens
@@ -104,7 +133,7 @@ export function useNotifications(): UseNotificationsReturn {
     setup();
 
     // Listen for notification taps (brings app to foreground)
-    listenerRef.current = Notifications.addNotificationResponseReceivedListener(
+    listenerRef.current = notifications.addNotificationResponseReceivedListener(
       (_response) => {
         // Future: navigate to the relevant screen based on response.notification.request.content.data
       }
@@ -117,9 +146,12 @@ export function useNotifications(): UseNotificationsReturn {
   }, []);
 
   const scheduleLocalNotification = async (title: string, body: string) => {
-    if (Platform.OS === 'web') return;
+    if (Platform.OS === 'web' || isExpoGo()) return;
+    const notifications = loadNotificationsApi();
+    if (!notifications) return;
+
     try {
-      await Notifications.scheduleNotificationAsync({
+      await notifications.scheduleNotificationAsync({
         content: {
           title,
           body,
