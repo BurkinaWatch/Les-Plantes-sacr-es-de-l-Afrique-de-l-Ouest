@@ -56,6 +56,6 @@
     "expo-audio": "~1.1.1",
     "expo-image-picker": "^17.0.11",
     "expo-notifications": "~0.32.17",
-    "expo-updates": "~0.29.20"
+    "expo-updates": "~29.0.20"
   }
 }
