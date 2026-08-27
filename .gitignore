@@ -6,6 +6,7 @@ tmp
 out-tsc
 *.tsbuildinfo
 .test-dist
+.screen-test-dist
 .expo
 .expo-shared
 
