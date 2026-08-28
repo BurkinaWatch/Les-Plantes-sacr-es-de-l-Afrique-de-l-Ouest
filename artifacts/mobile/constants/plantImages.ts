@@ -98,6 +98,25 @@ const PLANT_IMAGES: Record<string, any> = {
 
   // Extension — Nouvelle Herbe & Graminée
   andropogon:         require('@/assets/images/plants/andropogon.png'),
+
+  // Monographies complémentaires
+  'acacia-nilotica':       require('@/assets/images/plants/acacia-nilotica.png'),
+  'borreria-verticillata': require('@/assets/images/plants/borreria-verticillata.png'),
+  'centella-asiatica':     require('@/assets/images/plants/centella-asiatica.png'),
+  'cucurbita-pepo':        require('@/assets/images/plants/cucurbita-pepo.png'),
+  'detarium-senegalense':  require('@/assets/images/plants/detarium-senegalense.png'),
+  'euphorbia-hirta':       require('@/assets/images/plants/euphorbia-hirta.png'),
+  'holarrhena-floribunda': require('@/assets/images/plants/holarrhena-floribunda.png'),
+  'kigelia-africana':     require('@/assets/images/plants/kigelia-africana.png'),
+  'luffa-aegyptiaca':      require('@/assets/images/plants/luffa-aegyptiaca.png'),
+  'mangifera-indica':      require('@/assets/images/plants/mangifera-indica.png'),
+  'mitracarpus-scaber':    require('@/assets/images/plants/mitracarpus-scaber.png'),
+  'moghania-faginea':      require('@/assets/images/plants/moghania-faginea.png'),
+  'nauclea-latifolia':     require('@/assets/images/plants/nauclea-latifolia.png'),
+  'piliostigma-reticulatum': require('@/assets/images/plants/piliostigma-reticulatum.png'),
+  'sclerocarya-birrea':    require('@/assets/images/plants/sclerocarya-birrea.png'),
+  'sterculia-setigera':    require('@/assets/images/plants/sterculia-setigera.png'),
+  'vitex-doniana':         require('@/assets/images/plants/vitex-doniana.png'),
 };
 
 export default PLANT_IMAGES;
