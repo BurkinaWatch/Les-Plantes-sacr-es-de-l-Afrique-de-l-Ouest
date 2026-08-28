@@ -12,6 +12,7 @@
 const http = require("http");
 const fs = require("fs");
 const path = require("path");
+const { fileURLToPath, pathToFileURL } = require("url");
 
 const STATIC_ROOT = path.resolve(__dirname, "..", "static-build");
 const TEMPLATE_PATH = path.resolve(__dirname, "templates", "landing-page.html");
@@ -57,7 +58,7 @@ function buildStaticFileIndex(root, prefix = "") {
   for (const entry of fs.readdirSync(root, { withFileTypes: true })) {
     const fileName = entry.name;
     if (!/^[a-zA-Z0-9._-]+$/.test(fileName) || fileName === "." || fileName === "..") continue;
-    const diskPath = path.join(root, fileName); // nosemgrep: javascript.express.file.fs-express.fs-express — trusted directory entry, one validated segment
+    const diskPath = fileURLToPath(new URL(fileName, pathToFileURL(`${root}${path.sep}`)));
     const urlPath = `${prefix}/${fileName}`.replace(/\/+/g, "/");
     if (entry.isDirectory()) {
       for (const [nestedUrl, nestedDiskPath] of buildStaticFileIndex(diskPath, urlPath)) {
