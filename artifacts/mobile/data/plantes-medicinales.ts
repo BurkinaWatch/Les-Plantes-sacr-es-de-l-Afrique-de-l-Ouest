@@ -3,7 +3,9 @@
  * Source : Jean-Louis POUSSET, « Plantes Médicinales Africaines — Utilisation Pratique »
  * Éditions ESTEM / AUPELF, Paris, 1989
  *
- * Données extraites fidèlement du livre pour ~35 plantes du Sahel occidental.
+ * Données extraites fidèlement du livre pour une cinquantaine de plantes du
+ * Sahel occidental. Les monographies complémentaires sont regroupées dans
+ * plantes-medicinales-complementaires.ts pour garder ce fichier lisible.
  * Chaque fiche comprend : classification thérapeutique, noms africains,
  * historique, description, action curative, emplois pratiques et précautions.
  */
@@ -39,7 +41,7 @@ export interface PlanteMedicinale {
   source: string;
 }
 
-export const PLANTES_MEDICINALES: PlanteMedicinale[] = [
+const PLANTES_PDF: PlanteMedicinale[] = [
   // ─── 1 ───────────────────────────────────────────────
   {
     id: 'adansonia-digitata',
