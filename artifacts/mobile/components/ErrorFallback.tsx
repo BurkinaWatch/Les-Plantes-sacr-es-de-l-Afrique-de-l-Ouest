@@ -1,5 +1,5 @@
 import { reloadAppAsync } from "expo";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Modal,
   Platform,
@@ -17,13 +17,22 @@ import { SacredIcon } from "@/components/SacredIcon";
 export type ErrorFallbackProps = {
   error: Error;
   resetError: () => void;
+  initialModalVisible?: boolean;
 };
 
-export function ErrorFallback({ error, resetError }: ErrorFallbackProps) {
+export function ErrorFallback({
+  error,
+  resetError,
+  initialModalVisible = false,
+}: ErrorFallbackProps) {
   const colors = useColors();
   const insets = useSafeAreaInsets();
 
-  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [isModalVisible, setIsModalVisible] = useState(initialModalVisible);
+
+  useEffect(() => {
+    setIsModalVisible(initialModalVisible);
+  }, [initialModalVisible]);
 
   const handleRestart = async () => {
     try {

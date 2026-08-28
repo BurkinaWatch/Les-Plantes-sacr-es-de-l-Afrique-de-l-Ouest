@@ -1,6 +1,6 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { LinearGradient } from 'expo-linear-gradient';
-import { useRouter } from 'expo-router';
+import { useLocalSearchParams, useRouter } from 'expo-router';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import {
   ActivityIndicator,
@@ -106,11 +106,21 @@ export default function ChatTotemScreen() {
   const colors = useColors();
   const insets = useSafeAreaInsets();
   const router = useRouter();
-  const { quizResult } = useApp();
+  const { capture } = useLocalSearchParams<{ capture?: string }>();
+  const { quizResult: storedQuizResult } = useApp();
   const { lang, t } = useTranslation();
   const { token } = useAuth();
 
   const { scheduleLocalNotification } = useNotifications();
+  const quizResult = storedQuizResult ?? (
+    capture === 'icons'
+      ? {
+          primary: 'baobab' as const,
+          secondary: 'neem' as const,
+          completedAt: 'native-svg-capture',
+        }
+      : null
+  );
 
   const [messages, setMessages] = useState<Message[]>([]);
   const [sessions, setSessions] = useState<ChatSession[]>([]);

@@ -178,7 +178,10 @@ function mockModules() {
     ["expo-linear-gradient", { LinearGradient: makeHostComponent("LinearGradient") }],
     ["@expo/vector-icons", { Feather: makeHostComponent("Feather") }],
     ["@/components/SacredIcon", { SacredIcon: makeHostComponent("SacredIcon") }],
-    ["expo-router", { useRouter: () => ({ back() {}, push() {} }) }],
+    ["expo-router", {
+      useLocalSearchParams: () => ({}),
+      useRouter: () => ({ back() {}, push() {} }),
+    }],
     ["@react-native-async-storage/async-storage", { default: asyncStorage }],
     ["expo-image-picker", imagePicker],
     ["@/hooks/useColors", { useColors: () => ({

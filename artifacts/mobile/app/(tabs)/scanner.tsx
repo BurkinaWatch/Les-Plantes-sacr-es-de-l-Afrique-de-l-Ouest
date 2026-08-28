@@ -1,5 +1,6 @@
 import * as ImagePicker from 'expo-image-picker';
 import { LinearGradient } from 'expo-linear-gradient';
+import { useLocalSearchParams } from 'expo-router';
 import React, { useEffect, useRef, useState } from 'react';
 import {
   ActivityIndicator,
@@ -125,6 +126,7 @@ function BulletList({ items, colors }: { items: string[]; colors: any }) {
 export default function ScannerScreen() {
   const colors = useColors();
   const insets = useSafeAreaInsets();
+  const { capture } = useLocalSearchParams<{ capture?: string }>();
   const { t, lang } = useTranslation();
   const { token } = useAuth();
   const { scheduleLocalNotification } = useNotifications();
@@ -133,11 +135,20 @@ export default function ScannerScreen() {
   const [imageBase64, setImageBase64] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<PlantResult | null>(null);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(
+    capture === 'icons-error' ? t.scanner_error_generic : null,
+  );
   const [rateLimitRemaining, setRateLimitRemaining] = useState<number | null>(null);
   const [resetAt, setResetAt] = useState<number | null>(null);
   const [countdown, setCountdown] = useState<number | null>(null);
   const scanGeneration = useRef(0);
+
+  useEffect(() => {
+    if (capture !== 'icons-error') return;
+    setResult(null);
+    setLoading(false);
+    setError(t.scanner_error_generic);
+  }, [capture, t]);
 
   const beginScan = () => {
     scanGeneration.current += 1;

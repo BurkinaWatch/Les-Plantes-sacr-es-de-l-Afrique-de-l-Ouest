@@ -1,4 +1,5 @@
 import React from 'react';
+import { Platform } from 'react-native';
 import Svg, {
   Circle,
   Ellipse,
@@ -62,6 +63,7 @@ interface SacredIconProps {
   color?: string;
   strokeWidth?: number;
   accessibilityLabel?: string;
+  testID?: string;
 }
 
 const DEFAULT_COLOR = '#D4A017';
@@ -233,15 +235,18 @@ export function SacredIcon({
   color = DEFAULT_COLOR,
   strokeWidth = 1.8,
   accessibilityLabel,
+  testID,
 }: SacredIconProps) {
+  const iconTestID = testID ?? `sacred-icon-${name}`;
   return (
     <Svg
       width={size}
       height={size}
       viewBox="0 0 24 24"
       fill="none"
-      accessible={accessibilityLabel ? true : undefined}
-      accessibilityLabel={accessibilityLabel}
+      accessible={Platform.OS === 'web' ? undefined : true}
+      accessibilityLabel={accessibilityLabel ?? iconTestID}
+      testID={iconTestID}
     >
       <IconPaths name={name} color={color} strokeWidth={strokeWidth} />
     </Svg>

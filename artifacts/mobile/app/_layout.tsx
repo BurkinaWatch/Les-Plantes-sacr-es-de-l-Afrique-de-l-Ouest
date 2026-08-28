@@ -321,6 +321,7 @@ function RootLayoutNav() {
         <Stack.Screen name="(auth)"      options={{ headerShown: false }} />
         <Stack.Screen name="chat-totem"  options={{ headerShown: false, presentation: "card" }} />
         <Stack.Screen name="progression-spirituelle" options={{ headerShown: false, presentation: "card" }} />
+        <Stack.Screen name="error-fallback" options={{ headerShown: false, presentation: "card" }} />
       </Stack>
       <ScannerFab />
     </View>

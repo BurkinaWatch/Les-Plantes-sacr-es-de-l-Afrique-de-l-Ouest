@@ -8,6 +8,8 @@
     "build": "node scripts/build.js",
     "serve": "node server/serve.js",
     "typecheck": "tsc -p tsconfig.json --noEmit",
+    "capture:native": "node scripts/capture-native-svg.js",
+    "verify:native-svg": "node scripts/capture-native-svg.js --verify",
     "test": "rm -rf .test-dist .screen-test-dist && tsc --target ES2022 --module ES2022 --moduleResolution Bundler --lib ES2022,DOM --skipLibCheck --outDir .test-dist lib/ai-api.ts && printf '{\"type\":\"module\"}' > .test-dist/package.json && node scripts/build-screen-tests.js && node --test tests/*.test.mjs"
   },
   "devDependencies": {
