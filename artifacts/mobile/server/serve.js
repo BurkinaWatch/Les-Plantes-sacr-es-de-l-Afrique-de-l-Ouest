@@ -45,6 +45,29 @@ function getAppName() {
   }
 }
 
+/**
+ * Index files from the trusted build directory once at startup. Requests only
+ * look up URL paths in this map; they never construct filesystem paths from
+ * URL-controlled data.
+ */
+function buildStaticFileIndex(root, prefix = "") {
+  const index = new Map();
+  if (!fs.existsSync(root)) return index;
+
+  for (const entry of fs.readdirSync(root, { withFileTypes: true })) {
+    const diskPath = path.join(root, entry.name);
+    const urlPath = `${prefix}/${entry.name}`.replace(/\/+/g, "/");
+    if (entry.isDirectory()) {
+      for (const [nestedUrl, nestedDiskPath] of buildStaticFileIndex(diskPath, urlPath)) {
+        index.set(nestedUrl, nestedDiskPath);
+      }
+    } else if (entry.isFile()) {
+      index.set(urlPath, diskPath);
+    }
+  }
+  return index;
+}
+
 function serveManifest(platform, res) {
   const manifestPath = path.join(STATIC_ROOT, platform, "manifest.json");
 
@@ -103,7 +126,7 @@ function serveLandingPage(req, res, landingPageTemplate, appName) {
   res.end(html);
 }
 
-function serveStaticFile(urlPath, res) {
+function serveStaticFile(urlPath, res, staticFileIndex) {
   let decodedPath;
   try {
     decodedPath = decodeURIComponent(urlPath);
@@ -113,15 +136,14 @@ function serveStaticFile(urlPath, res) {
     return;
   }
 
-  const filePath = path.resolve(STATIC_ROOT, `.${decodedPath}`);
-  const relativePath = path.relative(STATIC_ROOT, filePath);
-  if (relativePath.startsWith("..") || path.isAbsolute(relativePath)) {
+  if (decodedPath.includes("\0") || decodedPath.includes("\\") || decodedPath.split("/").includes("..")) {
     res.writeHead(403, { "x-content-type-options": "nosniff" });
     res.end("Forbidden");
     return;
   }
 
-  if (!fs.existsSync(filePath) || fs.statSync(filePath).isDirectory()) {
+  const filePath = staticFileIndex.get(decodedPath);
+  if (!filePath || !fs.existsSync(filePath) || fs.statSync(filePath).isDirectory()) {
     res.writeHead(404, { "x-content-type-options": "nosniff" });
     res.end("Not Found");
     return;
@@ -140,6 +162,7 @@ function serveStaticFile(urlPath, res) {
 
 const landingPageTemplate = fs.readFileSync(TEMPLATE_PATH, "utf-8");
 const appName = getAppName();
+const staticFileIndex = buildStaticFileIndex(STATIC_ROOT);
 
 const server = http.createServer((req, res) => {
   const url = new URL(req.url || "/", "http://localhost");
@@ -160,7 +183,7 @@ const server = http.createServer((req, res) => {
     }
   }
 
-  serveStaticFile(pathname, res);
+  serveStaticFile(pathname, res, staticFileIndex);
 });
 
 const port = parseInt(process.env.PORT || "3000", 10);
