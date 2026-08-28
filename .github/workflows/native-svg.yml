@@ -1,0 +1,124 @@
+name: Native SVG verification
+
+on:
+  push:
+    paths:
+      - "artifacts/mobile/**"
+      - "screenshots/native-svg/**"
+      - ".github/workflows/native-svg.yml"
+      - "pnpm-lock.yaml"
+      - "pnpm-workspace.yaml"
+  pull_request:
+    paths:
+      - "artifacts/mobile/**"
+      - "screenshots/native-svg/**"
+      - ".github/workflows/native-svg.yml"
+      - "pnpm-lock.yaml"
+      - "pnpm-workspace.yaml"
+  workflow_dispatch:
+    inputs:
+      update_references:
+        description: "Capture a new reference candidate instead of verifying"
+        required: true
+        default: false
+        type: boolean
+
+permissions:
+  contents: read
+
+jobs:
+  native-svg:
+    name: iOS + Android native references
+    runs-on: macos-14
+    timeout-minutes: 45
+    env:
+      UPDATE_REFERENCES: ${{ inputs.update_references || false }}
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v4
+
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.26.1
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Start Metro for the native app
+        working-directory: artifacts/mobile
+        shell: bash
+        run: |
+          set -euo pipefail
+          pnpm exec expo start --dev-client --localhost --port 8081 > "$RUNNER_TEMP/native-svg-metro.log" 2>&1 &
+          echo "$!" > "$RUNNER_TEMP/native-svg-metro.pid"
+          for attempt in {1..30}; do
+            if curl --silent --fail http://127.0.0.1:8081/status >/dev/null; then
+              exit 0
+            fi
+            sleep 2
+          done
+          cat "$RUNNER_TEMP/native-svg-metro.log"
+          exit 1
+
+      - name: Boot an iOS simulator
+        id: ios
+        shell: bash
+        run: |
+          set -euo pipefail
+          IOS_DEVICE="$(node <<'NODE'
+          const { execFileSync } = require("node:child_process");
+          const devices = JSON.parse(execFileSync("xcrun", ["simctl", "list", "devices", "available", "-j"], { encoding: "utf8" }));
+          const device = Object.values(devices.devices ?? {}).flat().find((candidate) =>
+            candidate.name.startsWith("iPhone") && candidate.isAvailable !== false
+          );
+          if (!device) process.exit(1);
+          process.stdout.write(device.udid);
+          NODE
+          )"
+          echo "id=$IOS_DEVICE" >> "$GITHUB_OUTPUT"
+          xcrun simctl boot "$IOS_DEVICE" 2>/dev/null || true
+          xcrun simctl bootstatus "$IOS_DEVICE" -b
+
+      - name: Build and install the iOS app
+        working-directory: artifacts/mobile
+        env:
+          IOS_DEVICE: ${{ steps.ios.outputs.id }}
+        run: pnpm exec expo run:ios --device "$IOS_DEVICE" --no-bundler
+
+      - name: Boot Android emulator and verify both platforms
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 35
+          target: google_apis
+          arch: arm64-v8a
+          profile: Pixel_2
+          emulator-options: "-no-window -no-audio -no-boot-anim"
+          disable-animations: true
+          script: |
+            set -euo pipefail
+            cd artifacts/mobile
+            adb reverse tcp:8081 tcp:8081
+            pnpm exec expo run:android --device emulator-5554 --no-bundler
+            if [[ "$UPDATE_REFERENCES" == "true" ]]; then
+              pnpm capture:native -- --platform both --update
+            else
+              pnpm verify:native-svg -- --platform both
+            fi
+
+      - name: Publish native SVG report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: native-svg-${{ github.sha }}
+          if-no-files-found: warn
+          retention-days: 90
+          path: |
+            screenshots/native-svg/current/
+            screenshots/native-svg/reference/
