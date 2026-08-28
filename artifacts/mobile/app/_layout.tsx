@@ -53,19 +53,10 @@ function AnimatedSplash({ onFinish }: { onFinish: () => void }) {
   const logoScale   = useRef(new Animated.Value(0.75)).current;
   const logoOpacity = useRef(new Animated.Value(0)).current;
   const titleOpacity    = useRef(new Animated.Value(0)).current;
-  const subtitleOpacity = useRef(new Animated.Value(0)).current;
   const screenOpacity   = useRef(new Animated.Value(1)).current;
-  const shimmer         = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
     const native = isNative;
-
-    Animated.loop(
-      Animated.sequence([
-        Animated.timing(shimmer, { toValue: 1, duration: 2000, useNativeDriver: native }),
-        Animated.timing(shimmer, { toValue: 0, duration: 2000, useNativeDriver: native }),
-      ])
-    ).start();
 
     Animated.sequence([
       Animated.delay(150),
@@ -88,11 +79,6 @@ function AnimatedSplash({ onFinish }: { onFinish: () => void }) {
         duration: 500,
         useNativeDriver: native,
       }),
-      Animated.timing(subtitleOpacity, {
-        toValue: 1,
-        duration: 500,
-        useNativeDriver: native,
-      }),
       Animated.delay(1200),
       Animated.timing(screenOpacity, {
         toValue: 0,
@@ -102,34 +88,8 @@ function AnimatedSplash({ onFinish }: { onFinish: () => void }) {
     ]).start(() => onFinish());
   }, []);
 
-  const shimmerOpacity = shimmer.interpolate({
-    inputRange: [0, 1],
-    outputRange: [0.08, 0.2],
-  });
-
   return (
     <Animated.View style={[styles.splashContainer, { opacity: screenOpacity }]}>
-      {/* Motif de fond */}
-      <View style={[styles.bgPattern, { pointerEvents: 'none' }]}>
-        {Array.from({ length: 24 }).map((_, i) => (
-          <View
-            key={i}
-            style={[
-              styles.patternSymbol,
-              {
-                top: (Math.floor(i / 4)) * 130 + (i % 2 === 0 ? 0 : 65),
-                left: (i % 4) * (width / 3.5),
-              },
-            ]}
-          >
-            <SacredIcon name="sparkles" size={36} color="#C8A020" />
-          </View>
-        ))}
-      </View>
-
-      {/* Halo doré animé */}
-      <Animated.View style={[styles.logoGlow, { opacity: shimmerOpacity }]} />
-
       {/* Logo principal */}
       <Animated.View
         style={[
@@ -156,13 +116,6 @@ function AnimatedSplash({ onFinish }: { onFinish: () => void }) {
         >
           Les Plantes Sacrées{"\n"}d'Afrique de l'Ouest
         </Text>
-      </Animated.View>
-
-      {/* Sous-titre */}
-      <Animated.View style={[styles.subtitleBlock, { opacity: subtitleOpacity }]}>
-        <View style={styles.divider} />
-        <Text style={styles.subtitle}>Symboles de l'ancienne Sagesse</Text>
-        <View style={styles.divider} />
       </Animated.View>
 
     </Animated.View>
@@ -410,21 +363,6 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     paddingHorizontal: 32,
   },
-  bgPattern: {
-    ...StyleSheet.absoluteFillObject,
-    overflow: "hidden",
-  },
-  patternSymbol: {
-    position: "absolute",
-    opacity: 0.07,
-  },
-  logoGlow: {
-    position: "absolute",
-    width: width * 0.72,
-    height: width * 0.72,
-    borderRadius: (width * 0.72) / 2,
-    backgroundColor: "#C8A020",
-  },
   logoWrap: {
     width: width * 0.76,
     height: width * 0.76,
@@ -449,30 +387,5 @@ const styles = StyleSheet.create({
     color: "#F0EAD6",
     letterSpacing: 0.3,
     textAlign: "center",
-  },
-  subtitleBlock: {
-    alignItems: "center",
-    marginTop: 20,
-  },
-  divider: {
-    width: 56,
-    height: 1,
-    backgroundColor: "#C8A020",
-    opacity: 0.45,
-    marginVertical: 8,
-  },
-  subtitle: {
-    fontSize: 12,
-    color: "#C8A02099",
-    letterSpacing: 1.5,
-    fontStyle: "italic",
-  },
-  authors: {
-    position: "absolute",
-    bottom: 50,
-    fontSize: 10,
-    color: "#F0EAD650",
-    letterSpacing: 2.5,
-    textTransform: "uppercase",
   },
 });
