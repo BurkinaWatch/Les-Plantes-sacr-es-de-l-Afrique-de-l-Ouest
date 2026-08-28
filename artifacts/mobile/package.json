@@ -10,7 +10,8 @@
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "capture:native": "node scripts/capture-native-svg.js",
     "verify:native-svg": "node scripts/capture-native-svg.js --verify",
-    "test": "rm -rf .test-dist .screen-test-dist && tsc --target ES2022 --module ES2022 --moduleResolution Bundler --lib ES2022,DOM --skipLibCheck --outDir .test-dist lib/ai-api.ts && printf '{\"type\":\"module\"}' > .test-dist/package.json && node scripts/build-screen-tests.js && node --test tests/*.test.mjs"
+    "verify:plant-images": "node scripts/verify-plant-images.js",
+    "test": "rm -rf .test-dist .screen-test-dist && pnpm run verify:plant-images && tsc --target ES2022 --module ES2022 --moduleResolution Bundler --lib ES2022,DOM --skipLibCheck --outDir .test-dist lib/ai-api.ts && printf '{\"type\":\"module\"}' > .test-dist/package.json && node scripts/build-screen-tests.js && node --test tests/*.test.mjs"
   },
   "devDependencies": {
     "@babel/core": "^7.25.2",
