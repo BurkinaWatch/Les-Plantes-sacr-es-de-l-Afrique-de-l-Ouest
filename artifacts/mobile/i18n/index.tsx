@@ -77,12 +77,12 @@ export interface Translations {
 
   // ── CATEGORIES (used in filter)
   cat_all: string;
-  cat_mammals: string;
-  cat_birds: string;
-  cat_reptiles: string;
-  cat_amphibians: string;
-  cat_aquatic: string;
-  cat_invertebrates: string;
+  cat_sacred_trees: string;
+  cat_medicinal_plants: string;
+  cat_food_plants: string;
+  cat_ritual_plants: string;
+  cat_herbs_grasses: string;
+  cat_palms: string;
 
   // ── QUIZ WELCOME
   quiz_revelation_label: string;

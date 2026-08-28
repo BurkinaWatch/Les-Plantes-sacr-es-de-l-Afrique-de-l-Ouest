@@ -54,12 +54,12 @@ export const ful: Translations = {
   animals_none_hint: 'Lelnol wɗɗer walla haɓɓinaango fuu naat',
 
   cat_all: 'Fow',
-  cat_mammals: 'Leɗɗe bindi',
-  cat_birds: 'Leɗɗe balndi',
-  cat_reptiles: 'Leɗɗe nyaamde',
-  cat_amphibians: 'Leɗɗe jinnde',
-  cat_aquatic: 'Leɗɗe weeso',
-  cat_invertebrates: 'Leɗɗe palmiye',
+  cat_sacred_trees: 'Leɗɗe bindi',
+  cat_medicinal_plants: 'Leɗɗe balndi',
+  cat_food_plants: 'Leɗɗe nyaamde',
+  cat_ritual_plants: 'Leɗɗe jinnde',
+  cat_herbs_grasses: 'Leɗɗe weeso',
+  cat_palms: 'Leɗɗe palmiye',
 
   quiz_revelation_label: '✦ YIYRUDE',
   quiz_title_line1: 'Leɗe maa',

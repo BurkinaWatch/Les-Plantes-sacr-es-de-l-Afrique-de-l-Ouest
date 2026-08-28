@@ -54,12 +54,12 @@ export const dyo: Translations = {
   animals_none_hint: 'Fɔli wɛrɛ kɛ k\'a sɔrɔ',
 
   cat_all: 'Bɛɛ',
-  cat_mammals: 'Yiriw bɛlɛw',
-  cat_birds: 'Yiriw dɔgɔmanw',
-  cat_reptiles: 'Dumuni yiriw',
-  cat_amphibians: 'Yiriw bɛlɛw tɔw',
-  cat_aquatic: 'Finiw ni blew',
-  cat_invertebrates: 'Palmye yiriw',
+  cat_sacred_trees: 'Yiriw bɛlɛw',
+  cat_medicinal_plants: 'Yiriw dɔgɔmanw',
+  cat_food_plants: 'Dumuni yiriw',
+  cat_ritual_plants: 'Yiriw bɛlɛw tɔw',
+  cat_herbs_grasses: 'Finiw ni blew',
+  cat_palms: 'Palmye yiriw',
 
   quiz_revelation_label: '✦ JIRA',
   quiz_title_line1: 'I ka yiri',

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Pressable, ScrollView, StyleSheet, Text } from 'react-native';
 
 import type { PlanteCategorie } from '@/data/animals';
 import { CATEGORIES } from '@/data/animals';
@@ -17,12 +17,12 @@ export function CategoryFilter({ selected, onSelect }: Props) {
   const { t } = useTranslation();
 
   const CAT_LABELS: Record<PlanteCategorie, string> = {
-    'Arbres Sacrés': t.cat_mammals,
-    'Plantes Médicinales': t.cat_birds,
-    'Plantes Alimentaires': t.cat_reptiles,
-    'Plantes Rituelles': t.cat_amphibians,
-    'Herbes & Graminées': t.cat_aquatic,
-    'Palmiers': t.cat_invertebrates,
+    'Arbres Sacrés': t.cat_sacred_trees,
+    'Plantes Médicinales': t.cat_medicinal_plants,
+    'Plantes Alimentaires': t.cat_food_plants,
+    'Plantes Rituelles': t.cat_ritual_plants,
+    'Herbes & Graminées': t.cat_herbs_grasses,
+    'Palmiers': t.cat_palms,
   };
 
   const items: (PlanteCategorie | null)[] = [null, ...CATEGORIES];
@@ -84,9 +84,6 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     borderWidth: 1,
     gap: 5,
-  },
-  chipIcon: {
-    fontSize: 11,
   },
   chipText: {
     fontSize: 11,

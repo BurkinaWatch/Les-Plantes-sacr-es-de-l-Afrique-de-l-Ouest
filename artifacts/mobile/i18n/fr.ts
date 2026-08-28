@@ -49,12 +49,12 @@ export const fr: Translations = {
   animals_none_hint: "Essaie un autre terme ou réinitialise les filtres",
 
   cat_all: "Toutes",
-  cat_mammals: "Arbres Sacrés",
-  cat_birds: "Plantes Médicinales",
-  cat_reptiles: "Plantes Alimentaires",
-  cat_amphibians: "Plantes Rituelles",
-  cat_aquatic: "Herbes & Graminées",
-  cat_invertebrates: "Palmiers",
+  cat_sacred_trees: "Arbres Sacrés",
+  cat_medicinal_plants: "Plantes Médicinales",
+  cat_food_plants: "Plantes Alimentaires",
+  cat_ritual_plants: "Plantes Rituelles",
+  cat_herbs_grasses: "Herbes & Graminées",
+  cat_palms: "Palmiers",
 
   quiz_revelation_label: "✦ RÉVÉLATION",
   quiz_title_line1: "Quelle est votre",

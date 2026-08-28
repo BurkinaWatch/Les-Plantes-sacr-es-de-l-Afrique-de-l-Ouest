@@ -8,8 +8,6 @@ export type PlanteCategorie =
   | 'Herbes & Graminées'
   | 'Palmiers';
 
-export type AnimalCategorie = PlanteCategorie;
-
 export type Element = 'Feu' | 'Eau' | 'Terre' | 'Air';
 
 export interface Plante {
@@ -39,8 +37,6 @@ export interface Plante {
   vertus?: string[];
   usagesTraditionnels?: string[];
 }
-
-export type Animal = Plante;
 
 const CORE_PLANTS: Plante[] = [
 
@@ -3854,7 +3850,3 @@ export function getPlanteById(id: string): Plante | undefined {
   return PLANTS.find((p) => p.id === id);
 }
 
-export const getAnimalById = getPlanteById;
-export const ANIMALS = PLANTS;
-
-export const PLANT_CRIS: Record<string, { nom: string; description: string }> = {};

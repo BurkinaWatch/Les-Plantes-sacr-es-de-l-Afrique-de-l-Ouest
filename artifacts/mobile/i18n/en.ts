@@ -49,12 +49,12 @@ export const en: Translations = {
   animals_none_hint: 'Try another term or reset the filters',
 
   cat_all: 'All',
-  cat_mammals: 'Sacred Trees',
-  cat_birds: 'Medicinal Plants',
-  cat_reptiles: 'Food Plants',
-  cat_amphibians: 'Ritual Plants',
-  cat_aquatic: 'Herbs & Grasses',
-  cat_invertebrates: 'Palms',
+  cat_sacred_trees: 'Sacred Trees',
+  cat_medicinal_plants: 'Medicinal Plants',
+  cat_food_plants: 'Food Plants',
+  cat_ritual_plants: 'Ritual Plants',
+  cat_herbs_grasses: 'Herbs & Grasses',
+  cat_palms: 'Palms',
 
   quiz_revelation_label: '✦ REVELATION',
   quiz_title_line1: 'What is your',

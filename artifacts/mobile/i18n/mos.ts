@@ -54,12 +54,12 @@ export const mos: Translations = {
   animals_none_hint: 'Ko wʋsg kẽeg wall bãng nins fãa',
 
   cat_all: 'Fãa',
-  cat_mammals: 'Yɩɩse bindi',
-  cat_birds: 'Yɩɩse balndi',
-  cat_reptiles: 'Yɩɩse nyuumde',
-  cat_amphibians: 'Yɩɩse jinnde',
-  cat_aquatic: 'Yɩɩse wesr',
-  cat_invertebrates: 'Yɩɩse palmiye',
+  cat_sacred_trees: 'Yɩɩse bindi',
+  cat_medicinal_plants: 'Yɩɩse balndi',
+  cat_food_plants: 'Yɩɩse nyuumde',
+  cat_ritual_plants: 'Yɩɩse jinnde',
+  cat_herbs_grasses: 'Yɩɩse wesr',
+  cat_palms: 'Yɩɩse palmiye',
 
   quiz_revelation_label: '✦ WILGRI',
   quiz_title_line1: 'A yaa bʋgo',
