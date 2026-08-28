@@ -44,14 +44,13 @@ const validPlant = {
   confidence: "high",
 };
 
-test("Totem client returns a successful mocked response and sends the API key", async () => {
+test("Totem client returns a successful mocked response and sends only the JWT", async () => {
   const mock = fakeFetch(response(200, { content: "Je t'écoute." }, {
     "RateLimit-Remaining": "19",
     "RateLimit-Reset": "12345",
   }));
   const result = await requestTotem({
     apiBase: "https://example.test/api/",
-    apiKey: "mobile-test-key",
     token: "jwt-test",
     body: totemBody,
     fetchImpl: mock.fetchImpl,
@@ -59,7 +58,7 @@ test("Totem client returns a successful mocked response and sends the API key", 
 
   assert.deepEqual(result, { content: "Je t'écoute.", remaining: 19, resetAt: 12345 });
   assert.equal(mock.calls[0].url, "https://example.test/api/chat/totem");
-  assert.equal(mock.calls[0].options.headers["x-api-key"], "mobile-test-key");
+  assert.equal(mock.calls[0].options.headers["x-api-key"], undefined);
   assert.equal(mock.calls[0].options.headers.Authorization, "Bearer jwt-test");
   assert.deepEqual(JSON.parse(mock.calls[0].options.body), totemBody);
 });
@@ -69,7 +68,7 @@ test("Plant recognition client returns a successful mocked response", async () =
   const mock = fakeFetch(response(200, { plant }));
   const result = await requestPlantRecognition({
     apiBase: "https://example.test/api",
-    apiKey: "mobile-test-key",
+    token: "jwt-test",
     imageBase64: "fake-image",
     lang: "fr",
     fetchImpl: mock.fetchImpl,
@@ -89,7 +88,7 @@ test("Totem client rejects a successful response with no usable content", async 
   await assert.rejects(
     requestTotem({
       apiBase: "https://example.test/api",
-      apiKey: "mobile-test-key",
+      token: "jwt-test",
       body: totemBody,
       fetchImpl: mock.fetchImpl,
     }),
@@ -103,7 +102,7 @@ test("Plant recognition client rejects an incomplete successful payload", async 
   await assert.rejects(
     requestPlantRecognition({
       apiBase: "https://example.test/api",
-      apiKey: "mobile-test-key",
+      token: "jwt-test",
       imageBase64: "fake-image",
       lang: "fr",
       fetchImpl: mock.fetchImpl,
@@ -130,39 +129,38 @@ test("Plant recognition client preserves a valid unable-to-identify response", a
 for (const request of [
   () => requestTotem({
     apiBase: "https://example.test/api",
-    apiKey: "",
     body: totemBody,
     fetchImpl: async () => { throw new Error("network must not be called"); },
   }),
   () => requestPlantRecognition({
     apiBase: "https://example.test/api",
-    apiKey: "",
+      token: null,
     imageBase64: "fake-image",
     lang: "fr",
     fetchImpl: async () => { throw new Error("network must not be called"); },
   }),
 ]) {
-  test("AI clients expose a clear missing-key error before making a request", async () => {
-    await assert.rejects(request(), (error) => error instanceof ApiRequestError && error.code === "missing_key");
+  test("AI clients reject an absent session before making a request", async () => {
+    await assert.rejects(request(), (error) => error instanceof ApiRequestError && error.code === "unauthenticated");
   });
 }
 
 for (const request of [
   () => requestTotem({
     apiBase: "https://example.test/api",
-    apiKey: "wrong-key",
+    token: "wrong-token",
     body: totemBody,
     fetchImpl: async () => response(401, { error: "Clé API manquante ou invalide" }),
   }),
   () => requestPlantRecognition({
     apiBase: "https://example.test/api",
-    apiKey: "wrong-key",
+    token: "wrong-token",
     imageBase64: "fake-image",
     lang: "fr",
     fetchImpl: async () => response(401, { error: "Clé API manquante ou invalide" }),
   }),
 ]) {
-  test("AI clients expose a clear invalid-key error from the API boundary", async () => {
-    await assert.rejects(request(), (error) => error instanceof ApiRequestError && error.code === "invalid_key");
+  test("AI clients expose an unauthenticated error from the API boundary", async () => {
+    await assert.rejects(request(), (error) => error instanceof ApiRequestError && error.code === "unauthenticated");
   });
 }

@@ -200,7 +200,7 @@ function mockModules() {
       terracotta: "#C4622D",
     }) }],
     ["@/i18n", { useTranslation: () => ({ lang: "fr", t: translations }) }],
-    ["@/context/AuthContext", { useAuth: () => ({ token: null }) }],
+     ["@/context/AuthContext", { useAuth: () => ({ token: "screen-test-jwt" }) }],
     ["@/context/AppContext", { useApp: () => ({
       quizResult: { primary: "baobab", secondary: "neem", completedAt: "2026-08-27T00:00:00.000Z" },
     }) }],
@@ -249,7 +249,6 @@ function mockJsonResponse(body) {
 
 test("Totem screen shows recovery text and clears loading for empty AI content", async () => {
   process.env.EXPO_PUBLIC_DOMAIN = "example.test";
-  process.env.EXPO_PUBLIC_CHAT_API_KEY = "screen-test-key";
   const restoreModules = mockModules();
   const originalFetch = globalThis.fetch;
   const fetchCalls = [];
@@ -291,7 +290,6 @@ test("Totem screen shows recovery text and clears loading for empty AI content",
 
 test("Scanner shows unavailable recovery UI for incomplete plant data and retries", async () => {
   process.env.EXPO_PUBLIC_DOMAIN = "example.test";
-  process.env.EXPO_PUBLIC_CHAT_API_KEY = "screen-test-key";
   const restoreModules = mockModules();
   const originalFetch = globalThis.fetch;
   const fetchCalls = [];
@@ -333,7 +331,6 @@ test("Scanner shows unavailable recovery UI for incomplete plant data and retrie
 
 test("Scanner ignores a delayed response from an older retry", async () => {
   process.env.EXPO_PUBLIC_DOMAIN = "example.test";
-  process.env.EXPO_PUBLIC_CHAT_API_KEY = "screen-test-key";
   const restoreModules = mockModules();
   const originalFetch = globalThis.fetch;
   const pendingResponses = [];
