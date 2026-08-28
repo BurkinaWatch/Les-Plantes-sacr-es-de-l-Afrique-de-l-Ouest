@@ -46,6 +46,9 @@ export type SacredIconName =
   | 'paw'
   | 'user'
   | 'camera'
+  | 'image'
+  | 'send'
+  | 'refresh'
   | 'shield'
   | 'info'
   | 'plus'
@@ -203,6 +206,12 @@ function IconPaths({
       return <><Circle {...common} cx="12" cy="8" r="3.5" /><Path {...common} d="M4.5 21a7.5 7.5 0 0 1 15 0" /></>;
     case 'camera':
       return <><Path {...common} d="M4 7h3l1.5-2h7L17 7h3v12H4V7Z" /><Circle {...common} cx="12" cy="13" r="3.5" /></>;
+    case 'image':
+      return <><Rect {...common} x="3" y="4" width="18" height="16" rx="1.5" /><Circle {...common} cx="8.5" cy="9" r="1.5" /><Path {...common} d="m4 17 5-5 3.5 3.5 2.5-2.5 5 5" /></>;
+    case 'send':
+      return <Path {...common} d="m3 11 18-8-8 18-2.5-7.5L3 11Z" />;
+    case 'refresh':
+      return <><Path {...common} d="M20 11a8 8 0 0 0-14.7-4L3 10" /><Polyline {...common} points="3 4 3 10 9 10" /><Path {...common} d="M4 13a8 8 0 0 0 14.7 4L21 14" /><Polyline {...common} points="21 20 21 14 15 14" /></>;
     case 'shield':
       return <Path {...common} d="M12 3 20 6v5c0 5-3.2 8.2-8 10-4.8-1.8-8-5-8-10V6l8-3Z" />;
     case 'info':

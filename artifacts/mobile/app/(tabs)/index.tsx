@@ -16,6 +16,7 @@ import {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { QuoteCard } from '@/components/QuoteCard';
+import { SacredIcon } from '@/components/SacredIcon';
 import { useApp } from '@/context/AppContext';
 import { PLANTS } from '@/data/animals';
 import { QUIZ_QUESTIONS } from '@/data/quiz';
@@ -114,7 +115,9 @@ export default function HomeScreen() {
 
           <View style={styles.logoRow}>
             <View style={[styles.logoDivider, { backgroundColor: colors.gold }]} />
-            <Text style={[styles.logoSub, { color: colors.gold }]}>✦ {t.home_tagline} ✦</Text>
+            <SacredIcon name="sparkles" size={12} color={colors.gold} />
+            <Text style={[styles.logoSub, { color: colors.gold }]}>{t.home_tagline}</Text>
+            <SacredIcon name="sparkles" size={12} color={colors.gold} />
             <View style={[styles.logoDivider, { backgroundColor: colors.gold }]} />
           </View>
 
@@ -190,7 +193,7 @@ export default function HomeScreen() {
             style={styles.ctaButton}
           >
             <Text style={[styles.ctaText, { color: colors.deepBrown }]}>{t.home_cta_discover}</Text>
-            <Text style={[styles.ctaArrow, { color: colors.deepBrown }]}>→</Text>
+            <SacredIcon name="chevron-right" size={20} color={colors.deepBrown} />
           </LinearGradient>
         </Pressable>
 
@@ -391,7 +394,6 @@ const styles = StyleSheet.create({
     borderRadius: 16,
   },
   ctaText: { fontSize: 15, fontWeight: '700', letterSpacing: 0.3 },
-  ctaArrow: { fontSize: 18, fontWeight: '700' },
   quizButton: {
     alignItems: 'center',
     paddingVertical: 16,

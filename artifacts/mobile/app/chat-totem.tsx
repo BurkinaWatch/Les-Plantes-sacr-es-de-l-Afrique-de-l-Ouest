@@ -16,9 +16,9 @@ import {
   View,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { Feather } from '@expo/vector-icons';
 
 import { useApp } from '@/context/AppContext';
+import { SacredIcon, type SacredIconName } from '@/components/SacredIcon';
 import { TOTEM_RESULTS } from '@/data/quiz';
 import { getPlanteById } from '@/data/animals';
 import { useColors } from '@/hooks/useColors';
@@ -32,6 +32,7 @@ interface Message {
   role: 'user' | 'assistant';
   content: string;
   timestamp: number;
+  isError?: boolean;
 }
 
 interface ChatSession {
@@ -63,7 +64,7 @@ function getApiBase(): string | null {
 const API_BASE = getApiBase();
 const CHAT_API_KEY = process.env.EXPO_PUBLIC_CHAT_API_KEY ?? '';
 
-const ADINKRA = ['◆', '▲', '◇', '△', '●', '○', '✦', '✧'];
+const ADINKRA: SacredIconName[] = ['sparkles', 'star', 'circle', 'sun', 'circle', 'circle', 'sparkles', 'sparkles'];
 const KENTE_STRIP = ['#D4A017', '#C4622D', '#5C7A3E', '#CC7722', '#8B6914', '#D4A017'];
 
 function KenteStrip() {
@@ -79,8 +80,8 @@ function KenteStrip() {
 function AdinkraRow({ color }: { color: string }) {
   return (
     <View style={kStyles.adinkraRow}>
-      {ADINKRA.map((s, i) => (
-        <Text key={i} style={[kStyles.adinkraChar, { color: color + '60' }]}>{s}</Text>
+      {ADINKRA.map((name, i) => (
+        <SacredIcon key={i} name={name} size={11} color={color + '60'} />
       ))}
     </View>
   );
@@ -90,7 +91,6 @@ const kStyles = StyleSheet.create({
   kenteStrip: { flexDirection: 'row', height: 4 },
   kenteCell: { flex: 1 },
   adinkraRow: { flexDirection: 'row', justifyContent: 'space-around', paddingVertical: 6, paddingHorizontal: 8 },
-  adinkraChar: { fontSize: 11, fontWeight: '700' as const },
 });
 
 function formatDate(ts: number) {
@@ -224,8 +224,9 @@ export default function ChatTotemScreen() {
       const offlineMsg: Message = {
         id: (Date.now() + 1).toString(),
         role: 'assistant',
-        content: `⚠️ ${t.api_error_unavailable}`,
+        content: t.api_error_unavailable,
         timestamp: Date.now(),
+        isError: true,
       };
       setMessages([...allMessages, offlineMsg]);
       setIsLoading(false);
@@ -236,8 +237,9 @@ export default function ChatTotemScreen() {
       const missingKeyMsg: Message = {
         id: (Date.now() + 1).toString(),
         role: 'assistant',
-        content: `⚠️ ${t.api_error_missing_key}`,
+        content: t.api_error_missing_key,
         timestamp: Date.now(),
+        isError: true,
       };
       setMessages([...allMessages, missingKeyMsg]);
       setIsLoading(false);
@@ -300,8 +302,9 @@ export default function ChatTotemScreen() {
         setMessages([...allMessages, {
           id: (Date.now() + 1).toString(),
           role: 'assistant',
-          content: `⚠️ ${errorMessage}`,
+          content: errorMessage,
           timestamp: Date.now(),
+          isError: true,
         }]);
         return;
       }
@@ -311,16 +314,18 @@ export default function ChatTotemScreen() {
         setMessages([...allMessages, {
           id: (Date.now() + 1).toString(),
           role: 'assistant',
-          content: `⚠️ ${t.rate_limit_exhausted}`,
+          content: t.rate_limit_exhausted,
           timestamp: Date.now(),
+          isError: true,
         }]);
         return;
       }
       const errorMsg: Message = {
         id: (Date.now() + 1).toString(),
         role: 'assistant',
-        content: `⚠️ ${t.api_error_unavailable}`,
+        content: t.api_error_unavailable,
         timestamp: Date.now(),
+        isError: true,
       };
       const finalMessages = [...allMessages, errorMsg];
       setMessages(finalMessages);
@@ -355,9 +360,12 @@ export default function ChatTotemScreen() {
       <View style={[styles.container, { backgroundColor: colors.background }]}>
         <View style={[styles.emptyWrap, { paddingTop: topPad + 16 }]}>
           <Pressable onPress={() => router.back()} style={styles.backBtn}>
-            <Feather name="arrow-left" size={20} color={colors.gold} />
+            <SacredIcon name="arrow-left" size={20} color={colors.gold} />
           </Pressable>
-          <Text style={[styles.emptyTitle, { color: colors.ivory }]}>✦ Totem non révélé</Text>
+          <View style={styles.titleWithIcon}>
+            <SacredIcon name="sparkles" size={22} color={colors.gold} />
+            <Text style={[styles.emptyTitle, { color: colors.ivory }]}>Totem non révélé</Text>
+          </View>
           <Text style={[styles.emptyDesc, { color: colors.mutedForeground }]}>
             Complète le quiz sacré pour découvrir ta plante totem et accéder à ce dialogue ancestral.
           </Text>
@@ -392,11 +400,15 @@ export default function ChatTotemScreen() {
             style={({ pressed }) => [styles.iconBtn, { opacity: pressed ? 0.7 : 1, borderColor: totemColor + '60' }]}
             onPress={() => router.back()}
           >
-            <Feather name="arrow-left" size={18} color={totemColor} />
+            <SacredIcon name="arrow-left" size={18} color={totemColor} />
           </Pressable>
 
           <View style={styles.headerCenter}>
-            <Text style={[styles.headerSup, { color: totemColor + '90' }]}>✦ DIALOGUE SACRÉ ✦</Text>
+            <View style={styles.headerSupRow}>
+              <SacredIcon name="sparkles" size={11} color={totemColor + '90'} />
+              <Text style={[styles.headerSup, { color: totemColor + '90' }]}>DIALOGUE SACRÉ</Text>
+              <SacredIcon name="sparkles" size={11} color={totemColor + '90'} />
+            </View>
             <Text style={[styles.headerName, { color: colors.ivory }]}>{totem.nom}</Text>
             <Text style={[styles.headerSub, { color: colors.mutedForeground }]}>
               {plante.element} · {plante.regionOrigine}
@@ -408,13 +420,13 @@ export default function ChatTotemScreen() {
               style={({ pressed }) => [styles.iconBtn, { opacity: pressed ? 0.7 : 1, borderColor: totemColor + '60' }]}
               onPress={() => router.push('/progression-spirituelle' as any)}
             >
-              <Feather name="trending-up" size={16} color={totemColor} />
+              <SacredIcon name="trending" size={16} color={totemColor} />
             </Pressable>
             <Pressable
               style={({ pressed }) => [styles.iconBtn, { opacity: pressed ? 0.7 : 1, borderColor: totemColor + '60' }]}
               onPress={() => setShowArchives(true)}
             >
-              <Feather name="archive" size={18} color={totemColor} />
+              <SacredIcon name="archive" size={18} color={totemColor} />
               {sessions.length > 0 && (
                 <View style={[styles.badge, { backgroundColor: totemColor }]}>
                   <Text style={styles.badgeText}>{Math.min(sessions.length, 9)}</Text>
@@ -439,7 +451,7 @@ export default function ChatTotemScreen() {
         {messages.length === 0 && (
           <View style={styles.welcomeWrap}>
             <View style={[styles.totemEmblem, { borderColor: totemColor + '50', backgroundColor: totemColor + '12' }]}>
-              <Text style={[styles.totemEmblemChar, { color: totemColor }]}>✦</Text>
+              <SacredIcon name="sparkles" size={28} color={totemColor} />
               <Text style={[styles.totemEmblemName, { color: colors.ivory }]}>{totem.nom}</Text>
               <Text style={[styles.totemEmblemSci, { color: colors.mutedForeground }]}>{plante.nomScientifique}</Text>
             </View>
@@ -448,7 +460,11 @@ export default function ChatTotemScreen() {
               <Text style={[styles.citationText, { color: colors.ivory }]}>"{plante.citation}"</Text>
             </View>
 
-            <Text style={[styles.suggestLabel, { color: colors.mutedForeground }]}>◆ COMMENCE PAR ◆</Text>
+            <View style={styles.suggestLabelRow}>
+              <SacredIcon name="sparkles" size={11} color={colors.mutedForeground} />
+              <Text style={[styles.suggestLabel, { color: colors.mutedForeground }]}>COMMENCE PAR</Text>
+              <SacredIcon name="sparkles" size={11} color={colors.mutedForeground} />
+            </View>
             {[
               `Qu'est-ce que ta nature m'apprend sur moi ?`,
               `Comment puis-je surmonter mes peurs ?`,
@@ -463,7 +479,7 @@ export default function ChatTotemScreen() {
                 ]}
                 onPress={() => setInput(s)}
               >
-                <Text style={[styles.suggestionDiamond, { color: totemColor }]}>◆</Text>
+                <SacredIcon name="sparkles" size={13} color={totemColor} />
                 <Text style={[styles.suggestionText, { color: colors.ivory }]}>{s}</Text>
               </Pressable>
             ))}
@@ -489,9 +505,16 @@ export default function ChatTotemScreen() {
                   <View style={[styles.assistantAccent, { backgroundColor: totemColor }]} />
                   <View style={[styles.assistantBubble, { backgroundColor: colors.card, borderColor: colors.border }]}>
                     <View style={styles.assistantHeader}>
-                      <Text style={[styles.assistantLabel, { color: totemColor }]}>
-                        ✦ {totem.nom.toUpperCase()}
-                      </Text>
+                      <View style={styles.assistantLabelRow}>
+                        <SacredIcon
+                          name={msg.isError ? 'alert' : 'sparkles'}
+                          size={12}
+                          color={msg.isError ? '#E74C3C' : totemColor}
+                        />
+                        <Text style={[styles.assistantLabel, { color: msg.isError ? '#E74C3C' : totemColor }]}>
+                          {totem.nom.toUpperCase()}
+                        </Text>
+                      </View>
                     </View>
                     <Text style={[styles.bubbleText, { color: colors.ivory }]}>{msg.content}</Text>
                     <View style={[styles.assistantFooter, { borderTopColor: colors.border }]}>
@@ -511,7 +534,10 @@ export default function ChatTotemScreen() {
           <View style={styles.assistantBubbleWrap}>
             <View style={[styles.assistantAccent, { backgroundColor: totemColor }]} />
             <View style={[styles.assistantBubble, styles.loadingBubble, { backgroundColor: colors.card, borderColor: colors.border }]}>
-              <Text style={[styles.assistantLabel, { color: totemColor }]}>✦ {totem.nom.toUpperCase()}</Text>
+              <View style={styles.assistantLabelRow}>
+                <SacredIcon name="sparkles" size={12} color={totemColor} />
+                <Text style={[styles.assistantLabel, { color: totemColor }]}>{totem.nom.toUpperCase()}</Text>
+              </View>
               <View style={styles.dotsRow}>
                 {[0, 1, 2].map((i) => (
                   <Animated.View
@@ -538,20 +564,27 @@ export default function ChatTotemScreen() {
             { backgroundColor: rateLimitRemaining === 0 ? '#2A0A0A' : '#1A1500',
               borderColor: rateLimitRemaining === 0 ? '#C0392B40' : '#D4A01740' }
           ]}>
-            <Text style={[
-              styles.rateLimitBannerText,
-              { color: rateLimitRemaining === 0 ? '#E74C3C' : '#D4A017' }
-            ]}>
-              {rateLimitRemaining === 0
-                ? `⚠ ${t.rate_limit_reset_in} ${countdown !== null ? countdown + 's' : '…'}`
-                : `◆ ${rateLimitRemaining} ${t.rate_limit_remaining}`}
-            </Text>
+            <View style={styles.rateLimitContent}>
+              <SacredIcon
+                name={rateLimitRemaining === 0 ? 'alert' : 'circle'}
+                size={14}
+                color={rateLimitRemaining === 0 ? '#E74C3C' : '#D4A017'}
+              />
+              <Text style={[
+                styles.rateLimitBannerText,
+                { color: rateLimitRemaining === 0 ? '#E74C3C' : '#D4A017' }
+              ]}>
+                {rateLimitRemaining === 0
+                  ? `${t.rate_limit_reset_in} ${countdown !== null ? countdown + 's' : '...'}`
+                  : `${rateLimitRemaining} ${t.rate_limit_remaining}`}
+              </Text>
+            </View>
           </View>
         )}
         <View style={styles.inputRow}>
           <TextInput
             style={[styles.input, { color: colors.ivory, backgroundColor: colors.card, borderColor: totemColor + '40' }]}
-            placeholder={`Parle au ${totem.nom}…`}
+            placeholder={`Parle au ${totem.nom}...`}
             placeholderTextColor={colors.mutedForeground}
             value={input}
             onChangeText={setInput}
@@ -568,12 +601,12 @@ export default function ChatTotemScreen() {
           >
             {isLoading
               ? <ActivityIndicator size="small" color="#FFF" />
-              : <Feather name="send" size={18} color="#FFF" />
+              : <SacredIcon name="send" size={18} color="#FFF" />
             }
           </Pressable>
         </View>
         <Pressable style={styles.newChatBtn} onPress={newConversation}>
-          <Feather name="plus-circle" size={13} color={colors.mutedForeground} />
+          <SacredIcon name="plus" size={13} color={colors.mutedForeground} />
           <Text style={[styles.newChatText, { color: colors.mutedForeground }]}>Nouvelle conversation</Text>
         </Pressable>
       </View>
@@ -587,7 +620,10 @@ export default function ChatTotemScreen() {
               <KenteStrip />
               <View style={styles.modalHeaderRow}>
                 <View>
-                  <Text style={[styles.modalTitle, { color: colors.ivory }]}>✦ Archives sacrées</Text>
+                  <View style={styles.modalTitleRow}>
+                    <SacredIcon name="archive" size={18} color={totemColor} />
+                    <Text style={[styles.modalTitle, { color: colors.ivory }]}>Archives sacrées</Text>
+                  </View>
                   <Text style={[styles.modalSub, { color: colors.mutedForeground }]}>
                     {sessions.length} conversation{sessions.length !== 1 ? 's' : ''} avec {totem.nom}
                   </Text>
@@ -596,7 +632,7 @@ export default function ChatTotemScreen() {
                   style={({ pressed }) => [styles.iconBtn, { borderColor: totemColor + '40', opacity: pressed ? 0.7 : 1 }]}
                   onPress={() => setShowArchives(false)}
                 >
-                  <Feather name="x" size={18} color={totemColor} />
+                  <SacredIcon name="close" size={18} color={totemColor} />
                 </Pressable>
               </View>
               <AdinkraRow color={totemColor} />
@@ -606,7 +642,7 @@ export default function ChatTotemScreen() {
               style={[styles.newSessionBtn, { backgroundColor: totemColor + '20', borderColor: totemColor + '50' }]}
               onPress={newConversation}
             >
-              <Feather name="plus" size={16} color={totemColor} />
+              <SacredIcon name="plus" size={16} color={totemColor} />
               <Text style={[styles.newSessionText, { color: totemColor }]}>Nouvelle conversation</Text>
             </Pressable>
 
@@ -632,19 +668,24 @@ export default function ChatTotemScreen() {
                   <View style={[styles.archiveAccent, { backgroundColor: totemColor }]} />
                   <View style={styles.archiveBody}>
                     <View style={styles.archiveTop}>
-                      <Text style={[styles.archiveDate, { color: totemColor }]}>
-                        {s.id === currentSessionId ? '▶ En cours' : formatDate(s.startedAt)}
-                      </Text>
+                      {s.id === currentSessionId ? (
+                        <View style={styles.archiveStatus}>
+                          <SacredIcon name="circle" size={9} color={totemColor} />
+                          <Text style={[styles.archiveDate, { color: totemColor }]}>En cours</Text>
+                        </View>
+                      ) : (
+                        <Text style={[styles.archiveDate, { color: totemColor }]}>{formatDate(s.startedAt)}</Text>
+                      )}
                       <Pressable
                         onPress={() => deleteSession(s.id)}
                         hitSlop={10}
                         style={({ pressed }) => [{ opacity: pressed ? 0.5 : 0.6 }]}
                       >
-                        <Feather name="trash-2" size={13} color={colors.mutedForeground} />
+                        <SacredIcon name="trash" size={13} color={colors.mutedForeground} />
                       </Pressable>
                     </View>
                     <Text style={[styles.archivePreview, { color: colors.ivory }]} numberOfLines={2}>
-                      {s.preview || '…'}
+                      {s.preview || '...'}
                     </Text>
                     <Text style={[styles.archiveCount, { color: colors.mutedForeground }]}>
                       {s.messages.length} message{s.messages.length !== 1 ? 's' : ''}
@@ -666,6 +707,7 @@ const styles = StyleSheet.create({
   // Empty state
   emptyWrap: { flex: 1, padding: 28, gap: 16 },
   backBtn: { marginBottom: 20 },
+  titleWithIcon: { flexDirection: 'row', alignItems: 'center', gap: 8 },
   emptyTitle: { fontSize: 26, fontWeight: '800' as const },
   emptyDesc: { fontSize: 15, lineHeight: 24 },
   emptyBtn: { padding: 16, borderRadius: 14, alignItems: 'center' as const, marginTop: 8 },
@@ -675,6 +717,7 @@ const styles = StyleSheet.create({
   header: { paddingBottom: 0 },
   headerRow: { flexDirection: 'row', alignItems: 'center', gap: 12, paddingHorizontal: 14, paddingVertical: 12 },
   headerCenter: { flex: 1 },
+  headerSupRow: { flexDirection: 'row', alignItems: 'center', gap: 6 },
   headerSup: { fontSize: 9, fontWeight: '800' as const, letterSpacing: 2.5, marginBottom: 2 },
   headerName: { fontSize: 22, fontWeight: '800' as const, lineHeight: 26 },
   headerSub: { fontSize: 11, marginTop: 2 },
@@ -699,7 +742,6 @@ const styles = StyleSheet.create({
     alignItems: 'center', borderWidth: 1, borderRadius: 16,
     paddingVertical: 20, paddingHorizontal: 24, gap: 4,
   },
-  totemEmblemChar: { fontSize: 28 },
   totemEmblemName: { fontSize: 20, fontWeight: '800' as const, letterSpacing: 1 },
   totemEmblemSci: { fontSize: 12, fontStyle: 'italic' },
   citationCard: {
@@ -707,12 +749,12 @@ const styles = StyleSheet.create({
     padding: 14,
   },
   citationText: { fontSize: 14, fontStyle: 'italic', lineHeight: 22 },
-  suggestLabel: { fontSize: 9, fontWeight: '800' as const, letterSpacing: 3, textAlign: 'center', marginTop: 8 },
+  suggestLabelRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6, marginTop: 8 },
+  suggestLabel: { fontSize: 9, fontWeight: '800' as const, letterSpacing: 3, textAlign: 'center' },
   suggestion: {
     flexDirection: 'row', alignItems: 'flex-start',
     gap: 10, padding: 12, borderRadius: 12, borderWidth: 1,
   },
-  suggestionDiamond: { fontSize: 12, marginTop: 2 },
   suggestionText: { flex: 1, fontSize: 14, lineHeight: 20 },
 
   // Messages
@@ -727,6 +769,7 @@ const styles = StyleSheet.create({
   assistantBubble: { flex: 1, borderRadius: 16, borderTopLeftRadius: 4, borderWidth: 1, overflow: 'hidden' },
   loadingBubble: { paddingVertical: 14, paddingHorizontal: 14 },
   assistantHeader: { paddingHorizontal: 14, paddingTop: 12, paddingBottom: 6 },
+  assistantLabelRow: { flexDirection: 'row', alignItems: 'center', gap: 6 },
   assistantLabel: { fontSize: 9, fontWeight: '800' as const, letterSpacing: 2.5 },
   bubbleText: { fontSize: 15, lineHeight: 24, paddingHorizontal: 14, paddingBottom: 10 },
   assistantFooter: { borderTopWidth: 1, paddingHorizontal: 14, paddingVertical: 6 },
@@ -744,6 +787,7 @@ const styles = StyleSheet.create({
     paddingVertical: 6,
   },
   rateLimitBannerText: { fontSize: 12, fontWeight: '600' as const, letterSpacing: 0.3 },
+  rateLimitContent: { flexDirection: 'row', alignItems: 'center', gap: 6 },
 
   // Input
   inputWrap: { borderTopWidth: 1 },
@@ -778,6 +822,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20, paddingVertical: 16,
   },
   modalTitle: { fontSize: 18, fontWeight: '800' as const },
+  modalTitleRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },
   modalSub: { fontSize: 12, marginTop: 2 },
   newSessionBtn: {
     flexDirection: 'row', alignItems: 'center', gap: 10,
@@ -793,6 +838,7 @@ const styles = StyleSheet.create({
   archiveAccent: { width: 4 },
   archiveBody: { flex: 1, padding: 12, gap: 4 },
   archiveTop: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
+  archiveStatus: { flexDirection: 'row', alignItems: 'center', gap: 6 },
   archiveDate: { fontSize: 11, fontWeight: '700' as const, letterSpacing: 0.5 },
   archivePreview: { fontSize: 13, lineHeight: 19 },
   archiveCount: { fontSize: 11 },

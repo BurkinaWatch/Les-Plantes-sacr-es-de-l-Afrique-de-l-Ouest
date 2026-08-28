@@ -1,4 +1,3 @@
-import { Feather } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
 import { LinearGradient } from 'expo-linear-gradient';
 import React, { useEffect, useRef, useState } from 'react';
@@ -19,6 +18,7 @@ import { useColors } from '@/hooks/useColors';
 import { useTranslation } from '@/i18n';
 import { useAuth } from '@/context/AuthContext';
 import { useNotifications } from '@/hooks/useNotifications';
+import { SacredIcon, type SacredIconName } from '@/components/SacredIcon';
 import {
   ApiRequestError,
   requestPlantRecognition,
@@ -93,7 +93,7 @@ function Section({
   children,
   colors,
 }: {
-  icon: string;
+  icon: SacredIconName;
   title: string;
   children: React.ReactNode;
   colors: any;
@@ -101,7 +101,7 @@ function Section({
   return (
     <View style={[styles.section, { backgroundColor: colors.card, borderColor: colors.border }]}>
       <View style={styles.sectionHeader}>
-        <Feather name={icon as any} size={14} color={colors.gold} />
+        <SacredIcon name={icon} size={14} color={colors.gold} />
         <Text style={[styles.sectionTitle, { color: colors.gold }]}>{title}</Text>
       </View>
       {children}
@@ -114,7 +114,7 @@ function BulletList({ items, colors }: { items: string[]; colors: any }) {
     <View>
       {items.map((item, i) => (
         <View key={i} style={styles.bulletRow}>
-          <Text style={[styles.bullet, { color: colors.gold }]}>•</Text>
+          <SacredIcon name="circle" size={8} color={colors.gold} />
           <Text style={[styles.bulletText, { color: colors.foreground }]}>{item}</Text>
         </View>
       ))}
@@ -280,14 +280,21 @@ export default function ScannerScreen() {
               { backgroundColor: rateLimitRemaining === 0 ? '#2A0A0A' : '#1A1A00',
                 borderColor: rateLimitRemaining === 0 ? '#C0392B' : '#8B6914' }
             ]}>
-              <Text style={[
-                styles.rateLimitText,
-                { color: rateLimitRemaining === 0 ? '#E74C3C' : '#D4A017' }
-              ]}>
-                {rateLimitRemaining === 0
-                  ? `⚠ ${t.rate_limit_reset_in} ${countdown !== null ? countdown + 's' : '…'}`
-                  : `◆ ${rateLimitRemaining} ${t.rate_limit_remaining}`}
-              </Text>
+              <View style={styles.rateLimitContent}>
+                <SacredIcon
+                  name={rateLimitRemaining === 0 ? 'alert' : 'circle'}
+                  size={14}
+                  color={rateLimitRemaining === 0 ? '#E74C3C' : '#D4A017'}
+                />
+                <Text style={[
+                  styles.rateLimitText,
+                  { color: rateLimitRemaining === 0 ? '#E74C3C' : '#D4A017' }
+                ]}>
+                  {rateLimitRemaining === 0
+                    ? `${t.rate_limit_reset_in} ${countdown !== null ? countdown + 's' : '...'}`
+                    : `${rateLimitRemaining} ${t.rate_limit_remaining}`}
+                </Text>
+              </View>
             </View>
           )}
         </View>
@@ -319,14 +326,14 @@ export default function ScannerScreen() {
             style={[styles.pickBox, { borderColor: colors.border }]}
           >
             <View style={[styles.scanIcon, { borderColor: colors.gold }]}>
-              <Feather name="camera" size={36} color={colors.gold} />
+              <SacredIcon name="camera" size={36} color={colors.gold} />
             </View>
 
             <Pressable
               style={[styles.btn, { backgroundColor: colors.gold }]}
               onPress={() => handlePick('camera')}
             >
-              <Feather name="camera" size={16} color={colors.background} />
+              <SacredIcon name="camera" size={16} color={colors.background} />
               <Text style={[styles.btnText, { color: colors.background }]}>
                 {t.scanner_btn_camera}
               </Text>
@@ -342,7 +349,7 @@ export default function ScannerScreen() {
               style={[styles.btn, styles.btnOutline, { borderColor: colors.gold }]}
               onPress={() => handlePick('gallery')}
             >
-              <Feather name="image" size={16} color={colors.gold} />
+              <SacredIcon name="image" size={16} color={colors.gold} />
               <Text style={[styles.btnText, { color: colors.gold }]}>
                 {t.scanner_btn_gallery}
               </Text>
@@ -354,7 +361,7 @@ export default function ScannerScreen() {
       {/* Error */}
       {error && (
         <View style={[styles.errorBox, { backgroundColor: '#2A0A0A', borderColor: '#C0392B' }]}>
-          <Feather name="alert-circle" size={18} color="#E74C3C" />
+          <SacredIcon name="alert" size={18} color="#E74C3C" />
           <Text style={styles.errorText}>{error}</Text>
           <Pressable
             style={[styles.retryBtn, { borderColor: colors.gold }]}
@@ -389,14 +396,14 @@ export default function ScannerScreen() {
           </LinearGradient>
 
           {/* Description */}
-          <Section icon="book-open" title="Description" colors={colors}>
+          <Section icon="book" title="Description" colors={colors}>
             <Text style={[styles.bodyText, { color: colors.foreground }]}>
               {result.description}
             </Text>
           </Section>
 
           {/* Origin */}
-          <Section icon="map-pin" title={t.scanner_result_origin} colors={colors}>
+          <Section icon="pin" title={t.scanner_result_origin} colors={colors}>
             <Text style={[styles.bodyText, { color: colors.foreground }]}>
               {result.origineGeographique}
             </Text>
@@ -427,7 +434,7 @@ export default function ScannerScreen() {
 
           {/* Tips */}
           {result.conseils?.length > 0 && (
-            <Section icon="check-circle" title={t.scanner_result_tips} colors={colors}>
+            <Section icon="check" title={t.scanner_result_tips} colors={colors}>
               <BulletList items={result.conseils} colors={colors} />
             </Section>
           )}
@@ -438,9 +445,12 @@ export default function ScannerScreen() {
               colors={['#2A1A00', '#1A1000']}
               style={[styles.curiosityCard, { borderColor: colors.gold }]}
             >
-              <Text style={[styles.curiosityLabel, { color: colors.gold }]}>
-                ✦ {t.scanner_result_curiosity}
-              </Text>
+              <View style={styles.curiosityHeader}>
+                <SacredIcon name="sparkles" size={14} color={colors.gold} />
+                <Text style={[styles.curiosityLabel, { color: colors.gold }]}>
+                  {t.scanner_result_curiosity}
+                </Text>
+              </View>
               <Text style={[styles.curiosityText, { color: colors.ivory }]}>
                 {result.curiosite}
               </Text>
@@ -452,7 +462,7 @@ export default function ScannerScreen() {
             style={[styles.newScanBtn, { borderColor: colors.terracotta }]}
             onPress={reset}
           >
-            <Feather name="refresh-cw" size={16} color={colors.terracotta} />
+            <SacredIcon name="refresh" size={16} color={colors.terracotta} />
             <Text style={[styles.newScanText, { color: colors.terracotta }]}>
               {t.scanner_new_scan}
             </Text>
@@ -488,6 +498,7 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     letterSpacing: 0.3,
   },
+  rateLimitContent: { flexDirection: 'row', alignItems: 'center', gap: 6 },
 
   pickArea: { paddingHorizontal: 20 },
   pickBox: {
@@ -584,7 +595,6 @@ const styles = StyleSheet.create({
   sectionTitle: { fontSize: 11, fontWeight: '700', letterSpacing: 2, textTransform: 'uppercase' },
   bodyText: { fontSize: 14, lineHeight: 22 },
   bulletRow: { flexDirection: 'row', gap: 8, marginBottom: 6 },
-  bullet: { fontSize: 16, lineHeight: 22 },
   bulletText: { flex: 1, fontSize: 14, lineHeight: 22 },
 
   curiosityCard: {
@@ -593,6 +603,7 @@ const styles = StyleSheet.create({
     padding: 20,
     gap: 10,
   },
+  curiosityHeader: { flexDirection: 'row', alignItems: 'center', gap: 8 },
   curiosityLabel: { fontSize: 11, fontWeight: '700', letterSpacing: 2 },
   curiosityText: { fontSize: 14, lineHeight: 22, fontStyle: 'italic' },
 

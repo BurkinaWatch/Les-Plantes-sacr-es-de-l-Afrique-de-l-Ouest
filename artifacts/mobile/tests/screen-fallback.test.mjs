@@ -177,6 +177,7 @@ function mockModules() {
     ["react-native-safe-area-context", { useSafeAreaInsets: () => ({ top: 0, bottom: 0 }) }],
     ["expo-linear-gradient", { LinearGradient: makeHostComponent("LinearGradient") }],
     ["@expo/vector-icons", { Feather: makeHostComponent("Feather") }],
+    ["@/components/SacredIcon", { SacredIcon: makeHostComponent("SacredIcon") }],
     ["expo-router", { useRouter: () => ({ back() {}, push() {} }) }],
     ["@react-native-async-storage/async-storage", { default: asyncStorage }],
     ["expo-image-picker", imagePicker],
