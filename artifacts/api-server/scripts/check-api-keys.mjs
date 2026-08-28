@@ -1,12 +1,11 @@
 #!/usr/bin/env node
 /**
- * Pre-deploy API key verification script
+ * Pre-deploy authentication verification script
  *
  * Checks that:
- *   1. CHAT_API_KEY (server-side auth gate) is set
- *   2. EXPO_PUBLIC_CHAT_API_KEY (mobile client key) is set
- *   3. Both keys match — a mismatch means every mobile AI request will 401
- *   4. The live auth middleware actually enforces the key on both AI routes
+ *   1. JWT_SECRET (server-side signing secret) is set
+ *   2. No public client key is needed or accepted
+ *   3. The live auth middleware enforces a valid JWT on both AI routes
  *      (POST /api/chat/totem and POST /api/plant-recognition)
  *
  * Exit codes:
@@ -14,15 +13,15 @@
  *   1 — one or more checks failed (details printed to stderr)
  *
  * Environment variables:
- *   CHAT_API_KEY              — required
- *   EXPO_PUBLIC_CHAT_API_KEY  — required
+ *   JWT_SECRET                — required
  *   API_BASE_URL              — base URL for live checks (e.g. http://localhost:3000)
  *                               Falls back to http://localhost:$PORT if PORT is set.
  *                               If neither is set, live checks are skipped with a warning.
  */
 
-const CHAT_API_KEY = process.env["CHAT_API_KEY"];
-const EXPO_PUBLIC_CHAT_API_KEY = process.env["EXPO_PUBLIC_CHAT_API_KEY"];
+import jwt from "jsonwebtoken";
+
+const JWT_SECRET = process.env["JWT_SECRET"];
 
 let failed = false;
 
@@ -41,32 +40,13 @@ function warn(msg) {
 
 // ── 1. Env var presence check ────────────────────────────────────────────────
 
-console.log("\n🔑  Checking API key environment variables…\n");
+console.log("\n🔐  Checking JWT authentication configuration…\n");
 
-if (!CHAT_API_KEY) {
-  fail("CHAT_API_KEY is not set — all AI routes will be unprotected (dev) or crash (production).");
-  fail("  → Set it in Replit Secrets as CHAT_API_KEY before deploying.");
+if (!JWT_SECRET) {
+  fail("JWT_SECRET is not set — refusing to run authenticated API routes.");
+  fail("  → Set it in Replit Secrets as JWT_SECRET before deploying.");
 } else {
-  pass("CHAT_API_KEY is set.");
-}
-
-if (!EXPO_PUBLIC_CHAT_API_KEY) {
-  fail("EXPO_PUBLIC_CHAT_API_KEY is not set — the mobile app cannot authenticate with the API.");
-  fail("  → Set it in Replit Secrets as EXPO_PUBLIC_CHAT_API_KEY (must equal CHAT_API_KEY).");
-} else {
-  pass("EXPO_PUBLIC_CHAT_API_KEY is set.");
-}
-
-// ── 2. Key match check ───────────────────────────────────────────────────────
-
-if (CHAT_API_KEY && EXPO_PUBLIC_CHAT_API_KEY) {
-  if (CHAT_API_KEY === EXPO_PUBLIC_CHAT_API_KEY) {
-    pass("CHAT_API_KEY and EXPO_PUBLIC_CHAT_API_KEY match — mobile ↔ server auth will succeed.");
-  } else {
-    fail("CHAT_API_KEY and EXPO_PUBLIC_CHAT_API_KEY do NOT match.");
-    fail("  → Every AI request from the mobile app will receive a 401 Unauthorized.");
-    fail("  → Fix: make both secrets identical.");
-  }
+  pass("JWT_SECRET is configured.");
 }
 
 // ── 3. Live route check ──────────────────────────────────────────────────────
@@ -87,16 +67,16 @@ if (!BASE_URL) {
   /**
    * Ping a route with an arbitrary body.
    * We only care about the HTTP status, not a valid AI response:
-   *   - 401 → key was rejected (auth failed)
-   *   - 400 → key was accepted but body was invalid (auth passed — expected for probe bodies)
-   *   - 2xx → key was accepted (unexpected with dummy body, but still fine)
+   *   - 401 → token was rejected (auth failed)
+   *   - 400 → token was accepted but body was invalid (auth passed)
+   *   - 2xx → token was accepted (unexpected with dummy body, but still fine)
    *   - 5xx → server error (surfaces misconfiguration)
    */
-  async function probeRoute({ label, path, key }) {
+  async function probeRoute({ label, path, token }) {
     const url = `${BASE_URL}${path}`;
     const headers = { "Content-Type": "application/json" };
-    if (key) {
-      headers["x-api-key"] = key;
+    if (token) {
+      headers.Authorization = `Bearer ${token}`;
     }
 
     let status;
@@ -123,44 +103,49 @@ if (!BASE_URL) {
     { label: "POST /api/plant-recognition",   path: "/api/plant-recognition" },
   ];
 
+  const validToken = JWT_SECRET
+    ? jwt.sign(
+      { id: 1, username: "security-check" },
+      JWT_SECRET,
+      { algorithm: "HS256", issuer: "plantes-sacrees-api", audience: "plantes-sacrees-mobile", expiresIn: "5m" },
+    )
+    : null;
+
   for (const route of routes) {
-    // (a) With the key bundled into the Expo app — must NOT be 401 or 5xx.
-    const statusWith = await probeRoute({ ...route, label: `${route.label} (with Expo key)`, key: EXPO_PUBLIC_CHAT_API_KEY });
+    // (a) With a server-issued JWT — must NOT be 401 or 5xx.
+    const statusWith = await probeRoute({ ...route, label: `${route.label} (with JWT)`, token: validToken });
     if (statusWith !== null) {
       if (statusWith === 401) {
-        fail(`${route.label}: server returned 401 even though the Expo key was sent.`);
-        fail("  → EXPO_PUBLIC_CHAT_API_KEY does not match the server's CHAT_API_KEY.");
-        fail("  → Redeploy after aligning both secrets.");
+        fail(`${route.label}: server returned 401 even though a valid JWT was sent.`);
       } else if (statusWith >= 500) {
         fail(`${route.label}: server returned ${statusWith} — possible startup misconfiguration (check server logs).`);
       } else {
-        // 400 (bad body) or 200 are both fine — auth was accepted
-        pass(`${route.label}: key accepted (HTTP ${statusWith}).`);
+        pass(`${route.label}: JWT accepted (HTTP ${statusWith}).`);
       }
     }
 
-    // (b) Without key — must be 401 (confirms auth IS enforced).
-    const statusWithout = await probeRoute({ ...route, label: `${route.label} (no key)`, key: null });
+    // (b) Without a token — must be 401 (confirms auth is enforced).
+    const statusWithout = await probeRoute({ ...route, label: `${route.label} (no JWT)`, token: null });
     if (statusWithout !== null) {
       if (statusWithout === 401) {
         pass(`${route.label}: auth enforced — unauthenticated request correctly rejected.`);
       } else {
         fail(`${route.label}: unauthenticated request returned ${statusWithout} instead of 401.`);
-        fail("  → The route is not protected — CHAT_API_KEY may not be loaded by the server.");
+        fail("  → The route is not protected — requireJwt may be missing.");
       }
     }
 
-    // (c) With an invalid key — must be 401 (confirms invalid mobile keys fail clearly).
+    // (c) With an invalid token — must be 401.
     const statusInvalid = await probeRoute({
       ...route,
-      label: `${route.label} (invalid key)`,
-      key: "invalid-key-for-smoke-test",
+      label: `${route.label} (invalid JWT)`,
+      token: "invalid-token-for-smoke-test",
     });
     if (statusInvalid !== null) {
       if (statusInvalid === 401) {
-        pass(`${route.label}: invalid key correctly rejected.`);
+        pass(`${route.label}: invalid JWT correctly rejected.`);
       } else {
-        fail(`${route.label}: invalid key returned ${statusInvalid} instead of 401.`);
+      fail(`${route.label}: invalid JWT returned ${statusInvalid} instead of 401.`);
       }
     }
   }
@@ -172,6 +157,6 @@ if (failed) {
   console.error("\n🚨  Pre-deploy check FAILED — fix the issues above before deploying.\n");
   process.exit(1);
 } else {
-  console.log("\n✅  All API key checks passed — safe to deploy.\n");
+  console.log("\n✅  All JWT checks passed — safe to deploy.\n");
   process.exit(0);
 }
