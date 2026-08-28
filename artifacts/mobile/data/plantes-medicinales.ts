@@ -1,3 +1,5 @@
+import { PLANTES_COMPLEMENTAIRES } from './plantes-medicinales-complementaires';
+
 /**
  * Plantes médicinales africaines
  * Source : Jean-Louis POUSSET, « Plantes Médicinales Africaines — Utilisation Pratique »
@@ -1179,6 +1181,23 @@ const PLANTES_PDF: PlanteMedicinale[] = [
       'Ne pas appliquer de préparation maison sur une plaie ou remplacer un soin médical par une pratique traditionnelle. Prudence en cas d’allergie connue au bouleau ou de traitement en cours.',
     source: 'Lacoste, Sophie, « Les plantes qui guérissent », Repères-Santé, 2004',
   },
+];
+
+/**
+ * Catalogue documentaire complet.
+ *
+ * Le filtre par nom scientifique évite de créer deux fiches pour une espèce
+ * déjà présente dans la première série de monographies.
+ */
+export const PLANTES_MEDICINALES: PlanteMedicinale[] = [
+  ...PLANTES_PDF,
+  ...PLANTES_COMPLEMENTAIRES.filter(
+    (complement) =>
+      !PLANTES_PDF.some(
+        (existing) =>
+          existing.nomScientifique.toLowerCase() === complement.nomScientifique.toLowerCase(),
+      ),
+  ),
 ];
 
 /** Retourne toutes les catégories thérapeutiques uniques */

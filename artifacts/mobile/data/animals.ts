@@ -1,3 +1,5 @@
+import { PLANTES_MEDICINALES } from './plantes-medicinales';
+
 export type PlanteCategorie =
   | 'Arbres Sacrés'
   | 'Plantes Médicinales'
@@ -40,7 +42,7 @@ export interface Plante {
 
 export type Animal = Plante;
 
-export const PLANTS: Plante[] = [
+const CORE_PLANTS: Plante[] = [
 
   /* ═══════════════════════════════════════════════════════════
      ARBRES SACRÉS
@@ -3753,6 +3755,80 @@ export const PLANTS: Plante[] = [
     usagesTraditionnels: ['Toitures de chaume', 'Nattes et paniers tressés', 'Alimentation du bétail', 'Stabilisation des sols'],
   },
 ];
+
+const normalizeScientificName = (name: string) =>
+  name
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .replace(/\s+/g, ' ')
+    .trim();
+
+const coreScientificNames = new Set(
+  CORE_PLANTS.map((plant) => normalizeScientificName(plant.nomScientifique)),
+);
+
+/**
+ * Adapte les monographies documentaires au format du catalogue principal.
+ *
+ * Les deux bibliothèques restent complémentaires : la fiche détaillée de
+ * Savoir conserve les monographies complètes, tandis que cette adaptation
+ * permet à la bibliothèque principale, au compteur et aux filtres de
+ * découvrir les espèces vérifiées qui n’étaient pas encore dans les 77 fiches
+ * éditoriales.
+ */
+const documentedPlants: Plante[] = PLANTES_MEDICINALES
+  .filter((plant) => !coreScientificNames.has(normalizeScientificName(plant.nomScientifique)))
+  .map((plant) => {
+    const indications = plant.emplois.map((emploi) => emploi.indication);
+    const firstIndication = indications[0] ?? plant.categorieTherapeutique;
+    return {
+      id: plant.id,
+      nom: plant.nomVulgaire,
+      nomAnglais: plant.nomVulgaire,
+      nomScientifique: plant.nomScientifique,
+      categorie: 'Plantes Médicinales',
+      element: 'Terre',
+      description: plant.descriptionPlante,
+      symboliqueAfricaine:
+        `Cette fiche relie ${plant.nomVulgaire.toLowerCase()} aux savoirs de la pharmacopée ouest-africaine. ` +
+        'Les usages présentés sont des traditions documentées, à transmettre avec discernement et respect des communautés.',
+      symboliqueSpirirtuelle:
+        'La connaissance d’une plante commence par l’observation : reconnaître, respecter les limites du vivant et demander conseil avant d’agir.',
+      symbolique: 'Symbole de transmission responsable et de soin attentif du vivant.',
+      qualites: ['Observation', 'Patience', 'Prudence', 'Respect du vivant'],
+      defauts: ['Confusion possible', 'Usage hors contexte', 'Impatience'],
+      pouvoirs: ['Transmission des savoirs', 'Lien au territoire', 'Soin traditionnel documenté'],
+      enseignements: [
+        'Une plante utile doit d’abord être identifiée avec certitude',
+        'Un savoir transmis avec prudence protège mieux qu’une promesse',
+        'Respecte les limites du vivant et celles de ton propre corps',
+      ],
+      citation: 'Connaître une plante, c’est aussi connaître ses limites.',
+      proverbes: [
+        'La feuille reconnue est plus sûre que la racine devinée.',
+        'Le savoir partagé grandit quand la prudence l’accompagne.',
+      ],
+      legendes: [],
+      conseilsDeVie: [
+        'Observe avant de cueillir.',
+        'Garde la trace du nom, du lieu et de la partie utilisée.',
+        'Pour un symptôme important, demande d’abord un avis de santé.',
+      ],
+      niveauSpirituel: 2,
+      regionOrigine: 'Afrique de l’Ouest — fiche documentaire',
+      couleur: plant.couleur,
+      couleurSecondaire: '#384A29',
+      enseignementDuJour: `Aujourd’hui, apprends à reconnaître ${plant.nomVulgaire.toLowerCase()} sans confondre tradition et prescription.`,
+      vertus: [plant.categorieTherapeutique, firstIndication, ...indications.slice(1, 3)],
+      usagesTraditionnels: [
+        ...plant.partiesUtilisees.map((partie) => `Partie documentée : ${partie}`),
+        ...plant.emplois.slice(0, 3).map((emploi) => emploi.indication),
+      ],
+    };
+  });
+
+export const PLANTS: Plante[] = [...CORE_PLANTS, ...documentedPlants];
 
 export const CATEGORIES: PlanteCategorie[] = [
   'Arbres Sacrés',
