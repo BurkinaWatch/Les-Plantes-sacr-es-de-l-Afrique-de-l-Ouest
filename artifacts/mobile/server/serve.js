@@ -57,6 +57,8 @@ function buildStaticFileIndex(root, prefix = "") {
   for (const entry of fs.readdirSync(root, { withFileTypes: true })) {
     const fileName = entry.name;
     if (!/^[a-zA-Z0-9._-]+$/.test(fileName) || fileName === "." || fileName === "..") continue;
+    // nosemgrep: javascript.express.file.fs-express.fs-express — fileName comes
+    // from the trusted static-build directory and is constrained to one segment.
     const diskPath = path.join(root, fileName);
     const urlPath = `${prefix}/${fileName}`.replace(/\/+/g, "/");
     if (entry.isDirectory()) {
