@@ -628,4 +628,79 @@ export const ARTICLES: Article[] = [
     ],
     sources: ['Davis (1995), One River: Explorations and Discoveries in the Amazon Rain Forest', 'BGCI (2020), State of the World\'s Trees', 'Gueye & Diallo (2019), Ethnobotanique ouest-africaine : bilan et perspectives'],
   },
+
+  {
+    id: 'inventaire-pousset-lire-avec-prudence',
+    titre: 'Lire un inventaire médicinal avec prudence',
+    sousTitre: 'Du document de référence à une transmission responsable',
+    auteur: 'Équipe éditoriale des Plantes Sacrées',
+    source: 'D’après Jean-Louis Pousset, Plantes Médicinales Africaines',
+    annee: '2026',
+    duree: '6 min',
+    categorie: 'ethnobotanique',
+    categorieLabel: 'Méthode & transmission',
+    planteIcon: '📖',
+    couleur: '#B58A3A',
+    resume: 'Comment consulter les monographies du corpus sans confondre un usage traditionnel documenté avec un diagnostic, une dose ou une prescription.',
+    tags: ['Pousset', 'monographies', 'méthode', 'prudence', 'conservation', 'pharmacopée'],
+    contenu: [
+      {
+        type: 'paragraph',
+        content: 'Le corpus documentaire de l’application s’appuie d’abord sur Jean-Louis Pousset, Plantes Médicinales Africaines — Utilisation Pratique, publié en 1989. Le livre décrit des plantes, des parties utilisées, des préparations et des usages rapportés dans plusieurs pharmacopées africaines. Il s’agit d’une source historique et ethnobotanique : elle renseigne la transmission des savoirs, mais ne remplace pas l’évaluation d’une personne malade.',
+      },
+      {
+        type: 'subtitle',
+        content: 'Trois niveaux à ne pas mélanger',
+      },
+      {
+        type: 'list',
+        content: 'Chaque fiche distingue volontairement :',
+        items: [
+          'L’alimentation : fruit, graine, feuille ou boisson consommés comme aliments.',
+          'La préparation traditionnelle : infusion, décoction ou soin externe rapporté par la source.',
+          'La prudence de santé : situations qui exigent un professionnel, comme une fièvre persistante, une détresse respiratoire, une déshydratation ou une plaie importante.',
+        ],
+      },
+      {
+        type: 'paragraph',
+        content: 'Un résultat observé en laboratoire, une propriété décrite dans un ouvrage et une efficacité clinique ne sont pas équivalents. La dose, l’identification botanique, la partie de la plante, la saison, le mode de préparation et les traitements associés peuvent changer le risque. Pour cette raison, l’application conserve les formulations « usage traditionnel documenté » et évite de transformer une indication ancienne en promesse de guérison.',
+      },
+      {
+        type: 'subtitle',
+        content: 'Identifier avant de cueillir',
+      },
+      {
+        type: 'paragraph',
+        content: 'Un nom populaire peut désigner plusieurs espèces selon la région et la langue. Le nom scientifique aide à comparer les sources, mais il ne suffit pas à identifier une plante sur le terrain. Observer la forme, le lieu, la saison et les caractères botaniques avec une personne compétente ; ne jamais utiliser une plante simplement parce qu’elle ressemble à une photographie ou à une autre fiche.',
+      },
+      {
+        type: 'quote',
+        content: '« Connaître le nom d’une plante, c’est commencer à la reconnaître ; connaître ses limites, c’est commencer à la respecter. »',
+      },
+      {
+        type: 'subtitle',
+        content: 'Préserver les plantes et les savoirs',
+      },
+      {
+        type: 'list',
+        content: 'Une transmission durable peut commencer par des gestes simples :',
+        items: [
+          'Privilégier les feuilles, fruits ou graines lorsque la tradition le permet, plutôt que d’arracher les racines.',
+          'Ne pas prélever dans une forêt sacrée ou sur un arbre protégé sans l’autorisation de la communauté.',
+          'Noter la langue, le lieu, la partie utilisée et le nom de la personne qui transmet le savoir.',
+          'Respecter le consentement et la reconnaissance des communautés qui détiennent ces connaissances.',
+          'Cultiver les espèces recherchées et laisser des plants produire des graines.',
+        ],
+      },
+      {
+        type: 'paragraph',
+        content: 'L’Organisation mondiale de la Santé souligne l’importance de la qualité, de la sécurité et de l’usage responsable des médecines traditionnelles. Le rôle de cette bibliothèque est donc de rendre les sources plus lisibles et de soutenir la curiosité botanique, pas d’organiser une automédication. En cas de doute, l’abstention et la demande d’un avis qualifié sont les choix les plus protecteurs.',
+      },
+    ],
+    sources: [
+      'Pousset, J.-L. (1989), Plantes Médicinales Africaines — Utilisation Pratique, Éditions ESTEM / AUPELF, Paris.',
+      'Organisation mondiale de la Santé (2013), Stratégie de l’OMS pour la médecine traditionnelle 2014–2023 : https://www.who.int/publications/i/item/9789241506096',
+      'Convention sur la diversité biologique, Traditional Knowledge : https://www.cbd.int/traditional/',
+    ],
+  },
 ];

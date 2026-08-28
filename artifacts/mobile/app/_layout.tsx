@@ -141,7 +141,7 @@ function AnimatedSplash({ onFinish }: { onFinish: () => void }) {
         ]}
       >
         <Image
-          source={require("@/assets/images/icon-plants.png")}
+          source={require("@/assets/images/logo-plantes-sacrees.png")}
           style={styles.logo}
           resizeMode="contain"
           accessibilityLabel="Logo des Plantes Sacrées d'Afrique de l'Ouest"
@@ -154,7 +154,7 @@ function AnimatedSplash({ onFinish }: { onFinish: () => void }) {
           accessibilityLabel="Les Plantes Sacrées d'Afrique de l'Ouest"
           style={styles.splashTitle}
         >
-          Les Plantes{"\n"}Sacrées d'Afrique{"\n"}de l'Ouest
+          Les Plantes Sacrées{"\n"}d'Afrique de l'Ouest
         </Text>
       </Animated.View>
 
@@ -426,15 +426,16 @@ const styles = StyleSheet.create({
     backgroundColor: "#C8A020",
   },
   logoWrap: {
-    width: width * 0.62,
-    height: width * 0.62,
+    width: width * 0.76,
+    height: width * 0.76,
     alignItems: "center",
     justifyContent: "center",
-    marginBottom: 32,
+    marginBottom: 20,
   },
   logo: {
-    width: width * 0.68,
-    height: width * 0.68,
+    width: width * 0.78,
+    height: width * 0.78,
+    borderRadius: 28,
   },
   titleBlock: {
     alignItems: "center",
@@ -442,8 +443,8 @@ const styles = StyleSheet.create({
     width: "100%",
   },
   splashTitle: {
-    fontSize: 28,
-    lineHeight: 35,
+    fontSize: 24,
+    lineHeight: 31,
     fontWeight: "800",
     color: "#F0EAD6",
     letterSpacing: 0.3,

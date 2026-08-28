@@ -3764,8 +3764,19 @@ const normalizeScientificName = (name: string) =>
     .replace(/\s+/g, ' ')
     .trim();
 
+const uniquePlantsByScientificName = (plants: Plante[]) => {
+  const seen = new Set<string>();
+  return plants.filter((plant) => {
+    const scientificName = normalizeScientificName(plant.nomScientifique);
+    if (seen.has(scientificName)) return false;
+    seen.add(scientificName);
+    return true;
+  });
+};
+
+const uniqueCorePlants = uniquePlantsByScientificName(CORE_PLANTS);
 const coreScientificNames = new Set(
-  CORE_PLANTS.map((plant) => normalizeScientificName(plant.nomScientifique)),
+  uniqueCorePlants.map((plant) => normalizeScientificName(plant.nomScientifique)),
 );
 
 /**
@@ -3828,7 +3839,7 @@ const documentedPlants: Plante[] = PLANTES_MEDICINALES
     };
   });
 
-export const PLANTS: Plante[] = [...CORE_PLANTS, ...documentedPlants];
+export const PLANTS: Plante[] = [...uniqueCorePlants, ...documentedPlants];
 
 export const CATEGORIES: PlanteCategorie[] = [
   'Arbres Sacrés',

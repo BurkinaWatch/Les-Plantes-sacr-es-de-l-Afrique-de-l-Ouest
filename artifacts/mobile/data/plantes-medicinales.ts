@@ -1195,7 +1195,18 @@ export const PLANTES_MEDICINALES: PlanteMedicinale[] = [
     (complement) =>
       !PLANTES_PDF.some(
         (existing) =>
-          existing.nomScientifique.toLowerCase() === complement.nomScientifique.toLowerCase(),
+          existing.nomScientifique
+            .normalize('NFD')
+            .replace(/[\u0300-\u036f]/g, '')
+            .toLowerCase()
+            .replace(/\s+/g, ' ')
+            .trim() ===
+          complement.nomScientifique
+            .normalize('NFD')
+            .replace(/[\u0300-\u036f]/g, '')
+            .toLowerCase()
+            .replace(/\s+/g, ' ')
+            .trim(),
       ),
   ),
 ];

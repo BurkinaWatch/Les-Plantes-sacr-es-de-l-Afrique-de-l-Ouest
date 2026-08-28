@@ -109,7 +109,7 @@ export default function HomeScreen() {
           <View style={styles.logoWrapper}>
             <Animated.View style={[styles.logoGlowOuter, { opacity: glowAnim }]} />
             <View style={styles.logoGlowInner} />
-            <Image source={require('@/assets/images/icon.png')} style={styles.heroLogo} />
+            <Image source={require('@/assets/images/logo-plantes-sacrees.png')} style={styles.heroLogo} />
             <View style={styles.logoMoonOverlay} />
           </View>
 
@@ -238,17 +238,17 @@ const styles = StyleSheet.create({
   },
 
   logoWrapper: {
-    width: 80,
-    height: 80,
+    width: 142,
+    height: 142,
     marginBottom: 10,
     alignItems: 'center',
     justifyContent: 'center',
   },
   logoGlowOuter: {
     position: 'absolute',
-    width: 112,
-    height: 112,
-    borderRadius: 56,
+    width: 174,
+    height: 174,
+    borderRadius: 87,
     backgroundColor: 'rgba(200,160,32,0.16)',
     ...Platform.select({
       web: { boxShadow: '0 0 28px 14px rgba(200,160,32,0.28)' },
@@ -256,26 +256,26 @@ const styles = StyleSheet.create({
   },
   logoGlowInner: {
     position: 'absolute',
-    width: 88,
-    height: 88,
-    borderRadius: 44,
+    width: 154,
+    height: 154,
+    borderRadius: 77,
     borderWidth: 1,
     borderColor: 'rgba(200,160,32,0.38)',
     backgroundColor: 'rgba(92,122,62,0.12)',
   },
   heroLogo: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
+    width: 142,
+    height: 142,
+    borderRadius: 24,
     ...Platform.select({
       web: { filter: 'brightness(1.1) saturate(1.1) drop-shadow(0 0 10px rgba(200,160,32,0.50))' },
     }),
   },
   logoMoonOverlay: {
     position: 'absolute',
-    width: 80,
-    height: 80,
-    borderRadius: 40,
+    width: 142,
+    height: 142,
+    borderRadius: 24,
     backgroundColor: 'rgba(200,160,32,0.08)',
   },
 
