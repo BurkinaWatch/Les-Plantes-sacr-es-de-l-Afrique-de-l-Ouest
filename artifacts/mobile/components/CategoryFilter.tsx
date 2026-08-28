@@ -6,6 +6,7 @@ import { CATEGORIES } from '@/data/animals';
 import { SacredIcon, iconForCategory } from '@/components/SacredIcon';
 import { useColors } from '@/hooks/useColors';
 import { useTranslation } from '@/i18n';
+import { getCategoryLabels } from '@/lib/category-labels';
 
 interface Props {
   selected: PlanteCategorie | null;
@@ -16,14 +17,7 @@ export function CategoryFilter({ selected, onSelect }: Props) {
   const colors = useColors();
   const { t } = useTranslation();
 
-  const CAT_LABELS: Record<PlanteCategorie, string> = {
-    'Arbres Sacrés': t.cat_sacred_trees,
-    'Plantes Médicinales': t.cat_medicinal_plants,
-    'Plantes Alimentaires': t.cat_food_plants,
-    'Plantes Rituelles': t.cat_ritual_plants,
-    'Herbes & Graminées': t.cat_herbs_grasses,
-    'Palmiers': t.cat_palms,
-  };
+  const CAT_LABELS: Record<PlanteCategorie, string> = getCategoryLabels(t);
 
   const items: (PlanteCategorie | null)[] = [null, ...CATEGORIES];
 
