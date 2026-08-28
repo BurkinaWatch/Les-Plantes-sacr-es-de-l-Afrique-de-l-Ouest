@@ -117,9 +117,9 @@ test("Plant recognition client preserves a valid unable-to-identify response", a
 
   const result = await requestPlantRecognition({
     apiBase: "https://example.test/api",
-    apiKey: "mobile-test-key",
     imageBase64: "fake-image",
     lang: "fr",
+    token: "jwt-test",
     fetchImpl: mock.fetchImpl,
   });
 

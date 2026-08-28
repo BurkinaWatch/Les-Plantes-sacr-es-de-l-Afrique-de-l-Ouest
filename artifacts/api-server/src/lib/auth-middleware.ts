@@ -10,7 +10,7 @@ declare global {
   }
 }
 
-const JWT_SECRET = process.env["JWT_SECRET"];
+const JWT_SECRET = process.env["JWT_SECRET"] ?? "";
 if (!JWT_SECRET) {
   throw new Error("FATAL: JWT_SECRET environment variable is not set.");
 }
@@ -20,22 +20,24 @@ export const JWT_AUDIENCE = process.env["JWT_AUDIENCE"] ?? "plantes-sacrees-mobi
 
 function attachVerifiedUser(req: Request, token: string): boolean {
   try {
-    const payload = jwt.verify(token, JWT_SECRET, {
+    const payload: unknown = jwt.verify(token, JWT_SECRET, {
       algorithms: ["HS256"],
       issuer: JWT_ISSUER,
       audience: JWT_AUDIENCE,
     });
+    const claims = typeof payload === "object" && payload !== null
+      ? payload as Record<string, unknown>
+      : null;
     if (
-      typeof payload === "object" &&
-      payload !== null &&
-      typeof payload.id === "number" &&
-      Number.isInteger(payload.id) &&
-      payload.id > 0 &&
-      typeof payload.username === "string" &&
-      payload.username.length > 0 &&
-      payload.username.length <= 30
+      claims !== null &&
+      typeof claims.id === "number" &&
+      Number.isInteger(claims.id) &&
+      claims.id > 0 &&
+      typeof claims.username === "string" &&
+      claims.username.length > 0 &&
+      claims.username.length <= 30
     ) {
-      req.user = { id: payload.id, username: payload.username };
+      req.user = { id: claims.id, username: claims.username };
       return true;
     }
   } catch {
