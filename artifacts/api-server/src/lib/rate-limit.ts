@@ -42,7 +42,7 @@ export const MONTHLY_AI_QUOTA =
  * run `requireJwt` first, so the IP fallback is only for reusable public routes.
  */
 export function userKeyGenerator(req: Request): string {
-  // req.user is set by optionalJwt only after server-side JWT verification
+  // req.user is set by requireJwt only after server-side JWT verification
   const userId = req.user?.id;
   if (userId != null) {
     return `user:${userId}`;

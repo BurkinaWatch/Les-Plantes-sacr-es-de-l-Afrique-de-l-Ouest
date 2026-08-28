@@ -65,5 +65,3 @@ packages = ["eas-cli"]
 [userenv]
 
 [userenv.shared]
-CHAT_API_KEY = "f060cabdf98e8049d08257d9e04cdba2e4f047f579a49d6f997a40f4c4d2b8c6"
-EXPO_PUBLIC_CHAT_API_KEY = "f060cabdf98e8049d08257d9e04cdba2e4f047f579a49d6f997a40f4c4d2b8c6"
