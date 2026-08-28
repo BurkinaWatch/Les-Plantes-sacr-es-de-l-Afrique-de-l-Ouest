@@ -26,8 +26,6 @@ export const en: Translations = {
   scanner_confidence_low: 'Low',
   scanner_error_no_plant: 'Plant not identifiable. Try with a clearer photo or a different angle.',
   scanner_error_generic: 'Error during analysis. Please try again.',
-  api_error_missing_key: 'Service unavailable: the app access key is missing. Please contact support.',
-  api_error_invalid_key: 'Invalid access key. Close and reopen the app, or contact support.',
   api_error_unavailable: 'Unable to reach the service. Check your connection and try again.',
   scanner_retry: 'Try again',
   scanner_new_scan: 'New scan',

@@ -31,8 +31,6 @@ export const mos: Translations = {
   scanner_confidence_low: 'Bilf',
   scanner_error_no_plant: 'Yɩɩga ka yãt ye. Paam foto sẽn noom wʋsgo.',
   scanner_error_generic: 'Tʋʋmd ka maan ye. Ges tɩ f leb n maan.',
-  api_error_missing_key: 'Tʋʋmd ka be ye: application zug-kãngã ka be ye. Tɩɩs support.',
-  api_error_invalid_key: 'Application zug-kãngã ka sõma ye. Yiis applicationa la leb n kẽeg, wall tɩɩs support.',
   api_error_unavailable: 'Tʋʋmd ka tõe n yɩɩs ye. Ges f nɛɛt la leb n maan.',
   scanner_retry: 'Leb n maan',
   scanner_new_scan: 'Yɩiga yɩɩga',
