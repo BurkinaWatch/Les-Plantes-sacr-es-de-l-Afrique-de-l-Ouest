@@ -55,8 +55,10 @@ function buildStaticFileIndex(root, prefix = "") {
   if (!fs.existsSync(root)) return index;
 
   for (const entry of fs.readdirSync(root, { withFileTypes: true })) {
-    const diskPath = path.join(root, entry.name);
-    const urlPath = `${prefix}/${entry.name}`.replace(/\/+/g, "/");
+    const fileName = entry.name;
+    if (!/^[a-zA-Z0-9._-]+$/.test(fileName) || fileName === "." || fileName === "..") continue;
+    const diskPath = path.join(root, fileName);
+    const urlPath = `${prefix}/${fileName}`.replace(/\/+/g, "/");
     if (entry.isDirectory()) {
       for (const [nestedUrl, nestedDiskPath] of buildStaticFileIndex(diskPath, urlPath)) {
         index.set(nestedUrl, nestedDiskPath);
