@@ -68,10 +68,10 @@ function buildStaticFileIndex(root, prefix = "") {
   return index;
 }
 
-function serveManifest(platform, res) {
-  const manifestPath = path.join(STATIC_ROOT, platform, "manifest.json");
+function serveManifest(platform, res, staticFileIndex) {
+  const manifestPath = staticFileIndex.get(`/${platform}/manifest.json`);
 
-  if (!fs.existsSync(manifestPath)) {
+  if (!manifestPath || !fs.existsSync(manifestPath)) {
     res.writeHead(404, { "content-type": "application/json" });
     res.end(
       JSON.stringify({ error: `Manifest not found for platform: ${platform}` }),
