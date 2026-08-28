@@ -61,20 +61,23 @@ function buildStaticFileIndex(root, prefix = "") {
     const diskPath = fileURLToPath(new URL(fileName, pathToFileURL(`${root}${path.sep}`)));
     const urlPath = `${prefix}/${fileName}`.replace(/\/+/g, "/");
     if (entry.isDirectory()) {
-      for (const [nestedUrl, nestedDiskPath] of buildStaticFileIndex(diskPath, urlPath)) {
-        index.set(nestedUrl, nestedDiskPath);
+      for (const [nestedUrl, nestedFile] of buildStaticFileIndex(diskPath, urlPath)) {
+        index.set(nestedUrl, nestedFile);
       }
     } else if (entry.isFile()) {
-      index.set(urlPath, diskPath);
+      index.set(urlPath, {
+        content: fs.readFileSync(diskPath),
+        extension: path.extname(fileName).toLowerCase(),
+      });
     }
   }
   return index;
 }
 
 function serveManifest(platform, res, staticFileIndex) {
-  const manifestPath = staticFileIndex.get(`/${platform}/manifest.json`);
+  const manifestFile = staticFileIndex.get(`/${platform}/manifest.json`);
 
-  if (!manifestPath || !fs.existsSync(manifestPath)) {
+  if (!manifestFile) {
     res.writeHead(404, { "content-type": "application/json" });
     res.end(
       JSON.stringify({ error: `Manifest not found for platform: ${platform}` }),
@@ -82,7 +85,7 @@ function serveManifest(platform, res, staticFileIndex) {
     return;
   }
 
-  const manifestJson = fs.readFileSync(manifestPath, "utf-8");
+  const manifestJson = manifestFile.content.toString("utf-8");
   const boundary = "expo-manifest-boundary";
   const body = [
     `--${boundary}`,
@@ -145,22 +148,20 @@ function serveStaticFile(urlPath, res, staticFileIndex) {
     return;
   }
 
-  const filePath = staticFileIndex.get(decodedPath);
-  if (!filePath || !fs.existsSync(filePath) || fs.statSync(filePath).isDirectory()) {
+  const file = staticFileIndex.get(decodedPath);
+  if (!file) {
     res.writeHead(404, { "x-content-type-options": "nosniff" });
     res.end("Not Found");
     return;
   }
 
-  const ext = path.extname(filePath).toLowerCase();
-  const contentType = MIME_TYPES[ext] || "application/octet-stream";
-  const content = fs.readFileSync(filePath);
+  const contentType = MIME_TYPES[file.extension] || "application/octet-stream";
   res.writeHead(200, {
     "content-type": contentType,
     "x-content-type-options": "nosniff",
     "content-security-policy": "default-src 'none'; frame-ancestors 'none'",
   });
-  res.end(content);
+  res.end(file.content);
 }
 
 const landingPageTemplate = fs.readFileSync(TEMPLATE_PATH, "utf-8");
