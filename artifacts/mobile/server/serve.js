@@ -76,33 +76,53 @@ function serveManifest(platform, res) {
 }
 
 function serveLandingPage(req, res, landingPageTemplate, appName) {
-  const forwardedProto = req.headers["x-forwarded-proto"];
-  const protocol = forwardedProto || "https";
-  const host = req.headers["x-forwarded-host"] || req.headers["host"];
-  const baseUrl = `${protocol}://${host}`;
-  const expsUrl = `${host}`;
+  const forwardedProto = String(req.headers["x-forwarded-proto"] || "").split(",")[0].trim().toLowerCase();
+  const protocol = forwardedProto === "http" ? "http" : "https";
+  const rawHost = String(req.headers["x-forwarded-host"] || req.headers["host"] || "");
+  const host = rawHost.split(",")[0].trim();
+  const safeHost = /^[a-z0-9.-]+(?::\d{1,5})?$/i.test(host) ? host : "localhost";
+  const baseUrl = `${protocol}://${safeHost}`;
+  const expsUrl = safeHost;
+  const escapeHtml = (value) => value
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#39;");
 
   const html = landingPageTemplate
-    .replace(/BASE_URL_PLACEHOLDER/g, baseUrl)
-    .replace(/EXPS_URL_PLACEHOLDER/g, expsUrl)
-    .replace(/APP_NAME_PLACEHOLDER/g, appName);
+    .replace(/BASE_URL_PLACEHOLDER/g, escapeHtml(baseUrl))
+    .replace(/EXPS_URL_PLACEHOLDER/g, escapeHtml(expsUrl))
+    .replace(/APP_NAME_PLACEHOLDER/g, escapeHtml(appName));
 
-  res.writeHead(200, { "content-type": "text/html; charset=utf-8" });
+  res.writeHead(200, {
+    "content-type": "text/html; charset=utf-8",
+    "x-content-type-options": "nosniff",
+    "content-security-policy": "default-src 'none'; style-src 'unsafe-inline'; img-src data:; script-src 'unsafe-inline'; frame-ancestors 'none'",
+  });
   res.end(html);
 }
 
 function serveStaticFile(urlPath, res) {
-  const safePath = path.normalize(urlPath).replace(/^(\.\.(\/|\\|$))+/, "");
-  const filePath = path.join(STATIC_ROOT, safePath);
-
-  if (!filePath.startsWith(STATIC_ROOT)) {
+  let decodedPath;
+  try {
+    decodedPath = decodeURIComponent(urlPath);
+  } catch {
     res.writeHead(403);
     res.end("Forbidden");
     return;
   }
 
+  const filePath = path.resolve(STATIC_ROOT, `.${decodedPath}`);
+  const relativePath = path.relative(STATIC_ROOT, filePath);
+  if (relativePath.startsWith("..") || path.isAbsolute(relativePath)) {
+    res.writeHead(403, { "x-content-type-options": "nosniff" });
+    res.end("Forbidden");
+    return;
+  }
+
   if (!fs.existsSync(filePath) || fs.statSync(filePath).isDirectory()) {
-    res.writeHead(404);
+    res.writeHead(404, { "x-content-type-options": "nosniff" });
     res.end("Not Found");
     return;
   }
@@ -110,7 +130,11 @@ function serveStaticFile(urlPath, res) {
   const ext = path.extname(filePath).toLowerCase();
   const contentType = MIME_TYPES[ext] || "application/octet-stream";
   const content = fs.readFileSync(filePath);
-  res.writeHead(200, { "content-type": contentType });
+  res.writeHead(200, {
+    "content-type": contentType,
+    "x-content-type-options": "nosniff",
+    "content-security-policy": "default-src 'none'; frame-ancestors 'none'",
+  });
   res.end(content);
 }
 
@@ -118,10 +142,10 @@ const landingPageTemplate = fs.readFileSync(TEMPLATE_PATH, "utf-8");
 const appName = getAppName();
 
 const server = http.createServer((req, res) => {
-  const url = new URL(req.url || "/", `http://${req.headers.host}`);
+  const url = new URL(req.url || "/", "http://localhost");
   let pathname = url.pathname;
 
-  if (basePath && pathname.startsWith(basePath)) {
+  if (basePath && (pathname === basePath || pathname.startsWith(`${basePath}/`))) {
     pathname = pathname.slice(basePath.length) || "/";
   }
 
