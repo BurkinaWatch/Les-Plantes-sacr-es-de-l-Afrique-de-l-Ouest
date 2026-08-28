@@ -288,10 +288,7 @@ export default function ChatTotemScreen() {
       setTimeout(() => scrollRef.current?.scrollToEnd({ animated: true }), 100);
     } catch (err: any) {
       if (err instanceof ApiRequestError) {
-        const errorMessage =
-          err.code === 'missing_key'
-            ? t.api_error_unavailable
-            : t.api_error_unavailable;
+        const errorMessage = t.api_error_unavailable;
         setMessages([...allMessages, {
           id: (Date.now() + 1).toString(),
           role: 'assistant',

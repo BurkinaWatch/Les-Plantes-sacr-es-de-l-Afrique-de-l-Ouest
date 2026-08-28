@@ -9,7 +9,7 @@
     "start": "node --enable-source-maps ./dist/index.mjs",
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "check-keys": "node scripts/check-api-keys.mjs",
-    "test": "rm -rf .test-dist && tsc -p tests/tsconfig.json && CHAT_API_KEY=test-chat-key NODE_ENV=test node --test tests/*.test.mjs"
+    "test": "rm -rf .test-dist && tsc -p tests/tsconfig.json && JWT_SECRET=test-jwt-secret NODE_ENV=test node --test tests/*.test.mjs"
   },
   "dependencies": {
     "@workspace/api-zod": "workspace:*",

@@ -255,11 +255,11 @@ const fabStyles = StyleSheet.create({
  */
 function NotificationsSetup() {
   const { pushToken } = useNotifications();
+  const { token } = useAuth();
 
   useEffect(() => {
-    if (!pushToken) return;
+    if (!pushToken || !token) return;
 
-    const chatApiKey = process.env.EXPO_PUBLIC_CHAT_API_KEY ?? '';
     const domain = process.env.EXPO_PUBLIC_DOMAIN;
     if (!domain) return;
 
@@ -267,13 +267,13 @@ function NotificationsSetup() {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        ...(chatApiKey ? { 'x-api-key': chatApiKey } : {}),
+        Authorization: `Bearer ${token}`,
       },
       body: JSON.stringify({ token: pushToken, platform: Platform.OS }),
     }).catch(() => {
       // Non-critical — silently ignore network errors
     });
-  }, [pushToken]);
+  }, [pushToken, token]);
 
   return null;
 }

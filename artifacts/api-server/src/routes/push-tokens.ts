@@ -54,7 +54,7 @@ router.post("/", requireJwt, async (req, res) => {
   const userId = req.user!.id;
 
   try {
-    await pool.query(
+    const result = await pool.query(
       `INSERT INTO push_tokens (user_id, token, platform, updated_at)
        VALUES ($1, $2, $3, NOW())
        ON CONFLICT (token) DO UPDATE SET platform = $3, updated_at = NOW()
@@ -62,11 +62,14 @@ router.post("/", requireJwt, async (req, res) => {
        RETURNING id`,
       [userId, token, platform ?? null]
     );
+    if (result.rowCount === 0) {
+      return res.status(409).json({ error: "Ce token est déjà associé à un autre compte" });
+    }
     logger.info({ userId, platform }, "[push] Push token registered");
     return res.status(201).json({ ok: true });
   } catch (err) {
     logger.error({ err }, "[push] Failed to store push token");
-    return res.status(409).json({ error: "Ce token est déjà associé à un autre compte" });
+    return res.status(500).json({ error: "Impossible d'enregistrer le token" });
   }
 });
 
