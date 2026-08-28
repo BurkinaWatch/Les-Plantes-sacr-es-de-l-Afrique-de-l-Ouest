@@ -6,3 +6,4 @@
 - [Package firewall compatibility](package-firewall.md) — Replit package installs may reject an older transitive tar release; use a latest-compatible pnpm override when needed
 - [Test runner environment](test-runner-environment.md) — use Node's built-in runner plus targeted tsc output when workspace package installation cannot target a package
 - [EAS build constraints](eas-build-constraints.md) — imported project access, remote keystore setup, and Android build quota can block APK builds
+- [Native SVG verification](native-svg-verification.md) — device/emulator is required for final visuals; preview may stop on the animated splash
