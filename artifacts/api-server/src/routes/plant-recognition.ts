@@ -1,7 +1,7 @@
 import { Router } from "express";
 import Groq from "groq-sdk";
 import { z } from "zod";
-import { requireApiKey, optionalJwt } from "../lib/auth-middleware.js";
+import { requireJwt } from "../lib/auth-middleware.js";
 import {
   createUserRateLimiter,
   monthlyQuotaMiddleware,
@@ -31,9 +31,9 @@ const recognitionLimiter = createUserRateLimiter({
 });
 
 const recognitionSchema = z.object({
-  imageBase64: z.string().min(1).max(10_000_000),
+  imageBase64: z.string().min(16).max(7_000_000).regex(/^[A-Za-z0-9+/]+={0,2}$/, "Image encodée invalide"),
   lang: z.enum(["fr", "en", "mos", "dyo", "ful"]).default("fr"),
-});
+}).strict();
 
 const plantRecognitionDataSchema = z.object({
   nom: z.string().trim().min(1),
@@ -41,18 +41,18 @@ const plantRecognitionDataSchema = z.object({
   famille: z.string().trim().min(1),
   description: z.string().trim().min(1),
   origineGeographique: z.string().trim().min(1),
-  utilisationsTraditionnelles: z.array(z.string().trim().min(1)),
-  proprietesMediacinales: z.array(z.string().trim().min(1)),
-  symboliqueAfricaine: z.string().trim().min(1),
-  conseils: z.array(z.string().trim().min(1)),
-  curiosite: z.string().trim().min(1),
+  utilisationsTraditionnelles: z.array(z.string().trim().min(1).max(500)).max(30),
+  proprietesMediacinales: z.array(z.string().trim().min(1).max(500)).max(30),
+  symboliqueAfricaine: z.string().trim().min(1).max(5000),
+  conseils: z.array(z.string().trim().min(1).max(500)).max(30),
+  curiosite: z.string().trim().min(1).max(2000),
   confidence: z.enum(["high", "medium", "low"]),
-});
+}).strict();
 
 const plantRecognitionErrorSchema = z.object({
   error: z.literal(true),
-  message: z.string().trim().min(1),
-});
+  message: z.string().trim().min(1).max(500),
+}).strict();
 
 const plantRecognitionResponseSchema = z.union([
   plantRecognitionDataSchema,
@@ -105,10 +105,10 @@ Retourne UNIQUEMENT du JSON valide. Pas de markdown, pas d'explication, pas de b
 export function createPlantRecognitionRouter(getClient: () => ChatClient = getGroq): Router {
   const router = Router();
 
-  router.post("/", requireApiKey, optionalJwt, recognitionLimiter, monthlyQuotaMiddleware, async (req, res) => {
+  router.post("/", requireJwt, recognitionLimiter, monthlyQuotaMiddleware, async (req, res) => {
   const parsed = recognitionSchema.safeParse(req.body);
   if (!parsed.success) {
-    return res.status(400).json({ error: "Données invalides", details: parsed.error.issues });
+    return res.status(400).json({ error: "Données invalides" });
   }
 
   const { imageBase64, lang } = parsed.data;

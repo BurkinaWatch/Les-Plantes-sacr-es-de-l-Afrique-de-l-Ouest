@@ -7,15 +7,15 @@
 import { Router } from "express";
 import { z } from "zod";
 import { pool } from "@workspace/db";
-import { requireApiKey, optionalJwt } from "../lib/auth-middleware.js";
+import { requireJwt } from "../lib/auth-middleware.js";
 import { logger } from "../lib/logger.js";
 
 const router = Router();
 
 const tokenSchema = z.object({
-  token: z.string().min(1).max(500),
+  token: z.string().trim().min(1).max(500).regex(/^ExponentPushToken\[[A-Za-z0-9_-]+\]$/, "Token Expo invalide"),
   platform: z.enum(["ios", "android", "web"]).optional(),
-});
+}).strict();
 
 /**
  * Send a push notification to one or more Expo push tokens via the Expo Push API.
@@ -44,28 +44,29 @@ export async function sendExpoPushNotification(
   }
 }
 
-router.post("/", requireApiKey, optionalJwt, async (req, res) => {
+router.post("/", requireJwt, async (req, res) => {
   const parsed = tokenSchema.safeParse(req.body);
   if (!parsed.success) {
-    return res.status(400).json({ error: "Token invalide", details: parsed.error.issues });
+    return res.status(400).json({ error: "Token invalide" });
   }
 
   const { token, platform } = parsed.data;
-  const userId = req.user?.id ?? null;
+  const userId = req.user!.id;
 
   try {
     await pool.query(
       `INSERT INTO push_tokens (user_id, token, platform, updated_at)
        VALUES ($1, $2, $3, NOW())
-       ON CONFLICT (token) DO UPDATE SET user_id = $1, platform = $3, updated_at = NOW()`,
+       ON CONFLICT (token) DO UPDATE SET platform = $3, updated_at = NOW()
+       WHERE push_tokens.user_id = $1
+       RETURNING id`,
       [userId, token, platform ?? null]
     );
     logger.info({ userId, platform }, "[push] Push token registered");
     return res.status(201).json({ ok: true });
   } catch (err) {
     logger.error({ err }, "[push] Failed to store push token");
-    // Non-critical — token registration failure should not break the app flow.
-    return res.status(200).json({ ok: false, error: "Could not persist token" });
+    return res.status(409).json({ error: "Ce token est déjà associé à un autre compte" });
   }
 });
 

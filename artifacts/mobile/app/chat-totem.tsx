@@ -62,7 +62,6 @@ function getApiBase(): string | null {
 }
 
 const API_BASE = getApiBase();
-const CHAT_API_KEY = process.env.EXPO_PUBLIC_CHAT_API_KEY ?? '';
 
 const ADINKRA: SacredIconName[] = ['sparkles', 'star', 'circle', 'sun', 'circle', 'circle', 'sparkles', 'sparkles'];
 const KENTE_STRIP = ['#D4A017', '#C4622D', '#5C7A3E', '#CC7722', '#8B6914', '#D4A017'];
@@ -243,23 +242,9 @@ export default function ChatTotemScreen() {
       return;
     }
 
-    if (!CHAT_API_KEY) {
-      const missingKeyMsg: Message = {
-        id: (Date.now() + 1).toString(),
-        role: 'assistant',
-        content: t.api_error_missing_key,
-        timestamp: Date.now(),
-        isError: true,
-      };
-      setMessages([...allMessages, missingKeyMsg]);
-      setIsLoading(false);
-      return;
-    }
-
     try {
       const { content, remaining, resetAt: newResetAt } = await requestTotem({
         apiBase: API_BASE,
-        apiKey: CHAT_API_KEY,
         token,
         body: {
           planteId: plante.id,
@@ -305,9 +290,7 @@ export default function ChatTotemScreen() {
       if (err instanceof ApiRequestError) {
         const errorMessage =
           err.code === 'missing_key'
-            ? t.api_error_missing_key
-            : err.code === 'invalid_key'
-            ? t.api_error_invalid_key
+            ? t.api_error_unavailable
             : t.api_error_unavailable;
         setMessages([...allMessages, {
           id: (Date.now() + 1).toString(),

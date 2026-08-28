@@ -1,4 +1,4 @@
-export type ApiErrorCode = 'missing_key' | 'invalid_key' | 'unavailable';
+export type ApiErrorCode = 'unauthenticated' | 'unavailable';
 
 export class ApiRequestError extends Error {
   constructor(public readonly code: ApiErrorCode) {
@@ -99,20 +99,18 @@ export function parseRateLimitHeaders(response: Response): RateLimitInfo {
 async function postAiRequest<T>(
   path: string,
   apiBase: string | null,
-  apiKey: string,
   token: string | null | undefined,
   body: unknown,
   fetchImpl: FetchLike,
 ): Promise<{ data: T } & RateLimitInfo> {
   if (!apiBase) throw new ApiRequestError('unavailable');
-  if (!apiKey) throw new ApiRequestError('missing_key');
+  if (!token) throw new ApiRequestError('unauthenticated');
 
   const response = await fetchImpl(`${apiBase.replace(/\/$/, '')}${path}`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      'x-api-key': apiKey,
-      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      Authorization: `Bearer ${token}`,
     },
     body: JSON.stringify(body),
   });
@@ -123,7 +121,7 @@ async function postAiRequest<T>(
       throw new ApiRateLimitError(resetAt);
     }
     const errorBody = await response.json().catch(() => ({})) as { error?: string };
-    if (response.status === 401) throw new ApiRequestError('invalid_key');
+    if (response.status === 401) throw new ApiRequestError('unauthenticated');
     throw new Error(errorBody.error ?? 'Erreur serveur');
   }
 
@@ -133,7 +131,6 @@ async function postAiRequest<T>(
 export async function requestTotem(
   args: {
     apiBase: string | null;
-    apiKey: string;
     token?: string | null;
     body: TotemRequest;
     fetchImpl?: FetchLike;
@@ -142,7 +139,6 @@ export async function requestTotem(
   const { data, remaining, resetAt } = await postAiRequest<{ content?: string }>(
     '/chat/totem',
     args.apiBase,
-    args.apiKey,
     args.token,
     args.body,
     args.fetchImpl ?? fetch,
@@ -156,7 +152,6 @@ export async function requestTotem(
 export async function requestPlantRecognition(
   args: {
     apiBase: string | null;
-    apiKey: string;
     imageBase64: string;
     lang: string;
     token?: string | null;
@@ -166,7 +161,6 @@ export async function requestPlantRecognition(
   const { data, remaining, resetAt } = await postAiRequest<{ plant?: unknown }>(
     '/plant-recognition',
     args.apiBase,
-    args.apiKey,
     args.token,
     { imageBase64: args.imageBase64, lang: args.lang },
     args.fetchImpl ?? fetch,

@@ -10,47 +10,69 @@ declare global {
   }
 }
 
-const API_KEY = process.env["CHAT_API_KEY"];
-const JWT_SECRET = process.env["JWT_SECRET"] ?? "animaux-sacres-secret-change-in-prod";
-
-if (!API_KEY) {
-  if (process.env["NODE_ENV"] === "production") {
-    throw new Error("FATAL: CHAT_API_KEY environment variable is not set.");
-  } else {
-    console.warn("[auth] WARNING: CHAT_API_KEY is not set — chat endpoint is unprotected in dev.");
-  }
+const JWT_SECRET = process.env["JWT_SECRET"];
+if (!JWT_SECRET) {
+  throw new Error("FATAL: JWT_SECRET environment variable is not set.");
 }
 
-export function requireApiKey(req: Request, res: Response, next: NextFunction) {
-  if (!API_KEY) {
-    // Dev mode without key configured — allow through
-    return next();
+export const JWT_ISSUER = process.env["JWT_ISSUER"] ?? "plantes-sacrees-api";
+export const JWT_AUDIENCE = process.env["JWT_AUDIENCE"] ?? "plantes-sacrees-mobile";
+
+function attachVerifiedUser(req: Request, token: string): boolean {
+  try {
+    const payload = jwt.verify(token, JWT_SECRET, {
+      algorithms: ["HS256"],
+      issuer: JWT_ISSUER,
+      audience: JWT_AUDIENCE,
+    });
+    if (
+      typeof payload === "object" &&
+      payload !== null &&
+      typeof payload.id === "number" &&
+      Number.isInteger(payload.id) &&
+      payload.id > 0 &&
+      typeof payload.username === "string" &&
+      payload.username.length > 0 &&
+      payload.username.length <= 30
+    ) {
+      req.user = { id: payload.id, username: payload.username };
+      return true;
+    }
+  } catch {
+    // Invalid, expired, or incorrectly scoped tokens are never accepted.
   }
-  const key = req.headers["x-api-key"];
-  if (!key || key !== API_KEY) {
-    return res.status(401).json({ error: "Clé API manquante ou invalide" });
-  }
-  return next();
+  return false;
 }
 
 /**
- * Optional JWT middleware. When a valid `Authorization: Bearer <token>` header is
- * present, verifies the token and attaches `req.user = { id, username }`.
- * Never blocks the request — missing or invalid tokens are silently ignored and
- * the rate limiter falls back to IP-based limits instead.
+ * Requires a server-issued JWT and attaches only its verified identity.
+ * AI and push-token routes must not be callable with a public client key.
  */
-export function optionalJwt(req: Request, _res: Response, next: NextFunction): void {
+export function requireJwt(req: Request, res: Response, next: NextFunction): void {
   const auth = req.headers["authorization"];
-  if (auth && auth.startsWith("Bearer ")) {
-    const token = auth.slice(7);
-    try {
-      const payload = jwt.verify(token, JWT_SECRET) as { id: number; username: string };
-      if (typeof payload.id === "number" && typeof payload.username === "string") {
-        req.user = { id: payload.id, username: payload.username };
-      }
-    } catch {
-      // Invalid/expired token — treat as unauthenticated, continue without blocking
-    }
+  if (typeof auth !== "string" || !auth.startsWith("Bearer ")) {
+    res.status(401).json({ error: "Authentification requise" });
+    return;
   }
+
+  if (!attachVerifiedUser(req, auth.slice(7).trim())) {
+    res.status(401).json({ error: "Session invalide ou expirée" });
+    return;
+  }
+
   next();
+}
+
+export function signUserToken(user: { id: number; username: string }): string {
+  const expiresIn = (process.env["JWT_EXPIRES_IN"] ?? "7d") as jwt.SignOptions["expiresIn"];
+  return jwt.sign(
+    { id: user.id, username: user.username },
+    JWT_SECRET,
+    {
+      algorithm: "HS256",
+      audience: JWT_AUDIENCE,
+      issuer: JWT_ISSUER,
+      expiresIn,
+    },
+  );
 }

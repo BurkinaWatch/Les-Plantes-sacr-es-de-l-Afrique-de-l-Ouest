@@ -2,7 +2,7 @@
  * Shared rate-limit utilities for AI routes.
  *
  * Key design decisions:
- * - Rate-limit keys are based on `x-user-id` when present (per-user), falling back to IP.
+ * - Rate-limit keys are based on the server-verified user identity, never a client header.
  * - All limits are configurable via environment variables so they can be tuned without code changes.
  * - Monthly quotas are tracked in-memory (resets on server restart). In a production deployment
  *   with multiple replicas or strict durability requirements, replace `monthlyUsage` with a
@@ -38,11 +38,8 @@ export const MONTHLY_AI_QUOTA =
 /**
  * Returns a rate-limit key for the given request.
  *
- * Uses the server-verified user ID from `req.user` (set by `optionalJwt` middleware)
- * when the caller presented a valid JWT. This guarantees the key is tied to a
- * server-issued identity that cannot be spoofed by the client.
- *
- * Falls back to the client IP (IPv6-safe) for unauthenticated requests.
+ * Uses the server-verified user ID from `req.user`. Protected AI routes always
+ * run `requireJwt` first, so the IP fallback is only for reusable public routes.
  */
 export function userKeyGenerator(req: Request): string {
   // req.user is set by optionalJwt only after server-side JWT verification

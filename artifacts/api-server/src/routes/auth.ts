@@ -1,22 +1,12 @@
 import { Router } from "express";
 import bcrypt from "bcryptjs";
-import jwt from "jsonwebtoken";
 import rateLimit from "express-rate-limit";
 import { db, usersTable } from "@workspace/db";
 import { eq } from "drizzle-orm";
 import { z } from "zod";
+import { signUserToken } from "../lib/auth-middleware.js";
 
 const router = Router();
-
-const JWT_SECRET = process.env["JWT_SECRET"];
-if (!JWT_SECRET) {
-  if (process.env["NODE_ENV"] === "production") {
-    throw new Error("FATAL: JWT_SECRET environment variable is not set. Refusing to start in production.");
-  } else {
-    console.warn("[auth] WARNING: JWT_SECRET is not set — using insecure default. Set it before deploying.");
-  }
-}
-const SECRET = JWT_SECRET ?? "animaux-sacres-secret-change-in-prod";
 
 const SALT_ROUNDS = 10;
 
@@ -29,9 +19,9 @@ const authLimiter = rateLimit({
 });
 
 const credentialsSchema = z.object({
-  username: z.string().min(3).max(30).regex(/^[a-zA-Z0-9_]+$/, "Le nom d'utilisateur ne peut contenir que des lettres, chiffres et underscores"),
-  password: z.string().min(6),
-});
+  username: z.string().trim().toLowerCase().min(3).max(30).regex(/^[a-z0-9_]+$/, "Le nom d'utilisateur ne peut contenir que des lettres, chiffres et underscores"),
+  password: z.string().min(6).max(128),
+}).strict();
 
 router.post("/register", authLimiter, async (req, res) => {
   const parsed = credentialsSchema.safeParse(req.body);
@@ -49,7 +39,7 @@ router.post("/register", authLimiter, async (req, res) => {
   const passwordHash = await bcrypt.hash(password, SALT_ROUNDS);
   const [user] = await db.insert(usersTable).values({ username, passwordHash }).returning({ id: usersTable.id, username: usersTable.username });
 
-  const token = jwt.sign({ id: user!.id, username: user!.username }, SECRET, { expiresIn: "30d" });
+  const token = signUserToken({ id: user!.id, username: user!.username });
 
   return res.status(201).json({ token, user: { id: user!.id, username: user!.username } });
 });
@@ -72,7 +62,7 @@ router.post("/login", authLimiter, async (req, res) => {
     return res.status(401).json({ error: "Nom d'utilisateur ou mot de passe incorrect" });
   }
 
-  const token = jwt.sign({ id: user.id, username: user.username }, SECRET, { expiresIn: "30d" });
+  const token = signUserToken({ id: user.id, username: user.username });
 
   return res.status(200).json({ token, user: { id: user.id, username: user.username } });
 });

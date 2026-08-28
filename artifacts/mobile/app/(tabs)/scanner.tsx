@@ -34,7 +34,6 @@ function getApiBase(): string | null {
 }
 
 const API_BASE = getApiBase();
-const CHAT_API_KEY = process.env.EXPO_PUBLIC_CHAT_API_KEY ?? '';
 
 async function pickImage(source: 'camera' | 'gallery'): Promise<string | null> {
   if (source === 'camera') {
@@ -229,7 +228,6 @@ export default function ScannerScreen() {
       const apiLang = ['fr', 'en'].includes(lang) ? lang : 'fr';
       const { plant, remaining, resetAt: newResetAt } = await requestPlantRecognition({
         apiBase: API_BASE,
-        apiKey: CHAT_API_KEY,
         imageBase64: b64,
         lang: apiLang,
         token,
@@ -248,11 +246,7 @@ export default function ScannerScreen() {
       if (!isCurrentScan(generation)) return;
       if (err instanceof ApiRequestError) {
         const errorMessage =
-          err.code === 'missing_key'
-            ? t.api_error_missing_key
-            : err.code === 'invalid_key'
-            ? t.api_error_invalid_key
-            : t.api_error_unavailable;
+          t.api_error_unavailable;
         setError(errorMessage);
         return;
       }

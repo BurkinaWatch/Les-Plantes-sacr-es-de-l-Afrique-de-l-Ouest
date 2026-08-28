@@ -1,7 +1,7 @@
 import { Router } from "express";
 import Groq from "groq-sdk";
 import { z } from "zod";
-import { requireApiKey, optionalJwt } from "../lib/auth-middleware.js";
+import { requireJwt } from "../lib/auth-middleware.js";
 import {
   createUserRateLimiter,
   monthlyQuotaMiddleware,
@@ -30,39 +30,41 @@ const chatLimiter = createUserRateLimiter({
   message: { error: "Trop de messages. Réessaye dans une minute." },
 });
 
+const shortText = z.string().trim().min(1).max(500);
+const listText = z.array(shortText).max(30);
 const planteDataSchema = z.object({
-  nom: z.string(),
-  nomScientifique: z.string(),
-  element: z.string(),
-  categorie: z.string(),
-  regionOrigine: z.string(),
-  description: z.string(),
-  symboliqueAfricaine: z.string(),
-  symboliqueSpirirtuelle: z.string(),
-  qualites: z.array(z.string()),
-  defauts: z.array(z.string()),
-  pouvoirs: z.array(z.string()),
-  enseignements: z.array(z.string()),
-  citation: z.string(),
-  proverbes: z.array(z.string()),
-  conseilsDeVie: z.array(z.string()),
-  niveauSpirituel: z.number(),
-});
+  nom: shortText.max(120),
+  nomScientifique: shortText.max(160),
+  element: shortText.max(80),
+  categorie: shortText.max(120),
+  regionOrigine: shortText.max(240),
+  description: z.string().trim().min(1).max(5000),
+  symboliqueAfricaine: z.string().trim().min(1).max(5000),
+  symboliqueSpirirtuelle: z.string().trim().min(1).max(5000),
+  qualites: listText,
+  defauts: listText,
+  pouvoirs: listText,
+  enseignements: listText,
+  citation: z.string().trim().min(1).max(1000),
+  proverbes: listText,
+  conseilsDeVie: listText,
+  niveauSpirituel: z.number().int().min(0).max(5),
+}).strict();
 
 const chatSchema = z.object({
   // Accept both planteId/planteData (new) and animalId/animalData (legacy)
-  planteId: z.string().min(1).optional(),
-  animalId: z.string().min(1).optional(),
+  planteId: z.string().trim().min(1).max(100).optional(),
+  animalId: z.string().trim().min(1).max(100).optional(),
   planteData: planteDataSchema.optional(),
   animalData: planteDataSchema.optional(),
   messages: z.array(
-    z.object({
+      z.object({
       role: z.enum(["user", "assistant"]),
-      content: z.string().max(1000),
-    })
+        content: z.string().trim().min(1).max(1000),
+      }).strict()
   ).max(50),
   userLang: z.enum(["fr", "en", "wo"]).default("fr"),
-}).refine(
+}).strict().refine(
   (d) => (d.planteData ?? d.animalData) !== undefined,
   { message: "planteData or animalData is required" }
 );
@@ -127,10 +129,10 @@ ${animal.conseilsDeVie.join("\n")}
 export function createChatRouter(getClient: () => ChatClient = getGroq): Router {
   const router = Router();
 
-  router.post("/totem", requireApiKey, optionalJwt, chatLimiter, monthlyQuotaMiddleware, async (req, res) => {
+  router.post("/totem", requireJwt, chatLimiter, monthlyQuotaMiddleware, async (req, res) => {
   const parsed = chatSchema.safeParse(req.body);
   if (!parsed.success) {
-    return res.status(400).json({ error: "Données invalides", details: parsed.error.issues });
+    return res.status(400).json({ error: "Données invalides" });
   }
 
   const { planteData, animalData, messages, userLang } = parsed.data;
