@@ -7,6 +7,7 @@ import React, { useEffect, useRef, useState } from "react";
 import {
   Animated,
   Dimensions,
+  Image,
   Platform,
   Pressable,
   StyleSheet,
@@ -129,15 +130,32 @@ function AnimatedSplash({ onFinish }: { onFinish: () => void }) {
       {/* Halo doré animé */}
       <Animated.View style={[styles.logoGlow, { opacity: shimmerOpacity }]} />
 
+      {/* Logo principal */}
+      <Animated.View
+        style={[
+          styles.logoWrap,
+          {
+            opacity: logoOpacity,
+            transform: [{ scale: logoScale }],
+          },
+        ]}
+      >
+        <Image
+          source={require("@/assets/images/icon-plants.png")}
+          style={styles.logo}
+          resizeMode="contain"
+          accessibilityLabel="Logo des Plantes Sacrées d'Afrique de l'Ouest"
+        />
+      </Animated.View>
+
       {/* Titre */}
       <Animated.View style={[styles.titleBlock, { opacity: titleOpacity }]}>
-        <View style={styles.titleSmallRow}>
-          <SacredIcon name="sparkles" size={14} color="#C8A020" />
-          <Text style={styles.titleSmall}>LES PLANTES SACRÉES</Text>
-          <SacredIcon name="sparkles" size={14} color="#C8A020" />
-        </View>
-        <Text style={styles.titleBig}>D'AFRIQUE</Text>
-        <Text style={styles.titleMid}>DE L'OUEST</Text>
+        <Text
+          accessibilityLabel="Les Plantes Sacrées d'Afrique de l'Ouest"
+          style={styles.splashTitle}
+        >
+          Les Plantes{"\n"}Sacrées d'Afrique{"\n"}de l'Ouest
+        </Text>
       </Animated.View>
 
       {/* Sous-titre */}
@@ -415,41 +433,21 @@ const styles = StyleSheet.create({
     marginBottom: 32,
   },
   logo: {
-    width: width * 0.60,
-    height: width * 0.60,
-    borderRadius: 20,
+    width: width * 0.68,
+    height: width * 0.68,
   },
   titleBlock: {
     alignItems: "center",
-    marginBottom: 4,
+    marginBottom: 0,
+    width: "100%",
   },
-  titleSmall: {
-    fontSize: 15,
-    letterSpacing: 3,
-    color: "#C8A020",
+  splashTitle: {
+    fontSize: 28,
+    lineHeight: 35,
     fontWeight: "800",
-    marginBottom: 8,
-    textAlign: "center",
-  },
-  titleSmallRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 8,
-  },
-  titleBig: {
-    fontSize: 46,
-    fontWeight: "900",
     color: "#F0EAD6",
-    letterSpacing: 3,
-    lineHeight: 50,
-  },
-  titleMid: {
-    fontSize: 18,
-    fontWeight: "300",
-    color: "#C4622D",
-    letterSpacing: 7,
-    textTransform: "uppercase",
-    marginTop: 2,
+    letterSpacing: 0.3,
+    textAlign: "center",
   },
   subtitleBlock: {
     alignItems: "center",
