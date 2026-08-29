@@ -155,6 +155,14 @@ function renderedImages(renderer) {
   return renderer.root.findAllByType("Image");
 }
 
+function rendersImagePlaceholder(renderer) {
+  return renderer.root.findAllByType("SacredIcon").some(
+    (icon) =>
+      icon.props.size === 80 &&
+      icon.props.color === "rgba(255,255,255,0.85)",
+  );
+}
+
 test("each complementary plant renders its dedicated detail illustration", () => {
   const { PLANTES_COMPLEMENTAIRES } = require(
     path.join(
@@ -194,6 +202,52 @@ test("each complementary plant renders its dedicated detail illustration", () =>
   );
 });
 
+test("catalog plants render their registered illustration or keep the placeholder", () => {
+  const { PLANTS } = require(
+    path.join(projectRoot, ".data-test-dist/data/animals.js"),
+  );
+  const { imageRegistry, screen, restore } = loadDetailScreen();
+  const failures = [];
+
+  try {
+    for (const { id } of PLANTS) {
+      currentPlant.id = id;
+      let renderer;
+      act(() => {
+        renderer = TestRenderer.create(React.createElement(screen));
+      });
+
+      const images = renderedImages(renderer);
+      const dedicatedImage = imageRegistry[id];
+      const hasPlaceholder = rendersImagePlaceholder(renderer);
+
+      if (dedicatedImage) {
+        if (images.length !== 1 || images[0].props.source !== dedicatedImage) {
+          failures.push(
+            `${id}: l’illustration enregistrée n’est pas rendue par l’écran de détail`,
+          );
+        }
+      } else if (images.length !== 0 || !hasPlaceholder) {
+        failures.push(
+          `${id}: la fiche sans illustration dédiée ne conserve pas son placeholder`,
+        );
+      }
+
+      act(() => {
+        renderer.unmount();
+      });
+    }
+  } finally {
+    restore();
+  }
+
+  assert.deepEqual(
+    failures,
+    [],
+    `Illustrations des fiches du catalogue invalides :\n${failures.join("\n")}`,
+  );
+});
+
 test("detail screen keeps the existing fallback for plants without an illustration", () => {
   const { screen, restore } = loadDetailScreen();
   currentPlant.id = "plant-without-dedicated-illustration";
@@ -209,10 +263,7 @@ test("detail screen keeps the existing fallback for plants without an illustrati
       0,
       "Une fiche sans illustration dédiée ne doit pas rendre d’image",
     );
-    assert.ok(
-      renderer.root.findAllByType("SacredIcon").length > 0,
-      "Le placeholder du fallback doit rester visible",
-    );
+    assert.ok(rendersImagePlaceholder(renderer), "Le placeholder du fallback doit rester visible");
     act(() => {
       renderer.unmount();
     });
