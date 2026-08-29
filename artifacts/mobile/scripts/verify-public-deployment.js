@@ -24,18 +24,37 @@ async function main() {
     domain = getDeploymentDomain();
     basePath = normalizeBasePath(process.env.BASE_PATH);
   } catch (error) {
-    console.error(`PUBLIC DEPLOYMENT CHECK FAILED\n- ${error.message}`);
+    console.error(
+      [
+        "PUBLIC DEPLOYMENT CHECK FAILED",
+        "- domain: unavailable",
+        "- routes controlled: none (deployment domain is not configured)",
+        `- ${error.message}`,
+      ].join("\n"),
+    );
     process.exitCode = 1;
     return;
   }
 
-  const report = await checkPublicDeployment({
-    domain,
-    expectedAppName: getExpectedAppName(),
-    basePath,
-  });
-  console.log(formatPublicDeploymentReport(report));
-  if (!report.ok) {
+  try {
+    const report = await checkPublicDeployment({
+      domain,
+      expectedAppName: getExpectedAppName(),
+      basePath,
+    });
+    console.log(formatPublicDeploymentReport(report));
+    if (!report.ok) {
+      process.exitCode = 1;
+    }
+  } catch (error) {
+    console.error(
+      [
+        "PUBLIC DEPLOYMENT CHECK FAILED",
+        `- domain: https://${domain}${basePath || "/"}`,
+        "- routes controlled: unavailable (check could not be completed)",
+        `- ${error.message}`,
+      ].join("\n"),
+    );
     process.exitCode = 1;
   }
 }

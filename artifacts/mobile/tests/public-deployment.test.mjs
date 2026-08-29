@@ -150,6 +150,9 @@ test("reports an obsolete Railway publication with an actionable redeploy messag
   assert.match(message, /older deployment|previous deployment/i);
   assert.match(message, /Redeploy/i);
   assert.match(message, /application name/);
+  assert.match(message, /domain: https:\/\/mobile\.example\.com\//);
+  assert.match(message, /routes controlled/);
+  assert.match(message, /\/manifest \[expo-platform=ios\]/);
 });
 
 test("sends traversal probes as raw request targets", async (t) => {

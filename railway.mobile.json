@@ -5,7 +5,7 @@
     "buildCommand": "pnpm install --frozen-lockfile=false && pnpm --filter @workspace/mobile run build"
   },
   "deploy": {
-    "startCommand": "node artifacts/mobile/server/serve.js",
+    "startCommand": "pnpm --filter @workspace/mobile run serve:with-public-check",
     "healthcheckPath": "/",
     "healthcheckTimeout": 300,
     "restartPolicyType": "ON_FAILURE",

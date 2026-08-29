@@ -199,16 +199,24 @@ async function checkPublicDeployment({
   const deployment = getPublicDeploymentBaseUrl(domain, basePath);
   const checks = [];
   const failures = [];
+  const routes = [];
+  const recordRoute = (route) => {
+    if (!routes.includes(route)) routes.push(route);
+  };
   const pass = (name, detail) => checks.push({ name, ok: true, detail });
   const fail = (name, detail) => {
     checks.push({ name, ok: false, detail });
     failures.push(`${name}: ${detail}`);
   };
-  const request = (requestPath, options = {}) =>
-    requestImpl(deployment.baseUrl, joinPublicPath(deployment.basePath, requestPath), {
+  const request = (requestPath, options = {}) => {
+    const publicPath = joinPublicPath(deployment.basePath, requestPath);
+    const platform = options.headers?.["expo-platform"];
+    recordRoute(platform ? `${publicPath} [expo-platform=${platform}]` : publicPath);
+    return requestImpl(deployment.baseUrl, publicPath, {
       timeoutMs,
       ...options,
     });
+  };
 
   let landing = null;
   try {
@@ -314,6 +322,7 @@ async function checkPublicDeployment({
       pass(`${platform} bundle URL`, launchAssetUrl);
       try {
         const assetPath = new URL(launchAssetUrl).pathname;
+        recordRoute(assetPath);
         const response = await requestImpl(deployment.baseUrl, assetPath, {
           timeoutMs,
           method: "GET",
@@ -343,6 +352,7 @@ async function checkPublicDeployment({
       pass(label, asset.url);
       try {
         const assetPath = new URL(asset.url).pathname;
+        recordRoute(assetPath);
         const response = await requestImpl(deployment.baseUrl, assetPath, {
           timeoutMs,
           method: "GET",
@@ -368,9 +378,11 @@ async function checkPublicDeployment({
   ];
   for (const traversalPath of traversalPaths) {
     try {
+      const publicPath = joinPublicPath(deployment.basePath, traversalPath);
+      recordRoute(publicPath);
       const response = await requestImpl(
         deployment.baseUrl,
-        joinPublicPath(deployment.basePath, traversalPath),
+        publicPath,
         { timeoutMs, method: "GET", readBody: false },
       );
       if (response.status !== 403) {
@@ -390,18 +402,30 @@ async function checkPublicDeployment({
     ok: failures.length === 0,
     domain: deployment.domain,
     basePath: deployment.basePath,
+    routes,
     checks,
     failures,
   };
 }
 
 function formatPublicDeploymentReport(report) {
+  const deploymentUrl = report.domain
+    ? `https://${report.domain}${report.basePath || "/"}`
+    : "unavailable";
+  const lines = [
+    report.ok ? "PUBLIC DEPLOYMENT CHECK PASSED" : "PUBLIC DEPLOYMENT CHECK FAILED",
+    `- domain: ${deploymentUrl}`,
+    "- routes controlled:",
+    ...(report.routes || []).map((route) => `  - ${route}`),
+  ];
+
   if (report.ok) {
-    return `Public deployment verified: ${report.domain}${report.basePath || "/"}`;
+    lines.push("- all checks passed");
+    return lines.join("\n");
   }
 
   return [
-    "PUBLIC DEPLOYMENT CHECK FAILED",
+    ...lines,
     ...report.failures.map((failure) => `- ${failure}`),
     "",
     "Railway may be serving a previous deployment. Redeploy the mobile service, wait for it to become healthy, then run this check again before sharing the QR code.",

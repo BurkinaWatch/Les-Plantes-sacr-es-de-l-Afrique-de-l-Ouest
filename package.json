@@ -9,7 +9,8 @@
     "typecheck:libs": "tsc --build",
     "typecheck": "pnpm run typecheck:libs && pnpm -r --filter \"./artifacts/**\" --filter \"./scripts\" --if-present run typecheck",
     "verify:native-svg": "pnpm --filter @workspace/mobile run verify:native-svg",
-    "verify:public-deployment": "pnpm --filter @workspace/mobile run verify:public-deployment"
+    "verify:public-deployment": "pnpm --filter @workspace/mobile run verify:public-deployment",
+    "serve:mobile-with-public-check": "pnpm --filter @workspace/mobile run serve:with-public-check"
   },
   "private": true,
   "devDependencies": {
