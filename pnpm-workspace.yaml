@@ -43,6 +43,7 @@ onlyBuiltDependencies:
   - unrs-resolver
 
 overrides:
+  image-size: 'workspace:@workspace/metro-image-size@*'
   tar: 7.5.22
   '@babel/core': 7.29.6
   body-parser: 2.3.0

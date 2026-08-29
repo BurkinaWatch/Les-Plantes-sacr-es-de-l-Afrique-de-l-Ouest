@@ -8,3 +8,4 @@
 - [EAS build constraints](eas-build-constraints.md) — imported project access, remote keystore setup, and Android build quota can block APK builds
 - [Native SVG verification](native-svg-verification.md) — device/emulator is required for final visuals; preview may stop on the animated splash
 - [Static URL validation](static-url-validation.md) — validate the raw decoded request path before URL parsing because WHATWG URL normalizes encoded dot segments and backslashes
+- [Image parser security](image-parser-security.md) — image-size advisories may have no patched release; replace Metro's parser dependency rather than only bumping its version
