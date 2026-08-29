@@ -20,3 +20,12 @@ For screen rendering, `react-test-renderer` can be used without Jest, but its de
 **Why:** The workspace commonly exposes `NODE_ENV=production`, which otherwise makes screen tests fail before rendering.
 
 **How to apply:** Set `NODE_ENV` to `test` at the top of the screen test, mock native modules through Node's loader, and install renderer dependencies with a package-scoped pnpm command when the helper's root guard rejects them.
+
+Static Expo asset registries must be loaded only after the test's Node loader mock handles
+their Metro `@/assets/...` imports.
+
+**Why:** Node cannot resolve Metro aliases outside Expo, even when the referenced PNG files
+exist on disk.
+
+**How to apply:** Install the loader hook before requiring the compiled registry, then pass
+the resulting registry into the screen mock so the test exercises the real static mappings.
