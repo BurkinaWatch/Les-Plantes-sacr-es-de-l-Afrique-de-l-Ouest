@@ -1,5 +1,8 @@
 import assert from "node:assert/strict";
+import { once } from "node:events";
 import { createRequire } from "node:module";
+import path from "node:path";
+import { spawn } from "node:child_process";
 import { EventEmitter } from "node:events";
 import http from "node:http";
 import test from "node:test";
@@ -115,6 +118,44 @@ async function stopLauncherAfterValidation(runPromise, signalSource, server) {
   assert.equal(signalSource.exitCode, undefined);
 }
 
+function getFreePort() {
+  return new Promise((resolve, reject) => {
+    const probe = http.createServer();
+    probe.once("error", reject);
+    probe.listen(0, "127.0.0.1", () => {
+      const address = probe.address();
+      probe.close((error) => {
+        if (error) {
+          reject(error);
+        } else {
+          resolve(address.port);
+        }
+      });
+    });
+  });
+}
+
+async function waitForLocalServer(port, timeoutMs = 5_000) {
+  const deadline = Date.now() + timeoutMs;
+  let lastFailure = "no response";
+
+  while (Date.now() < deadline) {
+    try {
+      const response = await requestPublicPath(`http://127.0.0.1:${port}`, "/", {
+        timeoutMs: 250,
+        readBody: false,
+      });
+      if (response.status === 200) return response;
+      lastFailure = `HTTP ${response.status}`;
+    } catch (error) {
+      lastFailure = error.message;
+    }
+    await new Promise((resolve) => setTimeout(resolve, 25));
+  }
+
+  throw new Error(`local child server did not respond (${lastFailure})`);
+}
+
 test("keeps the server running when the public domain never becomes reachable", async () => {
   const server = createFakeChild();
   const signalSource = new EventEmitter();
@@ -160,6 +201,73 @@ test("reports a failed smoke test while keeping the server running", async () =>
   assert.match(
     logger.messages.find(({ level }) => level === "error")?.message || "",
     /PUBLIC DEPLOYMENT VALIDATION FAILED[\s\S]*remain running[\s\S]*must not be treated as validated/,
+  );
+});
+
+test("keeps a real server child available after a controlled validation failure", async (t) => {
+  const port = await getFreePort();
+  const testDomain = "railway-integration.example.com";
+  const signalSource = new EventEmitter();
+  const logger = createTestLogger();
+  let validationFailureReported;
+  const validationFailure = new Promise((resolve) => {
+    validationFailureReported = resolve;
+  });
+  const serverRoot = path.resolve(import.meta.dirname, "..");
+  let server;
+
+  logger.error = (message) => {
+    logger.messages.push({ level: "error", message });
+    if (message.startsWith("PUBLIC DEPLOYMENT VALIDATION FAILED")) {
+      validationFailureReported();
+    }
+  };
+
+  const runPromise = runPublicDeploymentServer({
+    env: {
+      ...process.env,
+      PORT: String(port),
+      STATIC_ROOT: path.join(serverRoot, "static-build"),
+      RAILWAY_PUBLIC_DOMAIN: testDomain,
+    },
+    processLike: signalSource,
+    logger,
+    spawnProcess: (command, args, options) => {
+      server = spawn(command, args, { ...options, stdio: "ignore" });
+      return server;
+    },
+    waitForPublicReadinessImpl: async () => {
+      await waitForLocalServer(port);
+      return { domain: testDomain, basePath: "" };
+    },
+    runPublicCheckImpl: async () => {
+      const response = await waitForLocalServer(port);
+      assert.equal(response.status, 200);
+      return { code: 1, signal: null };
+    },
+  });
+
+  t.after(async () => {
+    if (server && server.exitCode === null && server.signalCode === null) {
+      server.kill("SIGKILL");
+      await once(server, "exit").catch(() => {});
+    }
+  });
+
+  await validationFailure;
+  assert.equal(server.exitCode, null);
+  const responseDuringFailure = await waitForLocalServer(port);
+  assert.equal(responseDuringFailure.status, 200);
+
+  signalSource.emit("SIGTERM");
+  const result = await runPromise;
+
+  assert.equal(result.code, null);
+  assert.equal(result.signal, "SIGTERM");
+  assert.equal(signalSource.exitCode, undefined);
+  assert.match(
+    logger.messages.find(({ level }) => level === "error")?.message || "",
+    /remain running[\s\S]*must not be treated as validated/,
   );
 });
 

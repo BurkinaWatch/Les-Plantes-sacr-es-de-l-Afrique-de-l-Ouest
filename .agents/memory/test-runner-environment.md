@@ -35,3 +35,13 @@ exist on disk.
 
 **How to apply:** Install the loader hook before requiring the compiled registry, then pass
 the resulting registry into the screen mock so the test exercises the real static mappings.
+
+When supervising a real Node child process in tests, a signal termination leaves
+`child.exitCode` as `null`; use `child.signalCode` as the settled-state check before
+waiting for another `exit` event during cleanup.
+
+**Why:** Treating `exitCode === null` as “still running” can attempt to kill an already
+terminated child and leave the test waiting forever.
+
+**How to apply:** Consider a child settled when both `exitCode` and `signalCode` are
+non-null, and only await `exit` after confirming it is still running.
