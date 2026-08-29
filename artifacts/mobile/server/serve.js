@@ -14,7 +14,9 @@ const fs = require("fs");
 const path = require("path");
 const { fileURLToPath, pathToFileURL } = require("url");
 
-const STATIC_ROOT = path.resolve(__dirname, "..", "static-build");
+const STATIC_ROOT = process.env.STATIC_ROOT
+  ? path.resolve(process.env.STATIC_ROOT)
+  : path.resolve(__dirname, "..", "static-build");
 const TEMPLATE_PATH = path.resolve(__dirname, "templates", "landing-page.html");
 const basePath = (process.env.BASE_PATH || "/").replace(/\/+$/, "");
 
@@ -132,6 +134,14 @@ function serveLandingPage(req, res, landingPageTemplate, appName) {
   res.end(html);
 }
 
+function isUnsafeDecodedPath(decodedPath) {
+  return (
+    decodedPath.includes("\0") ||
+    decodedPath.includes("\\") ||
+    decodedPath.split("/").includes("..")
+  );
+}
+
 function serveStaticFile(urlPath, res, staticFileIndex) {
   let decodedPath;
   try {
@@ -142,7 +152,7 @@ function serveStaticFile(urlPath, res, staticFileIndex) {
     return;
   }
 
-  if (decodedPath.includes("\0") || decodedPath.includes("\\") || decodedPath.split("/").includes("..")) {
+  if (isUnsafeDecodedPath(decodedPath)) {
     res.writeHead(403, { "x-content-type-options": "nosniff" });
     res.end("Forbidden");
     return;
@@ -169,6 +179,20 @@ const appName = getAppName();
 const staticFileIndex = buildStaticFileIndex(STATIC_ROOT);
 
 const server = http.createServer((req, res) => {
+  const rawPathname = (req.url || "/").split("?")[0] || "/";
+  let decodedRawPathname;
+  try {
+    decodedRawPathname = decodeURIComponent(rawPathname);
+  } catch {
+    return serveStaticFile(rawPathname, res, staticFileIndex);
+  }
+
+  // URL normalizes encoded dot segments and backslashes. Check the raw
+  // request target first so those characters cannot become a valid index key.
+  if (isUnsafeDecodedPath(decodedRawPathname)) {
+    return serveStaticFile(rawPathname, res, staticFileIndex);
+  }
+
   const url = new URL(req.url || "/", "http://localhost");
   let pathname = url.pathname;
 
@@ -179,7 +203,7 @@ const server = http.createServer((req, res) => {
   if (pathname === "/" || pathname === "/manifest") {
     const platform = req.headers["expo-platform"];
     if (platform === "ios" || platform === "android") {
-      return serveManifest(platform, res);
+      return serveManifest(platform, res, staticFileIndex);
     }
 
     if (pathname === "/") {
