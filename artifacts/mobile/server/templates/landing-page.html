@@ -394,8 +394,12 @@
       </div>
     </div>
 
-    <script src="https://unpkg.com/qr-code-styling@1.6.0/lib/qr-code-styling.js"></script>
-    <script>
+    <script
+      src="https://unpkg.com/qr-code-styling@1.8.4/lib/qr-code-styling.js"
+      integrity="sha384-ouRCLR+B6Inl+sRHUX54aH0IoL+QtaIyG4gemPDo2itY6iWdmOYkIIJwlJahJM8W"
+      crossorigin="anonymous"
+    ></script>
+    <script nonce="SCRIPT_NONCE_PLACEHOLDER">
       (function () {
         const ua = navigator.userAgent;
         const loadingEl = document.getElementById("loading");
@@ -421,29 +425,36 @@
           storeButtonsContainer.insertBefore(playStoreBtn, appStoreBtn);
         }
 
-        const qrCode = new QRCodeStyling({
-          width: 400,
-          height: 400,
-          data: deepLink,
-          dotsOptions: {
-            color: "#333333",
-            type: "rounded",
-          },
-          backgroundOptions: {
-            color: "#ffffff",
-          },
-          cornersSquareOptions: {
-            type: "extra-rounded",
-          },
-          cornersDotOptions: {
-            type: "dot",
-          },
-          qrOptions: {
-            errorCorrectionLevel: "H",
-          },
-        });
+        const qrContainer = document.getElementById("qr-code");
+        if (typeof QRCodeStyling === "function") {
+          const qrCode = new QRCodeStyling({
+            width: 400,
+            height: 400,
+            data: deepLink,
+            dotsOptions: {
+              color: "#333333",
+              type: "rounded",
+            },
+            backgroundOptions: {
+              color: "#ffffff",
+            },
+            cornersSquareOptions: {
+              type: "extra-rounded",
+            },
+            cornersDotOptions: {
+              type: "dot",
+            },
+            qrOptions: {
+              errorCorrectionLevel: "H",
+            },
+          });
 
-        qrCode.append(document.getElementById("qr-code"));
+          qrCode.append(qrContainer);
+        } else {
+          qrContainer.textContent = "QR code unavailable. Use the button below.";
+          qrContainer.style.color = "#333333";
+          qrContainer.style.fontSize = "13px";
+        }
 
         if (isAndroid || isIOS) {
           loadingEl.style.display = "block";

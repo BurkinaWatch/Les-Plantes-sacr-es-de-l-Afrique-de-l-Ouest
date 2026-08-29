@@ -3,6 +3,11 @@ const path = require("path");
 const { spawn } = require("child_process");
 const { Readable } = require("stream");
 const { pipeline } = require("stream/promises");
+const {
+  getDeploymentDomain,
+  normalizeBasePath,
+  normalizePublicDomain,
+} = require("../lib/public-deployment");
 
 let metroProcess = null;
 
@@ -20,7 +25,13 @@ function findWorkspaceRoot(startDir) {
 }
 
 const workspaceRoot = findWorkspaceRoot(projectRoot);
-const basePath = (process.env.BASE_PATH || "/").replace(/\/+$/, "");
+let basePath;
+try {
+  basePath = normalizeBasePath(process.env.BASE_PATH);
+} catch (error) {
+  console.error(`ERROR: ${error.message}`);
+  process.exit(1);
+}
 
 function exitWithError(message) {
   console.error(message);
@@ -42,39 +53,6 @@ function setupSignalHandlers() {
   process.on("SIGINT", cleanup);
   process.on("SIGTERM", cleanup);
   process.on("SIGHUP", cleanup);
-}
-
-function stripProtocol(domain) {
-  let urlString = domain.trim();
-
-  if (!/^https?:\/\//i.test(urlString)) {
-    urlString = `https://${urlString}`;
-  }
-
-  return new URL(urlString).host;
-}
-
-function getDeploymentDomain() {
-  if (process.env.REPLIT_INTERNAL_APP_DOMAIN) {
-    return stripProtocol(process.env.REPLIT_INTERNAL_APP_DOMAIN);
-  }
-
-  if (process.env.REPLIT_DEV_DOMAIN) {
-    return stripProtocol(process.env.REPLIT_DEV_DOMAIN);
-  }
-
-  if (process.env.EXPO_PUBLIC_DOMAIN) {
-    return stripProtocol(process.env.EXPO_PUBLIC_DOMAIN);
-  }
-
-  if (process.env.RAILWAY_PUBLIC_DOMAIN) {
-    return stripProtocol(process.env.RAILWAY_PUBLIC_DOMAIN);
-  }
-
-  console.error(
-    "ERROR: No deployment domain found. Set EXPO_PUBLIC_DOMAIN to your Railway public domain (e.g. your-app.railway.app), or set REPLIT_INTERNAL_APP_DOMAIN / REPLIT_DEV_DOMAIN.",
-  );
-  process.exit(1);
 }
 
 function prepareDirectories(timestamp) {
@@ -340,7 +318,7 @@ function extractAssets(timestamp) {
         throw new Error(`Asset missing unstable_path: ${originalPath}`);
       }
 
-      const decodedPath = decodeURIComponent(unstablePath);
+      const decodedPath = decodeAssetRelativePath(unstablePath);
       const key = path.posix.join(decodedPath, filename);
 
       if (!assetsMap.has(key)) {
@@ -365,6 +343,27 @@ function extractAssets(timestamp) {
   return Array.from(assetsMap.values());
 }
 
+function decodeAssetRelativePath(value) {
+  let decodedPath;
+  try {
+    decodedPath = decodeURIComponent(value);
+  } catch {
+    throw new Error(`Asset path is not valid URL encoding: ${value}`);
+  }
+
+  if (
+    decodedPath.includes("\0") ||
+    decodedPath.includes("\\") ||
+    decodedPath.startsWith("/") ||
+    decodedPath.split("/").includes("..") ||
+    decodedPath.split("/").some((segment) => segment === "")
+  ) {
+    throw new Error(`Unsafe asset path: ${value}`);
+  }
+
+  return decodedPath;
+}
+
 async function downloadAssets(assets, timestamp) {
   if (assets.length === 0) {
     return 0;
@@ -382,7 +381,7 @@ async function downloadAssets(assets, timestamp) {
       throw new Error(`Asset missing unstable_path: ${asset.originalPath}`);
     }
 
-    const decodedPath = decodeURIComponent(unstablePath);
+    const decodedPath = decodeAssetRelativePath(unstablePath);
 
     const outputDir = path.join(
       projectRoot,
@@ -457,7 +456,7 @@ function updateBundleUrls(timestamp, baseUrl) {
           );
         }
 
-        const decodedPath = decodeURIComponent(unstablePath);
+        const decodedPath = decodeAssetRelativePath(unstablePath);
         return `httpServerLocation:"${baseUrl}${basePath}/${timestamp}/_expo/static/js/${decodedPath}"`;
       },
     );
@@ -472,7 +471,13 @@ function updateBundleUrls(timestamp, baseUrl) {
 
 function updateManifests(manifests, timestamp, baseUrl, assetsByHash) {
   const updateForPlatform = (platform, manifest) => {
-    if (!manifest.launchAsset || !manifest.extra) {
+    if (
+      !manifest.launchAsset ||
+      !manifest.extra ||
+      !manifest.extra.expoClient ||
+      !manifest.extra.expoGo ||
+      !manifest.extra.expoGo.packagerOpts
+    ) {
       exitWithError(`Malformed manifest for ${platform}`);
     }
 
@@ -481,25 +486,33 @@ function updateManifests(manifests, timestamp, baseUrl, assetsByHash) {
     manifest.createdAt = new Date(
       Number(timestamp.split("-")[0]),
     ).toISOString();
-    manifest.extra.expoClient.hostUri =
-      baseUrl.replace("https://", "") + "/" + platform;
-    manifest.extra.expoGo.debuggerHost =
-      baseUrl.replace("https://", "") + "/" + platform;
+    const publicDomain = new URL(baseUrl).host;
+    manifest.extra.expoClient.hostUri = publicDomain;
+    manifest.extra.expoGo.debuggerHost = publicDomain;
     manifest.extra.expoGo.packagerOpts.dev = false;
 
     if (manifest.assets && manifest.assets.length > 0) {
       manifest.assets.forEach((asset) => {
-        if (!asset.url) return;
-
         const hash = asset.hash;
-        if (!hash) return;
+        if (!asset.url || !hash) {
+          exitWithError(`Malformed asset entry in ${platform} manifest`);
+        }
 
         const assetInfo = assetsByHash.get(hash);
-        if (!assetInfo) return;
+        if (!assetInfo) {
+          exitWithError(`Asset ${hash} is missing from the generated ${platform} build`);
+        }
 
         asset.url = `${baseUrl}${basePath}/${timestamp}/_expo/static/js/${assetInfo.relativePath}/${assetInfo.filename}`;
+        assertHttpsPublicUrl(asset.url, baseUrl, `${platform} asset`);
       });
     }
+
+    assertHttpsPublicUrl(
+      manifest.launchAsset.url,
+      baseUrl,
+      `${platform} launch asset`,
+    );
 
     fs.writeFileSync(
       path.join(projectRoot, "static-build", platform, "manifest.json"),
@@ -510,6 +523,26 @@ function updateManifests(manifests, timestamp, baseUrl, assetsByHash) {
   updateForPlatform("ios", manifests.ios);
   updateForPlatform("android", manifests.android);
   console.log("Manifests updated");
+}
+
+function assertHttpsPublicUrl(value, baseUrl, label) {
+  let url;
+  try {
+    url = new URL(value);
+  } catch {
+    exitWithError(`${label} URL is invalid`);
+  }
+
+  if (
+    url.protocol !== "https:" ||
+    url.host !== new URL(baseUrl).host ||
+    url.username ||
+    url.password ||
+    url.search ||
+    url.hash
+  ) {
+    exitWithError(`${label} URL must be HTTPS on the configured public domain`);
+  }
 }
 
 async function checkExpoPackageVersions() {
@@ -545,7 +578,12 @@ async function main() {
 
   await checkExpoPackageVersions();
 
-  const domain = getDeploymentDomain();
+  let domain;
+  try {
+    domain = normalizePublicDomain(getDeploymentDomain());
+  } catch (error) {
+    exitWithError(`ERROR: ${error.message}`);
+  }
   const expoPublicReplId = getExpoPublicReplId();
   const baseUrl = `https://${domain}`;
   const timestamp = `${Date.now()}-${process.pid}`;

@@ -12,13 +12,25 @@ await mkdir(path.join(fixtureRoot, "ios"), { recursive: true });
 await mkdir(path.join(fixtureRoot, "android"), { recursive: true });
 await writeFile(
   path.join(fixtureRoot, "ios", "manifest.json"),
-  JSON.stringify({ platform: "ios", marker: "ios-manifest" }),
+  JSON.stringify({
+    platform: "ios",
+    marker: "ios-manifest",
+    launchAsset: { url: "https://mobile.example.com/build/ios/bundle.js" },
+    assets: [{ hash: "ios-asset", url: "https://mobile.example.com/build/ios/icon.png" }],
+  }),
 );
 await writeFile(
   path.join(fixtureRoot, "android", "manifest.json"),
-  JSON.stringify({ platform: "android", marker: "android-manifest" }),
+  JSON.stringify({
+    platform: "android",
+    marker: "android-manifest",
+    launchAsset: { url: "https://mobile.example.com/build/android/bundle.js" },
+    assets: [{ hash: "android-asset", url: "https://mobile.example.com/build/android/icon.png" }],
+  }),
 );
 await writeFile(path.join(fixtureRoot, "ios", "bundle.js"), "ios-bundle");
+await writeFile(path.join(fixtureRoot, "ios", "icon.png"), "ios-asset");
+await writeFile(path.join(fixtureRoot, "android", "icon.png"), "android-asset");
 
 function getFreePort() {
   return new Promise((resolve, reject) => {
@@ -64,6 +76,7 @@ const serverProcess = spawn(process.execPath, ["server/serve.js"], {
     ...process.env,
     PORT: String(port),
     STATIC_ROOT: fixtureRoot,
+    RAILWAY_PUBLIC_DOMAIN: "https://mobile.example.com/",
   },
   stdio: ["ignore", "pipe", "pipe"],
 });
@@ -115,7 +128,10 @@ test("serves indexed files and both platform manifests", async () => {
     assert.deepEqual(JSON.parse(directManifest.body), {
       platform,
       marker: `${platform}-manifest`,
+      launchAsset: { url: `https://mobile.example.com/build/${platform}/bundle.js` },
+      assets: [{ hash: `${platform}-asset`, url: `https://mobile.example.com/build/${platform}/icon.png` }],
     });
+    assert.equal((await request(port, `/${platform}/icon.png`)).body, `${platform}-asset`);
 
     const expoManifest = await request(port, "/manifest", {
       "expo-platform": platform,
@@ -126,7 +142,35 @@ test("serves indexed files and both platform manifests", async () => {
       /^multipart\/mixed; boundary=expo-manifest-boundary$/,
     );
     assert.match(expoManifest.body, new RegExp(`"${platform}-manifest"`));
+    assert.match(expoManifest.body, new RegExp(`https://mobile\\.example\\.com/build/${platform}/bundle\\.js`));
+    assert.match(expoManifest.body, /https:\/\/mobile\.example\.com\/build\/(?:ios|android)\/icon\.png/);
+
+    const platformRouteManifest = await request(port, `/${platform}/manifest`);
+    assert.equal(platformRouteManifest.status, 200);
+    assert.match(platformRouteManifest.headers["content-type"], /^multipart\/mixed/);
   }
+});
+
+test("renders a public landing page with a pinned QR deep link", async () => {
+  const landing = await request(port, "/", {
+    host: "internal.invalid",
+    "x-forwarded-host": "mobile.example.com, attacker.example.net",
+    "x-forwarded-proto": "http, https",
+  });
+
+  assert.equal(landing.status, 200);
+  assert.match(landing.headers["content-type"], /^text\/html/);
+  assert.match(landing.body, /Les Plantes Sacrées d’Afrique de l’Ouest/);
+  assert.match(landing.body, /exps:\/\/mobile\.example\.com/);
+  assert.match(landing.body, /https:\/\/unpkg\.com\/qr-code-styling@1\.8\.4/);
+  assert.match(landing.body, /integrity="sha384-[^"]+"/);
+  assert.match(landing.headers["content-security-policy"], /script-src 'self' https:\/\/unpkg\.com 'nonce-[^']+'/);
+  assert.equal(landing.headers["cache-control"], "no-store");
+});
+
+test("rejects a mismatched platform route", async () => {
+  const response = await request(port, "/ios/manifest", { "expo-platform": "android" });
+  assert.equal(response.status, 400);
 });
 
 test("rejects encoded parent-directory traversal", async () => {
