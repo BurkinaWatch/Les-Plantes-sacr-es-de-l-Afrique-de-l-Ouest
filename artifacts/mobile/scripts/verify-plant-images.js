@@ -11,22 +11,6 @@ const complementaryPlantsPath = path.join(
 const plantImagesPath = path.join(root, "constants", "plantImages.ts");
 const plantImagesDirectory = path.join(root, "assets", "images", "plants");
 
-// These legacy animal illustrations share the plants directory but are not
-// catalog illustrations. Keep the exception explicit so new orphan assets do
-// not get silently accepted.
-const nonCatalogAssetIds = new Set([
-  "aigle",
-  "belier",
-  "crocodile",
-  "elephant",
-  "hippopotame",
-  "hyene",
-  "leopard",
-  "lion",
-  "python",
-  "zebu",
-]);
-
 function read(filePath) {
   return fs.readFileSync(filePath, "utf8");
 }
@@ -122,10 +106,7 @@ for (const id of ids) {
 
 for (const [id, imageFile] of registry) {
   const normalizedId = normalizeAssetId(id);
-  if (
-    !ids.some((catalogId) => normalizeAssetId(catalogId) === normalizedId) &&
-    !nonCatalogAssetIds.has(normalizedId)
-  ) {
+  if (!ids.some((catalogId) => normalizeAssetId(catalogId) === normalizedId)) {
     missing.push(
       `${id}: entrée orpheline dans constants/plantImages.ts (${imageFile}.png ne correspond à aucune fiche du catalogue)`,
     );
@@ -134,12 +115,9 @@ for (const [id, imageFile] of registry) {
 
 for (const imageFile of files) {
   const normalizedId = normalizeAssetId(imageFile);
-  if (
-    !ids.some((catalogId) => normalizeAssetId(catalogId) === normalizedId) &&
-    !nonCatalogAssetIds.has(normalizedId)
-  ) {
+  if (!ids.some((catalogId) => normalizeAssetId(catalogId) === normalizedId)) {
     missing.push(
-      `${imageFile}: illustration PNG orpheline dans assets/images/plants (aucune fiche du catalogue ni exception déclarée)`,
+      `${imageFile}: illustration PNG orpheline dans assets/images/plants (aucune fiche du catalogue)`,
     );
   }
 }
