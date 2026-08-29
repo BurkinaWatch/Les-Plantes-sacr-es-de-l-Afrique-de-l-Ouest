@@ -15,6 +15,12 @@ When compiling several source directories with `tsc --outDir`, emitted modules p
 
 **How to apply:** Keep focused test imports aligned with the emitted source tree and pass `--jsx react-jsx` when the compile graph resolves a `.tsx` module.
 
+When a focused TSX render test runs directly through `tsx`, components using classic JSX transforms need an explicit React runtime import even if the app's Vite transform does not.
+
+**Why:** The direct test runtime exposed `React is not defined` while the Vite build remained valid.
+
+**How to apply:** Add a normal `react` import to TSX components included in server-rendered focused tests; keep it out of type-only imports.
+
 For screen rendering, `react-test-renderer` can be used without Jest, but its development build must be selected before importing React or the renderer; the production build omits `act` and root inspection.
 
 **Why:** The workspace commonly exposes `NODE_ENV=production`, which otherwise makes screen tests fail before rendering.
