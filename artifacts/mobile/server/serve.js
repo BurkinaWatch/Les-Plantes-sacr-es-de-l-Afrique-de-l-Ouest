@@ -114,7 +114,7 @@ function serveManifest(platform, res, staticFileIndex) {
   const body = [
     `--${boundary}`,
     'Content-Type: application/json',
-    'Content-Disposition: inline; name="manifest"',
+    'Content-Disposition: form-data; name="manifest"',
     "",
     manifestJson,
     `--${boundary}--`,
@@ -122,9 +122,9 @@ function serveManifest(platform, res, staticFileIndex) {
 
   res.writeHead(200, {
     "content-type": `multipart/mixed; boundary=${boundary}`,
-    "expo-protocol-version": "1",
+    "expo-protocol-version": "0",
     "expo-sfv-version": "0",
-    "cache-control": "no-store",
+    "cache-control": "private, max-age=0",
     "x-content-type-options": "nosniff",
   });
   res.end(body);

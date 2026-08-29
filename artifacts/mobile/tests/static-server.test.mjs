@@ -141,6 +141,13 @@ test("serves indexed files and both platform manifests", async () => {
       expoManifest.headers["content-type"],
       /^multipart\/mixed; boundary=expo-manifest-boundary$/,
     );
+    assert.equal(expoManifest.headers["expo-protocol-version"], "0");
+    assert.equal(expoManifest.headers["expo-sfv-version"], "0");
+    assert.equal(expoManifest.headers["cache-control"], "private, max-age=0");
+    assert.match(
+      expoManifest.body,
+      /Content-Disposition: form-data; name="manifest"/,
+    );
     assert.match(expoManifest.body, new RegExp(`"${platform}-manifest"`));
     assert.match(expoManifest.body, new RegExp(`https://mobile\\.example\\.com/build/${platform}/bundle\\.js`));
     assert.match(expoManifest.body, /https:\/\/mobile\.example\.com\/build\/(?:ios|android)\/icon\.png/);
