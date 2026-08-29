@@ -26,6 +26,65 @@ export interface TotemResult {
   profilDimensions: Record<'E' | 'O' | 'C' | 'A' | 'S', number>;
 }
 
+export interface SpiritualReference {
+  id: string;
+  institution: string;
+  title: string;
+  tradition: string;
+  relevance: string;
+  url: string;
+}
+
+/**
+ * Sources used to frame the quiz. They document living cultural traditions;
+ * they are not evidence that a personality score can reveal a person's
+ * spiritual identity.
+ */
+export const SPIRITUAL_REFERENCES: SpiritualReference[] = [
+  {
+    id: 'unesco-ifa',
+    institution: 'UNESCO',
+    title: 'Système de divination Ifá',
+    tradition: 'Tradition yoruba',
+    relevance: 'Un système vivant de connaissance, de transmission et de discernement.',
+    url: 'https://ich.unesco.org/en/RL/ifa-divination-system-00146',
+  },
+  {
+    id: 'unesco-sosso-bala',
+    institution: 'UNESCO',
+    title: 'Espace culturel du Sosso-Bala',
+    tradition: 'Traditions mandingues',
+    relevance: 'Un patrimoine de parole, de mémoire et de responsabilité communautaire.',
+    url: 'https://ich.unesco.org/en/RL/sosso-bala-cultural-space-00009',
+  },
+  {
+    id: 'unesco-kankurang',
+    institution: 'UNESCO',
+    title: 'Le Kankurang, rite initiatique mandingue',
+    tradition: 'Traditions mandingues de Gambie et du Sénégal',
+    relevance: 'Un exemple de transmission rituelle et de cohésion sociale.',
+    url: 'https://ich.unesco.org/en/RL/kankurang-manding-initiatory-rite-00109',
+  },
+  {
+    id: 'kew-powo',
+    institution: 'Royal Botanic Gardens, Kew',
+    title: 'Plants of the World Online',
+    tradition: 'Référence botanique',
+    relevance: 'Pour vérifier les noms scientifiques et ne pas confondre symbole culturel et identification botanique.',
+    url: 'https://powo.science.kew.org/',
+  },
+];
+
+export const TOTEM_REFLECTIONS: Record<TotemAnimalId, string> = {
+  kolatier: 'Prenez un instant pour remercier une personne qui a rendu un lien possible. Le geste est une proposition de gratitude, pas un rite attribué à une tradition précise.',
+  baobab: 'Écrivez une parole reçue d’une génération précédente et la manière dont vous souhaitez la transmettre. La mémoire devient une responsabilité choisie.',
+  neem: 'Observez ce qui mérite une limite claire dans votre vie aujourd’hui. Protéger votre espace peut commencer par une décision simple et respectueuse.',
+  nere: 'Notez une ressource que vous pouvez partager avec votre communauté. L’abondance est ici explorée comme relation et non comme promesse surnaturelle.',
+  fromager: 'Levez les yeux, respirez lentement, puis revenez à une action concrète. Une vision spirituelle reste reliée au soin du monde réel.',
+  moringa: 'Identifiez un changement que vous traversez et une petite manière de nourrir votre énergie cette semaine. La transformation n’est pas une prédiction.',
+  ronier: 'Reconnaissez ce que vous donnez déjà et ce que vous êtes prêt à recevoir. L’endurance inclut aussi le repos et l’interdépendance.',
+};
+
 // ── 20 affirmations · 4 par dimension · 1 item inversé par dimension (★)
 export const QUIZ_QUESTIONS: QuizStatement[] = [
 

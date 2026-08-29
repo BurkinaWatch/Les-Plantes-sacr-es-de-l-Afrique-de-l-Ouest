@@ -11,10 +11,19 @@ import {
   Text,
   View,
 } from 'react-native';
+import { Linking } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { useApp } from '@/context/AppContext';
-import { QUIZ_QUESTIONS, TOTEM_RESULTS, calculateTotem, type LikertValue, type QuizAnswers } from '@/data/quiz';
+import {
+  QUIZ_QUESTIONS,
+  SPIRITUAL_REFERENCES,
+  TOTEM_REFLECTIONS,
+  TOTEM_RESULTS,
+  calculateTotem,
+  type LikertValue,
+  type QuizAnswers,
+} from '@/data/quiz';
 import { SacredIcon, type SacredIconName } from '@/components/SacredIcon';
 import { useColors } from '@/hooks/useColors';
 import { useTranslation } from '@/i18n';
@@ -125,6 +134,13 @@ export default function QuizScreen() {
             </View>
           ))}
 
+          <View style={[styles.anchorCard, { backgroundColor: colors.gold + '10', borderColor: colors.gold + '35' }]}>
+            <Text style={[styles.anchorTitle, { color: colors.gold }]}>UN CHEMIN ANCRÉ</Text>
+            <Text style={[styles.anchorText, { color: colors.ivory }]}>
+              Ce parcours ne prétend pas révéler une identité spirituelle. Il vous invite à réfléchir à votre relation aux autres, à la mémoire, aux cycles et au vivant, à partir de traditions documentées.
+            </Text>
+          </View>
+
           <Pressable
             style={({ pressed }) => [{ opacity: pressed ? 0.88 : 1, marginTop: 8 }]}
             onPress={() => {
@@ -194,6 +210,28 @@ export default function QuizScreen() {
                 <SacredIcon name="circle" size={10} color={colors.gold} />
                 <Text style={[styles.refText, { color: colors.mutedForeground }]}>{ref}</Text>
               </View>
+            ))}
+          </View>
+
+          <View style={[styles.charteCard, { backgroundColor: colors.card, borderColor: colors.gold + '40' }]}>
+            <Text style={[styles.charteCardTitle, { color: colors.gold }]}>SOURCES À CONSULTER</Text>
+            <Text style={[styles.sourceIntro, { color: colors.mutedForeground }]}>
+              Ces références documentent des traditions vivantes et le nom des plantes. Elles ne valident pas un diagnostic spirituel automatisé.
+            </Text>
+            {SPIRITUAL_REFERENCES.map((reference) => (
+              <Pressable
+                key={reference.id}
+                accessibilityRole="link"
+                accessibilityLabel={`${reference.institution} — ${reference.title}`}
+                onPress={() => void Linking.openURL(reference.url)}
+                style={({ pressed }) => [styles.sourceItem, { opacity: pressed ? 0.7 : 1 }]}
+              >
+                <Text style={[styles.sourceTitle, { color: colors.ivory }]}>
+                  {reference.institution} — {reference.title}
+                </Text>
+                <Text style={[styles.sourceMeta, { color: colors.gold }]}>{reference.tradition}</Text>
+                <Text style={[styles.sourceText, { color: colors.mutedForeground }]}>{reference.relevance}</Text>
+              </Pressable>
             ))}
           </View>
 
@@ -274,6 +312,14 @@ export default function QuizScreen() {
           <View style={[styles.card, { backgroundColor: colors.card, borderColor: colors.border }]}>
             <Text style={[styles.cardLabel, { color: colors.gold }]}>{t.quiz_result_revelation_label}</Text>
             <Text style={[styles.cardText, { color: colors.ivory }]}>{totem.description}</Text>
+          </View>
+
+          <View style={[styles.card, { backgroundColor: colors.gold + '10', borderColor: colors.gold + '35' }]}>
+            <Text style={[styles.cardLabel, { color: colors.gold }]}>PRATIQUE D’ANCRAGE</Text>
+            <Text style={[styles.cardText, { color: colors.ivory }]}>{TOTEM_REFLECTIONS[result.primary]}</Text>
+            <Text style={[styles.sourceText, { color: colors.mutedForeground }]}>
+              Proposition de réflexion inspirée par les relations au vivant documentées dans les sources, pas une prescription rituelle.
+            </Text>
           </View>
 
           <View style={[styles.card, { backgroundColor: colors.card, borderColor: colors.border }]}>
@@ -425,6 +471,9 @@ const styles = StyleSheet.create({
   featureIcon: { fontSize: 22 },
   featureTitle: { fontSize: 15, fontWeight: '700' as const },
   featureDesc: { fontSize: 13, marginTop: 2 },
+  anchorCard: { borderRadius: 14, padding: 16, borderWidth: 1, gap: 7 },
+  anchorTitle: { fontSize: 10, fontWeight: '700' as const, letterSpacing: 2 },
+  anchorText: { fontSize: 13, lineHeight: 20 },
 
   startBtn: { padding: 18, borderRadius: 16, alignItems: 'center' },
   startBtnText: { fontSize: 16, fontWeight: '700' as const, letterSpacing: 0.5 },
@@ -445,6 +494,11 @@ const styles = StyleSheet.create({
   refRow: { flexDirection: 'row', gap: 10, alignItems: 'flex-start', paddingVertical: 3 },
   refDot: { fontSize: 14, fontWeight: '700' as const, width: 16 },
   refText: { flex: 1, fontSize: 13, lineHeight: 20 },
+  sourceIntro: { fontSize: 12, lineHeight: 18 },
+  sourceItem: { gap: 3, paddingVertical: 7 },
+  sourceTitle: { fontSize: 13, fontWeight: '700' as const, lineHeight: 18 },
+  sourceMeta: { fontSize: 11, fontWeight: '600' as const },
+  sourceText: { fontSize: 12, lineHeight: 18 },
 
   resultHero: { padding: 28, paddingBottom: 40 },
   resultLabel: { fontSize: 11, fontWeight: '700' as const, letterSpacing: 2.5, marginBottom: 8 },
