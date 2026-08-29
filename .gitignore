@@ -7,6 +7,7 @@ out-tsc
 *.tsbuildinfo
 .test-dist
 .screen-test-dist
+.data-test-dist
 .expo
 .expo-shared
 
