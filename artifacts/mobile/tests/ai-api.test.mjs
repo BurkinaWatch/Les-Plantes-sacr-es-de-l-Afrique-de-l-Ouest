@@ -5,7 +5,7 @@ import {
   ApiRequestError,
   requestPlantRecognition,
   requestTotem,
-} from "../.test-dist/ai-api.js";
+} from "../.test-dist/lib/ai-api.js";
 
 function response(status, body, headers = {}) {
   return new Response(JSON.stringify(body), {

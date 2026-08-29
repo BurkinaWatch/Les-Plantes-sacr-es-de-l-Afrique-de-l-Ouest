@@ -9,6 +9,12 @@ The workspace package installer cannot add a dependency directly to an individua
 
 **How to apply:** Prefer package-local test scripts that emit disposable `.test-dist` output, then run `node --test` against mocked boundaries. Keep `.test-dist` ignored.
 
+When compiling several source directories with `tsc --outDir`, emitted modules preserve their source folders; test imports must follow that layout (for example, `.test-dist/lib/...`). Type-only imports from `.tsx` files also require an explicit JSX mode in focused compiler commands.
+
+**Why:** The focused mobile test command compiles source files outside the package tsconfig, so TypeScript infers a shared root and otherwise either rejects the JSX-resolved type source or emits modules at paths the Node test runner cannot resolve.
+
+**How to apply:** Keep focused test imports aligned with the emitted source tree and pass `--jsx react-jsx` when the compile graph resolves a `.tsx` module.
+
 For screen rendering, `react-test-renderer` can be used without Jest, but its development build must be selected before importing React or the renderer; the production build omits `act` and root inspection.
 
 **Why:** The workspace commonly exposes `NODE_ENV=production`, which otherwise makes screen tests fail before rendering.

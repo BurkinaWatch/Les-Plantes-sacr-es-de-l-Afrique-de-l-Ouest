@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 
-import { CATEGORY_LABEL_KEYS, getCategoryLabels } from "../.test-dist/category-labels.js";
+import { CATEGORY_LABEL_KEYS, getCategoryLabels } from "../.test-dist/lib/category-labels.js";
 import { dyo } from "../.test-dist/i18n/dyo.js";
 import { en } from "../.test-dist/i18n/en.js";
 import { fr } from "../.test-dist/i18n/fr.js";
