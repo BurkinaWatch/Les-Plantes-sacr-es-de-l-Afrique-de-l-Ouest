@@ -1,5 +1,6 @@
 const fs = require("fs");
 const path = require("path");
+const crypto = require("crypto");
 const { spawn } = require("child_process");
 const { Readable } = require("stream");
 const { pipeline } = require("stream/promises");
@@ -32,6 +33,12 @@ try {
   console.error(`ERROR: ${error.message}`);
   process.exit(1);
 }
+const metroPort = Number(process.env.METRO_PORT || 8081);
+if (!Number.isInteger(metroPort) || metroPort < 1024 || metroPort > 65535) {
+  console.error("ERROR: METRO_PORT must be an integer between 1024 and 65535");
+  process.exit(1);
+}
+const metroBaseUrl = `http://localhost:${metroPort}`;
 
 function exitWithError(message) {
   console.error(message);
@@ -96,7 +103,7 @@ function clearMetroCache() {
 
 async function checkMetroHealth() {
   try {
-    const response = await fetch("http://localhost:8081/status", {
+    const response = await fetch(`${metroBaseUrl}/status`, {
       signal: AbortSignal.timeout(5000),
     });
     return response.ok;
@@ -137,6 +144,8 @@ async function startMetro(expoPublicDomain, expoPublicReplId) {
       "--no-dev",
       "--minify",
       "--localhost",
+      "--port",
+      String(metroPort),
     ],
     {
       stdio: ["ignore", "pipe", "pipe"],
@@ -215,7 +224,7 @@ async function downloadFile(url, outputPath) {
 async function downloadBundle(platform, timestamp) {
   const entryPath = path.resolve(projectRoot, "node_modules", "expo-router", "entry");
   const bundlePath = path.relative(workspaceRoot, entryPath);
-  const url = new URL(`http://localhost:8081/${bundlePath}.bundle`);
+    const url = new URL(`${metroBaseUrl}/${bundlePath}.bundle`);
   url.searchParams.set("platform", platform);
   url.searchParams.set("dev", "false");
   url.searchParams.set("hot", "false");
@@ -243,7 +252,7 @@ async function downloadManifest(platform) {
 
   try {
     console.log(`Fetching ${platform} manifest...`);
-    const response = await fetch("http://localhost:8081/manifest", {
+    const response = await fetch(`${metroBaseUrl}/manifest`, {
       headers: { "expo-platform": platform },
       signal: controller.signal,
     });
@@ -311,22 +320,25 @@ function extractAssets(timestamp) {
       const originalPath = match[1];
       const filename = match[3] + "." + match[4];
 
-      const tempUrl = new URL(`http://localhost:8081${originalPath}`);
+      const tempUrl = new URL(`${metroBaseUrl}${originalPath}`);
       const unstablePath = tempUrl.searchParams.get("unstable_path");
 
       if (!unstablePath) {
         throw new Error(`Asset missing unstable_path: ${originalPath}`);
       }
 
-      const decodedPath = decodeAssetRelativePath(unstablePath);
-      const key = path.posix.join(decodedPath, filename);
+      const decodedPath = decodeAssetSourcePath(unstablePath);
+      const sourceFile = resolveTrustedAssetSource(decodedPath, filename);
+      const publicDirectory = getPublicAssetDirectory(decodedPath);
+      const key = sourceFile;
 
       if (!assetsMap.has(key)) {
         const asset = {
-          url: path.posix.join("/", decodedPath, filename),
+          url: path.posix.join("/", publicDirectory, filename),
           originalPath: originalPath,
           filename: filename,
-          relativePath: decodedPath,
+          sourcePath: decodedPath,
+          relativePath: publicDirectory,
           hash: match[2],
           platforms: new Set(),
         };
@@ -343,7 +355,7 @@ function extractAssets(timestamp) {
   return Array.from(assetsMap.values());
 }
 
-function decodeAssetRelativePath(value) {
+function decodeAssetSourcePath(value) {
   let decodedPath;
   try {
     decodedPath = decodeURIComponent(value);
@@ -354,14 +366,30 @@ function decodeAssetRelativePath(value) {
   if (
     decodedPath.includes("\0") ||
     decodedPath.includes("\\") ||
-    decodedPath.startsWith("/") ||
-    decodedPath.split("/").includes("..") ||
-    decodedPath.split("/").some((segment) => segment === "")
+    decodedPath.startsWith("/")
   ) {
     throw new Error(`Unsafe asset path: ${value}`);
   }
 
   return decodedPath;
+}
+
+function resolveTrustedAssetSource(decodedPath, filename) {
+  const sourcePath = path.resolve(projectRoot, decodedPath, filename);
+  const workspacePrefix = `${workspaceRoot}${path.sep}`;
+  if (sourcePath !== workspaceRoot && !sourcePath.startsWith(workspacePrefix)) {
+    throw new Error(`Asset resolves outside the workspace: ${decodedPath}/${filename}`);
+  }
+  return sourcePath;
+}
+
+function getPublicAssetDirectory(decodedPath) {
+  const digest = crypto
+    .createHash("sha256")
+    .update(decodedPath)
+    .digest("hex")
+    .slice(0, 16);
+  return path.posix.join("assets", digest);
 }
 
 async function downloadAssets(assets, timestamp) {
@@ -374,14 +402,14 @@ async function downloadAssets(assets, timestamp) {
   const failures = [];
 
   const downloadPromises = assets.map(async (asset) => {
-    const tempUrl = new URL(`http://localhost:8081${asset.originalPath}`);
+    const tempUrl = new URL(`${metroBaseUrl}${asset.originalPath}`);
     const unstablePath = tempUrl.searchParams.get("unstable_path");
 
     if (!unstablePath) {
       throw new Error(`Asset missing unstable_path: ${asset.originalPath}`);
     }
 
-    const decodedPath = decodeAssetRelativePath(unstablePath);
+    const decodedPath = decodeAssetSourcePath(unstablePath);
 
     const outputDir = path.join(
       projectRoot,
@@ -396,15 +424,11 @@ async function downloadAssets(assets, timestamp) {
     const output = path.join(outputDir, asset.filename);
 
     try {
-      const candidates = [
-        path.join(projectRoot, decodedPath, asset.filename),
-        path.join(workspaceRoot, decodedPath, asset.filename),
-      ];
-      const found = candidates.find((p) => fs.existsSync(p));
-      if (!found) {
+      const sourceFile = resolveTrustedAssetSource(decodedPath, asset.filename);
+      if (!fs.existsSync(sourceFile)) {
         throw new Error(`Asset not found on disk: ${asset.filename}`);
       }
-      fs.copyFileSync(found, output);
+      fs.copyFileSync(sourceFile, output);
       successCount++;
     } catch (error) {
       failures.push({
@@ -447,7 +471,7 @@ function updateBundleUrls(timestamp, baseUrl) {
     bundle = bundle.replace(
       /httpServerLocation:"(\/[^"]+)"/g,
       (_match, capturedPath) => {
-        const tempUrl = new URL(`http://localhost:8081${capturedPath}`);
+        const tempUrl = new URL(`${metroBaseUrl}${capturedPath}`);
         const unstablePath = tempUrl.searchParams.get("unstable_path");
 
         if (!unstablePath) {
