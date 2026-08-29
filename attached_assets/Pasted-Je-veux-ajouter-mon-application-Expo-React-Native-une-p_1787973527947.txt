@@ -1,0 +1,139 @@
+Je veux ajouter à mon application Expo React Native une page publique permettant de tester l’application avec Expo Go via un QR code après son déploiement sur Railway.
+
+Ne crée pas un simple QR code qui ouvre une page web. Le QR code doit ouvrir l’application dans Expo Go et Expo Go doit pouvoir récupérer le manifest et le bundle mobile depuis le domaine public Railway.
+
+Objectif :
+
+Créer une implémentation complète avec :
+
+1. Un build Expo mobile en mode production.
+2. Un serveur Node.js autonome servant les fichiers statiques.
+3. Une landing page publique avec :
+   - le nom de l’application ;
+   - un bouton App Store ;
+   - un bouton Google Play ;
+   - une section “Scan QR Code” ;
+   - un QR code généré dynamiquement ;
+   - un bouton “Open in Expo Go”.
+4. Un QR code contenant une deep link Expo Go de la forme :
+   exps://DOMAINE_PUBLIC_RAILWAY
+5. Une prise en charge correcte des manifests iOS et Android.
+
+Architecture attendue :
+
+- Créer un script de build, par exemple :
+  mobile/scripts/build.js
+- Créer un serveur de production, par exemple :
+  mobile/server/serve.js
+- Créer un template HTML, par exemple :
+  mobile/server/templates/landing-page.html
+- Créer une configuration Railway dédiée au mobile.
+
+Le script de build doit :
+
+- démarrer Metro avec Expo en mode production ;
+- utiliser :
+  expo start --no-dev --minify --localhost
+- générer séparément les bundles iOS et Android ;
+- télécharger les manifests Expo iOS et Android ;
+- télécharger les assets nécessaires ;
+- placer les bundles et assets dans un dossier static-build ;
+- remplacer toutes les URLs locales par l’URL publique HTTPS Railway ;
+- mettre à jour :
+  manifest.launchAsset.url
+  manifest.extra.expoClient.hostUri
+  manifest.extra.expoGo.debuggerHost
+  manifest.extra.expoGo.packagerOpts.dev = false
+- écrire :
+  static-build/ios/manifest.json
+  static-build/android/manifest.json
+
+Le domaine public doit être récupéré sans être codé en dur :
+
+- utiliser RAILWAY_PUBLIC_DOMAIN si cette variable existe ;
+- accepter aussi EXPO_PUBLIC_DOMAIN comme solution de secours ;
+- retirer automatiquement http:// ou https:// si la variable contient un protocole ;
+- produire ensuite une URL de base :
+  https://DOMAINE_PUBLIC
+
+Le serveur Node.js doit :
+
+- écouter sur process.env.PORT ;
+- écouter sur 0.0.0.0 ;
+- respecter les headers de reverse proxy Railway :
+  x-forwarded-host
+  x-forwarded-proto
+- servir la landing page sur GET / ;
+- remplacer dans le HTML :
+  APP_NAME_PLACEHOLDER
+  BASE_URL_PLACEHOLDER
+  EXPS_URL_PLACEHOLDER
+- servir les fichiers statiques depuis static-build ;
+- empêcher les chemins dangereux de type ../ ;
+- reconnaître les requêtes Expo contenant :
+  expo-platform: ios
+  expo-platform: android
+- répondre à GET /manifest avec le manifest correspondant à la plateforme ;
+- renvoyer le manifest dans le format multipart/mixed attendu par Expo Go ;
+- renvoyer les headers :
+  expo-protocol-version: 1
+  expo-sfv-version: 0
+
+La landing page doit utiliser qr-code-styling ou une bibliothèque QR fiable et générer le QR dans le navigateur avec une configuration similaire :
+
+const deepLink = "exps://DOMAINE_PUBLIC";
+
+const qrCode = new QRCodeStyling({
+  width: 400,
+  height: 400,
+  data: deepLink,
+  dotsOptions: {
+    color: "#333333",
+    type: "rounded"
+  },
+  backgroundOptions: {
+    color: "#ffffff"
+  },
+  cornersSquareOptions: {
+    type: "extra-rounded"
+  },
+  cornersDotOptions: {
+    type: "dot"
+  },
+  qrOptions: {
+    errorCorrectionLevel: "H"
+  }
+});
+
+Ajouter également une détection simple iOS/Android afin d’afficher le bouton App Store ou Google Play de manière adaptée. Sur mobile, tenter d’ouvrir automatiquement la deep link Expo Go, tout en conservant la page visible si Expo Go n’est pas installé.
+
+Configuration Railway mobile attendue :
+
+[build]
+buildCommand = "pnpm install --frozen-lockfile=false && pnpm --filter @workspace/mobile run build"
+
+[deploy]
+startCommand = "node mobile/server/serve.js"
+healthcheckPath = "/"
+healthcheckTimeout = 300
+
+Ajouter dans package.json :
+
+"build": "node server/build.js",
+"serve": "node server/serve.js"
+
+Ne pas utiliser localhost dans les URLs visibles par Expo Go. Toutes les URLs du manifest, des bundles et des assets doivent être accessibles publiquement en HTTPS depuis Railway.
+
+Ajouter des tests qui vérifient :
+
+- GET / retourne bien la page HTML ;
+- le HTML contient un QR code ;
+- le QR contient le domaine public attendu ;
+- GET /manifest avec expo-platform: ios retourne le manifest iOS ;
+- GET /manifest avec expo-platform: android retourne le manifest Android ;
+- les manifests utilisent des URLs HTTPS publiques ;
+- le bundle et les assets existent ;
+- le serveur écoute bien sur process.env.PORT ;
+- une URL inconnue ne permet pas de sortir du dossier static-build.
+
+Ne pas modifier la configuration du serveur API existant. Si le projet contient déjà un railway.json pour l’API, créer une configuration Railway distincte pour le mobile ou prévoir deux services Railway séparés.
