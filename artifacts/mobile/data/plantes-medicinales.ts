@@ -72,6 +72,8 @@ const PLANTES_PDF: PlanteMedicinale[] = [
       },
     ],
     partiesUtilisees: ['pulpe du fruit', 'feuilles'],
+    precautions:
+      'Usage alimentaire documenté. Ne pas considérer ces usages comme un traitement d’une diarrhée persistante, qui nécessite un avis médical.',
     source: 'Pousset, J.-L., 1989, p. 16–18',
   },
 
@@ -244,6 +246,8 @@ const PLANTES_PDF: PlanteMedicinale[] = [
       },
     ],
     partiesUtilisees: ['beurre extrait de la graine'],
+    precautions:
+      'Usage externe. Tester sur une petite zone et arrêter en cas d’irritation ; une congestion persistante nécessite un avis médical.',
     source: 'Pousset, J.-L., 1989, p. 32–33',
   },
 
@@ -475,6 +479,8 @@ const PLANTES_PDF: PlanteMedicinale[] = [
       },
     ],
     partiesUtilisees: ['feuilles', 'racines'],
+    precautions:
+      'Ne pas prolonger l’usage sans avis professionnel. Demander conseil en cas de maladie rénale, de grossesse ou de traitement régulier.',
     source: 'Pousset, J.-L., 1989, p. 50–51',
   },
 
@@ -938,6 +944,8 @@ const PLANTES_PDF: PlanteMedicinale[] = [
       },
     ],
     partiesUtilisees: ['feuilles fraîches'],
+    precautions:
+      'Ne pas confondre un usage alimentaire avec un traitement. Éviter les préparations concentrées et demander conseil en cas de grossesse ou de traitement régulier.',
     source: 'Pousset, J.-L., 1989, p. 115–116',
   },
 
@@ -1085,6 +1093,8 @@ const PLANTES_PDF: PlanteMedicinale[] = [
       },
     ],
     partiesUtilisees: ['pulpe du fruit', 'feuilles'],
+    precautions:
+      'Réserver à une constipation légère et ponctuelle. Ne pas utiliser en cas de douleur abdominale inexpliquée ou prolonger l’usage sans avis professionnel.',
     source: 'Pousset, J.-L., 1989 & connaissances ethnobotaniques traditionnelles',
   },
 

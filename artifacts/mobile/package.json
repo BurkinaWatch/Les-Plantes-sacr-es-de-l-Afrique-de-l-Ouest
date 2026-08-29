@@ -11,7 +11,7 @@
     "capture:native": "node scripts/capture-native-svg.js",
     "verify:native-svg": "node scripts/capture-native-svg.js --verify",
     "verify:plant-images": "node scripts/verify-plant-images.js",
-    "test": "rm -rf .test-dist .screen-test-dist && pnpm run verify:plant-images && tsc --target ES2022 --module ES2022 --moduleResolution Bundler --jsx react-jsx --lib ES2022,DOM --skipLibCheck --outDir .test-dist lib/ai-api.ts lib/category-labels.ts i18n/fr.ts i18n/en.ts i18n/mos.ts i18n/dyo.ts i18n/ful.ts && printf '{\"type\":\"module\"}' > .test-dist/package.json && node scripts/build-screen-tests.js && node --test tests/*.test.mjs"
+    "test": "rm -rf .test-dist .screen-test-dist .data-test-dist && pnpm run verify:plant-images && tsc --target ES2022 --module ES2022 --moduleResolution Bundler --jsx react-jsx --lib ES2022,DOM --skipLibCheck --outDir .test-dist lib/ai-api.ts lib/category-labels.ts i18n/fr.ts i18n/en.ts i18n/mos.ts i18n/dyo.ts i18n/ful.ts && cp .test-dist/lib/ai-api.js .test-dist/ai-api.js && cp .test-dist/lib/category-labels.js .test-dist/category-labels.js && printf '{\"type\":\"module\"}' > .test-dist/package.json && node scripts/build-screen-tests.js && node scripts/build-data-tests.js && node --test tests/*.test.mjs"
   },
   "devDependencies": {
     "@babel/core": "^7.25.2",
