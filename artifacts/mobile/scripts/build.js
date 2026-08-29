@@ -454,7 +454,7 @@ async function downloadAssets(assets, timestamp) {
   return successCount;
 }
 
-function updateBundleUrls(timestamp, baseUrl) {
+function updateBundleUrls(timestamp, baseUrl, publicAssetPaths) {
   const updateForPlatform = (platform) => {
     const bundlePath = path.join(
       projectRoot,
@@ -480,8 +480,12 @@ function updateBundleUrls(timestamp, baseUrl) {
           );
         }
 
-        const decodedPath = decodeAssetRelativePath(unstablePath);
-        return `httpServerLocation:"${baseUrl}${basePath}/${timestamp}/_expo/static/js/${decodedPath}"`;
+        const decodedPath = decodeAssetSourcePath(unstablePath);
+        const publicPath = publicAssetPaths.get(decodedPath);
+        if (!publicPath) {
+          throw new Error(`Asset path missing from registry: ${decodedPath}`);
+        }
+        return `httpServerLocation:"${baseUrl}${basePath}/${timestamp}/_expo/static/js/${publicPath}"`;
       },
     );
 
@@ -637,17 +641,19 @@ async function main() {
   console.log("Found", assets.length, "unique asset(s)");
 
   const assetsByHash = new Map();
+  const publicAssetPaths = new Map();
   for (const asset of assets) {
     assetsByHash.set(asset.hash, {
       relativePath: asset.relativePath,
       filename: asset.filename,
     });
+    publicAssetPaths.set(asset.sourcePath, asset.relativePath);
   }
 
   const assetCount = await downloadAssets(assets, timestamp);
 
   if (assetCount > 0) {
-    updateBundleUrls(timestamp, baseUrl);
+    updateBundleUrls(timestamp, baseUrl, publicAssetPaths);
   }
 
   console.log("Updating manifests and creating landing page...");
