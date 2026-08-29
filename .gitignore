@@ -8,6 +8,7 @@ out-tsc
 .test-dist
 .screen-test-dist
 .data-test-dist
+artifacts/mobile/static-build/
 .expo
 .expo-shared
 
