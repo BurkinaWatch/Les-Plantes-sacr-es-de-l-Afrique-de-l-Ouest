@@ -1,5 +1,6 @@
 import assert from "node:assert/strict";
 import { createRequire } from "node:module";
+import { EventEmitter } from "node:events";
 import http from "node:http";
 import test from "node:test";
 
@@ -12,6 +13,10 @@ const {
   formatPublicDeploymentReport,
   requestPublicPath,
 } = require("../lib/public-deployment.js");
+const {
+  run: runPublicDeploymentServer,
+  waitForPublicReadiness,
+} = require("../scripts/serve-with-public-check.js");
 
 test("prefers Railway's public domain and removes its protocol", () => {
   assert.equal(
@@ -47,6 +52,115 @@ test("accepts a safe base path and rejects traversal", () => {
   assert.equal(normalizeBasePath("preview"), "/preview");
   assert.throws(() => normalizeBasePath("/preview/../private"), /BASE_PATH/);
   assert.throws(() => normalizeBasePath("/preview\\private"), /BASE_PATH/);
+});
+
+test("times out public readiness using the configured interval and reports the last failure", async () => {
+  let now = 0;
+  let attempts = 0;
+  const requestTimeouts = [];
+
+  await assert.rejects(
+    waitForPublicReadiness({
+      env: { RAILWAY_PUBLIC_DOMAIN: "unreachable.example.com" },
+      timeoutMs: 3_000,
+      intervalMs: 1_000,
+      now: () => now,
+      sleep: async (duration) => {
+        now += duration;
+      },
+      requestImpl: async (_baseUrl, _requestPath, options) => {
+        attempts += 1;
+        requestTimeouts.push(options.timeoutMs);
+        throw new Error("DNS lookup failed");
+      },
+    }),
+    /did not become reachable within 3s \(DNS lookup failed\)/,
+  );
+
+  assert.equal(attempts, 3);
+  assert.deepEqual(requestTimeouts, [1_000, 1_000, 1_000]);
+});
+
+function createFakeChild() {
+  const child = new EventEmitter();
+  child.killed = false;
+  child.killSignal = null;
+  child.kill = (signal) => {
+    child.killed = true;
+    child.killSignal = signal;
+    queueMicrotask(() => child.emit("exit", null, signal));
+    return true;
+  };
+  return child;
+}
+
+function createTestLogger() {
+  return {
+    messages: [],
+    log(message) {
+      this.messages.push({ level: "log", message });
+    },
+    error(message) {
+      this.messages.push({ level: "error", message });
+    },
+  };
+}
+
+async function stopLauncherAfterValidation(runPromise, signalSource, server) {
+  await new Promise((resolve) => setImmediate(resolve));
+  assert.equal(server.killed, false);
+  signalSource.emit("SIGTERM");
+  await runPromise;
+  assert.equal(server.killSignal, "SIGTERM");
+  assert.equal(signalSource.exitCode, undefined);
+}
+
+test("keeps the server running when the public domain never becomes reachable", async () => {
+  const server = createFakeChild();
+  const signalSource = new EventEmitter();
+  const logger = createTestLogger();
+  const runPromise = runPublicDeploymentServer({
+    env: {},
+    processLike: signalSource,
+    logger,
+    spawnProcess: () => server,
+    waitForPublicReadinessImpl: async () => {
+      throw new Error(
+        "public deployment did not become reachable within 3s (DNS lookup failed)",
+      );
+    },
+  });
+
+  await stopLauncherAfterValidation(runPromise, signalSource, server);
+
+  assert.match(
+    logger.messages.find(({ level }) => level === "error")?.message || "",
+    /PUBLIC DEPLOYMENT VALIDATION COULD NOT COMPLETE[\s\S]*DNS lookup failed[\s\S]*remain running/,
+  );
+});
+
+test("reports a failed smoke test while keeping the server running", async () => {
+  const server = createFakeChild();
+  const signalSource = new EventEmitter();
+  const logger = createTestLogger();
+  const runPromise = runPublicDeploymentServer({
+    env: {},
+    processLike: signalSource,
+    logger,
+    spawnProcess: () => server,
+    waitForPublicReadinessImpl: async () => ({
+      domain: "mobile.example.com",
+      basePath: "",
+    }),
+    runPublicCheckImpl: async () => ({ code: 1 }),
+  });
+
+  await stopLauncherAfterValidation(runPromise, signalSource, server);
+
+  assert.match(
+    logger.messages.find(({ level }) => level === "error")?.message || "",
+    /PUBLIC DEPLOYMENT VALIDATION FAILED[\s\S]*remain running[\s\S]*must not be treated as validated/,
+  );
 });
 
 function createResponse(status, body, contentType = "application/json") {
@@ -124,7 +238,7 @@ test("reports an obsolete Railway publication with an actionable redeploy messag
     if (requestPath === "/") {
       return createResponse(
         200,
-        "<html><h1>App Landing Page</h1><a href=\"exps://old.example.com\">Open</a></html>",
+        '<html><h1>App Landing Page</h1><a href="exps://old.example.com">Open</a></html>',
         "text/html",
       );
     }
@@ -158,10 +272,9 @@ test("reports an obsolete Railway publication with an actionable redeploy messag
 test("sends traversal probes as raw request targets", async (t) => {
   const server = http.createServer((request, response) => {
     const expectedPath = "/%2e%2e/ios/manifest.json";
-    response.writeHead(
-      request.url === expectedPath ? 403 : 500,
-      { "content-type": "text/plain" },
-    );
+    response.writeHead(request.url === expectedPath ? 403 : 500, {
+      "content-type": "text/plain",
+    });
     response.end();
   });
   await new Promise((resolve, reject) => {

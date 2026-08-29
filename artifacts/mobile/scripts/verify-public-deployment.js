@@ -12,7 +12,9 @@ function getExpectedAppName() {
   const appJson = JSON.parse(fs.readFileSync(appJsonPath, "utf8"));
   const appName = appJson.expo?.name;
   if (!appName) {
-    throw new Error("Could not determine the expected Expo application name from app.json");
+    throw new Error(
+      "Could not determine the expected Expo application name from app.json",
+    );
   }
   return appName;
 }
