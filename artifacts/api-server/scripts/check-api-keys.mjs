@@ -14,7 +14,10 @@
  *
  * Environment variables:
  *   JWT_SECRET                — required
- *   API_BASE_URL              — base URL for live checks (e.g. http://localhost:3000)
+ *   DATABASE_URL or RAILWAY_DATABASE_URL
+ *                             — required for the API's PostgreSQL connection
+ *   API_BASE_URL              — API base URL used by the APK, including optional /api
+ *                               (e.g. http://localhost:3000/api)
  *                               Falls back to http://localhost:$PORT if PORT is set.
  *                               If neither is set, live checks are skipped with a warning.
  */
@@ -22,6 +25,8 @@
 import jwt from "jsonwebtoken";
 
 const JWT_SECRET = process.env["JWT_SECRET"];
+const DATABASE_URL =
+  process.env["DATABASE_URL"] ?? process.env["RAILWAY_DATABASE_URL"];
 
 let failed = false;
 
@@ -49,6 +54,13 @@ if (!JWT_SECRET) {
   pass("JWT_SECRET is configured.");
 }
 
+if (!DATABASE_URL) {
+  fail("Database configuration is not set.");
+  fail("  → Set DATABASE_URL or RAILWAY_DATABASE_URL before deploying.");
+} else {
+  pass("Database configuration is present.");
+}
+
 // ── 3. Live route check ──────────────────────────────────────────────────────
 
 const rawBase =
@@ -57,12 +69,41 @@ const rawBase =
 
 const BASE_URL = rawBase ? rawBase.replace(/\/$/, "") : null;
 
+function apiUrl(path) {
+  const normalizedPath = path.startsWith("/") ? path : `/${path}`;
+  return BASE_URL?.endsWith("/api")
+    ? `${BASE_URL}${normalizedPath.replace(/^\/api/, "")}`
+    : `${BASE_URL}${normalizedPath}`;
+}
+
 if (!BASE_URL) {
   warn("API_BASE_URL and PORT are not set — skipping live route checks.");
   warn("  → Set API_BASE_URL=<deployed-url> and re-run to verify auth end-to-end.");
   console.log();
 } else {
   console.log(`\n🌐  Running live auth checks against ${BASE_URL}…\n`);
+
+  try {
+    const response = await fetch(apiUrl("/api/healthz"), {
+      signal: AbortSignal.timeout(10_000),
+    });
+    const body = await response.json().catch(() => null);
+    if (response.status !== 200 || body?.status !== "ready") {
+      fail(
+        `GET /api/healthz: deployment is not ready (HTTP ${response.status}).`,
+      );
+      if (body?.message) {
+        fail(`  → ${body.message}`);
+      } else {
+        fail("  → Check DATABASE_URL, RAILWAY_DATABASE_URL, JWT_SECRET, and server logs.");
+      }
+    } else {
+      pass("GET /api/healthz: deployment is ready.");
+    }
+  } catch (err) {
+    fail(`GET /api/healthz: request failed — ${err.message}`);
+    fail(`  → Is the server running at ${BASE_URL}?`);
+  }
 
   /**
    * Ping a route with an arbitrary body.
@@ -73,7 +114,7 @@ if (!BASE_URL) {
    *   - 5xx → server error (surfaces misconfiguration)
    */
   async function probeRoute({ label, path, token }) {
-    const url = `${BASE_URL}${path}`;
+     const url = apiUrl(path);
     const headers = { "Content-Type": "application/json" };
     if (token) {
       headers.Authorization = `Bearer ${token}`;

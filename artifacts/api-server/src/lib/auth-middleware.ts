@@ -10,17 +10,15 @@ declare global {
   }
 }
 
-const JWT_SECRET = process.env["JWT_SECRET"] ?? "";
-if (!JWT_SECRET) {
-  throw new Error("FATAL: JWT_SECRET environment variable is not set.");
-}
-
 export const JWT_ISSUER = process.env["JWT_ISSUER"] ?? "plantes-sacrees-api";
 export const JWT_AUDIENCE = process.env["JWT_AUDIENCE"] ?? "plantes-sacrees-mobile";
 
 function attachVerifiedUser(req: Request, token: string): boolean {
+  const jwtSecret = process.env["JWT_SECRET"];
+  if (!jwtSecret) return false;
+
   try {
-    const payload: unknown = jwt.verify(token, JWT_SECRET, {
+    const payload: unknown = jwt.verify(token, jwtSecret, {
       algorithms: ["HS256"],
       issuer: JWT_ISSUER,
       audience: JWT_AUDIENCE,
@@ -66,10 +64,17 @@ export function requireJwt(req: Request, res: Response, next: NextFunction): voi
 }
 
 export function signUserToken(user: { id: number; username: string }): string {
+  const jwtSecret = process.env["JWT_SECRET"];
+  if (!jwtSecret) {
+    throw new Error(
+      "JWT configuration is missing: set JWT_SECRET before using authenticated routes.",
+    );
+  }
+
   const expiresIn = (process.env["JWT_EXPIRES_IN"] ?? "7d") as jwt.SignOptions["expiresIn"];
   return jwt.sign(
     { id: user.id, username: user.username },
-    JWT_SECRET,
+    jwtSecret,
     {
       algorithm: "HS256",
       audience: JWT_AUDIENCE,

@@ -1,7 +1,13 @@
-import { pool } from "@workspace/db";
+import { databaseUrl, pool } from "@workspace/db";
 import { logger } from "./logger";
 
 export async function ensureSchema() {
+  if (!databaseUrl) {
+    throw new Error(
+      "Database configuration is missing: set DATABASE_URL or RAILWAY_DATABASE_URL to a provisioned PostgreSQL database.",
+    );
+  }
+
   const client = await pool.connect();
   try {
     await client.query(`
