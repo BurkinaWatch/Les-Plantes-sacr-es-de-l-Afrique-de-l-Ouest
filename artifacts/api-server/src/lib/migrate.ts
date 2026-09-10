@@ -1,4 +1,4 @@
-import { databaseUrl, pool } from "@workspace/db";
+import { pool } from "@workspace/db";
 import { logger } from "./logger";
 
 export type SchemaPool = {
@@ -10,7 +10,8 @@ export type SchemaPool = {
 
 export async function ensureSchema(
   schemaPool: SchemaPool = pool,
-  configuredDatabaseUrl: string | undefined = databaseUrl,
+  configuredDatabaseUrl: string | undefined =
+    process.env.DATABASE_URL ?? process.env.RAILWAY_DATABASE_URL,
 ) {
   if (!configuredDatabaseUrl) {
     throw new Error(

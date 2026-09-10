@@ -1,4 +1,4 @@
-import pg from "pg";
+import { createDatabasePool } from "@workspace/db";
 import { ensureSchema } from "../lib/migrate.js";
 
 const readinessDatabaseUrl = process.env.READINESS_DATABASE_URL?.trim();
@@ -30,10 +30,7 @@ async function main(): Promise<void> {
     return;
   }
 
-  const readinessPool = new pg.Pool({
-    connectionString: readinessDatabaseUrl,
-    connectionTimeoutMillis: 10_000,
-  });
+  const readinessPool = createDatabasePool(readinessDatabaseUrl);
 
   try {
     await ensureSchema(readinessPool, readinessDatabaseUrl);

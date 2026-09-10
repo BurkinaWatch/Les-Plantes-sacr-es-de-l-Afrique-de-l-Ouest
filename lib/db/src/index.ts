@@ -12,9 +12,13 @@ export function resolveDatabaseUrl(
 
 export const databaseUrl = resolveDatabaseUrl();
 
+export function createDatabasePool(connectionString?: string) {
+  return new Pool(connectionString ? { connectionString } : {});
+}
+
 // Do not throw while this module is loading. The API needs to expose its
 // readiness endpoint even when Railway configuration is incomplete.
-export const pool = new Pool(databaseUrl ? { connectionString: databaseUrl } : {});
+export const pool = createDatabasePool(databaseUrl);
 export const db = drizzle(pool, { schema });
 
 export * from "./schema";
