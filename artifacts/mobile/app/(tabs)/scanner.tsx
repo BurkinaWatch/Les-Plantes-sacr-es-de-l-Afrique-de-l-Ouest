@@ -278,7 +278,14 @@ export default function ScannerScreen() {
       {/* Header */}
       <View style={styles.header}>
         <View style={styles.headerTop}>
-          <Text style={[styles.headerLabel, { color: colors.gold }]}>{t.scanner_title}</Text>
+          <View style={styles.headerCopy}>
+            <Text style={[styles.headerLabel, { color: colors.gold }]}>{t.scanner_title}</Text>
+            {!result && !loading && (
+              <Text style={[styles.headerSub, { color: colors.mutedForeground }]}>
+                {t.scanner_subtitle}
+              </Text>
+            )}
+          </View>
           {rateLimitRemaining !== null && rateLimitRemaining <= 3 && (
             <View style={[
               styles.rateLimitPill,
@@ -303,11 +310,6 @@ export default function ScannerScreen() {
             </View>
           )}
         </View>
-        {!result && !loading && (
-          <Text style={[styles.headerSub, { color: colors.mutedForeground }]}>
-            {t.scanner_subtitle}
-          </Text>
-        )}
       </View>
 
       {/* Image Preview */}
@@ -481,16 +483,24 @@ export default function ScannerScreen() {
 const styles = StyleSheet.create({
   container: { flex: 1 },
   header: { paddingHorizontal: 24, marginBottom: 24 },
-  headerTop: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 },
+  headerTop: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    justifyContent: 'space-between',
+    gap: 12,
+  },
+  headerCopy: { flex: 1, minWidth: 0 },
   headerLabel: {
     fontSize: 13,
     fontWeight: '700',
     letterSpacing: 4,
+    lineHeight: 18,
   },
   headerSub: {
     fontSize: 14,
     lineHeight: 20,
     letterSpacing: 0.3,
+    marginTop: 8,
   },
   rateLimitPill: {
     borderWidth: 1,
