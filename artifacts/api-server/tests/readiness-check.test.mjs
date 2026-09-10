@@ -4,7 +4,7 @@ import test from "node:test";
 import {
   formatReadinessFailure,
   getReadinessDatabaseUrl,
-} from "../.test-dist/src/scripts/check-postgres-readiness.js";
+} from "../.test-dist/src/lib/readiness-report.js";
 
 test("readiness check accepts only the explicitly supplied database URL", () => {
   assert.equal(
