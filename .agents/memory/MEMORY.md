@@ -11,3 +11,4 @@
 - [Image parser security](image-parser-security.md) — image-size advisories may have no patched release; replace Metro's parser dependency rather than only bumping its version
 - [Expo asset paths](expo-asset-paths.md) — Metro asset sources may resolve through workspace dependencies; validate resolved sources, but publish only sanitized output paths
 - [Expo Go manifest protocol](expo-go-static-manifest.md) — self-hosted Expo Go manifests must use protocol version 0 and a form-data multipart manifest part
+- [Railway public domains](railway-public-domains.md) — service domains cannot be inferred reliably; authenticated Railway project access is required before embedding one in a client
