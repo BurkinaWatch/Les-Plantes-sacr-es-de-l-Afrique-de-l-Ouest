@@ -210,6 +210,7 @@ function mockModules() {
     ["@/data/quiz", { TOTEM_RESULTS: { baobab: totem } }],
     ["@/data/animals", { getPlanteById: () => plant }],
     ["@/lib/ai-api", apiClient],
+     ["@/lib/api-config", { getApiBase: () => "https://api.example.test/api" }],
   ]);
 
   const originalLoad = Module._load;

@@ -12,12 +12,17 @@ function normalizeApiBaseUrl(value: unknown): string | null {
  * Resolves the API endpoint without making native builds depend on a
  * development-only Replit environment variable.
  *
- * Build-time environment variables still take precedence so local preview
- * and future deployments can override the public fallback safely.
+ * An explicit API URL still takes precedence, followed by the release
+ * configuration embedded in app.json. The generic Expo domain is only a
+ * development fallback because the mobile bundle's host is not necessarily
+ * the API service.
  */
 export function getApiBase(): string | null {
   const explicitBaseUrl = normalizeApiBaseUrl(process.env.EXPO_PUBLIC_API_BASE_URL);
   if (explicitBaseUrl) return explicitBaseUrl;
+
+  const releaseBaseUrl = normalizeApiBaseUrl(configuredApiBaseUrl);
+  if (releaseBaseUrl) return releaseBaseUrl;
 
   if (process.env.EXPO_PUBLIC_DOMAIN) {
     return `https://${process.env.EXPO_PUBLIC_DOMAIN}/api`;
@@ -33,5 +38,5 @@ export function getApiBase(): string | null {
     }
   }
 
-  return normalizeApiBaseUrl(configuredApiBaseUrl);
+  return null;
 }
