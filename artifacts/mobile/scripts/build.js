@@ -9,6 +9,10 @@ const {
   normalizeBasePath,
   normalizePublicDomain,
 } = require("../lib/public-deployment");
+const { getConfiguredApiBaseUrl } = require("./verify-public-deployment");
+const {
+  assertAndroidApiConfiguration,
+} = require("./validate-api-bundle");
 
 let metroProcess = null;
 
@@ -355,6 +359,22 @@ function extractAssets(timestamp) {
   return Array.from(assetsMap.values());
 }
 
+function readGeneratedBundle(timestamp, platform) {
+  return fs.readFileSync(
+    path.join(
+      projectRoot,
+      "static-build",
+      timestamp,
+      "_expo",
+      "static",
+      "js",
+      platform,
+      "bundle.js",
+    ),
+    "utf-8",
+  );
+}
+
 function decodeAssetSourcePath(value) {
   let decodedPath;
   try {
@@ -637,6 +657,14 @@ async function main() {
   const manifests = await Promise.race([downloadPromise, timeoutPromise]);
 
   console.log("Processing assets...");
+  assertAndroidApiConfiguration({
+    bundle: readGeneratedBundle(timestamp, "android"),
+    manifest: manifests.android,
+    mobileBaseUrl: baseUrl,
+    apiBaseUrl: getConfiguredApiBaseUrl(),
+  });
+  console.log("Android API target verified");
+
   const assets = extractAssets(timestamp);
   console.log("Found", assets.length, "unique asset(s)");
 
