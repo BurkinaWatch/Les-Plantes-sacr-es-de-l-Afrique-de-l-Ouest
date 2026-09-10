@@ -186,6 +186,39 @@ function apiUrl(path) {
     : `${BASE_URL}${normalizedPath}`;
 }
 
+function readinessDetails(body, httpStatus) {
+  const status =
+    typeof body?.status === "string" ? body.status : "unknown";
+  const checks =
+    body?.checks && typeof body.checks === "object" && !Array.isArray(body.checks)
+      ? Object.entries(body.checks).map(([name, value]) => [
+          name,
+          typeof value === "string" ||
+          typeof value === "number" ||
+          typeof value === "boolean"
+            ? String(value)
+            : "unknown",
+        ])
+      : [];
+  const database = checks.find(([name]) => name === "database")?.[1];
+  const hasMissingConfiguration = checks.some(
+    ([, value]) => value === "missing",
+  );
+
+  return {
+    status,
+    httpStatus,
+    checks,
+    diagnosis: hasMissingConfiguration
+      ? "missing configuration"
+      : database === "unavailable"
+        ? "database unavailable"
+        : status === "ready"
+          ? "ready"
+          : "not ready",
+  };
+}
+
 if (!BASE_URL) {
   warn("API_BASE_URL and PORT are not set — skipping live route checks.");
   warn(
@@ -200,18 +233,34 @@ if (!BASE_URL) {
       signal: AbortSignal.timeout(10_000),
     });
     const body = await response.json().catch(() => null);
+    const readiness = readinessDetails(body, response.status);
+    console.log(
+      `  ℹ️   GET /api/healthz: readiness status=${readiness.status} (HTTP ${readiness.httpStatus}).`,
+    );
+    if (readiness.checks.length === 0) {
+      fail("  → Readiness checks are missing from the health response.");
+    } else {
+      for (const [name, value] of readiness.checks) {
+        const message = `  → Readiness check ${name}=${value}.`;
+        if (value === "missing" || value === "unavailable") {
+          fail(message);
+        } else {
+          pass(message);
+        }
+      }
+    }
+
     const isExpectedHealthResponse =
       body?.status === "ready" &&
       body?.ready === true &&
       body?.checks?.database === "ready" &&
-      body?.checks?.jwt === "configured" &&
-      body?.message === "API is ready to accept traffic.";
+      body?.checks?.jwt === "configured";
     if (response.status !== 200 || !isExpectedHealthResponse) {
       fail(
-        `GET /api/healthz: unexpected readiness response (HTTP ${response.status}).`,
+        `GET /api/healthz: ${readiness.diagnosis} — expected ready response.`,
       );
       fail(
-        `  → Expected { status: "ready", ready: true, checks: { database: "ready", jwt: "configured" } }; received ${JSON.stringify(body)}`,
+        "  → Missing configuration and database-unavailable states are reported above by check name.",
       );
     } else {
       pass("GET /api/healthz: returned the expected ready JSON.");

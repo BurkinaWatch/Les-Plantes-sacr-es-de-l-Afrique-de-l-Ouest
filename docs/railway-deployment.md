@@ -20,6 +20,19 @@ URL that is embedded in the APK (including `/api`). The check accepts either
 that form or the service origin and normalizes the health and authenticated
 route requests consistently.
 
+The release diagnostics print the response from `GET /api/healthz` without
+printing any secret or connection-string values. The report includes:
+
+- the readiness `status` and HTTP status;
+- each named readiness check, such as `database` and `jwt`;
+- `missing configuration` when a required setting is absent; and
+- `database unavailable` when PostgreSQL or schema verification has failed.
+
+`pnpm --filter @workspace/mobile run verify:public-deployment` uses
+`EXPO_PUBLIC_API_BASE_URL` when supplied, otherwise the API base in
+`expo.extra.apiBaseUrl` from `app.json`. This keeps the diagnostic pointed at
+the same API base that the mobile release uses.
+
 ## Readiness behavior
 
 The API starts its HTTP listener before checking the database so a bad
