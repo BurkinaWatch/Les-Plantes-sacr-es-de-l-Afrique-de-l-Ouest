@@ -1,14 +1,24 @@
 import { databaseUrl, pool } from "@workspace/db";
 import { logger } from "./logger";
 
-export async function ensureSchema() {
-  if (!databaseUrl) {
+export type SchemaPool = {
+  connect(): Promise<{
+    query(text: string): Promise<unknown>;
+    release(): void;
+  }>;
+};
+
+export async function ensureSchema(
+  schemaPool: SchemaPool = pool,
+  configuredDatabaseUrl: string | undefined = databaseUrl,
+) {
+  if (!configuredDatabaseUrl) {
     throw new Error(
       "Database configuration is missing: set DATABASE_URL or RAILWAY_DATABASE_URL to a provisioned PostgreSQL database.",
     );
   }
 
-  const client = await pool.connect();
+  const client = await schemaPool.connect();
   try {
     await client.query(`
       CREATE TABLE IF NOT EXISTS users (

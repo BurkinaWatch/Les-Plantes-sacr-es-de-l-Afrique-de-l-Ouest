@@ -9,6 +9,7 @@
     "start": "node --enable-source-maps ./dist/index.mjs",
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "check-keys": "node scripts/check-api-keys.mjs",
+    "check:postgres-readiness": "pnpm run build && node dist/check-postgres-readiness.mjs",
     "test": "rm -rf .test-dist && tsc -p tests/tsconfig.json && JWT_SECRET=test-jwt-secret NODE_ENV=test node --test tests/*.test.mjs"
   },
   "dependencies": {

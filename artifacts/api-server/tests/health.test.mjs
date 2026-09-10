@@ -80,3 +80,34 @@ test("health returns ready only after the schema check succeeds", async () => {
     setDatabaseReadiness("not_started");
   }
 });
+
+test("health exposes a clear not-ready response after PostgreSQL schema failure", async () => {
+  const previousDatabaseUrl = process.env.DATABASE_URL;
+  const previousJwtSecret = process.env.JWT_SECRET;
+  process.env.DATABASE_URL = "postgresql://health-check.example.invalid/api";
+  process.env.JWT_SECRET = "health-test-secret";
+  setDatabaseReadiness(
+    "failed",
+    "Database schema verification failed. Check the PostgreSQL connection and server logs.",
+  );
+
+  try {
+    await withHealthServer(async (baseUrl) => {
+      const response = await fetch(`${baseUrl}/api/healthz`);
+      const body = await response.json();
+
+      assert.equal(response.status, 503);
+      assert.deepEqual(body.checks, { database: "unavailable", jwt: "configured" });
+      assert.equal(body.status, "not_ready");
+      assert.equal(body.ready, false);
+      assert.match(body.message, /Database schema verification failed/);
+      assert.doesNotMatch(body.message, /postgresql:\/\/health-check/);
+    });
+  } finally {
+    if (previousDatabaseUrl === undefined) delete process.env.DATABASE_URL;
+    else process.env.DATABASE_URL = previousDatabaseUrl;
+    if (previousJwtSecret === undefined) delete process.env.JWT_SECRET;
+    else process.env.JWT_SECRET = previousJwtSecret;
+    setDatabaseReadiness("not_started");
+  }
+});

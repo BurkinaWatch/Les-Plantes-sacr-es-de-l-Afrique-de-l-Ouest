@@ -35,3 +35,27 @@ deployment can report its cause instead of failing during module loading.
 Railway will keep the deployment out of service while `/api/healthz` returns
 `503`. Configure the variables above and redeploy; do not use a public route
 response as evidence that the API is ready.
+
+## PostgreSQL release check
+
+Run the dedicated check against an explicitly supplied PostgreSQL environment:
+
+```sh
+READINESS_DATABASE_URL="$DATABASE_URL" \
+  pnpm --filter @workspace/api-server run check:postgres-readiness
+```
+
+The command runs the same schema initialization used at API startup and exits
+successfully only after PostgreSQL accepts the connection and the `users` and
+`push_tokens` tables are ready. It requires `READINESS_DATABASE_URL` rather
+than silently selecting a local or inherited database. Connection failures are
+reported as not-ready without printing the connection string or password.
+
+For Railway's fallback variable, use:
+
+```sh
+READINESS_DATABASE_URL="$RAILWAY_DATABASE_URL" \
+  pnpm --filter @workspace/api-server run check:postgres-readiness
+```
+
+Do not paste a connection string into logs or commit it to the repository.
