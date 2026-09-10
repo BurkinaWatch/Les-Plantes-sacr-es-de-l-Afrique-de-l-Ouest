@@ -51,24 +51,35 @@ response as evidence that the API is ready.
 
 ## PostgreSQL release check
 
-Run the dedicated check against an explicitly supplied PostgreSQL environment:
-
-```sh
-READINESS_DATABASE_URL="$DATABASE_URL" \
-  pnpm --filter @workspace/api-server run check:postgres-readiness
-```
-
-The command runs the same schema initialization used at API startup and exits
-successfully only after PostgreSQL accepts the connection and the `users` and
-`push_tokens` tables are ready. It requires `READINESS_DATABASE_URL` rather
-than silently selecting a local or inherited database. Connection failures are
-reported as not-ready without printing the connection string or password.
-
-For Railway's fallback variable, use:
+Run the dedicated check from a shell attached to the Railway API service. The
+shell must pass the connection string explicitly through `READINESS_DATABASE_URL`;
+the check does not fall back to `DATABASE_URL` or `RAILWAY_DATABASE_URL`:
 
 ```sh
 READINESS_DATABASE_URL="$RAILWAY_DATABASE_URL" \
   pnpm --filter @workspace/api-server run check:postgres-readiness
 ```
 
+The command runs the same schema initialization used at API startup, then
+queries PostgreSQL's information schema to verify that both `users` and
+`push_tokens` exist. It exits successfully only after the connection, table
+creation, and table verification succeed. Connection failures are reported as
+not-ready without printing the connection string or password.
+
+If the Railway service exposes the connection as `DATABASE_URL` instead, pass
+that value explicitly in the same in-network shell:
+
+```sh
+READINESS_DATABASE_URL="$DATABASE_URL" \
+  pnpm --filter @workspace/api-server run check:postgres-readiness
+```
+
+On a successful in-network run, the release verification result is:
+
+```text
+PostgreSQL readiness check passed: users and push_tokens tables are ready.
+```
+
+Run this check in Railway's service shell before publication; a local Replit
+shell is not sufficient when the configured host is `*.railway.internal`.
 Do not paste a connection string into logs or commit it to the repository.
