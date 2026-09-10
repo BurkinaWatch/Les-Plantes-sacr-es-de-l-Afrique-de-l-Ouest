@@ -77,7 +77,6 @@
       "reactCompiler": true
     },
     "extra": {
-      "apiBaseUrl": "https://les-plantes-mobile-production.up.railway.app/api",
       "eas": {
         "projectId": "cb62d8b0-1962-4974-9bc9-987d7c68a92e"
       }
