@@ -24,6 +24,7 @@ import { AuthProvider, useAuth } from "@/context/AuthContext";
 import { useColors } from "@/hooks/useColors";
 import { LanguageProvider } from "@/i18n";
 import { useNotifications } from "@/hooks/useNotifications";
+import { getApiBase } from "@/lib/api-config";
 
 // Suppress fontfaceobserver timeout errors on web (known Expo Web / vector-icons issue)
 if (Platform.OS === "web" && typeof window !== "undefined") {
@@ -260,10 +261,10 @@ function NotificationsSetup() {
   useEffect(() => {
     if (!pushToken || !token) return;
 
-    const domain = process.env.EXPO_PUBLIC_DOMAIN;
-    if (!domain) return;
+    const apiBase = getApiBase();
+    if (!apiBase) return;
 
-    fetch(`https://${domain}/api/push-tokens`, {
+    fetch(`${apiBase}/push-tokens`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
