@@ -31,6 +31,7 @@ export const ful: Translations = {
   scanner_confidence_low: 'Wanngii',
   scanner_error_no_plant: 'Leɗe nattaama yiyeede. Natal goɗɗo waddu.',
   scanner_error_generic: 'Juumre waɗii. Coodu kadi.',
+  api_error_unauthenticated: 'Naatu ngam huutoraade miijirde leɗɗe.',
   api_error_unavailable: 'Mi waawaa heɓde gollal ngal. Ƴeewto jokkondiral maa, coodu kadi.',
   scanner_retry: 'Coodu kadi',
   scanner_new_scan: 'Miijirde kewe',

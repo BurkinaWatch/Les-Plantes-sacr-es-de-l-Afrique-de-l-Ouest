@@ -31,6 +31,7 @@ export const dyo: Translations = {
   scanner_confidence_low: 'Dɔɔni',
   scanner_error_no_plant: 'Yiri ma sɔrɔ ye. Foto wɛrɛ ta.',
   scanner_error_generic: 'Fili sɔrɔra. A lɔn tuma.',
+  api_error_unauthenticated: 'I ka dɔnniya dɔn ka yiriw dɔn.',
   api_error_unavailable: 'Service ma se ka sɔrɔ. I ka kɔnɛksiyɔn lajɛ ka a lɔn tugu.',
   scanner_retry: 'A lɔn',
   scanner_new_scan: 'Yiri kura dɔn',
