@@ -26,6 +26,7 @@ export const en: Translations = {
   scanner_confidence_low: 'Low',
   scanner_error_no_plant: 'Plant not identifiable. Try with a clearer photo or a different angle.',
   scanner_error_generic: 'Error during analysis. Please try again.',
+  api_error_unauthenticated: 'Sign in to use plant recognition.',
   api_error_unavailable: 'Unable to reach the service. Check your connection and try again.',
   scanner_retry: 'Try again',
   scanner_new_scan: 'New scan',

@@ -51,6 +51,7 @@ export interface Translations {
   scanner_confidence_low: string;
   scanner_error_no_plant: string;
   scanner_error_generic: string;
+  api_error_unauthenticated: string;
   api_error_unavailable: string;
   scanner_retry: string;
   scanner_new_scan: string;

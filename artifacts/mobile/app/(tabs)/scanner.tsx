@@ -1,6 +1,6 @@
 import * as ImagePicker from 'expo-image-picker';
 import { LinearGradient } from 'expo-linear-gradient';
-import { useLocalSearchParams } from 'expo-router';
+import { useLocalSearchParams, useRouter } from 'expo-router';
 import React, { useEffect, useRef, useState } from 'react';
 import {
   ActivityIndicator,
@@ -125,6 +125,7 @@ function BulletList({ items, colors }: { items: string[]; colors: any }) {
 export default function ScannerScreen() {
   const colors = useColors();
   const insets = useSafeAreaInsets();
+  const router = useRouter();
   const { capture } = useLocalSearchParams<{ capture?: string }>();
   const { t, lang } = useTranslation();
   const { token } = useAuth();
@@ -137,6 +138,9 @@ export default function ScannerScreen() {
   const [error, setError] = useState<string | null>(
     capture === 'icons-error' ? t.scanner_error_generic : null,
   );
+  const [errorCode, setErrorCode] = useState<'unauthenticated' | 'unavailable' | null>(
+    capture === 'icons-error' ? 'unavailable' : null,
+  );
   const [rateLimitRemaining, setRateLimitRemaining] = useState<number | null>(null);
   const [resetAt, setResetAt] = useState<number | null>(null);
   const [countdown, setCountdown] = useState<number | null>(null);
@@ -147,6 +151,7 @@ export default function ScannerScreen() {
     setResult(null);
     setLoading(false);
     setError(t.scanner_error_generic);
+    setErrorCode('unavailable');
   }, [capture, t]);
 
   const beginScan = () => {
@@ -181,6 +186,7 @@ export default function ScannerScreen() {
     const generation = beginScan();
     setResult(null);
     setError(null);
+    setErrorCode(null);
     setImageUri(null);
     setImageBase64(null);
 
@@ -223,6 +229,7 @@ export default function ScannerScreen() {
   const analyze = async (b64: string, generation = beginScan()) => {
     setLoading(true);
     setError(null);
+    setErrorCode(null);
     setResult(null);
     try {
       const apiLang = ['fr', 'en'].includes(lang) ? lang : 'fr';
@@ -245,9 +252,10 @@ export default function ScannerScreen() {
     } catch (err: any) {
       if (!isCurrentScan(generation)) return;
       if (err instanceof ApiRequestError) {
-        const errorMessage =
-          t.api_error_unavailable;
-        setError(errorMessage);
+        setErrorCode(err.code);
+        setError(err.code === 'unauthenticated'
+          ? t.api_error_unauthenticated
+          : t.api_error_unavailable);
         return;
       }
       const isRateLimit = (err as any).name === 'ApiRateLimitError';
@@ -255,6 +263,7 @@ export default function ScannerScreen() {
         setRateLimitRemaining(0);
         if (err.resetAt != null) setResetAt(err.resetAt);
       }
+      setErrorCode('unavailable');
       setError(isRateLimit ? t.rate_limit_exhausted : t.api_error_unavailable);
     } finally {
       if (isCurrentScan(generation)) setLoading(false);
@@ -267,6 +276,7 @@ export default function ScannerScreen() {
     setImageBase64(null);
     setResult(null);
     setError(null);
+    setErrorCode(null);
   };
 
   return (
@@ -372,10 +382,20 @@ export default function ScannerScreen() {
           <Text style={styles.errorText}>{error}</Text>
           <Pressable
             style={[styles.retryBtn, { borderColor: colors.gold }]}
-            onPress={() => imageBase64 ? analyze(imageBase64) : reset()}
+            onPress={() => {
+              if (errorCode === 'unauthenticated') {
+                router.push('/(auth)/login' as any);
+              } else if (imageBase64) {
+                analyze(imageBase64);
+              } else {
+                reset();
+              }
+            }}
             disabled={loading}
           >
-            <Text style={[styles.retryText, { color: colors.gold }]}>{t.scanner_retry}</Text>
+            <Text style={[styles.retryText, { color: colors.gold }]}>
+              {errorCode === 'unauthenticated' ? t.auth_login_btn : t.scanner_retry}
+            </Text>
           </Pressable>
         </View>
       )}
