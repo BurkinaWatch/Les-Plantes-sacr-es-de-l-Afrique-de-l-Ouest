@@ -21,7 +21,13 @@ function originsFromEnv(...keys: string[]): string[] {
 }
 
 const ALLOWED_ORIGINS = new Set([
-  ...originsFromEnv("ALLOWED_ORIGINS", "REPLIT_DEV_DOMAIN", "REPLIT_DOMAINS", "RAILWAY_PUBLIC_DOMAIN"),
+  ...originsFromEnv(
+    "ALLOWED_ORIGINS",
+    "REPLIT_DEV_DOMAIN",
+    "REPLIT_EXPO_DEV_DOMAIN",
+    "REPLIT_DOMAINS",
+    "RAILWAY_PUBLIC_DOMAIN",
+  ),
   ...(process.env["NODE_ENV"] !== "production"
     ? ["http://localhost", "http://127.0.0.1", "http://localhost:8081", "http://127.0.0.1:8081"]
     : []),
