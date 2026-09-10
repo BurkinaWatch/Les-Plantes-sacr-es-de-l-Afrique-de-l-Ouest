@@ -38,13 +38,14 @@ export default function HomeScreen() {
   const slideAnim = useRef(new Animated.Value(30)).current;
   const scaleAnim = useRef(new Animated.Value(0.92)).current;
   const glowAnim = useRef(new Animated.Value(0.5)).current;
-  const carouselFade = useRef(new Animated.Value(1)).current;
+
+  const plantsWithImages = PLANTS.filter((plant) => Boolean(PLANT_IMAGES[plant.id]));
 
   const pickRandom = useCallback((exclude: string[] = []): typeof PLANTS => {
-    const pool = PLANTS.filter((a) => !exclude.includes(a.id));
+    const pool = plantsWithImages.filter((plant) => !exclude.includes(plant.id));
     const shuffled = [...pool].sort(() => Math.random() - 0.5);
     return shuffled.slice(0, 4);
-  }, []);
+  }, [plantsWithImages]);
 
   const [featuredPlantes, setFeaturedPlantes] = useState(() => pickRandom());
 
@@ -62,16 +63,6 @@ export default function HomeScreen() {
       ])
     ).start();
   }, []);
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      Animated.timing(carouselFade, { toValue: 0, duration: 350, useNativeDriver: true }).start(() => {
-        setFeaturedPlantes((prev) => pickRandom(prev.map((a) => a.id)));
-        Animated.timing(carouselFade, { toValue: 1, duration: 450, useNativeDriver: true }).start();
-      });
-    }, 9000);
-    return () => clearInterval(interval);
-  }, [pickRandom]);
 
   const isTablet = width >= 600;
   // 2×2 grid: 2 columns with a gap
@@ -145,21 +136,25 @@ export default function HomeScreen() {
       <View style={[styles.section, { paddingHorizontal: 20 }]}>
         <Text style={[styles.sectionLabel, { color: colors.gold }]}>{t.home_sacred_animals_label}</Text>
         <Text style={[styles.sectionTitle, { color: colors.ivory }]}>{t.home_guardians}</Text>
-        <Animated.View style={{ opacity: carouselFade }}>
-          <View style={[styles.featuredGrid, { gap: GRID_GAP }]}>
-            {featuredPlantes.map((plante) => (
+        <View style={[styles.featuredGrid, { gap: GRID_GAP }]}>
+          {featuredPlantes.map((plante) => {
+            const imageSource = PLANT_IMAGES[plante.id];
+
+            return (
               <Pressable
                 key={plante.id}
                 style={({ pressed }) => [styles.featuredCard, { width: cardWidth, height: cardHeight, opacity: pressed ? 0.85 : 1 }]}
                 onPress={() => router.push(`/animal/${plante.id}` as any)}
               >
-                <ImageBackground
-                  source={PLANT_IMAGES[plante.id]}
-                  style={styles.featuredGradient}
-                  imageStyle={styles.featuredImage}
-                  resizeMode="cover"
-                >
-                  {!PLANT_IMAGES[plante.id] && (
+                <View style={styles.featuredGradient}>
+                  {imageSource ? (
+                    <Image
+                      source={imageSource}
+                      style={StyleSheet.absoluteFillObject}
+                      resizeMode="cover"
+                      fadeDuration={0}
+                    />
+                  ) : (
                     <LinearGradient
                       colors={[plante.couleur, plante.couleurSecondaire]}
                       style={StyleSheet.absoluteFillObject}
@@ -168,17 +163,18 @@ export default function HomeScreen() {
                   <LinearGradient
                     colors={['rgba(0,0,0,0.08)', 'rgba(0,0,0,0.72)']}
                     locations={[0.3, 1]}
-                    style={[StyleSheet.absoluteFillObject, { pointerEvents: 'none' }]}
+                    style={StyleSheet.absoluteFillObject}
+                    pointerEvents="none"
                   />
                   <View style={styles.featuredTextBlock}>
                     <Text style={[styles.featuredNom, isTablet && styles.featuredNomTablet]}>{plante.nom}</Text>
                     <Text style={[styles.featuredPouvoir, isTablet && styles.featuredPouvoirTablet]}>{plante.pouvoirs[0]}</Text>
                   </View>
-                </ImageBackground>
+                </View>
               </Pressable>
-            ))}
-          </View>
-        </Animated.View>
+            );
+          })}
+        </View>
       </View>
 
       <View style={[styles.section, { paddingHorizontal: 20 }]}>
