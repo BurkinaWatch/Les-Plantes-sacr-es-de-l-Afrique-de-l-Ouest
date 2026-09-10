@@ -26,6 +26,7 @@ import { useTranslation } from '@/i18n';
 import { useAuth } from '@/context/AuthContext';
 import { useNotifications } from '@/hooks/useNotifications';
 import { ApiRateLimitError, ApiRequestError, requestTotem } from '@/lib/ai-api';
+import { getApiBase } from '@/lib/api-config';
 
 interface Message {
   id: string;
@@ -40,25 +41,6 @@ interface ChatSession {
   startedAt: number;
   messages: Message[];
   preview: string;
-}
-
-function getApiBase(): string | null {
-  if (process.env.EXPO_PUBLIC_DOMAIN) {
-    return `https://${process.env.EXPO_PUBLIC_DOMAIN}/api`;
-  }
-  // On Expo Web running in Replit, derive the API URL from the browser location.
-  // The API server is on port 8080 of the same host.
-  if (Platform.OS === 'web' && typeof window !== 'undefined') {
-    const host = window.location.hostname;
-    if (host.includes('replit.dev') || host.includes('replit.app')) {
-      return `https://${host}:8080/api`;
-    }
-    // Local dev fallback
-    if (host === 'localhost' || host === '127.0.0.1') {
-      return `http://${host}:8080/api`;
-    }
-  }
-  return null;
 }
 
 const API_BASE = getApiBase();

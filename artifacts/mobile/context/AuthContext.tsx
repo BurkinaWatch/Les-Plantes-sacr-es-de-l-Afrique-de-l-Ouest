@@ -1,28 +1,12 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { Platform } from 'react-native';
 import React, { createContext, useCallback, useContext, useEffect, useState } from 'react';
+import { getApiBase } from '@/lib/api-config';
 
 /**
  * Auth storage key (v2 — uses server-issued JWTs, not local fake tokens).
  * A separate key avoids collisions with the old local-only auth storage.
  */
 const AUTH_KEY = '@plantes_sacrees_auth_v2';
-
-// ── API base URL ──────────────────────────────────────────────────────────────
-
-function getApiBase(): string | null {
-  if (process.env.EXPO_PUBLIC_DOMAIN) {
-    return `https://${process.env.EXPO_PUBLIC_DOMAIN}/api`;
-  }
-  // Expo Web running inside Replit dev preview — derive host from window.location
-  if (Platform.OS === 'web' && typeof window !== 'undefined') {
-    const host = window.location.hostname;
-    if (host.includes('replit.dev') || host.includes('replit.app')) {
-      return `https://${host}:8080/api`;
-    }
-  }
-  return null;
-}
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 

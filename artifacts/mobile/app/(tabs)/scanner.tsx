@@ -25,13 +25,9 @@ import {
   requestPlantRecognition,
   type PlantRecognitionSuccess,
 } from '@/lib/ai-api';
+import { getApiBase } from '@/lib/api-config';
 
 type PlantResult = PlantRecognitionSuccess;
-
-function getApiBase(): string | null {
-  const domain = process.env.EXPO_PUBLIC_DOMAIN;
-  return domain ? `https://${domain}/api` : null;
-}
 
 const API_BASE = getApiBase();
 
