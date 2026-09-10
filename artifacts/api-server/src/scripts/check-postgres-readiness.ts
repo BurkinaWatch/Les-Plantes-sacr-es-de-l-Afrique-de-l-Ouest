@@ -30,7 +30,9 @@ async function main(): Promise<void> {
     return;
   }
 
-  const readinessPool = createDatabasePool(readinessDatabaseUrl);
+  const readinessPool = createDatabasePool(readinessDatabaseUrl, {
+    connectionTimeoutMillis: 10_000,
+  });
 
   try {
     await ensureSchema(readinessPool, readinessDatabaseUrl);

@@ -12,8 +12,14 @@ export function resolveDatabaseUrl(
 
 export const databaseUrl = resolveDatabaseUrl();
 
-export function createDatabasePool(connectionString?: string) {
-  return new Pool(connectionString ? { connectionString } : {});
+export function createDatabasePool(
+  connectionString?: string,
+  options: { connectionTimeoutMillis?: number } = {},
+) {
+  return new Pool({
+    ...(connectionString ? { connectionString } : {}),
+    ...options,
+  });
 }
 
 // Do not throw while this module is loading. The API needs to expose its
