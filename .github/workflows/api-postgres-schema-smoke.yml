@@ -11,10 +11,15 @@ on:
 
 jobs:
   schema-smoke:
+    name: PostgreSQL ${{ matrix.postgres-version }} schema smoke
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        postgres-version: ["15", "16", "17"]
     services:
       postgres:
-        image: postgres:16
+        image: postgres:${{ matrix.postgres-version }}
         env:
           POSTGRES_DB: schema_smoke
           POSTGRES_USER: schema_smoke
@@ -29,6 +34,7 @@ jobs:
 
     env:
       READINESS_DATABASE_URL: postgresql://schema_smoke:schema_smoke_password@127.0.0.1:5432/schema_smoke
+      POSTGRES_VERSION: ${{ matrix.postgres-version }}
 
     steps:
       - uses: actions/checkout@v4
@@ -40,7 +46,7 @@ jobs:
           node-version: 20
           cache: pnpm
       - run: pnpm install --frozen-lockfile
-      - name: Verify the disposable database is ready
-        run: pnpm --filter @workspace/api-server run check:postgres-readiness
-      - name: Verify schema creation, version, and field drift detection
+      - name: Verify schema migrations and field drift detection on PostgreSQL ${{ matrix.postgres-version }}
         run: pnpm --filter @workspace/api-server run check:postgres-schema-smoke
+      - name: Verify the versioned database is ready on PostgreSQL ${{ matrix.postgres-version }}
+        run: pnpm --filter @workspace/api-server run check:postgres-readiness

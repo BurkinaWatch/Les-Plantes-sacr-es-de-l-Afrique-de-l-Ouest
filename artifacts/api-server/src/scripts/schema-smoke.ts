@@ -10,6 +10,43 @@ import {
   getReadinessDatabaseUrl,
 } from "../lib/readiness-report.js";
 
+type ServerVersionRow = {
+  server_version: string;
+};
+
+type DatabaseTableRow = {
+  table_name: string;
+};
+
+async function readServerVersion(
+  testPool: ReturnType<typeof createDatabasePool>,
+): Promise<string> {
+  const result = await testPool.query<ServerVersionRow>(
+    "SELECT current_setting('server_version') AS server_version",
+  );
+  return result.rows[0]?.server_version ?? "unknown";
+}
+
+async function assertEmptyDatabase(
+  testPool: ReturnType<typeof createDatabasePool>,
+): Promise<void> {
+  const result = await testPool.query<DatabaseTableRow>(`
+    SELECT table_name
+    FROM information_schema.tables
+    WHERE table_schema = current_schema()
+      AND table_type = 'BASE TABLE'
+    ORDER BY table_name
+  `);
+
+  if (result.rows.length > 0) {
+    throw new Error(
+      `Expected a blank PostgreSQL database, found table(s): ${result.rows
+        .map((row) => row.table_name)
+        .join(", ")}`,
+    );
+  }
+}
+
 async function main(): Promise<void> {
   const databaseUrl = getReadinessDatabaseUrl();
 
@@ -24,10 +61,26 @@ async function main(): Promise<void> {
   const testPool = createDatabasePool(databaseUrl, {
     connectionTimeoutMillis: 10_000,
   });
+  let postgresVersion = process.env.POSTGRES_VERSION?.trim() || "unknown";
 
   try {
+    postgresVersion = await readServerVersion(testPool);
+    console.log(
+      `PostgreSQL ${postgresVersion}: starting blank-database migration smoke check.`,
+    );
+    await assertEmptyDatabase(testPool);
+
     await ensureSchema(testPool, databaseUrl);
     await verifySchema(testPool, databaseUrl);
+    console.log(
+      `PostgreSQL ${postgresVersion}: initial migrations succeeded on a blank database.`,
+    );
+
+    await ensureSchema(testPool, databaseUrl);
+    await verifySchema(testPool, databaseUrl);
+    console.log(
+      `PostgreSQL ${postgresVersion}: already-versioned database verification succeeded.`,
+    );
 
     await testPool.query(
       "INSERT INTO schema_migrations (version) VALUES ($1)",
@@ -47,9 +100,12 @@ async function main(): Promise<void> {
 
     if (!incompatibleVersionDetected) {
       throw new Error(
-        "Schema version smoke check failed: a future schema version was accepted.",
+        "Schema version smoke check failed: a future migration version was accepted.",
       );
     }
+    console.log(
+      `PostgreSQL ${postgresVersion}: future migration version was rejected on an already-versioned database.`,
+    );
 
     await testPool.query("DELETE FROM schema_migrations WHERE version = $1", [
       CURRENT_SCHEMA_VERSION + 1,
@@ -171,11 +227,11 @@ async function main(): Promise<void> {
     await ensureSchema(testPool, databaseUrl);
     await verifySchema(testPool, databaseUrl);
     console.log(
-      "PostgreSQL schema smoke check passed: creation, drift detection, and restoration all succeeded.",
+      `PostgreSQL ${postgresVersion} schema smoke check passed: blank and already-versioned migrations, future-version rejection, drift detection, and restoration all succeeded.`,
     );
   } catch (error) {
     console.error(
-      `PostgreSQL schema smoke check failed: ${formatReadinessFailure(error)}`,
+      `PostgreSQL ${postgresVersion} schema smoke check failed: ${formatReadinessFailure(error)}`,
     );
     process.exitCode = 1;
   } finally {
