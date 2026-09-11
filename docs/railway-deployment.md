@@ -80,6 +80,29 @@ rolled-back schema, applies the migration again, and then checks field/index
 drift. The repository's GitHub Actions workflow runs this against a disposable
 PostgreSQL service; it never uses a production database.
 
+The same workflow also proves that a real PostgreSQL backup can recover
+representative data and the versioned schema. For every supported PostgreSQL
+major version it:
+
+1. Inserts a disposable user and push-token relationship into the migrated
+   source database.
+2. Creates a custom-format archive with `pg_dump`.
+3. Restores that archive into a separate disposable database with
+   `pg_restore`.
+4. Confirms that the `schema_migrations` version, user data, token data, and
+   foreign-key relationship are present after restoration.
+5. Runs the API readiness check against the restored database.
+
+The archive is created and consumed only inside the isolated GitHub Actions
+job. It must never be pointed at a production database or uploaded as a CI
+artifact. A successful run reports the archive size and checksum in the job
+log, followed by `Backup restore verification passed`. Before a destructive
+production migration, retain the equivalent backup evidence from the actual
+Railway database: the backup timestamp and source, the archive format and
+checksum, a successful restore into a separate disposable database, matching
+representative row checks, and a passing readiness check against the restored
+database.
+
 ## Schema versions and rollback
 
 The API records every applied migration in the PostgreSQL

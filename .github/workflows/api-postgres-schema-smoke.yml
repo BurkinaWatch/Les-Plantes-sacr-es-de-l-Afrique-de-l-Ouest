@@ -56,3 +56,95 @@ jobs:
         run: pnpm --filter @workspace/api-server run check:postgres-schema-smoke
       - name: Verify the versioned database is ready on PostgreSQL ${{ matrix.postgres-version }}
         run: pnpm --filter @workspace/api-server run check:postgres-readiness
+      - name: Verify a real backup restores data and schema on PostgreSQL ${{ matrix.postgres-version }}
+        env:
+          SOURCE_DATABASE_URL: postgresql://schema_smoke:schema_smoke_password@127.0.0.1:5432/schema_smoke
+          RESTORE_DATABASE_URL: postgresql://schema_smoke:schema_smoke_password@127.0.0.1:5432/schema_smoke_restore
+        run: |
+          set -euo pipefail
+
+          backup_file="$RUNNER_TEMP/schema-smoke-${POSTGRES_VERSION}.dump"
+          psql --version
+          pg_dump --version
+          pg_restore --version
+
+          psql "$SOURCE_DATABASE_URL" --set=ON_ERROR_STOP=1 <<'SQL'
+          INSERT INTO users (username, password_hash)
+          VALUES ('backup-restore-smoke-user', 'backup-restore-smoke-hash')
+          ON CONFLICT (username)
+          DO UPDATE SET password_hash = EXCLUDED.password_hash
+          RETURNING id \gset backup_
+
+          INSERT INTO push_tokens (user_id, token, platform)
+          VALUES (:backup_id, 'backup-restore-smoke-token', 'ci')
+          ON CONFLICT (token)
+          DO UPDATE SET user_id = EXCLUDED.user_id, platform = EXCLUDED.platform;
+          SQL
+
+          pg_dump \
+            --format=custom \
+            --no-owner \
+            --no-acl \
+            --file="$backup_file" \
+            "$SOURCE_DATABASE_URL"
+          test -s "$backup_file"
+          printf 'Backup archive created: %s bytes\n' "$(wc -c < "$backup_file")"
+          sha256sum "$backup_file"
+
+          psql "$SOURCE_DATABASE_URL" --set=ON_ERROR_STOP=1 \
+            --command='DROP DATABASE IF EXISTS schema_smoke_restore'
+          psql "$SOURCE_DATABASE_URL" --set=ON_ERROR_STOP=1 \
+            --command='CREATE DATABASE schema_smoke_restore'
+          pg_restore \
+            --exit-on-error \
+            --no-owner \
+            --no-acl \
+            --dbname="$RESTORE_DATABASE_URL" \
+            "$backup_file"
+
+          psql "$RESTORE_DATABASE_URL" --set=ON_ERROR_STOP=1 <<'SQL'
+          DO $$
+          DECLARE
+            restored_user_id integer;
+            restored_token_user_id integer;
+          BEGIN
+            IF NOT EXISTS (
+              SELECT 1
+              FROM schema_migrations
+              WHERE version = 1
+            ) THEN
+              RAISE EXCEPTION 'Restored schema_migrations does not contain version 1';
+            END IF;
+
+            SELECT id
+            INTO restored_user_id
+            FROM users
+            WHERE username = 'backup-restore-smoke-user';
+
+            IF restored_user_id IS NULL THEN
+              RAISE EXCEPTION 'Restored users row is missing';
+            END IF;
+
+            IF NOT EXISTS (
+              SELECT 1
+              FROM users
+              WHERE id = restored_user_id
+                AND password_hash = 'backup-restore-smoke-hash'
+            ) THEN
+              RAISE EXCEPTION 'Restored users data does not match the backup';
+            END IF;
+
+            SELECT user_id
+            INTO restored_token_user_id
+            FROM push_tokens
+            WHERE token = 'backup-restore-smoke-token';
+
+            IF restored_token_user_id IS DISTINCT FROM restored_user_id THEN
+              RAISE EXCEPTION 'Restored push_tokens relationship does not match the backup';
+            END IF;
+          END $$;
+          SQL
+
+          READINESS_DATABASE_URL="$RESTORE_DATABASE_URL" \
+            pnpm --filter @workspace/api-server run check:postgres-readiness
+          printf 'Backup restore verification passed: representative data and schema were recovered.\n'
