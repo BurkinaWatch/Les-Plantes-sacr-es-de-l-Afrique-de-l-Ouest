@@ -59,6 +59,25 @@ const plantRecognitionResponseSchema = z.union([
   plantRecognitionErrorSchema,
 ]);
 
+function logProviderFailure(err: unknown): void {
+  const providerStatus =
+    typeof err === "object" &&
+    err !== null &&
+    "status" in err &&
+    typeof err.status === "number" &&
+    Number.isFinite(err.status)
+      ? err.status
+      : undefined;
+  const providerErrorType = err instanceof Error ? err.name : typeof err;
+
+  // Keep provider diagnostics useful without logging SDK messages, request
+  // bodies, credentials, or model image payloads.
+  console.error("[plant-recognition] AI provider request failed", {
+    providerStatus,
+    providerErrorType,
+  });
+}
+
 function buildPrompt(lang: string): string {
   const isEn = lang === "en";
   return isEn
@@ -158,11 +177,14 @@ export function createPlantRecognitionRouter(getClient: () => ChatClient = getGr
       console.error("[plant-recognition] GROQ_API_KEY is not configured");
       return res.status(503).json({ error: "Le service de reconnaissance n'est pas encore configuré (clé API manquante)." });
     }
-    console.error("[plant-recognition] Error:", err?.message, err?.status);
     if (err instanceof SyntaxError) {
       return res.status(502).json({ error: "La réponse de l'IA n'est pas du JSON valide. Réessaie dans un instant." });
     }
-    return res.status(500).json({ error: "Erreur lors de l'analyse de la plante" });
+    logProviderFailure(err);
+    return res.status(502).json({
+      code: "provider_error",
+      error: "Le service de reconnaissance est temporairement indisponible. Réessaie dans un instant.",
+    });
   }
   });
 

@@ -134,7 +134,7 @@ export default function ScannerScreen() {
   const [error, setError] = useState<string | null>(
     capture === 'icons-error' ? t.scanner_error_generic : null,
   );
-  const [errorCode, setErrorCode] = useState<'unauthenticated' | 'unavailable' | null>(
+  const [errorCode, setErrorCode] = useState<'unauthenticated' | 'unavailable' | 'provider' | null>(
     capture === 'icons-error' ? 'unavailable' : null,
   );
   const [rateLimitRemaining, setRateLimitRemaining] = useState<number | null>(null);
@@ -249,9 +249,13 @@ export default function ScannerScreen() {
       if (!isCurrentScan(generation)) return;
       if (err instanceof ApiRequestError) {
         setErrorCode(err.code);
-        setError(err.code === 'unauthenticated'
-          ? t.api_error_unauthenticated
-          : t.api_error_unavailable);
+        setError(
+          err.code === 'unauthenticated'
+            ? t.api_error_unauthenticated
+            : err.code === 'provider'
+              ? t.api_error_provider
+              : t.api_error_unavailable,
+        );
         return;
       }
       const isRateLimit = (err as any).name === 'ApiRateLimitError';

@@ -28,6 +28,7 @@ export const en: Translations = {
   scanner_error_generic: 'Error during analysis. Please try again.',
   api_error_unauthenticated: 'Sign in to use plant recognition.',
   api_error_unavailable: 'Unable to reach the service. Check your connection and try again.',
+  api_error_provider: 'The recognition service is temporarily having trouble. Your photo is saved, so please try again in a moment.',
   scanner_retry: 'Try again',
   scanner_new_scan: 'New scan',
 

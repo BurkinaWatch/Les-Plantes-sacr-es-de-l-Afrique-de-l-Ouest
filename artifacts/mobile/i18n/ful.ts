@@ -33,6 +33,7 @@ export const ful: Translations = {
   scanner_error_generic: 'Juumre waɗii. Coodu kadi.',
   api_error_unauthenticated: 'Naatu ngam huutoraade miijirde leɗɗe.',
   api_error_unavailable: 'Mi waawaa heɓde gollal ngal. Ƴeewto jokkondiral maa, coodu kadi.',
+  api_error_provider: 'Gollal miijirde ngal woodi caɗeele ɗoo. Natal maa woni, coodu kadi.',
   scanner_retry: 'Coodu kadi',
   scanner_new_scan: 'Miijirde kewe',
 

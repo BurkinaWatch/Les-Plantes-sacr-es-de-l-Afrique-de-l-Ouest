@@ -33,7 +33,7 @@ const plantData = {
   niveauSpirituel: 5,
 };
 
-function createMockGroq({ chatContent, plantContent } = {}) {
+function createMockGroq({ chatContent, plantContent, plantError } = {}) {
   const calls = [];
   return {
     calls,
@@ -43,6 +43,7 @@ function createMockGroq({ chatContent, plantContent } = {}) {
           create: async (request) => {
             calls.push(request);
             if (request.messages[0]?.content?.[0]?.type === "image_url") {
+              if (plantError) throw plantError;
               return {
                 choices: [{
                   message: {
@@ -128,6 +129,27 @@ test("Plant recognition returns the mocked structured plant response", async () 
     assert.equal(result.body.plant.confidence, "high");
     assert.equal(mock.calls[0].model, "qwen/qwen3.8-27b");
     assert.equal(mock.calls[0].messages[0].content[0].image_url.url, "data:image/jpeg;base64,ZmFrZS1pbWFnZS1ieXRlcw==");
+  });
+});
+
+test("Plant recognition classifies provider failures without exposing provider details", async () => {
+  const providerError = new Error("provider response contained a secret and image data");
+  providerError.status = 503;
+  const mock = createMockGroq({ plantError: providerError });
+  await withApp(mock, async (baseUrl) => {
+    const result = await post(baseUrl, "/api/plant-recognition", {
+      imageBase64: "ZmFrZS1pbWFnZS1ieXRlcw==",
+      lang: "fr",
+    });
+
+    assert.equal(result.response.status, 502);
+    assert.deepEqual(result.body, {
+      code: "provider_error",
+      error: "Le service de reconnaissance est temporairement indisponible. Réessaie dans un instant.",
+    });
+    assert.equal(JSON.stringify(result.body).includes("secret"), false);
+    assert.equal(JSON.stringify(result.body).includes("image data"), false);
+    assert.equal(mock.calls.length, 1);
   });
 });
 
