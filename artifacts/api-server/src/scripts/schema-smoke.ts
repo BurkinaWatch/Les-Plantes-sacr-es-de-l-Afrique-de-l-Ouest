@@ -27,6 +27,33 @@ async function main(): Promise<void> {
     await ensureSchema(testPool, databaseUrl);
     await verifySchema(testPool, databaseUrl);
 
+    await testPool.query("DROP INDEX IF EXISTS push_tokens_user_id_idx");
+
+    let indexDriftDetected = false;
+    try {
+      await verifySchema(testPool, databaseUrl);
+    } catch (error) {
+      if (
+        error instanceof Error &&
+        error.message.includes(
+          "missing required index(es): push_tokens_user_id_idx on push_tokens(user_id)",
+        )
+      ) {
+        indexDriftDetected = true;
+      } else {
+        throw error;
+      }
+    }
+
+    if (!indexDriftDetected) {
+      throw new Error(
+        "Schema drift smoke check failed: missing push_tokens_user_id_idx was not detected.",
+      );
+    }
+
+    await ensureSchema(testPool, databaseUrl);
+    await verifySchema(testPool, databaseUrl);
+
     await testPool.query("DROP TABLE IF EXISTS push_tokens");
 
     let driftDetected = false;

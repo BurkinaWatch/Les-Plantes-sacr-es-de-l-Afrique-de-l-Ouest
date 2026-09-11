@@ -40,5 +40,7 @@ jobs:
           node-version: 20
           cache: pnpm
       - run: pnpm install --frozen-lockfile
-      - run: pnpm --filter @workspace/api-server run check:postgres-readiness
-      - run: pnpm --filter @workspace/api-server run check:postgres-schema-smoke
+      - name: Verify the disposable database is ready
+        run: pnpm --filter @workspace/api-server run check:postgres-readiness
+      - name: Verify schema creation and drift detection
+        run: pnpm --filter @workspace/api-server run check:postgres-schema-smoke

@@ -3,6 +3,58 @@ import { logger } from "./logger";
 
 export const REQUIRED_SCHEMA_TABLES = ["users", "push_tokens"] as const;
 
+const REQUIRED_SCHEMA_COLUMNS = [
+  { tableName: "users", columnName: "id", isNullable: "NO" },
+  { tableName: "users", columnName: "username", isNullable: "NO" },
+  { tableName: "users", columnName: "password_hash", isNullable: "NO" },
+  { tableName: "users", columnName: "created_at", isNullable: "NO" },
+  { tableName: "push_tokens", columnName: "id", isNullable: "NO" },
+  { tableName: "push_tokens", columnName: "user_id", isNullable: "YES" },
+  { tableName: "push_tokens", columnName: "token", isNullable: "NO" },
+  { tableName: "push_tokens", columnName: "platform", isNullable: "YES" },
+  { tableName: "push_tokens", columnName: "created_at", isNullable: "NO" },
+  { tableName: "push_tokens", columnName: "updated_at", isNullable: "NO" },
+] as const;
+
+const REQUIRED_SCHEMA_CONSTRAINTS = [
+  {
+    tableName: "users",
+    constraintType: "PRIMARY KEY",
+    columns: ["id"],
+  },
+  {
+    tableName: "users",
+    constraintType: "UNIQUE",
+    columns: ["username"],
+  },
+  {
+    tableName: "push_tokens",
+    constraintType: "PRIMARY KEY",
+    columns: ["id"],
+  },
+  {
+    tableName: "push_tokens",
+    constraintType: "UNIQUE",
+    columns: ["token"],
+  },
+  {
+    tableName: "push_tokens",
+    constraintType: "FOREIGN KEY",
+    columns: ["user_id"],
+    referencedTableName: "users",
+    referencedColumns: ["id"],
+    deleteRule: "SET NULL",
+  },
+] as const;
+
+const REQUIRED_SCHEMA_INDEXES = [
+  {
+    indexName: "push_tokens_user_id_idx",
+    tableName: "push_tokens",
+    columns: ["user_id"],
+  },
+] as const;
+
 type SchemaClient = {
   query(text: string, values?: unknown[]): Promise<unknown>;
   release(): void;
@@ -66,6 +118,36 @@ export async function ensureSchema(
   }
 }
 
+type ColumnRow = {
+  table_name: string;
+  column_name: string;
+  is_nullable: string;
+};
+
+type ConstraintRow = {
+  table_name: string;
+  constraint_name: string;
+  constraint_type: string;
+  column_name: string | null;
+  ordinal_position: number | null;
+  foreign_table_name: string | null;
+  foreign_column_name: string | null;
+  delete_rule: string | null;
+};
+
+type IndexRow = {
+  index_name: string;
+  table_name: string;
+  column_names: string[];
+};
+
+function sameColumns(actual: string[], expected: readonly string[]) {
+  return (
+    actual.length === expected.length &&
+    actual.every((columnName, index) => columnName === expected[index])
+  );
+}
+
 export async function verifySchema(
   schemaPool: Pick<SchemaPool, "query"> = pool,
   configuredDatabaseUrl: string | undefined =
@@ -92,6 +174,192 @@ export async function verifySchema(
   if (missingTables.length > 0) {
     throw new Error(
       `PostgreSQL schema verification failed: missing required table(s): ${missingTables.join(", ")}`,
+    );
+  }
+
+  const columnsResult = await schemaPool.query<ColumnRow>(
+    `
+      SELECT table_name, column_name, is_nullable
+      FROM information_schema.columns
+      WHERE table_schema = current_schema()
+        AND table_name = ANY($1::text[])
+    `,
+    [REQUIRED_SCHEMA_TABLES],
+  );
+  const existingColumns = new Map(
+    columnsResult.rows.map((row) => [
+      `${row.table_name}.${row.column_name}`,
+      row.is_nullable,
+    ]),
+  );
+  const missingColumns = REQUIRED_SCHEMA_COLUMNS.filter(
+    (column) =>
+      !existingColumns.has(`${column.tableName}.${column.columnName}`) ||
+      existingColumns.get(`${column.tableName}.${column.columnName}`) !==
+        column.isNullable,
+  ).map(
+    (column) =>
+      `${column.tableName}.${column.columnName}${
+        column.isNullable === "NO" ? " (NOT NULL)" : ""
+      }`,
+  );
+
+  const constraintsResult = await schemaPool.query<ConstraintRow>(
+    `
+      SELECT
+        tc.table_name,
+        tc.constraint_name,
+        tc.constraint_type,
+        kcu.column_name,
+        kcu.ordinal_position,
+        ccu.table_name AS foreign_table_name,
+        ccu.column_name AS foreign_column_name,
+        rc.delete_rule
+      FROM information_schema.table_constraints AS tc
+      LEFT JOIN information_schema.key_column_usage AS kcu
+        ON kcu.constraint_schema = tc.constraint_schema
+        AND kcu.constraint_name = tc.constraint_name
+        AND kcu.table_name = tc.table_name
+      LEFT JOIN information_schema.constraint_column_usage AS ccu
+        ON ccu.constraint_schema = tc.constraint_schema
+        AND ccu.constraint_name = tc.constraint_name
+      LEFT JOIN information_schema.referential_constraints AS rc
+        ON rc.constraint_schema = tc.constraint_schema
+        AND rc.constraint_name = tc.constraint_name
+      WHERE tc.constraint_schema = current_schema()
+        AND tc.table_name = ANY($1::text[])
+        AND tc.constraint_type IN ('PRIMARY KEY', 'UNIQUE', 'FOREIGN KEY')
+      ORDER BY tc.table_name, tc.constraint_name, kcu.ordinal_position
+    `,
+    [REQUIRED_SCHEMA_TABLES],
+  );
+  const existingConstraints = new Map<
+    string,
+    {
+      columns: string[];
+      foreignTableName: string | null;
+      foreignColumns: string[];
+      deleteRule: string | null;
+    }
+  >();
+
+  for (const row of constraintsResult.rows) {
+    const key = `${row.table_name}.${row.constraint_name}`;
+    const existing = existingConstraints.get(key) ?? {
+      columns: [],
+      foreignTableName: null,
+      foreignColumns: [],
+      deleteRule: null,
+    };
+    if (row.column_name) {
+      existing.columns.push(row.column_name);
+    }
+    if (row.foreign_table_name) {
+      existing.foreignTableName = row.foreign_table_name;
+    }
+    if (row.foreign_column_name) {
+      existing.foreignColumns.push(row.foreign_column_name);
+    }
+    if (row.delete_rule) {
+      existing.deleteRule = row.delete_rule;
+    }
+    existingConstraints.set(key, existing);
+  }
+
+  const missingConstraints = REQUIRED_SCHEMA_CONSTRAINTS.filter(
+    (requiredConstraint) =>
+      !Array.from(existingConstraints.entries()).some(
+        ([constraintKey, actualConstraint]) => {
+          const [tableName] = constraintKey.split(".");
+          if (
+            tableName !== requiredConstraint.tableName ||
+            !sameColumns(actualConstraint.columns, requiredConstraint.columns)
+          ) {
+            return false;
+          }
+
+          const constraintName = constraintKey.slice(tableName.length + 1);
+          const matchingType = constraintsResult.rows.find(
+            (row) =>
+              row.constraint_name === constraintName &&
+              row.table_name === tableName,
+          )?.constraint_type;
+          if (matchingType !== requiredConstraint.constraintType) {
+            return false;
+          }
+
+          if (requiredConstraint.constraintType !== "FOREIGN KEY") {
+            return true;
+          }
+
+          return (
+            actualConstraint.foreignTableName ===
+              requiredConstraint.referencedTableName &&
+            sameColumns(
+              actualConstraint.foreignColumns,
+              requiredConstraint.referencedColumns,
+            ) &&
+            actualConstraint.deleteRule === requiredConstraint.deleteRule
+          );
+        },
+      ),
+  ).map(
+    (constraint) =>
+      `${constraint.tableName} ${constraint.constraintType} (${constraint.columns.join(", ")})`,
+  );
+
+  const indexesResult = await schemaPool.query<IndexRow>(
+    `
+      SELECT
+        index_class.relname AS index_name,
+        table_class.relname AS table_name,
+        ARRAY_AGG(attribute.attname::text ORDER BY index_column.ordinality)::text[] AS column_names
+      FROM pg_catalog.pg_index AS index_definition
+      JOIN pg_catalog.pg_class AS index_class
+        ON index_class.oid = index_definition.indexrelid
+      JOIN pg_catalog.pg_class AS table_class
+        ON table_class.oid = index_definition.indrelid
+      JOIN pg_catalog.pg_namespace AS schema_namespace
+        ON schema_namespace.oid = table_class.relnamespace
+      CROSS JOIN LATERAL unnest(index_definition.indkey) WITH ORDINALITY
+        AS index_column(attnum, ordinality)
+      JOIN pg_catalog.pg_attribute AS attribute
+        ON attribute.attrelid = table_class.oid
+        AND attribute.attnum = index_column.attnum
+      WHERE schema_namespace.nspname = current_schema()
+        AND index_class.relname = ANY($1::text[])
+      GROUP BY index_class.relname, table_class.relname
+    `,
+    [REQUIRED_SCHEMA_INDEXES.map((index) => index.indexName)],
+  );
+  const missingIndexes = REQUIRED_SCHEMA_INDEXES.filter(
+    (requiredIndex) =>
+      !indexesResult.rows.some(
+        (actualIndex) =>
+          actualIndex.index_name === requiredIndex.indexName &&
+          actualIndex.table_name === requiredIndex.tableName &&
+          sameColumns(actualIndex.column_names, requiredIndex.columns),
+      ),
+  ).map(
+    (index) =>
+      `${index.indexName} on ${index.tableName}(${index.columns.join(", ")})`,
+  );
+
+  const schemaProblems = [
+    missingColumns.length > 0
+      ? `missing required column(s): ${missingColumns.join(", ")}`
+      : undefined,
+    missingConstraints.length > 0
+      ? `missing required constraint(s): ${missingConstraints.join(", ")}`
+      : undefined,
+    missingIndexes.length > 0
+      ? `missing required index(es): ${missingIndexes.join(", ")}`
+      : undefined,
+  ].filter((problem): problem is string => Boolean(problem));
+
+  if (schemaProblems.length > 0) {
+    throw new Error(
+      `PostgreSQL schema verification failed: ${schemaProblems.join("; ")}`,
     );
   }
 }
