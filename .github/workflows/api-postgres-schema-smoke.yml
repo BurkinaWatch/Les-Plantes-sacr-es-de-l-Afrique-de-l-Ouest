@@ -40,6 +40,7 @@ jobs:
 
     env:
       READINESS_DATABASE_URL: postgresql://schema_smoke:schema_smoke_password@127.0.0.1:5432/schema_smoke
+      READINESS_CONNECTION_MODE: railway-tls
       POSTGRES_VERSION: ${{ matrix.postgres-version }}
 
     steps:
@@ -54,7 +55,66 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - name: Verify schema migrations and field drift detection on PostgreSQL ${{ matrix.postgres-version }}
         run: pnpm --filter @workspace/api-server run check:postgres-schema-smoke
-      - name: Verify the versioned database is ready on PostgreSQL ${{ matrix.postgres-version }}
+      - name: Configure disposable PostgreSQL TLS for the Railway connection check
+        env:
+          POSTGRES_VERSION: ${{ matrix.postgres-version }}
+        run: |
+          set -euo pipefail
+
+          container_id="$(docker ps --filter "ancestor=postgres:${POSTGRES_VERSION}" --format '{{.ID}}' | head -n 1)"
+          if [ -z "$container_id" ]; then
+            echo "Could not locate the PostgreSQL ${POSTGRES_VERSION} service container." >&2
+            exit 1
+          fi
+
+          tls_dir="${RUNNER_TEMP}/postgres-railway-tls"
+          mkdir -p "$tls_dir"
+          openssl req -x509 -newkey rsa:2048 -nodes -days 1 \
+            -subj "/CN=disposable-postgres-ca" \
+            -keyout "$tls_dir/ca.key" \
+            -out "$tls_dir/ca.crt"
+          openssl req -newkey rsa:2048 -nodes \
+            -subj "/CN=127.0.0.1" \
+            -keyout "$tls_dir/server.key" \
+            -out "$tls_dir/server.csr"
+          cat > "$tls_dir/server.ext" <<'EOF'
+          subjectAltName = IP:127.0.0.1
+          extendedKeyUsage = serverAuth
+          EOF
+          openssl x509 -req -days 1 \
+            -in "$tls_dir/server.csr" \
+            -CA "$tls_dir/ca.crt" \
+            -CAkey "$tls_dir/ca.key" \
+            -CAcreateserial \
+            -extfile "$tls_dir/server.ext" \
+            -out "$tls_dir/server.crt"
+
+          docker cp "$tls_dir/server.crt" "$container_id:/var/lib/postgresql/data/server.crt"
+          docker cp "$tls_dir/server.key" "$container_id:/var/lib/postgresql/data/server.key"
+          docker exec "$container_id" chown postgres:postgres \
+            /var/lib/postgresql/data/server.crt /var/lib/postgresql/data/server.key
+          docker exec "$container_id" chmod 600 /var/lib/postgresql/data/server.key
+          docker exec "$container_id" psql -U schema_smoke -d schema_smoke \
+            -v ON_ERROR_STOP=1 \
+            -c "ALTER SYSTEM SET ssl = 'on'"
+          docker restart "$container_id"
+          for attempt in $(seq 1 30); do
+            if docker exec "$container_id" pg_isready -U schema_smoke -d schema_smoke; then
+              break
+            fi
+            if [ "$attempt" -eq 30 ]; then
+              echo "PostgreSQL ${POSTGRES_VERSION} did not become ready after TLS restart." >&2
+              exit 1
+            fi
+            sleep 1
+          done
+
+          {
+            printf 'READINESS_DATABASE_URL='
+            printf '%s' "postgresql://schema_smoke:schema_smoke_password@127.0.0.1:5432/schema_smoke"
+            printf '?sslmode=require&sslrootcert=%s&application_name=railway-schema-smoke&connect_timeout=10\n' "$tls_dir/ca.crt"
+          } >> "$GITHUB_ENV"
+      - name: Verify Railway SSL and URL parameters on PostgreSQL ${{ matrix.postgres-version }}
         run: pnpm --filter @workspace/api-server run check:postgres-readiness
       - name: Verify a real backup restores data and schema on PostgreSQL ${{ matrix.postgres-version }}
         env:
