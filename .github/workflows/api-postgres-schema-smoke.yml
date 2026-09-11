@@ -42,6 +42,8 @@ jobs:
       READINESS_DATABASE_URL: postgresql://schema_smoke:schema_smoke_password@127.0.0.1:5432/schema_smoke
       READINESS_CONNECTION_MODE: railway-tls
       POSTGRES_VERSION: ${{ matrix.postgres-version }}
+      SERVICE_DATABASE_USER: railway_api_smoke
+      SERVICE_DATABASE_PASSWORD: railway_api_smoke_password
 
     steps:
       - uses: actions/checkout@v4
@@ -113,17 +115,59 @@ jobs:
             printf 'READINESS_DATABASE_URL='
             printf '%s' "postgresql://schema_smoke:schema_smoke_password@127.0.0.1:5432/schema_smoke"
             printf '?sslmode=require&sslrootcert=%s&application_name=railway-schema-smoke&connect_timeout=10\n' "$tls_dir/ca.crt"
+            printf 'SERVICE_DATABASE_URL='
+            printf '%s' "postgresql://${SERVICE_DATABASE_USER}:${SERVICE_DATABASE_PASSWORD}@127.0.0.1:5432/schema_smoke"
+            printf '?sslmode=require&sslrootcert=%s&application_name=railway-service-schema-smoke&connect_timeout=10\n' "$tls_dir/ca.crt"
           } >> "$GITHUB_ENV"
       - name: Verify Railway SSL and URL parameters on PostgreSQL ${{ matrix.postgres-version }}
         run: pnpm --filter @workspace/api-server run check:postgres-readiness
+      - name: Create a non-privileged Railway API role on PostgreSQL ${{ matrix.postgres-version }}
+        run: |
+          set -euo pipefail
+
+          psql "$READINESS_DATABASE_URL" --set=ON_ERROR_STOP=1 <<'SQL'
+          CREATE ROLE railway_api_smoke
+            LOGIN
+            PASSWORD 'railway_api_smoke_password'
+            NOSUPERUSER
+            NOCREATEDB
+            NOCREATEROLE
+            NOINHERIT
+            NOREPLICATION
+            NOBYPASSRLS;
+
+          DO $$
+          DECLARE
+            role_record pg_roles%ROWTYPE;
+          BEGIN
+            SELECT *
+            INTO role_record
+            FROM pg_roles
+            WHERE rolname = 'railway_api_smoke';
+
+            IF role_record.rolsuper
+              OR role_record.rolcreatedb
+              OR role_record.rolcreaterole
+              OR role_record.rolreplication
+              OR role_record.rolbypassrls THEN
+              RAISE EXCEPTION 'railway_api_smoke must not have administrative privileges';
+            END IF;
+          END $$;
+
+          GRANT CONNECT ON DATABASE schema_smoke TO railway_api_smoke;
+          GRANT USAGE ON SCHEMA public TO railway_api_smoke;
+          GRANT SELECT ON ALL TABLES IN SCHEMA public TO railway_api_smoke;
+          GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO railway_api_smoke;
+          SQL
       - name: Verify a real backup restores data and schema on PostgreSQL ${{ matrix.postgres-version }}
         env:
           SOURCE_DATABASE_URL: postgresql://schema_smoke:schema_smoke_password@127.0.0.1:5432/schema_smoke
-          RESTORE_DATABASE_URL: postgresql://schema_smoke:schema_smoke_password@127.0.0.1:5432/schema_smoke_restore
+          RESTORE_ADMIN_DATABASE_URL: postgresql://schema_smoke:schema_smoke_password@127.0.0.1:5432/schema_smoke_restore
         run: |
           set -euo pipefail
 
           backup_file="$RUNNER_TEMP/schema-smoke-${POSTGRES_VERSION}.dump"
+          service_restore_database_url="${SERVICE_DATABASE_URL/schema_smoke/schema_smoke_restore}"
           psql --version
           pg_dump --version
           pg_restore --version
@@ -155,14 +199,18 @@ jobs:
             --command='DROP DATABASE IF EXISTS schema_smoke_restore'
           psql "$SOURCE_DATABASE_URL" --set=ON_ERROR_STOP=1 \
             --command='CREATE DATABASE schema_smoke_restore'
+          psql "$RESTORE_ADMIN_DATABASE_URL" --set=ON_ERROR_STOP=1 <<'SQL'
+          GRANT CONNECT ON DATABASE schema_smoke_restore TO railway_api_smoke;
+          GRANT USAGE, CREATE ON SCHEMA public TO railway_api_smoke;
+          SQL
           pg_restore \
             --exit-on-error \
             --no-owner \
             --no-acl \
-            --dbname="$RESTORE_DATABASE_URL" \
+            --dbname="$service_restore_database_url" \
             "$backup_file"
 
-          psql "$RESTORE_DATABASE_URL" --set=ON_ERROR_STOP=1 <<'SQL'
+          psql "$service_restore_database_url" --set=ON_ERROR_STOP=1 <<'SQL'
           DO $$
           DECLARE
             restored_user_id integer;
@@ -205,6 +253,6 @@ jobs:
           END $$;
           SQL
 
-          READINESS_DATABASE_URL="$RESTORE_DATABASE_URL" \
+          READINESS_DATABASE_URL="$service_restore_database_url" \
             pnpm --filter @workspace/api-server run check:postgres-readiness
-          printf 'Backup restore verification passed: representative data and schema were recovered.\n'
+          printf 'Backup restore verification passed: representative data and schema were recovered with the non-privileged Railway API role.\n'

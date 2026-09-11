@@ -8,10 +8,12 @@ import {
 type ConnectionMetadata = {
   serverVersion: string;
   applicationName: string;
+  databaseUser: string;
   ssl: boolean;
 };
 
 type ConnectionOptions = {
+  databaseUser: string;
   mode: string;
   sslMode: string;
   applicationName: string | undefined;
@@ -29,6 +31,7 @@ function getConnectionOptions(databaseUrl: string): ConnectionOptions {
     parsedUrl.searchParams.get("application_name") || undefined;
 
   return {
+    databaseUser: decodeURIComponent(parsedUrl.username),
     mode: getConnectionMode(),
     sslMode: /^[a-z0-9_-]+$/i.test(sslMode) ? sslMode : "custom",
     applicationName,
@@ -36,12 +39,15 @@ function getConnectionOptions(databaseUrl: string): ConnectionOptions {
 }
 
 function formatConnectionOptions(options: ConnectionOptions): string {
+  const databaseUser = /^[a-z0-9._-]{1,63}$/i.test(options.databaseUser)
+    ? options.databaseUser
+    : "custom";
   const applicationName =
     options.applicationName &&
     /^[a-z0-9._-]{1,64}$/i.test(options.applicationName)
       ? `, application_name=${options.applicationName}`
       : "";
-  return `${options.mode} (sslmode=${options.sslMode}${applicationName})`;
+  return `${options.mode} (sslmode=${options.sslMode}${applicationName}, database_user=${databaseUser})`;
 }
 
 async function readConnectionMetadata(
@@ -53,11 +59,13 @@ async function readConnectionMetadata(
     const result = await client.query<{
       server_version: string;
       application_name: string;
+      database_user: string;
       ssl: boolean;
     }>(`
       SELECT
         current_setting('server_version') AS server_version,
         current_setting('application_name') AS application_name,
+        current_user AS database_user,
         COALESCE(pg_stat_ssl.ssl, false) AS ssl
       FROM pg_stat_activity
       LEFT JOIN pg_stat_ssl ON pg_stat_ssl.pid = pg_stat_activity.pid
@@ -72,6 +80,7 @@ async function readConnectionMetadata(
     return {
       serverVersion: row.server_version,
       applicationName: row.application_name,
+      databaseUser: row.database_user,
       ssl: row.ssl,
     };
   } finally {
@@ -83,6 +92,12 @@ function assertConnectionOptions(
   metadata: ConnectionMetadata,
   options: ConnectionOptions,
 ): void {
+  if (metadata.databaseUser !== options.databaseUser) {
+    throw new Error(
+      `PostgreSQL connection user was not applied (expected ${options.databaseUser}, found ${metadata.databaseUser}).`,
+    );
+  }
+
   if (
     options.applicationName &&
     metadata.applicationName !== options.applicationName

@@ -88,20 +88,39 @@ major version it:
    source database.
 2. Creates a custom-format archive with `pg_dump`.
 3. Restores that archive into a separate disposable database with
-   `pg_restore`.
+   `pg_restore`, using a login role that is explicitly
+   `NOSUPERUSER`, `NOCREATEDB`, `NOCREATEROLE`, and `NOBYPASSRLS`.
 4. Confirms that the `schema_migrations` version, user data, token data, and
    foreign-key relationship are present after restoration.
-5. Runs the API readiness check against the restored database.
+5. Runs the API readiness check against the restored database with that same
+   non-privileged role.
 
 The archive is created and consumed only inside the isolated GitHub Actions
 job. It must never be pointed at a production database or uploaded as a CI
 artifact. A successful run reports the archive size and checksum in the job
-log, followed by `Backup restore verification passed`. Before a destructive
-production migration, retain the equivalent backup evidence from the actual
-Railway database: the backup timestamp and source, the archive format and
-checksum, a successful restore into a separate disposable database, matching
-representative row checks, and a passing readiness check against the restored
-database.
+log, followed by `Backup restore verification passed`. The disposable
+database itself is still created by the PostgreSQL image's administrative
+role; the API role is never granted database creation or deletion privileges.
+It receives only the schema and object access needed to restore the archive and
+run the check. The readiness output includes `database_user`, which proves
+which PostgreSQL role was active for that connection.
+
+This is a privilege simulation, not proof about the role configured in a live
+Railway project. It does not reproduce Railway's role memberships, default
+privileges, extensions, network policy, or production TLS certificate chain.
+Before a destructive production migration, retain the equivalent evidence from
+the actual Railway database:
+
+- the backup timestamp, source, archive format, and checksum;
+- a successful restore into a separate disposable database;
+- matching representative row and relationship checks;
+- the effective `current_user` and `session_user`;
+- the role attributes showing that the API role does not have superuser,
+  database-creation, or role-creation privileges;
+- `has_database_privilege`, `has_schema_privilege`, and
+  `has_table_privilege` results for the operations the API performs; and
+- a passing readiness check against the restored database using the same
+  connection role as the service.
 
 ## Schema versions and rollback
 
@@ -166,7 +185,7 @@ READINESS_DATABASE_URL="$DATABASE_URL" \
 On a successful in-network run, the release verification result is:
 
 ```text
-PostgreSQL readiness check passed: users and push_tokens tables are ready.
+PostgreSQL 16.x default (sslmode=default, database_user=<railway-role>): schema readiness passed; users and push_tokens tables are ready.
 ```
 
 Run this check in Railway's service shell before publication; a local Replit
