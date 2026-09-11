@@ -170,6 +170,20 @@ export class IncompatibleSchemaVersionError extends Error {
   }
 }
 
+export class BackupRestoreRequiredError extends Error {
+  readonly migrationVersion: number;
+  readonly notes: string;
+
+  constructor(migrationVersion: number, notes: string) {
+    super(
+      `Schema migration ${migrationVersion} requires a backup restore for rollback; a reverse migration is not available. ${notes}`,
+    );
+    this.name = "BackupRestoreRequiredError";
+    this.migrationVersion = migrationVersion;
+    this.notes = notes;
+  }
+}
+
 type SchemaMigration = {
   version: number;
   up: (client: SchemaClient) => Promise<void>;
@@ -217,22 +231,15 @@ async function ensureSchemaObjects(client: SchemaClient): Promise<void> {
   `);
 }
 
-async function dropSchemaObjects(client: SchemaClient): Promise<void> {
-  await client.query("DROP INDEX IF EXISTS push_tokens_user_id_idx");
-  await client.query("DROP TABLE IF EXISTS push_tokens");
-  await client.query("DROP TABLE IF EXISTS users");
-}
-
 const SCHEMA_MIGRATIONS: readonly SchemaMigration[] = [
   {
     version: 1,
     up: ensureSchemaObjects,
     rollback: {
-      strategy: "reverse-migration",
+      strategy: "restore-backup",
       reviewed: true,
       notes:
-        "Drops the initial application tables. Use only on a disposable database or after a verified backup.",
-      down: dropSchemaObjects,
+        "The initial application tables contain user credentials and push tokens; restore a verified backup instead of dropping them.",
     },
   },
 ];
@@ -390,8 +397,9 @@ export async function rollbackSchemaForVerification(
 
     for (const migration of migrationsToRollback) {
       if (migration.rollback.strategy !== "reverse-migration") {
-        throw new Error(
-          `Schema migration ${migration.version} requires a backup restore for rollback; a reverse migration is not available.`,
+        throw new BackupRestoreRequiredError(
+          migration.version,
+          migration.rollback.notes,
         );
       }
 

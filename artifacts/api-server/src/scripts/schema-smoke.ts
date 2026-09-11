@@ -1,5 +1,6 @@
 import { createDatabasePool } from "@workspace/db";
 import {
+  BackupRestoreRequiredError,
   CURRENT_SCHEMA_VERSION,
   ensureSchema,
   IncompatibleSchemaVersionError,
@@ -19,8 +20,16 @@ type DatabaseTableRow = {
   table_name: string;
 };
 
-type SchemaMigrationVersionRow = {
-  version: number;
+type RepresentativeUserRow = {
+  id: number;
+  username: string;
+  password_hash: string;
+};
+
+type RepresentativeTokenRow = {
+  token: string;
+  user_id: number | null;
+  platform: string | null;
 };
 
 async function readServerVersion(
@@ -52,41 +61,78 @@ async function assertEmptyDatabase(
   }
 }
 
-async function assertRolledBackDatabase(
+async function readRepresentativeData(
   testPool: ReturnType<typeof createDatabasePool>,
-): Promise<void> {
-  const tableResult = await testPool.query<DatabaseTableRow>(
+): Promise<{
+  users: RepresentativeUserRow[];
+  tokens: RepresentativeTokenRow[];
+}> {
+  const userResult = await testPool.query<RepresentativeUserRow>(`
+    SELECT id, username, password_hash
+    FROM users
+    WHERE username IN ('smoke-alice', 'smoke-boubacar')
+    ORDER BY username
+  `);
+  const tokenResult = await testPool.query<RepresentativeTokenRow>(`
+    SELECT token, user_id, platform
+    FROM push_tokens
+    WHERE token IN ('smoke-token-alice', 'smoke-token-boubacar')
+    ORDER BY token
+  `);
+
+  return {
+    users: userResult.rows,
+    tokens: tokenResult.rows,
+  };
+}
+
+function assertRepresentativeData(
+  actual: {
+    users: RepresentativeUserRow[];
+    tokens: RepresentativeTokenRow[];
+  },
+  expected: {
+    users: RepresentativeUserRow[];
+    tokens: RepresentativeTokenRow[];
+  },
+  context: string,
+): void {
+  if (JSON.stringify(actual) !== JSON.stringify(expected)) {
+    throw new Error(
+      `Rollback data verification failed ${context}: expected ${JSON.stringify(
+        expected,
+      )}, found ${JSON.stringify(actual)}.`,
+    );
+  }
+}
+
+async function seedRepresentativeData(
+  testPool: ReturnType<typeof createDatabasePool>,
+): Promise<{
+  users: RepresentativeUserRow[];
+  tokens: RepresentativeTokenRow[];
+}> {
+  await testPool.query(`
+    INSERT INTO users (username, password_hash)
+    VALUES
+      ('smoke-alice', 'representative-password-hash-alice'),
+      ('smoke-boubacar', 'representative-password-hash-boubacar')
+    RETURNING id, username, password_hash
+  `);
+  await testPool.query(
     `
-      SELECT table_name
-      FROM information_schema.tables
-      WHERE table_schema = current_schema()
-        AND table_type = 'BASE TABLE'
-        AND table_name = ANY($1::text[])
-      ORDER BY table_name
+      INSERT INTO push_tokens (user_id, token, platform)
+      SELECT id, 'smoke-token-alice', 'ios'
+      FROM users
+      WHERE username = 'smoke-alice'
+      UNION ALL
+      SELECT id, 'smoke-token-boubacar', 'android'
+      FROM users
+      WHERE username = 'smoke-boubacar'
     `,
-    [["users", "push_tokens"]],
   );
 
-  if (tableResult.rows.length > 0) {
-    throw new Error(
-      `Rollback verification failed: application table(s) remain: ${tableResult.rows
-        .map((row) => row.table_name)
-        .join(", ")}`,
-    );
-  }
-
-  const versionResult = await testPool.query<SchemaMigrationVersionRow>(`
-    SELECT version
-    FROM schema_migrations
-    ORDER BY version
-  `);
-  if (versionResult.rows.length > 0) {
-    throw new Error(
-      `Rollback verification failed: schema version(s) remain: ${versionResult.rows
-        .map((row) => row.version)
-        .join(", ")}`,
-    );
-  }
+  return readRepresentativeData(testPool);
 }
 
 async function main(): Promise<void> {
@@ -124,34 +170,52 @@ async function main(): Promise<void> {
       `PostgreSQL ${postgresVersion}: already-versioned database verification succeeded.`,
     );
 
-    await rollbackSchemaForVerification(
-      testPool,
-      databaseUrl,
-      CURRENT_SCHEMA_VERSION - 1,
+    const representativeDataBeforeUpgrade =
+      await seedRepresentativeData(testPool);
+    await testPool.query(
+      "DELETE FROM schema_migrations WHERE version = $1",
+      [CURRENT_SCHEMA_VERSION],
     );
-    await assertRolledBackDatabase(testPool);
+    await ensureSchema(testPool, databaseUrl);
+    await verifySchema(testPool, databaseUrl);
+    assertRepresentativeData(
+      await readRepresentativeData(testPool),
+      representativeDataBeforeUpgrade,
+      "after the upgrade",
+    );
+    console.log(
+      `PostgreSQL ${postgresVersion}: representative users and push tokens survived the upgrade.`,
+    );
 
-    let currentSchemaRejected = false;
+    let backupRestoreRequired = false;
     try {
-      await verifySchema(testPool, databaseUrl);
+      await rollbackSchemaForVerification(
+        testPool,
+        databaseUrl,
+        CURRENT_SCHEMA_VERSION - 1,
+      );
     } catch (error) {
-      if (error instanceof IncompatibleSchemaVersionError) {
-        currentSchemaRejected = true;
+      if (error instanceof BackupRestoreRequiredError) {
+        backupRestoreRequired = true;
       } else {
         throw error;
       }
     }
 
-    if (!currentSchemaRejected) {
+    if (!backupRestoreRequired) {
       throw new Error(
-        "Rollback verification failed: the current API accepted the rolled-back schema.",
+        "Rollback verification failed: a destructive migration did not require a backup restore.",
       );
     }
 
-    await ensureSchema(testPool, databaseUrl);
+    assertRepresentativeData(
+      await readRepresentativeData(testPool),
+      representativeDataBeforeUpgrade,
+      "after the backup-restore requirement",
+    );
     await verifySchema(testPool, databaseUrl);
     console.log(
-      `PostgreSQL ${postgresVersion}: upgrade, reviewed reverse migration, and re-upgrade succeeded on the disposable database.`,
+      `PostgreSQL ${postgresVersion}: destructive rollback was rejected in favor of backup restore and representative data remained intact.`,
     );
 
     await testPool.query(
