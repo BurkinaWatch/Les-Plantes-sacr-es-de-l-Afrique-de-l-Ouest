@@ -55,8 +55,57 @@ jobs:
           node-version: 20
           cache: pnpm
       - run: pnpm install --frozen-lockfile
+      - name: Create a non-privileged Railway API role on PostgreSQL ${{ matrix.postgres-version }}
+        run: |
+          set -euo pipefail
+
+          psql "$READINESS_DATABASE_URL" --set=ON_ERROR_STOP=1 <<'SQL'
+          CREATE ROLE railway_api_smoke
+            LOGIN
+            PASSWORD 'railway_api_smoke_password'
+            NOSUPERUSER
+            NOCREATEDB
+            NOCREATEROLE
+            NOINHERIT
+            NOREPLICATION
+            NOBYPASSRLS;
+
+          DO $$
+          DECLARE
+            role_record pg_roles%ROWTYPE;
+          BEGIN
+            SELECT *
+            INTO role_record
+            FROM pg_roles
+            WHERE rolname = 'railway_api_smoke';
+
+            IF role_record.rolsuper
+              OR role_record.rolcreatedb
+              OR role_record.rolcreaterole
+              OR role_record.rolreplication
+              OR role_record.rolbypassrls THEN
+              RAISE EXCEPTION 'railway_api_smoke must not have administrative privileges';
+            END IF;
+          END $$;
+
+          GRANT CONNECT ON DATABASE schema_smoke TO railway_api_smoke;
+          GRANT USAGE, CREATE ON SCHEMA public TO railway_api_smoke;
+          GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA public TO railway_api_smoke;
+          GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO railway_api_smoke;
+          ALTER DEFAULT PRIVILEGES FOR ROLE schema_smoke IN SCHEMA public
+            GRANT SELECT, INSERT, UPDATE, DELETE ON TABLES TO railway_api_smoke;
+          ALTER DEFAULT PRIVILEGES FOR ROLE schema_smoke IN SCHEMA public
+            GRANT USAGE, SELECT ON SEQUENCES TO railway_api_smoke;
+          SQL
       - name: Verify schema migrations and field drift detection on PostgreSQL ${{ matrix.postgres-version }}
-        run: pnpm --filter @workspace/api-server run check:postgres-schema-smoke
+        env:
+          SERVICE_DATABASE_URL: postgresql://railway_api_smoke:railway_api_smoke_password@127.0.0.1:5432/schema_smoke
+        run: |
+          set -euo pipefail
+          MIGRATION_DATABASE_URL="$READINESS_DATABASE_URL" \
+            READINESS_DATABASE_URL="$SERVICE_DATABASE_URL" \
+            SERVICE_DATABASE_URL="$SERVICE_DATABASE_URL" \
+            pnpm --filter @workspace/api-server run check:postgres-schema-smoke
       - name: Configure disposable PostgreSQL TLS for the Railway connection check
         env:
           POSTGRES_VERSION: ${{ matrix.postgres-version }}
@@ -121,44 +170,6 @@ jobs:
           } >> "$GITHUB_ENV"
       - name: Verify Railway SSL and URL parameters on PostgreSQL ${{ matrix.postgres-version }}
         run: pnpm --filter @workspace/api-server run check:postgres-readiness
-      - name: Create a non-privileged Railway API role on PostgreSQL ${{ matrix.postgres-version }}
-        run: |
-          set -euo pipefail
-
-          psql "$READINESS_DATABASE_URL" --set=ON_ERROR_STOP=1 <<'SQL'
-          CREATE ROLE railway_api_smoke
-            LOGIN
-            PASSWORD 'railway_api_smoke_password'
-            NOSUPERUSER
-            NOCREATEDB
-            NOCREATEROLE
-            NOINHERIT
-            NOREPLICATION
-            NOBYPASSRLS;
-
-          DO $$
-          DECLARE
-            role_record pg_roles%ROWTYPE;
-          BEGIN
-            SELECT *
-            INTO role_record
-            FROM pg_roles
-            WHERE rolname = 'railway_api_smoke';
-
-            IF role_record.rolsuper
-              OR role_record.rolcreatedb
-              OR role_record.rolcreaterole
-              OR role_record.rolreplication
-              OR role_record.rolbypassrls THEN
-              RAISE EXCEPTION 'railway_api_smoke must not have administrative privileges';
-            END IF;
-          END $$;
-
-          GRANT CONNECT ON DATABASE schema_smoke TO railway_api_smoke;
-          GRANT USAGE ON SCHEMA public TO railway_api_smoke;
-          GRANT SELECT ON ALL TABLES IN SCHEMA public TO railway_api_smoke;
-          GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO railway_api_smoke;
-          SQL
       - name: Verify a real backup restores data and schema on PostgreSQL ${{ matrix.postgres-version }}
         env:
           SOURCE_DATABASE_URL: postgresql://schema_smoke:schema_smoke_password@127.0.0.1:5432/schema_smoke

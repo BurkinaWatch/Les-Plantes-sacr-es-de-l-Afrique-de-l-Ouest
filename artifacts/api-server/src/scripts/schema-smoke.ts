@@ -5,6 +5,7 @@ import {
   ensureSchema,
   IncompatibleSchemaVersionError,
   rollbackSchemaForVerification,
+  verifyEffectivePrivileges,
   verifySchema,
 } from "../lib/migrate.js";
 import {
@@ -31,6 +32,21 @@ type RepresentativeTokenRow = {
   user_id: number | null;
   platform: string | null;
 };
+
+const PRIVILEGE_PROBE_TABLE = "migration_privilege_probe";
+const PRIVILEGE_PROBE_SEQUENCE = "migration_privilege_probe_id_seq";
+const PRIVILEGE_PROBE_REQUIREMENTS = [
+  {
+    objectType: "table" as const,
+    objectName: `${PRIVILEGE_PROBE_TABLE}`,
+    privileges: ["SELECT", "INSERT", "UPDATE", "DELETE"],
+  },
+  {
+    objectType: "sequence" as const,
+    objectName: `${PRIVILEGE_PROBE_SEQUENCE}`,
+    privileges: ["USAGE", "SELECT"],
+  },
+] as const;
 
 async function readServerVersion(
   testPool: ReturnType<typeof createDatabasePool>,
@@ -149,6 +165,18 @@ async function main(): Promise<void> {
   const testPool = createDatabasePool(databaseUrl, {
     connectionTimeoutMillis: 10_000,
   });
+  const serviceDatabaseUrl = process.env.SERVICE_DATABASE_URL?.trim();
+  const servicePool = serviceDatabaseUrl
+    ? createDatabasePool(serviceDatabaseUrl, {
+        connectionTimeoutMillis: 10_000,
+      })
+    : undefined;
+  const migrationDatabaseUrl = process.env.MIGRATION_DATABASE_URL?.trim();
+  const migrationPool = migrationDatabaseUrl
+    ? createDatabasePool(migrationDatabaseUrl, {
+        connectionTimeoutMillis: 10_000,
+      })
+    : undefined;
   let postgresVersion = process.env.POSTGRES_VERSION?.trim() || "unknown";
 
   try {
@@ -160,6 +188,32 @@ async function main(): Promise<void> {
 
     await ensureSchema(testPool, databaseUrl);
     await verifySchema(testPool, databaseUrl);
+    const privilegeProbePool = migrationPool ?? testPool;
+    await privilegeProbePool.query(
+      `CREATE SEQUENCE ${PRIVILEGE_PROBE_SEQUENCE}`,
+    );
+    await privilegeProbePool.query(`
+      CREATE TABLE ${PRIVILEGE_PROBE_TABLE} (
+        id INTEGER NOT NULL DEFAULT nextval('${PRIVILEGE_PROBE_SEQUENCE}'),
+        payload TEXT NOT NULL,
+        PRIMARY KEY (id)
+      )
+    `);
+    await verifyEffectivePrivileges(
+      privilegeProbePool,
+      migrationDatabaseUrl ?? databaseUrl,
+      PRIVILEGE_PROBE_REQUIREMENTS,
+    );
+    if (servicePool && serviceDatabaseUrl) {
+      await verifyEffectivePrivileges(
+        servicePool,
+        serviceDatabaseUrl,
+        PRIVILEGE_PROBE_REQUIREMENTS,
+      );
+      console.log(
+        `PostgreSQL ${postgresVersion}: API role privileges remained effective on a migration-created table and sequence.`,
+      );
+    }
     console.log(
       `PostgreSQL ${postgresVersion}: initial migrations succeeded on a blank database.`,
     );
@@ -371,6 +425,8 @@ async function main(): Promise<void> {
     );
     process.exitCode = 1;
   } finally {
+    await servicePool?.end();
+    await migrationPool?.end();
     await testPool.end();
   }
 }

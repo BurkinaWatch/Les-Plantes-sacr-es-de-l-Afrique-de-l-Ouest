@@ -205,6 +205,18 @@ type SchemaVersionRow = {
   version: number;
 };
 
+export type EffectivePrivilegeRequirement = {
+  objectType: "schema" | "table" | "sequence";
+  objectName: string;
+  privileges: readonly string[];
+};
+
+type EffectivePrivilegeRow = {
+  database_user: string;
+  object_exists: boolean;
+  privilege_granted: boolean;
+};
+
 async function ensureSchemaObjects(client: SchemaClient): Promise<void> {
   await client.query(`
     CREATE TABLE IF NOT EXISTS users (
@@ -492,6 +504,124 @@ function describeExpectedDefault(
   return undefined;
 }
 
+async function assertEffectivePrivilege(
+  schemaPool: Pick<SchemaPool, "query">,
+  requirement: EffectivePrivilegeRequirement,
+  privilege: string,
+): Promise<void> {
+  const result =
+    requirement.objectType === "schema"
+      ? await schemaPool.query<EffectivePrivilegeRow>(
+          `
+            SELECT
+              current_user AS database_user,
+              true AS object_exists,
+              has_schema_privilege(current_user, current_schema(), $1) AS privilege_granted
+          `,
+          [privilege],
+        )
+      : await schemaPool.query<EffectivePrivilegeRow>(
+          `
+            SELECT
+              current_user AS database_user,
+              to_regclass($1) IS NOT NULL AS object_exists,
+              CASE
+                WHEN to_regclass($1) IS NULL THEN false
+                WHEN $2 = 'table' THEN has_table_privilege(current_user, $1, $3)
+                ELSE has_sequence_privilege(current_user, $1, $3)
+              END AS privilege_granted
+          `,
+          [requirement.objectName, requirement.objectType, privilege],
+        );
+  const row = result.rows[0];
+
+  if (!row?.object_exists) {
+    throw new Error(
+      `PostgreSQL privilege verification failed: required ${requirement.objectType} "${requirement.objectName}" does not exist for privilege ${privilege}.`,
+    );
+  }
+
+  if (!row.privilege_granted) {
+    throw new Error(
+      `PostgreSQL privilege verification failed: role "${row.database_user}" lacks ${privilege} on ${requirement.objectType} "${requirement.objectName}".`,
+    );
+  }
+}
+
+const REQUIRED_APPLICATION_PRIVILEGES: readonly EffectivePrivilegeRequirement[] = [
+  {
+    objectType: "schema",
+    objectName: "current_schema()",
+    privileges: ["USAGE"],
+  },
+  ...REQUIRED_SCHEMA_TABLES.map((tableName) => ({
+    objectType: "table" as const,
+    objectName: `${tableName}`,
+    privileges: ["SELECT", "INSERT", "UPDATE", "DELETE"],
+  })),
+];
+
+const SERIAL_COLUMNS = [
+  { tableName: "users", columnName: "id" },
+  { tableName: "push_tokens", columnName: "id" },
+] as const;
+
+export async function verifyEffectivePrivileges(
+  schemaPool: Pick<SchemaPool, "query"> = pool,
+  configuredDatabaseUrl: string | undefined =
+    process.env.DATABASE_URL ?? process.env.RAILWAY_DATABASE_URL,
+  requirements: readonly EffectivePrivilegeRequirement[] =
+    REQUIRED_APPLICATION_PRIVILEGES,
+): Promise<void> {
+  assertDatabaseConfigured(configuredDatabaseUrl);
+
+  for (const requirement of requirements) {
+    for (const privilege of requirement.privileges) {
+      await assertEffectivePrivilege(schemaPool, requirement, privilege);
+    }
+  }
+
+  if (requirements !== REQUIRED_APPLICATION_PRIVILEGES) {
+    return;
+  }
+
+  const sequenceResult = await schemaPool.query<{
+    sequence_name: string | null;
+  }>(`
+    SELECT pg_get_serial_sequence(
+      format('%I.%I', current_schema(), required.table_name),
+      required.column_name
+    ) AS sequence_name
+    FROM (
+      VALUES
+        ('users', 'id'),
+        ('push_tokens', 'id')
+    ) AS required(table_name, column_name)
+  `);
+
+  for (const [index, row] of sequenceResult.rows.entries()) {
+    const serialColumn = SERIAL_COLUMNS[index];
+    if (!serialColumn || !row.sequence_name) {
+      throw new Error(
+        `PostgreSQL privilege verification failed: sequence for ${serialColumn?.tableName ?? "required table"}.${serialColumn?.columnName ?? "required column"} does not exist.`,
+      );
+    }
+
+    const sequenceRequirement: EffectivePrivilegeRequirement = {
+      objectType: "sequence",
+      objectName: row.sequence_name,
+      privileges: ["USAGE", "SELECT"],
+    };
+    for (const privilege of sequenceRequirement.privileges) {
+      await assertEffectivePrivilege(
+        schemaPool,
+        sequenceRequirement,
+        privilege,
+      );
+    }
+  }
+}
+
 export async function verifySchema(
   schemaPool: Pick<SchemaPool, "query"> = pool,
   configuredDatabaseUrl: string | undefined =
@@ -743,4 +873,6 @@ export async function verifySchema(
       `PostgreSQL schema verification failed: ${schemaProblems.join("; ")}`,
     );
   }
+
+  await verifyEffectivePrivileges(schemaPool, configuredDatabaseUrl);
 }

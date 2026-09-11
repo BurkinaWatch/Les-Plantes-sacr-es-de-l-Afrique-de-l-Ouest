@@ -67,6 +67,35 @@ schema-version, table creation, and table verification checks succeed.
 Connection failures are reported as not-ready without printing the connection
 string or password.
 
+### Migration and API roles
+
+The migration role is the PostgreSQL login that runs `ensureSchema` and creates
+new tables, indexes, constraints, and sequences. The API role is the login used
+by the running service for reads and writes. The normal Railway configuration
+uses the same role for both: the `DATABASE_URL` (or
+`RAILWAY_DATABASE_URL`) supplied to the API must be allowed to apply its
+versioned migrations and remains the owner of the objects it creates. Do not
+apply a migration manually with a different login and assume that table
+`SELECT` grants also cover the metadata inspected by readiness.
+
+If an operational process deliberately uses a separate migration role, it must
+grant the API role's effective privileges before creating objects. Configure
+default privileges for that migration role in the application schema, including
+`SELECT, INSERT, UPDATE, DELETE` on tables and `USAGE, SELECT` on sequences.
+The API role must still pass the readiness check using its own connection. A
+grant or ownership change that leaves the API role without an effective
+privilege is a migration failure, not a reason to bypass the check.
+
+The schema smoke check models both paths. It runs the application migrations
+with the non-privileged API role, creates a future-migration probe table and
+sequence with the separate migration role, and then checks the probe through
+the API role. Each missing privilege reports the role, object type, object
+name, and privilege, for example:
+
+```text
+PostgreSQL privilege verification failed: role "railway_api_smoke" lacks INSERT on table "public.future_probe".
+```
+
 For automated pre-release coverage, run the isolated PostgreSQL smoke check:
 
 ```sh
