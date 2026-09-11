@@ -2,6 +2,10 @@ name: API PostgreSQL schema smoke
 
 on:
   workflow_dispatch:
+  schedule:
+    # Railway's supported PostgreSQL majors can change independently of app
+    # changes, so run this compatibility check weekly.
+    - cron: "17 4 * * 1"
   push:
     paths:
       - "artifacts/api-server/**"
@@ -16,6 +20,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
+        # Source of truth for the PostgreSQL major versions supported by Railway.
+        # Update this list when Railway changes its supported images.
         postgres-version: ["15", "16", "17"]
     services:
       postgres:
