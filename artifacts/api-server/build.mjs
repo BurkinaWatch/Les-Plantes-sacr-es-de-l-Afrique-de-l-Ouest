@@ -18,6 +18,7 @@ async function buildAll() {
     entryPoints: [
       path.resolve(artifactDir, "src/index.ts"),
       path.resolve(artifactDir, "src/scripts/check-postgres-readiness.ts"),
+      path.resolve(artifactDir, "src/scripts/schema-smoke.ts"),
     ],
     platform: "node",
     bundle: true,

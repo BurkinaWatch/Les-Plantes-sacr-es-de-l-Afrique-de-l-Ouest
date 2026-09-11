@@ -1,0 +1,44 @@
+name: API PostgreSQL schema smoke
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - "artifacts/api-server/**"
+      - "lib/db/**"
+      - "docs/railway-deployment.md"
+      - ".github/workflows/api-postgres-schema-smoke.yml"
+
+jobs:
+  schema-smoke:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_DB: schema_smoke
+          POSTGRES_USER: schema_smoke
+          POSTGRES_PASSWORD: schema_smoke_password
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U schema_smoke -d schema_smoke"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 12
+
+    env:
+      READINESS_DATABASE_URL: postgresql://schema_smoke:schema_smoke_password@127.0.0.1:5432/schema_smoke
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.26.1
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm --filter @workspace/api-server run check:postgres-readiness
+      - run: pnpm --filter @workspace/api-server run check:postgres-schema-smoke

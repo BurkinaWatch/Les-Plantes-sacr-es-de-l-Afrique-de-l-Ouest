@@ -66,6 +66,19 @@ queries PostgreSQL's information schema to verify that both `users` and
 creation, and table verification succeed. Connection failures are reported as
 not-ready without printing the connection string or password.
 
+For automated pre-release coverage, run the isolated PostgreSQL smoke check:
+
+```sh
+READINESS_DATABASE_URL="$READINESS_DATABASE_URL" \
+  pnpm --filter @workspace/api-server run check:postgres-schema-smoke
+```
+
+The smoke check creates the required schema, removes `push_tokens` in the
+temporary test database, confirms that read-only verification detects the
+drift, and restores the schema before exiting. The repository's GitHub Actions
+workflow runs this against a disposable PostgreSQL service; it never uses a
+production database.
+
 If the Railway service exposes the connection as `DATABASE_URL` instead, pass
 that value explicitly in the same in-network shell:
 

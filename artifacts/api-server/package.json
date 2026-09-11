@@ -10,6 +10,7 @@
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "check-keys": "node scripts/check-api-keys.mjs",
     "check:postgres-readiness": "pnpm run build && if [ -z \"$READINESS_DATABASE_URL\" ]; then echo 'READINESS_DATABASE_URL must be set explicitly.' >&2; exit 1; fi && node dist/scripts/check-postgres-readiness.mjs",
+    "check:postgres-schema-smoke": "pnpm run build && if [ -z \"$READINESS_DATABASE_URL\" ]; then echo 'READINESS_DATABASE_URL must be set explicitly.' >&2; exit 1; fi && node dist/scripts/schema-smoke.mjs",
     "test": "rm -rf .test-dist && tsc -p tests/tsconfig.json && JWT_SECRET=test-jwt-secret NODE_ENV=test node --test tests/*.test.mjs"
   },
   "dependencies": {
