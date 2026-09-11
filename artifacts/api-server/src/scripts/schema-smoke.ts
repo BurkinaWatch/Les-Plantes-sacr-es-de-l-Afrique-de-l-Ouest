@@ -84,6 +84,68 @@ async function main(): Promise<void> {
     await ensureSchema(testPool, databaseUrl);
     await verifySchema(testPool, databaseUrl);
 
+    await testPool.query(
+      "ALTER TABLE push_tokens ALTER COLUMN platform TYPE integer USING NULL",
+    );
+
+    let typeDriftDetected = false;
+    try {
+      await verifySchema(testPool, databaseUrl);
+    } catch (error) {
+      if (
+        error instanceof Error &&
+        error.message.includes(
+          "incompatible required column(s): push_tokens.platform (expected type text (text), found integer (int4))",
+        )
+      ) {
+        typeDriftDetected = true;
+      } else {
+        throw error;
+      }
+    }
+
+    if (!typeDriftDetected) {
+      throw new Error(
+        "Schema drift smoke check failed: incompatible push_tokens.platform type was not detected.",
+      );
+    }
+
+    await testPool.query(
+      "ALTER TABLE push_tokens ALTER COLUMN platform TYPE text USING NULL",
+    );
+    await verifySchema(testPool, databaseUrl);
+
+    await testPool.query(
+      "ALTER TABLE push_tokens ALTER COLUMN updated_at SET DEFAULT TIMESTAMP '2000-01-01 00:00:00'",
+    );
+
+    let defaultDriftDetected = false;
+    try {
+      await verifySchema(testPool, databaseUrl);
+    } catch (error) {
+      if (
+        error instanceof Error &&
+        error.message.includes(
+          "incompatible required column(s): push_tokens.updated_at (expected default now(), found ",
+        )
+      ) {
+        defaultDriftDetected = true;
+      } else {
+        throw error;
+      }
+    }
+
+    if (!defaultDriftDetected) {
+      throw new Error(
+        "Schema drift smoke check failed: incompatible push_tokens.updated_at default was not detected.",
+      );
+    }
+
+    await testPool.query(
+      "ALTER TABLE push_tokens ALTER COLUMN updated_at SET DEFAULT NOW()",
+    );
+    await verifySchema(testPool, databaseUrl);
+
     await testPool.query("DROP TABLE IF EXISTS push_tokens");
 
     let driftDetected = false;

@@ -4,18 +4,92 @@ import { logger } from "./logger";
 export const REQUIRED_SCHEMA_TABLES = ["users", "push_tokens"] as const;
 export const CURRENT_SCHEMA_VERSION = 1;
 
-const REQUIRED_SCHEMA_COLUMNS = [
-  { tableName: "users", columnName: "id", isNullable: "NO" },
-  { tableName: "users", columnName: "username", isNullable: "NO" },
-  { tableName: "users", columnName: "password_hash", isNullable: "NO" },
-  { tableName: "users", columnName: "created_at", isNullable: "NO" },
-  { tableName: "push_tokens", columnName: "id", isNullable: "NO" },
-  { tableName: "push_tokens", columnName: "user_id", isNullable: "YES" },
-  { tableName: "push_tokens", columnName: "token", isNullable: "NO" },
-  { tableName: "push_tokens", columnName: "platform", isNullable: "YES" },
-  { tableName: "push_tokens", columnName: "created_at", isNullable: "NO" },
-  { tableName: "push_tokens", columnName: "updated_at", isNullable: "NO" },
-] as const;
+type RequiredSchemaColumn = {
+  tableName: string;
+  columnName: string;
+  isNullable: "YES" | "NO";
+  dataType: string;
+  udtName: string;
+  defaultRequirement?: "sequence" | "now";
+};
+
+const REQUIRED_SCHEMA_COLUMNS: readonly RequiredSchemaColumn[] = [
+  {
+    tableName: "users",
+    columnName: "id",
+    isNullable: "NO",
+    dataType: "integer",
+    udtName: "int4",
+    defaultRequirement: "sequence",
+  },
+  {
+    tableName: "users",
+    columnName: "username",
+    isNullable: "NO",
+    dataType: "text",
+    udtName: "text",
+  },
+  {
+    tableName: "users",
+    columnName: "password_hash",
+    isNullable: "NO",
+    dataType: "text",
+    udtName: "text",
+  },
+  {
+    tableName: "users",
+    columnName: "created_at",
+    isNullable: "NO",
+    dataType: "timestamp without time zone",
+    udtName: "timestamp",
+    defaultRequirement: "now",
+  },
+  {
+    tableName: "push_tokens",
+    columnName: "id",
+    isNullable: "NO",
+    dataType: "integer",
+    udtName: "int4",
+    defaultRequirement: "sequence",
+  },
+  {
+    tableName: "push_tokens",
+    columnName: "user_id",
+    isNullable: "YES",
+    dataType: "integer",
+    udtName: "int4",
+  },
+  {
+    tableName: "push_tokens",
+    columnName: "token",
+    isNullable: "NO",
+    dataType: "text",
+    udtName: "text",
+  },
+  {
+    tableName: "push_tokens",
+    columnName: "platform",
+    isNullable: "YES",
+    dataType: "text",
+    udtName: "text",
+  },
+  {
+    tableName: "push_tokens",
+    columnName: "created_at",
+    isNullable: "NO",
+    dataType: "timestamp without time zone",
+    udtName: "timestamp",
+    defaultRequirement: "now",
+  },
+  {
+    tableName: "push_tokens",
+    columnName: "updated_at",
+    isNullable: "NO",
+    dataType: "timestamp without time zone",
+    udtName: "timestamp",
+    defaultRequirement: "now",
+  },
+];
 
 const REQUIRED_SCHEMA_CONSTRAINTS = [
   {
@@ -242,6 +316,9 @@ type ColumnRow = {
   table_name: string;
   column_name: string;
   is_nullable: string;
+  data_type: string;
+  udt_name: string;
+  column_default: string | null;
 };
 
 type ConstraintRow = {
@@ -266,6 +343,39 @@ function sameColumns(actual: string[], expected: readonly string[]) {
     actual.length === expected.length &&
     actual.every((columnName, index) => columnName === expected[index])
   );
+}
+
+function normalizeDefaultExpression(expression: string | null): string | null {
+  return expression?.replace(/\s+/g, " ").trim().toLowerCase() ?? null;
+}
+
+function hasRequiredDefault(
+  column: RequiredSchemaColumn,
+  actualDefault: string | null,
+): boolean {
+  const normalizedDefault = normalizeDefaultExpression(actualDefault);
+
+  if (!column.defaultRequirement) {
+    return true;
+  }
+
+  if (column.defaultRequirement === "sequence") {
+    return normalizedDefault !== null && /^nextval\(.+::regclass\)$/.test(normalizedDefault);
+  }
+
+  return normalizedDefault === "now()";
+}
+
+function describeExpectedDefault(
+  requirement: RequiredSchemaColumn["defaultRequirement"],
+): string | undefined {
+  if (requirement === "sequence") {
+    return "sequence-generated";
+  }
+  if (requirement === "now") {
+    return "now()";
+  }
+  return undefined;
 }
 
 export async function verifySchema(
@@ -302,7 +412,7 @@ export async function verifySchema(
 
   const columnsResult = await schemaPool.query<ColumnRow>(
     `
-      SELECT table_name, column_name, is_nullable
+      SELECT table_name, column_name, is_nullable, data_type, udt_name, column_default
       FROM information_schema.columns
       WHERE table_schema = current_schema()
         AND table_name = ANY($1::text[])
@@ -312,20 +422,51 @@ export async function verifySchema(
   const existingColumns = new Map(
     columnsResult.rows.map((row) => [
       `${row.table_name}.${row.column_name}`,
-      row.is_nullable,
+      row,
     ]),
   );
   const missingColumns = REQUIRED_SCHEMA_COLUMNS.filter(
-    (column) =>
-      !existingColumns.has(`${column.tableName}.${column.columnName}`) ||
-      existingColumns.get(`${column.tableName}.${column.columnName}`) !==
-        column.isNullable,
+    (column) => !existingColumns.has(`${column.tableName}.${column.columnName}`),
   ).map(
     (column) =>
       `${column.tableName}.${column.columnName}${
         column.isNullable === "NO" ? " (NOT NULL)" : ""
       }`,
   );
+  const incompatibleColumns = REQUIRED_SCHEMA_COLUMNS.flatMap((column) => {
+    const actual = existingColumns.get(`${column.tableName}.${column.columnName}`);
+    if (!actual) {
+      return [];
+    }
+
+    const differences: string[] = [];
+    if (actual.is_nullable !== column.isNullable) {
+      differences.push(
+        `expected ${column.isNullable === "NO" ? "NOT NULL" : "NULLABLE"}, found ${
+          actual.is_nullable === "NO" ? "NOT NULL" : "NULLABLE"
+        }`,
+      );
+    }
+    if (
+      actual.data_type !== column.dataType ||
+      actual.udt_name !== column.udtName
+    ) {
+      differences.push(
+        `expected type ${column.dataType} (${column.udtName}), found ${actual.data_type} (${actual.udt_name})`,
+      );
+    }
+    if (!hasRequiredDefault(column, actual.column_default)) {
+      differences.push(
+        `expected default ${describeExpectedDefault(column.defaultRequirement)}, found ${
+          normalizeDefaultExpression(actual.column_default) ?? "none"
+        }`,
+      );
+    }
+
+    return differences.length > 0
+      ? [`${column.tableName}.${column.columnName} (${differences.join("; ")})`]
+      : [];
+  });
 
   const constraintsResult = await schemaPool.query<ConstraintRow>(
     `
@@ -471,6 +612,9 @@ export async function verifySchema(
   const schemaProblems = [
     missingColumns.length > 0
       ? `missing required column(s): ${missingColumns.join(", ")}`
+      : undefined,
+    incompatibleColumns.length > 0
+      ? `incompatible required column(s): ${incompatibleColumns.join(", ")}`
       : undefined,
     missingConstraints.length > 0
       ? `missing required constraint(s): ${missingConstraints.join(", ")}`
