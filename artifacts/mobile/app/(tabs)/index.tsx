@@ -389,9 +389,6 @@ const styles = StyleSheet.create({
   featuredImage: {
     borderRadius: 18,
   },
-  featuredImage: {
-    borderRadius: 18,
-  },
   featuredTextBlock: {
     padding: 12,
     paddingBottom: 14,
