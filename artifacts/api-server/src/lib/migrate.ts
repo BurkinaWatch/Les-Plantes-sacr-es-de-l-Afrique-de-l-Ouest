@@ -1,5 +1,4 @@
-import { pool } from "@workspace/db";
-import { logger } from "./logger";
+import { logger } from "./logger.js";
 
 export const REQUIRED_SCHEMA_TABLES = ["users", "push_tokens"] as const;
 export const CURRENT_SCHEMA_VERSION = 1;
@@ -145,6 +144,11 @@ export type SchemaPool = {
     values?: unknown[],
   ): Promise<{ rows: T[] }>;
 };
+
+async function getDefaultSchemaPool(): Promise<SchemaPool> {
+  const { pool } = await import("@workspace/db");
+  return pool;
+}
 
 function assertDatabaseConfigured(configuredDatabaseUrl: string | undefined) {
   if (!configuredDatabaseUrl) {
@@ -299,13 +303,13 @@ function assertCompatibleSchemaVersions(appliedVersions: number[]): void {
 }
 
 export async function ensureSchema(
-  schemaPool: Pick<SchemaPool, "connect"> = pool,
+  schemaPool?: Pick<SchemaPool, "connect">,
   configuredDatabaseUrl: string | undefined =
     process.env.DATABASE_URL ?? process.env.RAILWAY_DATABASE_URL,
 ) {
   assertDatabaseConfigured(configuredDatabaseUrl);
 
-  const client = await schemaPool.connect();
+  const client = await (schemaPool ?? (await getDefaultSchemaPool())).connect();
   try {
     await client.query("BEGIN");
     await client.query(`
@@ -364,7 +368,7 @@ export async function ensureSchema(
  * usually a backup restore, rather than invoking this helper.
  */
 export async function rollbackSchemaForVerification(
-  schemaPool: Pick<SchemaPool, "connect"> = pool,
+  schemaPool?: Pick<SchemaPool, "connect">,
   configuredDatabaseUrl: string | undefined =
     process.env.DATABASE_URL ?? process.env.RAILWAY_DATABASE_URL,
   targetVersion = CURRENT_SCHEMA_VERSION - 1,
@@ -387,7 +391,7 @@ export async function rollbackSchemaForVerification(
     );
   }
 
-  const client = await schemaPool.connect();
+  const client = await (schemaPool ?? (await getDefaultSchemaPool())).connect();
   try {
     await client.query("BEGIN");
     await client.query(`
@@ -567,17 +571,23 @@ const SERIAL_COLUMNS = [
 ] as const;
 
 export async function verifyEffectivePrivileges(
-  schemaPool: Pick<SchemaPool, "query"> = pool,
+  schemaPool?: Pick<SchemaPool, "query">,
   configuredDatabaseUrl: string | undefined =
     process.env.DATABASE_URL ?? process.env.RAILWAY_DATABASE_URL,
   requirements: readonly EffectivePrivilegeRequirement[] =
     REQUIRED_APPLICATION_PRIVILEGES,
 ): Promise<void> {
   assertDatabaseConfigured(configuredDatabaseUrl);
+  const effectiveSchemaPool =
+    schemaPool ?? (await getDefaultSchemaPool());
 
   for (const requirement of requirements) {
     for (const privilege of requirement.privileges) {
-      await assertEffectivePrivilege(schemaPool, requirement, privilege);
+      await assertEffectivePrivilege(
+        effectiveSchemaPool,
+        requirement,
+        privilege,
+      );
     }
   }
 
@@ -585,7 +595,7 @@ export async function verifyEffectivePrivileges(
     return;
   }
 
-  const sequenceResult = await schemaPool.query<{
+  const sequenceResult = await effectiveSchemaPool.query<{
     sequence_name: string | null;
   }>(`
     SELECT pg_get_serial_sequence(
@@ -614,7 +624,7 @@ export async function verifyEffectivePrivileges(
     };
     for (const privilege of sequenceRequirement.privileges) {
       await assertEffectivePrivilege(
-        schemaPool,
+        effectiveSchemaPool,
         sequenceRequirement,
         privilege,
       );
@@ -623,16 +633,18 @@ export async function verifyEffectivePrivileges(
 }
 
 export async function verifySchema(
-  schemaPool: Pick<SchemaPool, "query"> = pool,
+  schemaPool?: Pick<SchemaPool, "query">,
   configuredDatabaseUrl: string | undefined =
     process.env.DATABASE_URL ?? process.env.RAILWAY_DATABASE_URL,
 ) {
   assertDatabaseConfigured(configuredDatabaseUrl);
+  const effectiveSchemaPool =
+    schemaPool ?? (await getDefaultSchemaPool());
 
-  const appliedVersions = await readAppliedSchemaVersions(schemaPool);
+  const appliedVersions = await readAppliedSchemaVersions(effectiveSchemaPool);
   assertCompatibleSchemaVersions(appliedVersions);
 
-  const result = await schemaPool.query<{ table_name: string }>(
+  const result = await effectiveSchemaPool.query<{ table_name: string }>(
     `
       SELECT table_name
       FROM information_schema.tables
@@ -654,7 +666,7 @@ export async function verifySchema(
     );
   }
 
-  const columnsResult = await schemaPool.query<ColumnRow>(
+  const columnsResult = await effectiveSchemaPool.query<ColumnRow>(
     `
       SELECT table_name, column_name, is_nullable, data_type, udt_name, column_default
       FROM information_schema.columns
@@ -712,7 +724,7 @@ export async function verifySchema(
       : [];
   });
 
-  const constraintsResult = await schemaPool.query<ConstraintRow>(
+  const constraintsResult = await effectiveSchemaPool.query<ConstraintRow>(
     `
       SELECT
         tc.table_name,
@@ -816,7 +828,7 @@ export async function verifySchema(
       `${constraint.tableName} ${constraint.constraintType} (${constraint.columns.join(", ")})`,
   );
 
-  const indexesResult = await schemaPool.query<IndexRow>(
+  const indexesResult = await effectiveSchemaPool.query<IndexRow>(
     `
       SELECT
         index_class.relname AS index_name,
@@ -874,5 +886,5 @@ export async function verifySchema(
     );
   }
 
-  await verifyEffectivePrivileges(schemaPool, configuredDatabaseUrl);
+  await verifyEffectivePrivileges(effectiveSchemaPool, configuredDatabaseUrl);
 }
