@@ -10,6 +10,7 @@ Application mobile Expo/React Native consacrée aux plantes et aux animaux sacr�
 - `pnpm --filter @workspace/mockup-sandbox run dev` — run the component preview server on port 8081
 - `pnpm run typecheck` — run the workspace TypeScript checks
 - `pnpm run build` — typecheck and build all packages
+- `pnpm run check:github-workflows` — lint all GitHub Actions workflow syntax and expressions with actionlint
 - `pnpm --filter @workspace/api-spec run codegen` — regenerate API hooks and Zod schemas from the OpenAPI spec
 - `pnpm --filter @workspace/db run push` — push DB schema changes (development only)
 

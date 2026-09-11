@@ -1,0 +1,21 @@
+name: Validate GitHub Actions workflows
+
+on:
+  pull_request:
+    paths:
+      - ".github/workflows/**"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  actionlint:
+    name: Lint workflow syntax and expressions
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v4
+
+      - name: Validate GitHub Actions workflows
+        uses: raven-actions/actionlint@v2
