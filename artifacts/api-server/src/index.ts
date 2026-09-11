@@ -1,6 +1,9 @@
 import app from "./app";
 import { logger } from "./lib/logger";
-import { ensureSchema } from "./lib/migrate";
+import {
+  ensureSchema,
+  IncompatibleSchemaVersionError,
+} from "./lib/migrate";
 import { getRuntimeConfiguration } from "./lib/runtime-config";
 import { setDatabaseReadiness } from "./lib/runtime-state";
 
@@ -63,8 +66,12 @@ if (runtimeConfiguration.databaseConfigured) {
     })
     .catch((err) => {
       setDatabaseReadiness(
-        "failed",
-        "Database schema verification failed. Check DATABASE_URL and the PostgreSQL service logs.",
+        err instanceof IncompatibleSchemaVersionError
+          ? "incompatible"
+          : "failed",
+        err instanceof IncompatibleSchemaVersionError
+          ? err.message
+          : "Database schema verification failed. Check DATABASE_URL and the PostgreSQL service logs.",
       );
       logger.error(
         { err },

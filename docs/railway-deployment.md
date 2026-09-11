@@ -60,11 +60,12 @@ READINESS_DATABASE_URL="$RAILWAY_DATABASE_URL" \
   pnpm --filter @workspace/api-server run check:postgres-readiness
 ```
 
-The command runs the same schema initialization used at API startup, then
+The command runs the same versioned schema migrations used at API startup, then
 queries PostgreSQL's information schema to verify that both `users` and
-`push_tokens` exist. It exits successfully only after the connection, table
-creation, and table verification succeed. Connection failures are reported as
-not-ready without printing the connection string or password.
+`push_tokens` exist. It exits successfully only after the connection, migration,
+schema-version, table creation, and table verification checks succeed.
+Connection failures are reported as not-ready without printing the connection
+string or password.
 
 For automated pre-release coverage, run the isolated PostgreSQL smoke check:
 
@@ -78,6 +79,35 @@ temporary test database, confirms that read-only verification detects the
 drift, and restores the schema before exiting. The repository's GitHub Actions
 workflow runs this against a disposable PostgreSQL service; it never uses a
 production database.
+
+## Schema versions and rollback
+
+The API records every applied migration in the PostgreSQL
+`schema_migrations` table. The current API expects schema version `1`. Startup
+and both PostgreSQL checks reject a database that contains a future or unknown
+version, or that has not recorded the current version; the health endpoint
+remains `503` until the mismatch is resolved.
+
+To upgrade a database, deploy the API version that contains the next migration,
+then run the readiness check from the Railway API service shell:
+
+```sh
+READINESS_DATABASE_URL="$RAILWAY_DATABASE_URL" \
+  pnpm --filter @workspace/api-server run check:postgres-readiness
+```
+
+The migration is applied in a transaction and its version is recorded only
+after the migration succeeds. If the command fails, inspect the reported
+migration error, correct the database issue, and run it again before
+publishing traffic.
+
+There is no automatic destructive rollback. To roll back an application
+release, first use a compatible API version; do not delete rows from
+`schema_migrations` or manually lower its version. If a migration requires a
+rollback, create and review a dedicated reverse migration for that schema
+version, run it against a backup or disposable database first, and only then
+deploy the matching older API. Restore the database backup if the reverse
+migration cannot safely undo the change.
 
 If the Railway service exposes the connection as `DATABASE_URL` instead, pass
 that value explicitly in the same in-network shell:

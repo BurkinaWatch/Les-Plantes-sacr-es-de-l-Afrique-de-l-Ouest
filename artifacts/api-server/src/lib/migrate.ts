@@ -2,6 +2,7 @@ import { pool } from "@workspace/db";
 import { logger } from "./logger";
 
 export const REQUIRED_SCHEMA_TABLES = ["users", "push_tokens"] as const;
+export const CURRENT_SCHEMA_VERSION = 1;
 
 const REQUIRED_SCHEMA_COLUMNS = [
   { tableName: "users", columnName: "id", isNullable: "NO" },
@@ -56,7 +57,10 @@ const REQUIRED_SCHEMA_INDEXES = [
 ] as const;
 
 type SchemaClient = {
-  query(text: string, values?: unknown[]): Promise<unknown>;
+  query<T extends Record<string, unknown>>(
+    text: string,
+    values?: unknown[],
+  ): Promise<{ rows: T[] }>;
   release(): void;
 };
 
@@ -76,6 +80,106 @@ function assertDatabaseConfigured(configuredDatabaseUrl: string | undefined) {
   }
 }
 
+export class IncompatibleSchemaVersionError extends Error {
+  readonly appliedVersions: number[];
+  readonly expectedVersion: number;
+
+  constructor(appliedVersions: number[], expectedVersion = CURRENT_SCHEMA_VERSION) {
+    super(
+      `PostgreSQL schema version is incompatible: found version(s) ${appliedVersions.join(
+        ", ",
+      )}; expected ${expectedVersion}.`,
+    );
+    this.name = "IncompatibleSchemaVersionError";
+    this.appliedVersions = appliedVersions;
+    this.expectedVersion = expectedVersion;
+  }
+}
+
+type SchemaMigration = {
+  version: number;
+  up: (client: SchemaClient) => Promise<void>;
+};
+
+type SchemaVersionRow = {
+  version: number;
+};
+
+async function ensureSchemaObjects(client: SchemaClient): Promise<void> {
+  await client.query(`
+    CREATE TABLE IF NOT EXISTS users (
+      id SERIAL PRIMARY KEY,
+      username TEXT NOT NULL UNIQUE,
+      password_hash TEXT NOT NULL,
+      created_at TIMESTAMP DEFAULT NOW() NOT NULL
+    )
+  `);
+
+  await client.query(`
+    CREATE TABLE IF NOT EXISTS push_tokens (
+      id SERIAL PRIMARY KEY,
+      user_id INTEGER REFERENCES users(id) ON DELETE SET NULL,
+      token TEXT NOT NULL UNIQUE,
+      platform TEXT,
+      created_at TIMESTAMP DEFAULT NOW() NOT NULL,
+      updated_at TIMESTAMP DEFAULT NOW() NOT NULL
+    )
+  `);
+
+  await client.query(`
+    CREATE INDEX IF NOT EXISTS push_tokens_user_id_idx ON push_tokens(user_id)
+  `);
+}
+
+const SCHEMA_MIGRATIONS: readonly SchemaMigration[] = [
+  {
+    version: 1,
+    up: ensureSchemaObjects,
+  },
+];
+
+function getMigration(version: number): SchemaMigration | undefined {
+  return SCHEMA_MIGRATIONS.find((migration) => migration.version === version);
+}
+
+async function readAppliedSchemaVersions(
+  schemaPool: Pick<SchemaPool, "query">,
+): Promise<number[]> {
+  const metadataTableResult = await schemaPool.query<{
+    exists: boolean;
+  }>(`
+    SELECT to_regclass(current_schema() || '.schema_migrations') IS NOT NULL AS exists
+  `);
+
+  if (!metadataTableResult.rows[0]?.exists) {
+    throw new IncompatibleSchemaVersionError([], CURRENT_SCHEMA_VERSION);
+  }
+
+  const result = await schemaPool.query<SchemaVersionRow>(`
+    SELECT version
+    FROM schema_migrations
+    ORDER BY version
+  `);
+  return result.rows.map((row) => row.version);
+}
+
+function assertCompatibleSchemaVersions(appliedVersions: number[]): void {
+  const hasUnknownVersion = appliedVersions.some(
+    (version) => getMigration(version) === undefined,
+  );
+  const hasFutureVersion = appliedVersions.some(
+    (version) => version > CURRENT_SCHEMA_VERSION,
+  );
+
+  if (
+    hasUnknownVersion ||
+    hasFutureVersion ||
+    !appliedVersions.includes(CURRENT_SCHEMA_VERSION)
+  ) {
+    throw new IncompatibleSchemaVersionError(appliedVersions);
+  }
+}
+
 export async function ensureSchema(
   schemaPool: Pick<SchemaPool, "connect"> = pool,
   configuredDatabaseUrl: string | undefined =
@@ -85,32 +189,48 @@ export async function ensureSchema(
 
   const client = await schemaPool.connect();
   try {
+    await client.query("BEGIN");
     await client.query(`
-      CREATE TABLE IF NOT EXISTS users (
-        id SERIAL PRIMARY KEY,
-        username TEXT NOT NULL UNIQUE,
-        password_hash TEXT NOT NULL,
-        created_at TIMESTAMP DEFAULT NOW() NOT NULL
+      CREATE TABLE IF NOT EXISTS schema_migrations (
+        version INTEGER PRIMARY KEY,
+        applied_at TIMESTAMP DEFAULT NOW() NOT NULL
       )
     `);
 
-    await client.query(`
-      CREATE TABLE IF NOT EXISTS push_tokens (
-        id SERIAL PRIMARY KEY,
-        user_id INTEGER REFERENCES users(id) ON DELETE SET NULL,
-        token TEXT NOT NULL UNIQUE,
-        platform TEXT,
-        created_at TIMESTAMP DEFAULT NOW() NOT NULL,
-        updated_at TIMESTAMP DEFAULT NOW() NOT NULL
-      )
-    `);
+    await client.query("LOCK TABLE schema_migrations IN EXCLUSIVE MODE");
+    const appliedVersions = await readAppliedSchemaVersions(client);
+    if (appliedVersions.some((version) => version > CURRENT_SCHEMA_VERSION)) {
+      throw new IncompatibleSchemaVersionError(appliedVersions);
+    }
 
-    await client.query(`
-      CREATE INDEX IF NOT EXISTS push_tokens_user_id_idx ON push_tokens(user_id)
-    `);
+    for (const migration of SCHEMA_MIGRATIONS) {
+      if (appliedVersions.includes(migration.version)) {
+        continue;
+      }
 
-    logger.info("Database schema is ready");
+      await migration.up(client);
+      await client.query(
+        `
+          INSERT INTO schema_migrations (version)
+          VALUES ($1)
+        `,
+        [migration.version],
+      );
+    }
+
+    await ensureSchemaObjects(client);
+    await verifySchema(client, configuredDatabaseUrl);
+    await client.query("COMMIT");
+    logger.info(
+      { schemaVersion: CURRENT_SCHEMA_VERSION },
+      "Database schema is ready",
+    );
   } catch (err) {
+    try {
+      await client.query("ROLLBACK");
+    } catch (rollbackError) {
+      logger.error({ err: rollbackError }, "Failed to roll back schema migration");
+    }
     logger.error({ err }, "Failed to ensure database schema");
     throw err;
   } finally {
@@ -154,6 +274,9 @@ export async function verifySchema(
     process.env.DATABASE_URL ?? process.env.RAILWAY_DATABASE_URL,
 ) {
   assertDatabaseConfigured(configuredDatabaseUrl);
+
+  const appliedVersions = await readAppliedSchemaVersions(schemaPool);
+  assertCompatibleSchemaVersions(appliedVersions);
 
   const result = await schemaPool.query<{ table_name: string }>(
     `

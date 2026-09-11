@@ -3,7 +3,12 @@ import {
   type RuntimeConfiguration,
 } from "./runtime-config.js";
 
-export type DatabaseReadiness = "not_started" | "checking" | "ready" | "failed";
+export type DatabaseReadiness =
+  | "not_started"
+  | "checking"
+  | "ready"
+  | "failed"
+  | "incompatible";
 
 let databaseReadiness: DatabaseReadiness = "not_started";
 let databaseFailureMessage: string | undefined;
@@ -33,7 +38,7 @@ export function getReadinessReport(
     ? "missing"
     : databaseReadiness === "ready"
       ? "ready"
-      : databaseReadiness === "failed"
+      : databaseReadiness === "failed" || databaseReadiness === "incompatible"
         ? "unavailable"
         : "checking";
   const jwt = configuration.jwtConfigured ? "configured" : "missing";
@@ -43,10 +48,15 @@ export function getReadinessReport(
     messages.push("Database schema verification has not started yet.");
   } else if (configuration.databaseConfigured && databaseReadiness === "checking") {
     messages.push("Database schema verification is still in progress.");
-  } else if (configuration.databaseConfigured && databaseReadiness === "failed") {
+  } else if (
+    configuration.databaseConfigured &&
+    (databaseReadiness === "failed" || databaseReadiness === "incompatible")
+  ) {
     messages.push(
       databaseFailureMessage ??
-        "Database schema verification failed. Check the PostgreSQL connection and server logs.",
+        (databaseReadiness === "incompatible"
+          ? "Database schema version is incompatible with this API. Apply the pending migrations before accepting traffic."
+          : "Database schema verification failed. Check the PostgreSQL connection and server logs."),
     );
   }
 

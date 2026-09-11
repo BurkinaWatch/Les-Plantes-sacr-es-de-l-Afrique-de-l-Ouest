@@ -1,6 +1,8 @@
 import { createDatabasePool } from "@workspace/db";
 import {
+  CURRENT_SCHEMA_VERSION,
   ensureSchema,
+  IncompatibleSchemaVersionError,
   verifySchema,
 } from "../lib/migrate.js";
 import {
@@ -24,6 +26,34 @@ async function main(): Promise<void> {
   });
 
   try {
+    await ensureSchema(testPool, databaseUrl);
+    await verifySchema(testPool, databaseUrl);
+
+    await testPool.query(
+      "INSERT INTO schema_migrations (version) VALUES ($1)",
+      [CURRENT_SCHEMA_VERSION + 1],
+    );
+
+    let incompatibleVersionDetected = false;
+    try {
+      await ensureSchema(testPool, databaseUrl);
+    } catch (error) {
+      if (error instanceof IncompatibleSchemaVersionError) {
+        incompatibleVersionDetected = true;
+      } else {
+        throw error;
+      }
+    }
+
+    if (!incompatibleVersionDetected) {
+      throw new Error(
+        "Schema version smoke check failed: a future schema version was accepted.",
+      );
+    }
+
+    await testPool.query("DELETE FROM schema_migrations WHERE version = $1", [
+      CURRENT_SCHEMA_VERSION + 1,
+    ]);
     await ensureSchema(testPool, databaseUrl);
     await verifySchema(testPool, databaseUrl);
 

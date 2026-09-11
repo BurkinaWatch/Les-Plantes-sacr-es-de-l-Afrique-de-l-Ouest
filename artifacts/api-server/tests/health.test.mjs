@@ -111,3 +111,33 @@ test("health exposes a clear not-ready response after PostgreSQL schema failure"
     setDatabaseReadiness("not_started");
   }
 });
+
+test("health exposes an incompatible schema version as unavailable", async () => {
+  const previousDatabaseUrl = process.env.DATABASE_URL;
+  const previousJwtSecret = process.env.JWT_SECRET;
+  process.env.DATABASE_URL = "postgresql://health-check.example.invalid/api";
+  process.env.JWT_SECRET = "health-test-secret";
+  setDatabaseReadiness(
+    "incompatible",
+    "PostgreSQL schema version is incompatible: found version(s) 2; expected 1.",
+  );
+
+  try {
+    await withHealthServer(async (baseUrl) => {
+      const response = await fetch(`${baseUrl}/api/healthz`);
+      const body = await response.json();
+
+      assert.equal(response.status, 503);
+      assert.deepEqual(body.checks, { database: "unavailable", jwt: "configured" });
+      assert.equal(body.status, "not_ready");
+      assert.equal(body.ready, false);
+      assert.match(body.message, /schema version is incompatible/);
+    });
+  } finally {
+    if (previousDatabaseUrl === undefined) delete process.env.DATABASE_URL;
+    else process.env.DATABASE_URL = previousDatabaseUrl;
+    if (previousJwtSecret === undefined) delete process.env.JWT_SECRET;
+    else process.env.JWT_SECRET = previousJwtSecret;
+    setDatabaseReadiness("not_started");
+  }
+});
