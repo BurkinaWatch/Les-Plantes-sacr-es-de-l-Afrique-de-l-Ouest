@@ -33,6 +33,9 @@ type RepresentativeTokenRow = {
   platform: string | null;
 };
 
+const API_WRITE_SMOKE_USERNAME = "service-api-write-smoke-user";
+const API_WRITE_SMOKE_TOKEN = "ExponentPushToken[service_api_write_smoke]";
+
 const PRIVILEGE_PROBE_TABLE = "migration_privilege_probe";
 const PRIVILEGE_PROBE_SEQUENCE = "migration_privilege_probe_id_seq";
 const PRIVILEGE_PROBE_REQUIREMENTS = [
@@ -151,6 +154,227 @@ async function seedRepresentativeData(
   return readRepresentativeData(testPool);
 }
 
+function getPostgresErrorCode(error: unknown): string | undefined {
+  if (typeof error !== "object" || error === null || !("code" in error)) {
+    return undefined;
+  }
+
+  const code = (error as { code?: unknown }).code;
+  return typeof code === "string" ? code : undefined;
+}
+
+async function verifyServiceApiWrites(
+  servicePool: ReturnType<typeof createDatabasePool>,
+): Promise<void> {
+  const client = await servicePool.connect();
+
+  try {
+    await client.query("BEGIN");
+
+    const insertedUser = await client.query<{
+      id: number;
+      username: string;
+      password_hash: string;
+    }>(
+      `
+        INSERT INTO users (username, password_hash)
+        VALUES ($1, $2)
+        RETURNING id, username, password_hash
+      `,
+      [API_WRITE_SMOKE_USERNAME, "service-api-write-initial-hash"],
+    );
+    const user = insertedUser.rows[0];
+
+    if (
+      !user ||
+      !Number.isInteger(user.id) ||
+      user.username !== API_WRITE_SMOKE_USERNAME ||
+      user.password_hash !== "service-api-write-initial-hash"
+    ) {
+      throw new Error(
+        "API write smoke failed: the service role could not insert a user using the users.id sequence.",
+      );
+    }
+
+    const selectedUser = await client.query<{
+      id: number;
+      username: string;
+      password_hash: string;
+    }>(
+      `
+        SELECT id, username, password_hash
+        FROM users
+        WHERE id = $1
+      `,
+      [user.id],
+    );
+    if (
+      selectedUser.rows.length !== 1 ||
+      selectedUser.rows[0]?.username !== API_WRITE_SMOKE_USERNAME
+    ) {
+      throw new Error(
+        "API write smoke failed: the service role could not read the inserted user.",
+      );
+    }
+
+    const updatedUser = await client.query<{
+      id: number;
+      password_hash: string;
+    }>(
+      `
+        UPDATE users
+        SET password_hash = $2
+        WHERE id = $1
+        RETURNING id, password_hash
+      `,
+      [user.id, "service-api-write-updated-hash"],
+    );
+    if (
+      updatedUser.rows.length !== 1 ||
+      updatedUser.rows[0]?.password_hash !== "service-api-write-updated-hash"
+    ) {
+      throw new Error(
+        "API write smoke failed: the service role could not update the user.",
+      );
+    }
+
+    const insertedToken = await client.query<{ id: number }>(
+      `
+        INSERT INTO push_tokens (user_id, token, platform, updated_at)
+        VALUES ($1, $2, $3, NOW())
+        RETURNING id
+      `,
+      [user.id, API_WRITE_SMOKE_TOKEN, "ios"],
+    );
+    if (
+      insertedToken.rows.length !== 1 ||
+      !Number.isInteger(insertedToken.rows[0]?.id)
+    ) {
+      throw new Error(
+        "API write smoke failed: the service role could not insert a push token using the push_tokens.id sequence.",
+      );
+    }
+
+    const upsertedToken = await client.query<{ id: number }>(
+      `
+        INSERT INTO push_tokens (user_id, token, platform, updated_at)
+        VALUES ($1, $2, $3, NOW())
+        ON CONFLICT (token) DO UPDATE
+        SET platform = $3, updated_at = NOW()
+        WHERE push_tokens.user_id = $1
+        RETURNING id
+      `,
+      [user.id, API_WRITE_SMOKE_TOKEN, "android"],
+    );
+    if (upsertedToken.rows.length !== 1) {
+      throw new Error(
+        "API write smoke failed: the service role could not update an existing push token through the API upsert.",
+      );
+    }
+
+    const selectedToken = await client.query<{
+      user_id: number | null;
+      token: string;
+      platform: string | null;
+    }>(
+      `
+        SELECT user_id, token, platform
+        FROM push_tokens
+        WHERE token = $1
+      `,
+      [API_WRITE_SMOKE_TOKEN],
+    );
+    const token = selectedToken.rows[0];
+    if (
+      selectedToken.rows.length !== 1 ||
+      token?.user_id !== user.id ||
+      token.token !== API_WRITE_SMOKE_TOKEN ||
+      token.platform !== "android"
+    ) {
+      throw new Error(
+        "API write smoke failed: the service role could not read the updated push token relationship.",
+      );
+    }
+
+    await client.query("SAVEPOINT duplicate_username_constraint");
+    try {
+      await client.query(
+        `
+          INSERT INTO users (username, password_hash)
+          VALUES ($1, $2)
+        `,
+        [API_WRITE_SMOKE_USERNAME, "duplicate-user-hash"],
+      );
+      throw new Error(
+        "API write smoke failed: duplicate usernames were accepted.",
+      );
+    } catch (error) {
+      if (getPostgresErrorCode(error) !== "23505") {
+        throw error;
+      }
+      await client.query("ROLLBACK TO SAVEPOINT duplicate_username_constraint");
+      await client.query("RELEASE SAVEPOINT duplicate_username_constraint");
+    }
+
+    await client.query("SAVEPOINT foreign_key_constraint");
+    try {
+      await client.query(
+        `
+          INSERT INTO push_tokens (user_id, token, platform)
+          VALUES ($1, $2, $3)
+        `,
+        [-2147483648, "ExponentPushToken[invalid_foreign_key]", "ios"],
+      );
+      throw new Error(
+        "API write smoke failed: a push token with an unknown user was accepted.",
+      );
+    } catch (error) {
+      if (getPostgresErrorCode(error) !== "23503") {
+        throw error;
+      }
+      await client.query("ROLLBACK TO SAVEPOINT foreign_key_constraint");
+      await client.query("RELEASE SAVEPOINT foreign_key_constraint");
+    }
+
+    await client.query("DELETE FROM push_tokens WHERE token = $1", [
+      API_WRITE_SMOKE_TOKEN,
+    ]);
+    const deletedToken = await client.query(
+      "SELECT 1 FROM push_tokens WHERE token = $1",
+      [API_WRITE_SMOKE_TOKEN],
+    );
+    if (deletedToken.rows.length !== 0) {
+      throw new Error(
+        "API write smoke failed: the service role could not delete the push token.",
+      );
+    }
+
+    await client.query("DELETE FROM users WHERE id = $1", [user.id]);
+    const deletedUser = await client.query("SELECT 1 FROM users WHERE id = $1", [
+      user.id,
+    ]);
+    if (deletedUser.rows.length !== 0) {
+      throw new Error(
+        "API write smoke failed: the service role could not delete the user.",
+      );
+    }
+
+    await client.query("COMMIT");
+    console.log(
+      "PostgreSQL API write smoke passed: the non-privileged Railway API role inserted, read, updated, and deleted users and push tokens; serial permissions and constraints were enforced.",
+    );
+  } catch (error) {
+    try {
+      await client.query("ROLLBACK");
+    } catch {
+      // Preserve the original failure when the transaction is already closed.
+    }
+    throw error;
+  } finally {
+    client.release();
+  }
+}
+
 async function main(): Promise<void> {
   const databaseUrl = getReadinessDatabaseUrl();
 
@@ -223,6 +447,10 @@ async function main(): Promise<void> {
     console.log(
       `PostgreSQL ${postgresVersion}: already-versioned database verification succeeded.`,
     );
+
+    if (servicePool && serviceDatabaseUrl) {
+      await verifyServiceApiWrites(servicePool);
+    }
 
     const representativeDataBeforeUpgrade =
       await seedRepresentativeData(testPool);

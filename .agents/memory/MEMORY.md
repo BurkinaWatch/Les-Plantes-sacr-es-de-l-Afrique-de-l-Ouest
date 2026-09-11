@@ -16,3 +16,4 @@
 - [PostgreSQL schema smoke metadata](schema-smoke-postgres.md) — cast catalog identifier aggregates to text[] before comparing them in Node
 - [Railway PostgreSQL TLS checks](postgres-railway-ssl.md) — pg 8.20 treats sslmode=require as verified TLS; disposable checks need a trusted CA
 - [PostgreSQL readiness roles](postgresql-readiness-roles.md) — information_schema constraint metadata may require object ownership, not only SELECT grants
+- [PostgreSQL constraint probes](postgresql-constraint-probes.md) — expected constraint failures inside a write transaction need savepoints before later checks can continue
