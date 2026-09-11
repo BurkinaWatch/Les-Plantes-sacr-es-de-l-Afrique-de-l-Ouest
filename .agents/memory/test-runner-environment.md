@@ -21,6 +21,26 @@ When a focused TSX render test runs directly through `tsx`, components using cla
 
 **How to apply:** Add a normal `react` import to TSX components included in server-rendered focused tests; keep it out of type-only imports.
 
+Focused Node tests that compile API TypeScript with the workspace's `tsc`
+configuration cannot import workspace package aliases whose exports point to
+`.ts` source files, and extensionless local imports are not resolved by Node's
+ESM loader. Keep test-only runtime seams free of those aliases and use explicit
+`.js` extensions for newly exercised local modules.
+
+**Why:** The API health test initially failed before executing because Node
+resolved `@workspace/db`/`@workspace/api-zod` to TypeScript source and could
+not resolve an extensionless readiness module from `.test-dist`.
+
+**How to apply:** For focused API tests, import compiled local modules through
+the emitted `.test-dist` tree and avoid importing workspace source packages
+unless the test setup explicitly provides a loader.
+
+For API modules with injected database clients, keep the production pool import lazy so focused tests can exercise the module with a fake client without loading workspace TypeScript aliases.
+
+**Why:** Importing a compiled migration module eagerly loaded the database package's `.ts` export before the fake client could be supplied, preventing the unit test from reaching the privilege helper.
+
+**How to apply:** Resolve the default workspace pool only when the caller omits the injected client; use explicit `.js` extensions for local imports reached by the compiled test module.
+
 For screen rendering, `react-test-renderer` can be used without Jest, but its development build must be selected before importing React or the renderer; the production build omits `act` and root inspection.
 
 **Why:** The workspace commonly exposes `NODE_ENV=production`, which otherwise makes screen tests fail before rendering.
