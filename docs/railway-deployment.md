@@ -3,12 +3,12 @@
 The API service must have these runtime variables before Railway can mark the
 deployment healthy:
 
-| Variable | Required | Purpose |
-| --- | --- | --- |
-| `DATABASE_URL` | Yes | PostgreSQL connection string. Railway's `RAILWAY_DATABASE_URL` is accepted as a fallback. |
-| `JWT_SECRET` | Yes | Private secret used to sign and verify mobile login tokens. |
-| `PORT` | Railway-provided | Port that the API listens on. |
-| `GROQ_API_KEY` | Optional | Enables plant recognition and Totem AI routes. Without it, those features stay unavailable. |
+| Variable       | Required         | Purpose                                                                                     |
+| -------------- | ---------------- | ------------------------------------------------------------------------------------------- |
+| `DATABASE_URL` | Yes              | PostgreSQL connection string. Railway's `RAILWAY_DATABASE_URL` is accepted as a fallback.   |
+| `JWT_SECRET`   | Yes              | Private secret used to sign and verify mobile login tokens.                                 |
+| `PORT`         | Railway-provided | Port that the API listens on.                                                               |
+| `GROQ_API_KEY` | Optional         | Enables plant recognition and Totem AI routes. Without it, those features stay unavailable. |
 
 The public APK API base must point to the API service with the `/api` suffix,
 for example `https://api.example.com/api`. The same service exposes
@@ -74,11 +74,11 @@ READINESS_DATABASE_URL="$READINESS_DATABASE_URL" \
   pnpm --filter @workspace/api-server run check:postgres-schema-smoke
 ```
 
-The smoke check creates the required schema, removes `push_tokens` in the
-temporary test database, confirms that read-only verification detects the
-drift, and restores the schema before exiting. The repository's GitHub Actions
-workflow runs this against a disposable PostgreSQL service; it never uses a
-production database.
+The smoke check creates the required schema, runs the reviewed reverse
+migration back to version `0`, confirms that the current API rejects the
+rolled-back schema, applies the migration again, and then checks field/index
+drift. The repository's GitHub Actions workflow runs this against a disposable
+PostgreSQL service; it never uses a production database.
 
 ## Schema versions and rollback
 
@@ -87,6 +87,14 @@ The API records every applied migration in the PostgreSQL
 and both PostgreSQL checks reject a database that contains a future or unknown
 version, or that has not recorded the current version; the health endpoint
 remains `503` until the mismatch is resolved.
+
+Every migration definition must include a reviewed rollback strategy. A
+`reverse-migration` must contain the inverse operation and describe its data
+impact. A change that cannot be safely inverted must use the
+`restore-backup` strategy instead; it must not pretend that deleting its
+version record is a rollback. The schema smoke check exercises reverse
+migrations on a disposable database, but it cannot validate restoring a
+production backup.
 
 To upgrade a database, deploy the API version that contains the next migration,
 then run the readiness check from the Railway API service shell:
@@ -103,11 +111,26 @@ publishing traffic.
 
 There is no automatic destructive rollback. To roll back an application
 release, first use a compatible API version; do not delete rows from
-`schema_migrations` or manually lower its version. If a migration requires a
-rollback, create and review a dedicated reverse migration for that schema
-version, run it against a backup or disposable database first, and only then
-deploy the matching older API. Restore the database backup if the reverse
-migration cannot safely undo the change.
+`schema_migrations` or manually lower its version. Before any destructive
+schema change reaches production:
+
+1. Take a database backup and confirm that it can be restored in a separate
+   disposable database.
+2. Review the migration's declared reverse strategy, including dropped data,
+   transformed values, indexes, constraints, and compatibility with the older
+   API.
+3. Run the upgrade-then-rollback smoke check against a disposable database. A
+   passing check proves the tested inverse restores the declared schema shape;
+   it does not prove that production data can be recovered after a destructive
+   operation.
+4. Only then deploy the matching API version or perform the reviewed reverse
+   migration. If the change is not losslessly reversible, restore the verified
+   backup instead.
+
+The current version's reverse migration drops the initial application tables.
+It exists to exercise this lifecycle in the disposable smoke check and must not
+be run against a live database without the separately verified backup and
+rollback review described above.
 
 If the Railway service exposes the connection as `DATABASE_URL` instead, pass
 that value explicitly in the same in-network shell:

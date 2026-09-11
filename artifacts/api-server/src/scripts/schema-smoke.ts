@@ -3,6 +3,7 @@ import {
   CURRENT_SCHEMA_VERSION,
   ensureSchema,
   IncompatibleSchemaVersionError,
+  rollbackSchemaForVerification,
   verifySchema,
 } from "../lib/migrate.js";
 import {
@@ -16,6 +17,10 @@ type ServerVersionRow = {
 
 type DatabaseTableRow = {
   table_name: string;
+};
+
+type SchemaMigrationVersionRow = {
+  version: number;
 };
 
 async function readServerVersion(
@@ -42,6 +47,43 @@ async function assertEmptyDatabase(
     throw new Error(
       `Expected a blank PostgreSQL database, found table(s): ${result.rows
         .map((row) => row.table_name)
+        .join(", ")}`,
+    );
+  }
+}
+
+async function assertRolledBackDatabase(
+  testPool: ReturnType<typeof createDatabasePool>,
+): Promise<void> {
+  const tableResult = await testPool.query<DatabaseTableRow>(
+    `
+      SELECT table_name
+      FROM information_schema.tables
+      WHERE table_schema = current_schema()
+        AND table_type = 'BASE TABLE'
+        AND table_name = ANY($1::text[])
+      ORDER BY table_name
+    `,
+    [["users", "push_tokens"]],
+  );
+
+  if (tableResult.rows.length > 0) {
+    throw new Error(
+      `Rollback verification failed: application table(s) remain: ${tableResult.rows
+        .map((row) => row.table_name)
+        .join(", ")}`,
+    );
+  }
+
+  const versionResult = await testPool.query<SchemaMigrationVersionRow>(`
+    SELECT version
+    FROM schema_migrations
+    ORDER BY version
+  `);
+  if (versionResult.rows.length > 0) {
+    throw new Error(
+      `Rollback verification failed: schema version(s) remain: ${versionResult.rows
+        .map((row) => row.version)
         .join(", ")}`,
     );
   }
@@ -80,6 +122,36 @@ async function main(): Promise<void> {
     await verifySchema(testPool, databaseUrl);
     console.log(
       `PostgreSQL ${postgresVersion}: already-versioned database verification succeeded.`,
+    );
+
+    await rollbackSchemaForVerification(
+      testPool,
+      databaseUrl,
+      CURRENT_SCHEMA_VERSION - 1,
+    );
+    await assertRolledBackDatabase(testPool);
+
+    let currentSchemaRejected = false;
+    try {
+      await verifySchema(testPool, databaseUrl);
+    } catch (error) {
+      if (error instanceof IncompatibleSchemaVersionError) {
+        currentSchemaRejected = true;
+      } else {
+        throw error;
+      }
+    }
+
+    if (!currentSchemaRejected) {
+      throw new Error(
+        "Rollback verification failed: the current API accepted the rolled-back schema.",
+      );
+    }
+
+    await ensureSchema(testPool, databaseUrl);
+    await verifySchema(testPool, databaseUrl);
+    console.log(
+      `PostgreSQL ${postgresVersion}: upgrade, reviewed reverse migration, and re-upgrade succeeded on the disposable database.`,
     );
 
     await testPool.query(
@@ -227,7 +299,7 @@ async function main(): Promise<void> {
     await ensureSchema(testPool, databaseUrl);
     await verifySchema(testPool, databaseUrl);
     console.log(
-      `PostgreSQL ${postgresVersion} schema smoke check passed: blank and already-versioned migrations, future-version rejection, drift detection, and restoration all succeeded.`,
+      `PostgreSQL ${postgresVersion} schema smoke check passed: upgrade and rollback verification, future-version rejection, drift detection, and restoration all succeeded.`,
     );
   } catch (error) {
     console.error(

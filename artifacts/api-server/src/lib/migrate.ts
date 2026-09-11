@@ -173,6 +173,18 @@ export class IncompatibleSchemaVersionError extends Error {
 type SchemaMigration = {
   version: number;
   up: (client: SchemaClient) => Promise<void>;
+  rollback:
+    | {
+        strategy: "reverse-migration";
+        reviewed: true;
+        notes: string;
+        down: (client: SchemaClient) => Promise<void>;
+      }
+    | {
+        strategy: "restore-backup";
+        reviewed: true;
+        notes: string;
+      };
 };
 
 type SchemaVersionRow = {
@@ -205,10 +217,23 @@ async function ensureSchemaObjects(client: SchemaClient): Promise<void> {
   `);
 }
 
+async function dropSchemaObjects(client: SchemaClient): Promise<void> {
+  await client.query("DROP INDEX IF EXISTS push_tokens_user_id_idx");
+  await client.query("DROP TABLE IF EXISTS push_tokens");
+  await client.query("DROP TABLE IF EXISTS users");
+}
+
 const SCHEMA_MIGRATIONS: readonly SchemaMigration[] = [
   {
     version: 1,
     up: ensureSchemaObjects,
+    rollback: {
+      strategy: "reverse-migration",
+      reviewed: true,
+      notes:
+        "Drops the initial application tables. Use only on a disposable database or after a verified backup.",
+      down: dropSchemaObjects,
+    },
   },
 ];
 
@@ -306,6 +331,87 @@ export async function ensureSchema(
       logger.error({ err: rollbackError }, "Failed to roll back schema migration");
     }
     logger.error({ err }, "Failed to ensure database schema");
+    throw err;
+  } finally {
+    client.release();
+  }
+}
+
+/**
+ * Runs reviewed reverse migrations for schema verification only.
+ *
+ * This is deliberately not called during API startup and has no CLI entrypoint.
+ * A production rollback must use a separately reviewed operational procedure,
+ * usually a backup restore, rather than invoking this helper.
+ */
+export async function rollbackSchemaForVerification(
+  schemaPool: Pick<SchemaPool, "connect"> = pool,
+  configuredDatabaseUrl: string | undefined =
+    process.env.DATABASE_URL ?? process.env.RAILWAY_DATABASE_URL,
+  targetVersion = CURRENT_SCHEMA_VERSION - 1,
+): Promise<void> {
+  assertDatabaseConfigured(configuredDatabaseUrl);
+
+  if (!Number.isInteger(targetVersion) || targetVersion < 0) {
+    throw new Error(`Invalid schema rollback target: ${targetVersion}.`);
+  }
+
+  if (targetVersion > CURRENT_SCHEMA_VERSION) {
+    throw new Error(
+      `Cannot roll back schema version ${CURRENT_SCHEMA_VERSION} to a future target ${targetVersion}.`,
+    );
+  }
+
+  if (targetVersion > 0 && !getMigration(targetVersion)) {
+    throw new Error(
+      `Cannot roll back to unknown schema version ${targetVersion}; add its migration definition first.`,
+    );
+  }
+
+  const client = await schemaPool.connect();
+  try {
+    await client.query("BEGIN");
+    await client.query(`
+      CREATE TABLE IF NOT EXISTS schema_migrations (
+        version INTEGER PRIMARY KEY,
+        applied_at TIMESTAMP DEFAULT NOW() NOT NULL
+      )
+    `);
+    await client.query("LOCK TABLE schema_migrations IN EXCLUSIVE MODE");
+
+    const appliedVersions = await readAppliedSchemaVersions(client);
+    assertCompatibleSchemaVersions(appliedVersions);
+
+    const migrationsToRollback = SCHEMA_MIGRATIONS.filter(
+      (migration) =>
+        migration.version > targetVersion &&
+        appliedVersions.includes(migration.version),
+    ).reverse();
+
+    for (const migration of migrationsToRollback) {
+      if (migration.rollback.strategy !== "reverse-migration") {
+        throw new Error(
+          `Schema migration ${migration.version} requires a backup restore for rollback; a reverse migration is not available.`,
+        );
+      }
+
+      await migration.rollback.down(client);
+      await client.query("DELETE FROM schema_migrations WHERE version = $1", [
+        migration.version,
+      ]);
+    }
+
+    await client.query("COMMIT");
+    logger.info(
+      { schemaVersion: targetVersion },
+      "Schema rollback verification completed",
+    );
+  } catch (err) {
+    try {
+      await client.query("ROLLBACK");
+    } catch (rollbackError) {
+      logger.error({ err: rollbackError }, "Failed to roll back schema rollback verification");
+    }
     throw err;
   } finally {
     client.release();
