@@ -126,6 +126,35 @@ test("Plant recognition client preserves a valid unable-to-identify response", a
   assert.deepEqual(result.plant, plant);
 });
 
+test("Plant recognition client classifies provider responses separately from unavailable APIs", async () => {
+  await assert.rejects(
+    requestPlantRecognition({
+      apiBase: "https://example.test/api",
+      token: "jwt-test",
+      imageBase64: "fake-image",
+      lang: "fr",
+      fetchImpl: async () => response(502, {
+        code: "provider_error",
+        error: "Le service est temporairement indisponible.",
+      }),
+    }),
+    (error) => error instanceof ApiRequestError && error.code === "provider",
+  );
+
+  await assert.rejects(
+    requestPlantRecognition({
+      apiBase: "https://example.test/api",
+      token: "jwt-test",
+      imageBase64: "fake-image",
+      lang: "fr",
+      fetchImpl: async () => {
+        throw new Error("network down");
+      },
+    }),
+    (error) => error instanceof ApiRequestError && error.code === "unavailable",
+  );
+});
+
 for (const request of [
   () => requestTotem({
     apiBase: "https://example.test/api",
