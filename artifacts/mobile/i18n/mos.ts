@@ -33,6 +33,7 @@ export const mos: Translations = {
   scanner_error_generic: 'Tʋʋmd ka maan ye. Ges tɩ f leb n maan.',
   api_error_unauthenticated: 'Yɩɩse n wãb n yɩɩga dɔnniya.',
   api_error_unavailable: 'Tʋʋmd ka tõe n yɩɩs ye. Ges f nɛɛt la leb n maan.',
+  api_error_provider: 'Tʋʋmd n wãb n dɔn leogo. Fotoa sẽn taam ye, leb n maan tɩlae.',
   scanner_retry: 'Leb n maan',
   scanner_new_scan: 'Yɩiga yɩɩga',
 
