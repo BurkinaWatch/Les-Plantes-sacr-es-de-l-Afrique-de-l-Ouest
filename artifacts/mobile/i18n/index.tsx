@@ -53,6 +53,7 @@ export interface Translations {
   scanner_error_generic: string;
   api_error_unauthenticated: string;
   api_error_unavailable: string;
+  api_error_provider: string;
   scanner_retry: string;
   scanner_new_scan: string;
 
