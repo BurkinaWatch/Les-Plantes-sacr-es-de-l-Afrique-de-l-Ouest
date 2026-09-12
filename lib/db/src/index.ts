@@ -3,15 +3,28 @@ import pg from "pg";
 import * as schema from "./schema";
 
 const { Pool } = pg;
-const databaseUrl = process.env.DATABASE_URL ?? process.env.RAILWAY_DATABASE_URL;
-
-if (!databaseUrl) {
-  throw new Error(
-    "DATABASE_URL or RAILWAY_DATABASE_URL must be set. Did you forget to provision a database?",
-  );
+export function resolveDatabaseUrl(
+  env: NodeJS.ProcessEnv = process.env,
+): string | undefined {
+  const configuredUrl = env.DATABASE_URL ?? env.RAILWAY_DATABASE_URL;
+  return configuredUrl?.trim() || undefined;
 }
 
-export const pool = new Pool({ connectionString: databaseUrl });
+export const databaseUrl = resolveDatabaseUrl();
+
+export function createDatabasePool(
+  connectionString?: string,
+  options: { connectionTimeoutMillis?: number } = {},
+) {
+  return new Pool({
+    ...(connectionString ? { connectionString } : {}),
+    ...options,
+  });
+}
+
+// Do not throw while this module is loading. The API needs to expose its
+// readiness endpoint even when Railway configuration is incomplete.
+export const pool = createDatabasePool(databaseUrl);
 export const db = drizzle(pool, { schema });
 
 export * from "./schema";
