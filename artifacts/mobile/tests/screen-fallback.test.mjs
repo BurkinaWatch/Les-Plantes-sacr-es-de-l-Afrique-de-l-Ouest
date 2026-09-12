@@ -16,10 +16,12 @@ const screenDist = path.join(projectRoot, ".screen-test-dist");
 const apiClient = require(path.join(screenDist, "lib/ai-api.js"));
 
 const unavailableMessage = "Service indisponible — réessayez.";
+const providerMessage = "Le service de reconnaissance rencontre un problème temporaire.";
 const retryLabel = "Réessayer";
 const galleryLabel = "Choisir dans la galerie";
 const translations = new Proxy({
   api_error_unavailable: unavailableMessage,
+  api_error_provider: providerMessage,
   scanner_retry: retryLabel,
   scanner_btn_gallery: galleryLabel,
 }, {
@@ -210,6 +212,7 @@ function mockModules() {
     ["@/data/quiz", { TOTEM_RESULTS: { baobab: totem } }],
     ["@/data/animals", { getPlanteById: () => plant }],
     ["@/lib/ai-api", apiClient],
+     ["@/lib/api-config", { getApiBase: () => "https://api.example.test/api" }],
   ]);
 
   const originalLoad = Module._load;
@@ -323,6 +326,52 @@ test("Scanner shows unavailable recovery UI for incomplete plant data and retrie
     assert.equal(fetchCalls.length, 2);
     assert.equal(findTextNodes(renderer, unavailableMessage).length, 1);
     assert.equal(renderer.root.findAllByType("ActivityIndicator").length, 0);
+  } finally {
+    restoreModules();
+    globalThis.fetch = originalFetch;
+  }
+});
+
+test("Scanner keeps the selected image and shows provider recovery text", async () => {
+  process.env.EXPO_PUBLIC_DOMAIN = "example.test";
+  const restoreModules = mockModules();
+  const originalFetch = globalThis.fetch;
+  const fetchCalls = [];
+  globalThis.fetch = async (url, options) => {
+    fetchCalls.push({ url, options });
+    return new Response(JSON.stringify({
+      code: "provider_error",
+      error: "Le service est temporairement indisponible.",
+    }), {
+      status: 502,
+      headers: { "Content-Type": "application/json" },
+    });
+  };
+
+  try {
+    const { default: ScannerScreen } = require(path.join(screenDist, "app/(tabs)/scanner.js"));
+    let renderer;
+    await act(async () => {
+      renderer = TestRenderer.create(React.createElement(ScannerScreen));
+    });
+
+    await act(async () => {
+      findPressableWithText(renderer, galleryLabel).props.onPress();
+      await Promise.resolve();
+    });
+
+    assert.equal(fetchCalls.length, 1);
+    assert.equal(findTextNodes(renderer, providerMessage).length, 1);
+    assert.equal(renderer.root.findByType("Image").props.source.uri, "test://plant");
+    assert.equal(findTextNodes(renderer, retryLabel).length, 1);
+
+    await act(async () => {
+      findPressableWithText(renderer, retryLabel).props.onPress();
+      await Promise.resolve();
+    });
+
+    assert.equal(fetchCalls.length, 2);
+    assert.equal(renderer.root.findByType("Image").props.source.uri, "test://plant");
   } finally {
     restoreModules();
     globalThis.fetch = originalFetch;
