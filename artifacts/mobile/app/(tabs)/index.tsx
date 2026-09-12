@@ -1,6 +1,6 @@
 import { LinearGradient } from 'expo-linear-gradient';
-import { useRouter } from 'expo-router';
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import { useFocusEffect, useRouter } from 'expo-router';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
   Animated,
   Image,
@@ -39,15 +39,31 @@ export default function HomeScreen() {
   const scaleAnim = useRef(new Animated.Value(0.92)).current;
   const glowAnim = useRef(new Animated.Value(0.5)).current;
 
-  const plantsWithImages = PLANTS.filter((plant) => Boolean(PLANT_IMAGES[plant.id]));
+  const plantsWithImages = useMemo(
+    () => PLANTS.filter((plant) => Boolean(PLANT_IMAGES[plant.id])),
+    [],
+  );
 
   const pickRandom = useCallback((exclude: string[] = []): typeof PLANTS => {
     const pool = plantsWithImages.filter((plant) => !exclude.includes(plant.id));
-    const shuffled = [...pool].sort(() => Math.random() - 0.5);
+    const shuffled = [...pool];
+    for (let index = shuffled.length - 1; index > 0; index -= 1) {
+      const swapIndex = Math.floor(Math.random() * (index + 1));
+      [shuffled[index], shuffled[swapIndex]] = [shuffled[swapIndex], shuffled[index]];
+    }
     return shuffled.slice(0, 4);
   }, [plantsWithImages]);
 
   const [featuredPlantes, setFeaturedPlantes] = useState(() => pickRandom());
+  const featuredIdsRef = useRef<string[]>(featuredPlantes.map((plant) => plant.id));
+
+  useFocusEffect(
+    useCallback(() => {
+      const nextFeatured = pickRandom(featuredIdsRef.current);
+      featuredIdsRef.current = nextFeatured.map((plant) => plant.id);
+      setFeaturedPlantes(nextFeatured);
+    }, [pickRandom]),
+  );
 
   useEffect(() => {
     Animated.parallel([
@@ -150,8 +166,8 @@ export default function HomeScreen() {
                   {imageSource ? (
                     <Image
                       source={imageSource}
-                      style={StyleSheet.absoluteFillObject}
-                      resizeMode="cover"
+                      style={[StyleSheet.absoluteFillObject, styles.featuredImage]}
+                      resizeMode="contain"
                       fadeDuration={0}
                     />
                   ) : (
@@ -368,6 +384,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'flex-end',
     position: 'relative',
+    backgroundColor: '#142414',
   },
   featuredImage: {
     borderRadius: 18,
