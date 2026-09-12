@@ -24,6 +24,17 @@ import { useColors } from '@/hooks/useColors';
 import { useTranslation } from '@/i18n';
 import PLANT_IMAGES from '@/constants/plantImages';
 
+function shufflePlants(plants: typeof PLANTS): typeof PLANTS {
+  const shuffled = [...plants];
+
+  for (let index = shuffled.length - 1; index > 0; index -= 1) {
+    const swapIndex = Math.floor(Math.random() * (index + 1));
+    [shuffled[index], shuffled[swapIndex]] = [shuffled[swapIndex], shuffled[index]];
+  }
+
+  return shuffled;
+}
+
 export default function HomeScreen() {
   const colors = useColors();
   const router = useRouter();
@@ -44,25 +55,32 @@ export default function HomeScreen() {
     [],
   );
 
-  const pickRandom = useCallback((exclude: string[] = []): typeof PLANTS => {
-    const pool = plantsWithImages.filter((plant) => !exclude.includes(plant.id));
-    const shuffled = [...pool];
-    for (let index = shuffled.length - 1; index > 0; index -= 1) {
-      const swapIndex = Math.floor(Math.random() * (index + 1));
-      [shuffled[index], shuffled[swapIndex]] = [shuffled[swapIndex], shuffled[index]];
-    }
-    return shuffled.slice(0, 4);
-  }, [plantsWithImages]);
+  const initialCycle = useMemo(() => shufflePlants(plantsWithImages), [plantsWithImages]);
+  const [featuredPlantes, setFeaturedPlantes] = useState(() => initialCycle.slice(0, 4));
+  const remainingPlantsRef = useRef(initialCycle.slice(4));
+  const hasFocusedOnceRef = useRef(false);
 
-  const [featuredPlantes, setFeaturedPlantes] = useState(() => pickRandom());
-  const featuredIdsRef = useRef<string[]>(featuredPlantes.map((plant) => plant.id));
+  const showNextFeatured = useCallback(() => {
+    let remainingPlants = remainingPlantsRef.current;
+
+    if (remainingPlants.length === 0) {
+      remainingPlants = shufflePlants(plantsWithImages);
+    }
+
+    setFeaturedPlantes(remainingPlants.slice(0, 4));
+    remainingPlantsRef.current = remainingPlants.slice(4);
+  }, [plantsWithImages]);
 
   useFocusEffect(
     useCallback(() => {
-      const nextFeatured = pickRandom(featuredIdsRef.current);
-      featuredIdsRef.current = nextFeatured.map((plant) => plant.id);
-      setFeaturedPlantes(nextFeatured);
-    }, [pickRandom]),
+      // The initial state already contains the first group of the cycle.
+      // Advance only when the screen is focused again after being left.
+      if (hasFocusedOnceRef.current) {
+        showNextFeatured();
+      } else {
+        hasFocusedOnceRef.current = true;
+      }
+    }, [showNextFeatured]),
   );
 
   useEffect(() => {
