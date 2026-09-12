@@ -8,6 +8,7 @@
     "build": "pnpm run typecheck && pnpm -r --if-present run build",
     "typecheck:libs": "tsc --build",
     "typecheck": "pnpm run typecheck:libs && pnpm -r --filter \"./artifacts/**\" --filter \"./scripts\" --if-present run typecheck",
+    "check:github-workflows": "go run github.com/rhysd/actionlint/cmd/actionlint@v1.7.7",
     "verify:native-svg": "pnpm --filter @workspace/mobile run verify:native-svg",
     "verify:public-deployment": "pnpm --filter @workspace/mobile run verify:public-deployment",
     "serve:mobile-with-public-check": "pnpm --filter @workspace/mobile run serve:with-public-check"
