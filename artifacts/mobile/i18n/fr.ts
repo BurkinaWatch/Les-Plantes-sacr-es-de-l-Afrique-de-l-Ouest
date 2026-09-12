@@ -28,6 +28,7 @@ export const fr: Translations = {
   scanner_error_generic: "Erreur lors de l'analyse. Veuillez réessayer.",
   api_error_unauthenticated: "Connectez-vous pour utiliser la reconnaissance des plantes.",
   api_error_unavailable: "Impossible de joindre le service. Vérifiez votre connexion et réessayez.",
+  api_error_provider: "Le service de reconnaissance rencontre un problème temporaire. Votre photo est conservée, réessayez dans un instant.",
   scanner_retry: "Réessayer",
   scanner_new_scan: "Nouvelle analyse",
 
