@@ -13,6 +13,7 @@ const {
   normalizeBasePath,
   normalizePublicDomain,
   checkPublicDeployment,
+  checkApiReadiness,
   formatPublicDeploymentReport,
   requestPublicPath,
 } = require("../lib/public-deployment.js");
@@ -313,6 +314,17 @@ test("verifies the public landing, Expo manifests, assets, and raw traversal pat
       );
     }
 
+    if (requestPath === "/api/healthz") {
+      return createResponse(
+        200,
+        JSON.stringify({
+          status: "ready",
+          ready: true,
+          checks: { database: "ready", jwt: "configured" },
+        }),
+      );
+    }
+
     if (requestPath === "/manifest") {
       const platform = options.headers?.["expo-platform"];
       const manifest = createManifest(platform);
@@ -333,12 +345,67 @@ test("verifies the public landing, Expo manifests, assets, and raw traversal pat
   const report = await checkPublicDeployment({
     domain: "https://mobile.example.com/",
     expectedAppName: "Les Plantes Sacrées d’Afrique de l’Ouest",
+    apiBaseUrl: "https://api.example.com/api",
     requestImpl,
   });
 
   assert.equal(report.ok, true);
+  assert.deepEqual(report.apiReadiness.checks, [
+    ["database", "ready"],
+    ["jwt", "configured"],
+  ]);
   assert.ok(requestedPaths.includes("/%2e%2e/ios/manifest.json"));
   assert.ok(requestedPaths.includes("/ios\\bundle.js"));
+});
+
+test("distinguishes missing API configuration from database unavailability", async () => {
+  const responses = [
+    {
+      status: 503,
+      body: {
+        status: "not_ready",
+        ready: false,
+        checks: { database: "missing", jwt: "configured" },
+      },
+      diagnosis: "missing configuration",
+    },
+    {
+      status: 503,
+      body: {
+        status: "not_ready",
+        ready: false,
+        checks: { database: "unavailable", jwt: "configured" },
+      },
+      diagnosis: "database unavailable",
+    },
+  ];
+
+  for (const expected of responses) {
+    const readiness = await checkApiReadiness({
+      apiBaseUrl: "https://api.example.com/api",
+      requestImpl: async () =>
+        createResponse(expected.status, JSON.stringify(expected.body)),
+    });
+
+    assert.equal(readiness.ok, false);
+    assert.equal(readiness.diagnosis, expected.diagnosis);
+    assert.deepEqual(readiness.checks, Object.entries(expected.body.checks));
+
+    const report = formatPublicDeploymentReport({
+      ok: false,
+      domain: "mobile.example.com",
+      basePath: "",
+      routes: [],
+      checks: [],
+      failures: ["API readiness: diagnostic fixture"],
+      apiReadiness: readiness,
+    });
+    assert.match(report, new RegExp(`status: ${expected.body.status}`));
+    assert.match(report, new RegExp(`diagnosis: ${expected.diagnosis}`));
+    for (const [name, value] of Object.entries(expected.body.checks)) {
+      assert.match(report, new RegExp(`check ${name}: ${value}`));
+    }
+  }
 });
 
 test("reports an obsolete Railway publication with an actionable redeploy message", async () => {
