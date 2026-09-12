@@ -19,6 +19,18 @@ function getExpectedAppName() {
   return appName;
 }
 
+function getConfiguredApiBaseUrl() {
+  const configuredByBuild = process.env.EXPO_PUBLIC_API_BASE_URL?.trim();
+  if (configuredByBuild) return configuredByBuild;
+
+  const appJsonPath = path.resolve(__dirname, "..", "app.json");
+  const appJson = JSON.parse(fs.readFileSync(appJsonPath, "utf8"));
+  const configuredInRelease = appJson.expo?.extra?.apiBaseUrl;
+  return typeof configuredInRelease === "string"
+    ? configuredInRelease.trim()
+    : "";
+}
+
 async function main() {
   let domain;
   let basePath;
@@ -43,6 +55,7 @@ async function main() {
       domain,
       expectedAppName: getExpectedAppName(),
       basePath,
+      apiBaseUrl: getConfiguredApiBaseUrl(),
     });
     console.log(formatPublicDeploymentReport(report));
     if (!report.ok) {
@@ -68,4 +81,4 @@ if (require.main === module) {
   });
 }
 
-module.exports = { getExpectedAppName, main };
+module.exports = { getConfiguredApiBaseUrl, getExpectedAppName, main };
