@@ -1,9 +1,9 @@
 import { BlurView } from "expo-blur";
 import { Tabs } from "expo-router";
-import { Feather, MaterialCommunityIcons } from "@expo/vector-icons";
 import React from "react";
 import { Platform, StyleSheet, View, useColorScheme } from "react-native";
 
+import { SacredIcon, type SacredIconName } from "@/components/SacredIcon";
 import { useColors } from "@/hooks/useColors";
 import { useTranslation } from "@/i18n";
 
@@ -11,6 +11,14 @@ let SymbolView: any = null;
 try {
   SymbolView = require("expo-symbols").SymbolView;
 } catch {}
+
+let Feather: any = null;
+let MaterialCommunityIcons: any = null;
+if (Platform.OS !== "web") {
+  const vectorIcons = require("@expo/vector-icons");
+  Feather = vectorIcons.Feather;
+  MaterialCommunityIcons = vectorIcons.MaterialCommunityIcons;
+}
 
 export default function TabLayout() {
   const colors = useColors();
@@ -24,11 +32,15 @@ export default function TabLayout() {
     sfName: string,
     androidIcon: string,
     androidIconSet: "feather" | "mci",
-    size = 22
+    size = 22,
+    webIcon: SacredIconName = "circle",
   ) =>
     ({ color }: { color: string }) => {
       if (isIOS && SymbolView) {
         return <SymbolView name={sfName} tintColor={color} size={size} />;
+      }
+      if (isWeb) {
+        return <SacredIcon name={webIcon} size={size} color={color} />;
       }
       if (androidIconSet === "mci") {
         return (
@@ -83,14 +95,14 @@ export default function TabLayout() {
         name="index"
         options={{
           title: t.tab_home,
-          tabBarIcon: tabIcon("house.fill", "home", "feather"),
+          tabBarIcon: tabIcon("house.fill", "home", "feather", 22, "tree"),
         }}
       />
       <Tabs.Screen
         name="animaux"
         options={{
           title: t.tab_animals,
-          tabBarIcon: tabIcon("leaf.fill", "sprout", "mci"),
+          tabBarIcon: tabIcon("leaf.fill", "sprout", "mci", 22, "sprout"),
         }}
       />
       <Tabs.Screen
@@ -104,7 +116,9 @@ export default function TabLayout() {
           tabBarIcon: tabIcon(
             "books.vertical.fill",
             "book-open-variant",
-            "mci"
+            "mci",
+            22,
+            "book",
           ),
         }}
       />
@@ -114,14 +128,14 @@ export default function TabLayout() {
         name="ma-plante"
         options={{
           title: t.tab_my_animal,
-          tabBarIcon: tabIcon("crown.fill", "crown", "mci"),
+          tabBarIcon: tabIcon("crown.fill", "crown", "mci", 22, "crown"),
         }}
       />
       <Tabs.Screen
         name="profil"
         options={{
           title: t.tab_profile,
-          tabBarIcon: tabIcon("person.circle.fill", "user", "feather"),
+          tabBarIcon: tabIcon("person.circle.fill", "user", "feather", 22, "user"),
         }}
       />
     </Tabs>
