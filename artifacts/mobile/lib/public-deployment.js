@@ -130,6 +130,126 @@ function requestPublicPath(baseUrl, requestPath, options = {}) {
   });
 }
 
+function getApiHealthTarget(apiBaseUrl) {
+  if (typeof apiBaseUrl !== "string" || apiBaseUrl.trim() === "") {
+    throw new Error("mobile release API base URL is not configured");
+  }
+
+  let parsed;
+  try {
+    parsed = new URL(apiBaseUrl.trim());
+  } catch {
+    throw new Error("mobile release API base URL is not a valid URL");
+  }
+
+  if (
+    !["http:", "https:"].includes(parsed.protocol) ||
+    parsed.username ||
+    parsed.password ||
+    parsed.search ||
+    parsed.hash
+  ) {
+    throw new Error(
+      "mobile release API base URL must contain only an HTTP(S) URL",
+    );
+  }
+
+  const pathname = parsed.pathname.replace(/\/+$/, "");
+  const healthPath = pathname.endsWith("/api")
+    ? `${pathname}/healthz`
+    : `${pathname}/api/healthz`;
+
+  return {
+    baseUrl: parsed.origin,
+    healthPath: healthPath || "/api/healthz",
+    healthUrl: `${parsed.origin}${healthPath || "/api/healthz"}`,
+  };
+}
+
+function getReadinessCheckEntries(checks) {
+  if (!checks || typeof checks !== "object" || Array.isArray(checks)) {
+    return [];
+  }
+
+  return Object.entries(checks).map(([name, value]) => [
+    name,
+    typeof value === "string" || typeof value === "number" || typeof value === "boolean"
+      ? String(value)
+      : "unknown",
+  ]);
+}
+
+async function checkApiReadiness({
+  apiBaseUrl,
+  requestImpl = requestPublicPath,
+  timeoutMs = 10_000,
+}) {
+  let target;
+  try {
+    target = getApiHealthTarget(apiBaseUrl);
+  } catch (error) {
+    return {
+      ok: false,
+      url: null,
+      httpStatus: null,
+      status: "unknown",
+      ready: false,
+      checks: [],
+      diagnosis: "missing configuration",
+      error: error.message,
+    };
+  }
+
+  try {
+    const response = await requestImpl(target.baseUrl, target.healthPath, {
+      timeoutMs,
+      accept: "application/json",
+    });
+    let body = null;
+    try {
+      body = JSON.parse(response.body);
+    } catch {
+      // The formatted result below reports the HTTP status without echoing an
+      // arbitrary response body, which could contain sensitive server output.
+    }
+
+    const checks = getReadinessCheckEntries(body?.checks);
+    const status = typeof body?.status === "string" ? body.status : "unknown";
+    const ready = response.status === 200 && status === "ready" && body?.ready === true;
+    const database = checks.find(([name]) => name === "database")?.[1];
+    const missingConfiguration = checks.some(([, value]) => value === "missing");
+    const databaseUnavailable = database === "unavailable";
+
+    return {
+      ok: ready,
+      url: target.healthUrl,
+      httpStatus: response.status,
+      status,
+      ready: body?.ready === true,
+      checks,
+      diagnosis: missingConfiguration
+        ? "missing configuration"
+        : databaseUnavailable
+          ? "database unavailable"
+          : ready
+            ? null
+            : "not ready",
+      error: null,
+    };
+  } catch (error) {
+    return {
+      ok: false,
+      url: target.healthUrl,
+      httpStatus: null,
+      status: "unreachable",
+      ready: false,
+      checks: [],
+      diagnosis: "unavailable",
+      error: error.message,
+    };
+  }
+}
+
 function getHeader(headers, name) {
   const value = headers?.[name.toLowerCase()];
   return Array.isArray(value) ? value.join(", ") : String(value || "");
@@ -189,6 +309,7 @@ async function checkPublicDeployment({
   domain,
   expectedAppName,
   basePath = "",
+  apiBaseUrl,
   requestImpl = requestPublicPath,
   timeoutMs = 10_000,
 }) {
@@ -217,6 +338,35 @@ async function checkPublicDeployment({
       ...options,
     });
   };
+
+  let apiReadiness = null;
+  if (apiBaseUrl !== undefined) {
+    apiReadiness = await checkApiReadiness({
+      apiBaseUrl,
+      requestImpl,
+      timeoutMs,
+    });
+    const checkSummary = apiReadiness.checks.length
+      ? apiReadiness.checks
+          .map(([name, value]) => `${name}=${value}`)
+          .join(", ")
+      : "checks unavailable";
+    if (apiReadiness.ok) {
+      pass(
+        "API readiness",
+        `${apiReadiness.status} (HTTP ${apiReadiness.httpStatus}); ${checkSummary}`,
+      );
+    } else {
+      fail(
+        "API readiness",
+        `${apiReadiness.diagnosis}; status=${apiReadiness.status}${
+          apiReadiness.httpStatus ? ` (HTTP ${apiReadiness.httpStatus})` : ""
+        }; ${checkSummary}${
+          apiReadiness.error ? `; ${apiReadiness.error}` : ""
+        }`,
+      );
+    }
+  }
 
   let landing = null;
   try {
@@ -404,6 +554,7 @@ async function checkPublicDeployment({
     basePath: deployment.basePath,
     routes,
     checks,
+    apiReadiness,
     failures,
   };
 }
@@ -418,6 +569,26 @@ function formatPublicDeploymentReport(report) {
     "- routes controlled:",
     ...(report.routes || []).map((route) => `  - ${route}`),
   ];
+
+  if (report.apiReadiness) {
+    const readiness = report.apiReadiness;
+    lines.push("- API readiness:");
+    lines.push(`  - endpoint: ${readiness.url || "not configured"}`);
+    lines.push(
+      `  - status: ${readiness.status}${
+        readiness.httpStatus ? ` (HTTP ${readiness.httpStatus})` : ""
+      }`,
+    );
+    for (const [name, value] of readiness.checks || []) {
+      lines.push(`  - check ${name}: ${value}`);
+    }
+    if (readiness.diagnosis) {
+      lines.push(`  - diagnosis: ${readiness.diagnosis}`);
+    }
+    if (readiness.error) {
+      lines.push(`  - request: ${readiness.error}`);
+    }
+  }
 
   if (report.ok) {
     lines.push("- all checks passed");
@@ -434,7 +605,9 @@ function formatPublicDeploymentReport(report) {
 
 module.exports = {
   checkPublicDeployment,
+  checkApiReadiness,
   formatPublicDeploymentReport,
+  getApiHealthTarget,
   getDeploymentDomain,
   getPublicDeploymentBaseUrl,
   joinPublicPath,
