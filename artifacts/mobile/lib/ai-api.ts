@@ -1,4 +1,4 @@
-export type ApiErrorCode = 'unauthenticated' | 'unavailable';
+export type ApiErrorCode = 'unauthenticated' | 'unavailable' | 'provider';
 
 export class ApiRequestError extends Error {
   constructor(public readonly code: ApiErrorCode) {
@@ -106,14 +106,19 @@ async function postAiRequest<T>(
   if (!apiBase) throw new ApiRequestError('unavailable');
   if (!token) throw new ApiRequestError('unauthenticated');
 
-  const response = await fetchImpl(`${apiBase.replace(/\/$/, '')}${path}`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${token}`,
-    },
-    body: JSON.stringify(body),
-  });
+  let response: Response;
+  try {
+    response = await fetchImpl(`${apiBase.replace(/\/$/, '')}${path}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify(body),
+    });
+  } catch {
+    throw new ApiRequestError('unavailable');
+  }
 
   const { remaining, resetAt } = parseRateLimitHeaders(response);
   if (!response.ok) {
@@ -122,6 +127,9 @@ async function postAiRequest<T>(
     }
     const errorBody = await response.json().catch(() => ({})) as { error?: string };
     if (response.status === 401) throw new ApiRequestError('unauthenticated');
+    if (response.status === 502 || response.status === 503) {
+      throw new ApiRequestError(response.status === 502 ? 'provider' : 'unavailable');
+    }
     throw new Error(errorBody.error ?? 'Erreur serveur');
   }
 
