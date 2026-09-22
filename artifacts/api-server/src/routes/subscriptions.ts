@@ -1,4 +1,4 @@
-import { createHash, createHmac, timingSafeEqual } from "node:crypto";
+import { createHash } from "node:crypto";
 import { Router } from "express";
 import { and, desc, eq, or } from "drizzle-orm";
 import { z } from "zod";
@@ -13,6 +13,10 @@ import { requireJwt } from "../lib/auth-middleware.js";
 import { logger } from "../lib/logger.js";
 import { SasPayProvider, SasPayProviderError } from "../lib/saspay-provider.js";
 import type { PaymentProvider } from "../lib/payment-provider.js";
+import {
+  recordIdempotentWebhookEvent,
+  verifySasPayWebhook,
+} from "../lib/saspay-webhook.js";
 
 const provider = new SasPayProvider();
 
@@ -52,31 +56,6 @@ function isSuccessfulPayment(status: string): boolean {
 function isFailedPayment(status: string): boolean {
   return ["FAILED", "CANCELLED", "CANCELED", "EXPIRED", "DECLINED"].includes(
     status.toUpperCase(),
-  );
-}
-
-export function verifySasPayWebhook(
-  rawBody: Buffer,
-  signature: string | undefined,
-  timestamp: string | undefined,
-  secret: string | undefined,
-  nowMs = Date.now(),
-): boolean {
-  if (!signature || !timestamp || !secret) return false;
-  const timestampMs = Number(timestamp) * 1000;
-  if (!Number.isFinite(timestampMs) || Math.abs(nowMs - timestampMs) > 5 * 60 * 1000) {
-    return false;
-  }
-
-  const expected = createHmac("sha256", secret)
-    .update(`${timestamp}.${rawBody.toString("utf8")}`)
-    .digest("hex");
-  const normalized = signature.replace(/^sha256=/i, "");
-  const expectedBuffer = Buffer.from(expected, "utf8");
-  const receivedBuffer = Buffer.from(normalized, "utf8");
-  return (
-    expectedBuffer.length === receivedBuffer.length &&
-    timingSafeEqual(expectedBuffer, receivedBuffer)
   );
 }
 
@@ -262,29 +241,33 @@ router.post("/webhook", async (req, res) => {
 
   const payload = body;
   const payloadHash = createHash("sha256").update(rawBody).digest("hex");
-  const [event] = await database
-    .insert(paymentEventsTable)
-    .values({
-      provider: paymentProvider.name,
-      eventType,
-      providerTransactionId: transactionId,
-      providerReference: reference,
-      payloadHash,
-      payload,
-      processingStatus: "RECEIVED",
-    })
-    .onConflictDoNothing({
-      target: [
-        paymentEventsTable.provider,
-        paymentEventsTable.eventType,
-        paymentEventsTable.providerTransactionId,
-      ],
-    })
-    .returning({ id: paymentEventsTable.id });
+  const eventResult = await recordIdempotentWebhookEvent(async () => {
+    const [event] = await database
+      .insert(paymentEventsTable)
+      .values({
+        provider: paymentProvider.name,
+        eventType,
+        providerTransactionId: transactionId,
+        providerReference: reference,
+        payloadHash,
+        payload,
+        processingStatus: "RECEIVED",
+      })
+      .onConflictDoNothing({
+        target: [
+          paymentEventsTable.provider,
+          paymentEventsTable.eventType,
+          paymentEventsTable.providerTransactionId,
+        ],
+      })
+      .returning({ id: paymentEventsTable.id });
+    return event;
+  });
 
-  if (!event) {
+  if (eventResult.status === "duplicate") {
     return res.status(200).json({ received: true, duplicate: true });
   }
+  const event = eventResult.event;
 
   try {
     const metadata = asRecord(data.metadata ?? body.metadata);
