@@ -1071,6 +1071,10 @@ const REQUIRED_APPLICATION_PRIVILEGES: readonly EffectivePrivilegeRequirement[] 
 const SERIAL_COLUMNS = [
   { tableName: "users", columnName: "id" },
   { tableName: "push_tokens", columnName: "id" },
+  { tableName: "subscription_plans", columnName: "id" },
+  { tableName: "subscriptions", columnName: "id" },
+  { tableName: "payment_attempts", columnName: "id" },
+  { tableName: "payment_events", columnName: "id" },
 ] as const;
 
 export async function verifyEffectivePrivileges(
@@ -1108,7 +1112,11 @@ export async function verifyEffectivePrivileges(
     FROM (
       VALUES
         ('users', 'id'),
-        ('push_tokens', 'id')
+        ('push_tokens', 'id'),
+        ('subscription_plans', 'id'),
+        ('subscriptions', 'id'),
+        ('payment_attempts', 'id'),
+        ('payment_events', 'id')
     ) AS required(table_name, column_name)
   `);
 
