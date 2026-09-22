@@ -4,6 +4,7 @@ import authRouter from "./auth";
 import chatRouter from "./chat";
 import plantRecognitionRouter from "./plant-recognition";
 import pushTokensRouter from "./push-tokens";
+import subscriptionsRouter from "./subscriptions";
 
 const router: IRouter = Router();
 
@@ -12,5 +13,6 @@ router.use("/auth", authRouter);
 router.use("/chat", chatRouter);
 router.use("/plant-recognition", plantRecognitionRouter);
 router.use("/push-tokens", pushTokensRouter);
+router.use("/subscriptions", subscriptionsRouter);
 
 export default router;

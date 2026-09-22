@@ -7,6 +7,14 @@ import { logger } from "./lib/logger";
 const app: Express = express();
 app.disable("x-powered-by");
 
+declare global {
+  namespace Express {
+    interface Request {
+      rawBody?: Buffer;
+    }
+  }
+}
+
 // Trust the Replit reverse proxy so rate-limit can use the real client IP
 app.set('trust proxy', 1);
 
@@ -77,7 +85,14 @@ app.use((_req, res, next) => {
   next();
 });
 
-app.use(express.json({ limit: "8mb" }));
+app.use(
+  express.json({
+    limit: "8mb",
+    verify: (req, _res, buffer) => {
+      req.rawBody = Buffer.from(buffer);
+    },
+  }),
+);
 app.use(express.urlencoded({ extended: false, limit: "100kb" }));
 
 app.use("/api", router);
