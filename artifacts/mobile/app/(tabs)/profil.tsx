@@ -134,6 +134,17 @@ export default function ProfilScreen() {
               </LinearGradient>
             </Pressable>
           </View>
+
+          <Pressable
+            onPress={() => router.push('/abonnement' as any)}
+            style={[styles.card, { backgroundColor: colors.card, borderColor: colors.border, marginTop: 18 }]}
+          >
+            <Text style={[styles.quizPromoLabel, { color: colors.gold }]}>SOUTENIR LA TRANSMISSION</Text>
+            <Text style={[styles.quizPromoTitle, { color: colors.ivory }]}>Découvrir les abonnements</Text>
+            <Text style={[styles.quizPromoDesc, { color: colors.mutedForeground }]}>
+              Les formules mensuelle et annuelle seront bientôt disponibles.
+            </Text>
+          </Pressable>
         )}
 
         <View style={[styles.infoSection, { backgroundColor: colors.card, borderColor: colors.border }]}>

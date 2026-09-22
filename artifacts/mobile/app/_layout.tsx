@@ -24,6 +24,9 @@ import { useColors } from "@/hooks/useColors";
 import { LanguageProvider } from "@/i18n";
 import { useNotifications } from "@/hooks/useNotifications";
 import { getApiBase } from "@/lib/api-config";
+import { setAuthTokenGetter, setBaseUrl } from "@workspace/api-client-react";
+
+setBaseUrl(getApiBase());
 
 // Suppress fontfaceobserver timeout errors on web (known Expo Web / vector-icons issue)
 if (Platform.OS === "web" && typeof window !== "undefined") {
@@ -258,6 +261,11 @@ function NotificationsSetup() {
   const { token } = useAuth();
 
   useEffect(() => {
+    setAuthTokenGetter(() => token ?? null);
+    return () => setAuthTokenGetter(null);
+  }, [token]);
+
+  useEffect(() => {
     if (!pushToken || !token) return;
 
     const apiBase = getApiBase();
@@ -293,6 +301,7 @@ function RootLayoutNav() {
         <Stack.Screen name="chat-totem"  options={{ headerShown: false, presentation: "card" }} />
         <Stack.Screen name="progression-spirituelle" options={{ headerShown: false, presentation: "card" }} />
         <Stack.Screen name="error-fallback" options={{ headerShown: false, presentation: "card" }} />
+        <Stack.Screen name="abonnement" options={{ headerShown: false, presentation: "card" }} />
       </Stack>
       <ScannerFab />
     </View>
