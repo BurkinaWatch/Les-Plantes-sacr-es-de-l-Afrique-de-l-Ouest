@@ -642,6 +642,98 @@ async function ensureSchemaObjects(client: SchemaClient): Promise<void> {
   `);
 }
 
+async function ensurePaymentSchemaObjects(client: SchemaClient): Promise<void> {
+  await client.query(`
+    CREATE TABLE IF NOT EXISTS subscription_plans (
+      id SERIAL PRIMARY KEY,
+      code TEXT NOT NULL UNIQUE,
+      name TEXT NOT NULL,
+      description TEXT,
+      amount NUMERIC(18, 2),
+      currency TEXT,
+      period TEXT NOT NULL,
+      active BOOLEAN DEFAULT FALSE NOT NULL,
+      created_at TIMESTAMP DEFAULT NOW() NOT NULL,
+      updated_at TIMESTAMP DEFAULT NOW() NOT NULL
+    )
+  `);
+
+  await client.query(`
+    CREATE TABLE IF NOT EXISTS subscriptions (
+      id SERIAL PRIMARY KEY,
+      user_id INTEGER NOT NULL REFERENCES users(id),
+      plan_id INTEGER NOT NULL REFERENCES subscription_plans(id),
+      provider TEXT NOT NULL,
+      period TEXT NOT NULL,
+      status TEXT NOT NULL,
+      starts_at TIMESTAMP,
+      expires_at TIMESTAMP,
+      provider_checkout_id TEXT,
+      provider_transaction_id TEXT,
+      provider_reference TEXT,
+      created_at TIMESTAMP DEFAULT NOW() NOT NULL,
+      updated_at TIMESTAMP DEFAULT NOW() NOT NULL
+    )
+  `);
+
+  await client.query(`
+    CREATE TABLE IF NOT EXISTS payment_attempts (
+      id SERIAL PRIMARY KEY,
+      user_id INTEGER NOT NULL REFERENCES users(id),
+      subscription_id INTEGER NOT NULL REFERENCES subscriptions(id),
+      provider TEXT NOT NULL,
+      provider_checkout_id TEXT,
+      provider_transaction_id TEXT,
+      provider_reference TEXT,
+      status TEXT NOT NULL,
+      idempotency_key TEXT,
+      created_at TIMESTAMP DEFAULT NOW() NOT NULL,
+      updated_at TIMESTAMP DEFAULT NOW() NOT NULL
+    )
+  `);
+
+  await client.query(`
+    CREATE TABLE IF NOT EXISTS payment_events (
+      id SERIAL PRIMARY KEY,
+      provider TEXT NOT NULL,
+      event_type TEXT NOT NULL,
+      provider_transaction_id TEXT NOT NULL,
+      provider_reference TEXT,
+      payload_hash TEXT NOT NULL,
+      payload JSONB NOT NULL,
+      processing_status TEXT NOT NULL,
+      processing_error TEXT,
+      received_at TIMESTAMP DEFAULT NOW() NOT NULL,
+      processed_at TIMESTAMP
+    )
+  `);
+
+  await client.query(`
+    CREATE UNIQUE INDEX IF NOT EXISTS subscription_plans_code_unique
+    ON subscription_plans(code)
+  `);
+  await client.query(`
+    CREATE INDEX IF NOT EXISTS subscriptions_user_id_idx
+    ON subscriptions(user_id)
+  `);
+  await client.query(`
+    CREATE INDEX IF NOT EXISTS payment_attempts_user_id_idx
+    ON payment_attempts(user_id)
+  `);
+  await client.query(`
+    CREATE UNIQUE INDEX IF NOT EXISTS payment_events_provider_event_transaction_unique
+    ON payment_events(provider, event_type, provider_transaction_id)
+  `);
+
+  await client.query(`
+    INSERT INTO subscription_plans (code, name, description, period, active)
+    VALUES
+      ('MONTHLY', 'Abonnement mensuel', 'Prix à définir', 'MONTHLY', FALSE),
+      ('YEARLY', 'Abonnement annuel', 'Prix à définir', 'YEARLY', FALSE)
+    ON CONFLICT (code) DO NOTHING
+  `);
+}
+
 const SCHEMA_MIGRATIONS: readonly SchemaMigration[] = [
   {
     version: 1,
@@ -651,6 +743,22 @@ const SCHEMA_MIGRATIONS: readonly SchemaMigration[] = [
       reviewed: true,
       notes:
         "The initial application tables contain user credentials and push tokens; restore a verified backup instead of dropping them.",
+    },
+  },
+  {
+    version: 2,
+    up: ensurePaymentSchemaObjects,
+    rollback: {
+      strategy: "reverse-migration",
+      reviewed: true,
+      notes:
+        "Payment preparation tables contain no payment credentials; they can be removed in dependency order before returning to schema version 1.",
+      down: async (client) => {
+        await client.query("DROP TABLE IF EXISTS payment_events");
+        await client.query("DROP TABLE IF EXISTS payment_attempts");
+        await client.query("DROP TABLE IF EXISTS subscriptions");
+        await client.query("DROP TABLE IF EXISTS subscription_plans");
+      },
     },
   },
 ];
