@@ -132,7 +132,7 @@ router.post("/create-payment", requireJwt, async (req, res) => {
     return res.status(400).json({ error: "Informations de paiement invalides." });
   }
 
-  if (!provider.isConfigured()) {
+  if (!paymentProvider.isConfigured()) {
     return res.status(503).json({
       code: "PAYMENTS_NOT_CONFIGURED",
       error: "Les paiements ne sont pas encore disponibles.",
@@ -162,7 +162,7 @@ router.post("/create-payment", requireJwt, async (req, res) => {
     .values({
       userId: req.user!.id,
       planId: plan.id,
-      provider: provider.name,
+      provider: paymentProvider.name,
       period: plan.period,
       status: "PENDING",
     })
@@ -173,7 +173,7 @@ router.post("/create-payment", requireJwt, async (req, res) => {
   }
 
   try {
-    const checkout = await provider.createCheckout({
+    const checkout = await paymentProvider.createCheckout({
       amount: plan.amount,
       currency: plan.currency,
       customerEmail: parsed.data.customerEmail,
@@ -193,10 +193,10 @@ router.post("/create-payment", requireJwt, async (req, res) => {
         updatedAt: new Date(),
       })
       .where(eq(subscriptionsTable.id, subscription.id));
-    await db.insert(paymentAttemptsTable).values({
+    await database.insert(paymentAttemptsTable).values({
       userId: req.user!.id,
       subscriptionId: subscription.id,
-      provider: provider.name,
+      provider: paymentProvider.name,
       providerCheckoutId: checkout.id,
       status: "PENDING",
     });
@@ -265,7 +265,7 @@ router.post("/webhook", async (req, res) => {
   const [event] = await db
     .insert(paymentEventsTable)
     .values({
-      provider: provider.name,
+      provider: paymentProvider.name,
       eventType,
       providerTransactionId: transactionId,
       providerReference: reference,
