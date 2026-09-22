@@ -21,3 +21,52 @@ export const HealthCheckResponse = zod.object({
 }),
   "message": zod.string()
 })
+
+
+/**
+ * @summary List available subscription plans
+ */
+export const GetSubscriptionPlansResponse = zod.object({
+  "plans": zod.array(zod.object({
+  "code": zod.enum(['MONTHLY', 'YEARLY']),
+  "name": zod.string(),
+  "description": zod.string().nullish(),
+  "amount": zod.string().nullish(),
+  "currency": zod.string().nullish(),
+  "period": zod.enum(['MONTHLY', 'YEARLY']),
+  "active": zod.boolean()
+}))
+})
+
+
+/**
+ * @summary Get the authenticated user's latest subscription
+ */
+export const GetSubscriptionStatusResponse = zod.object({
+  "subscription": zod.union([zod.object({
+  "id": zod.number(),
+  "planCode": zod.string(),
+  "planName": zod.string(),
+  "period": zod.string(),
+  "status": zod.enum(['PENDING', 'ACTIVE', 'FAILED', 'CANCELLED', 'EXPIRED']),
+  "startsAt": zod.coerce.date().nullish(),
+  "expiresAt": zod.coerce.date().nullish()
+}),zod.null()])
+})
+
+
+/**
+ * @summary Create a hosted checkout for a configured subscription plan
+ */
+export const createSubscriptionPaymentBodyCustomerNameMax = 120;
+
+
+
+export const CreateSubscriptionPaymentBody = zod.object({
+  "planCode": zod.enum(['MONTHLY', 'YEARLY']),
+  "customerEmail": zod.string().email(),
+  "customerName": zod.string().min(1).max(createSubscriptionPaymentBodyCustomerNameMax),
+  "returnUrl": zod.string().url().optional()
+})
+
+

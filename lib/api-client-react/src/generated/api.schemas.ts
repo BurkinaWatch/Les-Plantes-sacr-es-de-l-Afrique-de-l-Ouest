@@ -5,6 +5,83 @@
  * API specification
  * OpenAPI spec version: 0.1.0
  */
+export interface ApiError {
+  code?: string;
+  error: string;
+}
+
+export type SubscriptionPlanCode = typeof SubscriptionPlanCode[keyof typeof SubscriptionPlanCode];
+
+
+export const SubscriptionPlanCode = {
+  MONTHLY: 'MONTHLY',
+  YEARLY: 'YEARLY',
+} as const;
+
+export type SubscriptionPlanPeriod = typeof SubscriptionPlanPeriod[keyof typeof SubscriptionPlanPeriod];
+
+
+export const SubscriptionPlanPeriod = {
+  MONTHLY: 'MONTHLY',
+  YEARLY: 'YEARLY',
+} as const;
+
+export interface SubscriptionPlan {
+  code: SubscriptionPlanCode;
+  name: string;
+  description?: string | null;
+  amount?: string | null;
+  currency?: string | null;
+  period: SubscriptionPlanPeriod;
+  active: boolean;
+}
+
+export type SubscriptionStatusStatus = typeof SubscriptionStatusStatus[keyof typeof SubscriptionStatusStatus];
+
+
+export const SubscriptionStatusStatus = {
+  PENDING: 'PENDING',
+  ACTIVE: 'ACTIVE',
+  FAILED: 'FAILED',
+  CANCELLED: 'CANCELLED',
+  EXPIRED: 'EXPIRED',
+} as const;
+
+export interface SubscriptionStatus {
+  id: number;
+  planCode: string;
+  planName: string;
+  period: string;
+  status: SubscriptionStatusStatus;
+  startsAt?: string | null;
+  expiresAt?: string | null;
+}
+
+export type CreateSubscriptionPaymentRequestPlanCode = typeof CreateSubscriptionPaymentRequestPlanCode[keyof typeof CreateSubscriptionPaymentRequestPlanCode];
+
+
+export const CreateSubscriptionPaymentRequestPlanCode = {
+  MONTHLY: 'MONTHLY',
+  YEARLY: 'YEARLY',
+} as const;
+
+export interface CreateSubscriptionPaymentRequest {
+  planCode: CreateSubscriptionPaymentRequestPlanCode;
+  customerEmail: string;
+  /**
+     * @minLength 1
+     * @maxLength 120
+     */
+  customerName: string;
+  returnUrl?: string;
+}
+
+export interface SubscriptionPayment {
+  subscriptionId: number;
+  checkoutUrl: string;
+  status: string;
+}
+
 export type HealthStatusStatus = typeof HealthStatusStatus[keyof typeof HealthStatusStatus];
 
 
@@ -42,3 +119,22 @@ export interface HealthStatus {
   checks: HealthStatusChecks;
   message: string;
 }
+
+/**
+ * Invalid request
+ */
+export type BadRequestResponse = ApiError;
+
+/**
+ * Authentication required
+ */
+export type UnauthorizedResponse = ApiError;
+
+export type GetSubscriptionPlans200 = {
+  plans: SubscriptionPlan[];
+};
+
+export type GetSubscriptionStatus200 = {
+  subscription: SubscriptionStatus | null;
+};
+

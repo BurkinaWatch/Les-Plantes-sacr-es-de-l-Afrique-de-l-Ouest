@@ -6,21 +6,32 @@
  * OpenAPI spec version: 0.1.0
  */
 import {
+  useMutation,
   useQuery
 } from '@tanstack/react-query';
 import type {
+  MutationFunction,
   QueryFunction,
   QueryKey,
+  UseMutationOptions,
+  UseMutationResult,
   UseQueryOptions,
   UseQueryResult
 } from '@tanstack/react-query';
 
 import type {
-  HealthStatus
+  ApiError,
+  BadRequestResponse,
+  CreateSubscriptionPaymentRequest,
+  GetSubscriptionPlans200,
+  GetSubscriptionStatus200,
+  HealthStatus,
+  SubscriptionPayment,
+  UnauthorizedResponse
 } from './api.schemas';
 
 import { customFetch } from '../custom-fetch';
-import type { ErrorType } from '../custom-fetch';
+import type { ErrorType , BodyType } from '../custom-fetch';
 
 type AwaitedInput<T> = PromiseLike<T> | T;
 
@@ -102,3 +113,235 @@ export function useHealthCheck<TData = Awaited<ReturnType<typeof healthCheck>>, 
 
   return { ...query, queryKey: queryOptions.queryKey };
 }
+
+
+
+
+
+
+
+export const getGetSubscriptionPlansUrl = () => {
+
+
+
+
+  return `/api/subscriptions/plans`
+}
+
+/**
+ * @summary List available subscription plans
+ */
+export const getSubscriptionPlans = async ( options?: RequestInit): Promise<GetSubscriptionPlans200> => {
+
+  return customFetch<GetSubscriptionPlans200>(getGetSubscriptionPlansUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetSubscriptionPlansQueryKey = () => {
+    return [
+    `/api/subscriptions/plans`
+    ] as const;
+    }
+
+
+export const getGetSubscriptionPlansQueryOptions = <TData = Awaited<ReturnType<typeof getSubscriptionPlans>>, TError = ErrorType<unknown>>( options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getSubscriptionPlans>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetSubscriptionPlansQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getSubscriptionPlans>>> = ({ signal }) => getSubscriptionPlans({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getSubscriptionPlans>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetSubscriptionPlansQueryResult = NonNullable<Awaited<ReturnType<typeof getSubscriptionPlans>>>
+export type GetSubscriptionPlansQueryError = ErrorType<unknown>
+
+
+/**
+ * @summary List available subscription plans
+ */
+
+export function useGetSubscriptionPlans<TData = Awaited<ReturnType<typeof getSubscriptionPlans>>, TError = ErrorType<unknown>>(
+  options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getSubscriptionPlans>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetSubscriptionPlansQueryOptions(options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
+export const getGetSubscriptionStatusUrl = () => {
+
+
+
+
+  return `/api/subscriptions/status`
+}
+
+/**
+ * @summary Get the authenticated user's latest subscription
+ */
+export const getSubscriptionStatus = async ( options?: RequestInit): Promise<GetSubscriptionStatus200> => {
+
+  return customFetch<GetSubscriptionStatus200>(getGetSubscriptionStatusUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetSubscriptionStatusQueryKey = () => {
+    return [
+    `/api/subscriptions/status`
+    ] as const;
+    }
+
+
+export const getGetSubscriptionStatusQueryOptions = <TData = Awaited<ReturnType<typeof getSubscriptionStatus>>, TError = ErrorType<UnauthorizedResponse>>( options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getSubscriptionStatus>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetSubscriptionStatusQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getSubscriptionStatus>>> = ({ signal }) => getSubscriptionStatus({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getSubscriptionStatus>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetSubscriptionStatusQueryResult = NonNullable<Awaited<ReturnType<typeof getSubscriptionStatus>>>
+export type GetSubscriptionStatusQueryError = ErrorType<UnauthorizedResponse>
+
+
+/**
+ * @summary Get the authenticated user's latest subscription
+ */
+
+export function useGetSubscriptionStatus<TData = Awaited<ReturnType<typeof getSubscriptionStatus>>, TError = ErrorType<UnauthorizedResponse>>(
+  options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getSubscriptionStatus>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetSubscriptionStatusQueryOptions(options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
+export const getCreateSubscriptionPaymentUrl = () => {
+
+
+
+
+  return `/api/subscriptions/create-payment`
+}
+
+/**
+ * @summary Create a hosted checkout for a configured subscription plan
+ */
+export const createSubscriptionPayment = async (createSubscriptionPaymentRequest: CreateSubscriptionPaymentRequest, options?: RequestInit): Promise<SubscriptionPayment> => {
+
+  return customFetch<SubscriptionPayment>(getCreateSubscriptionPaymentUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      createSubscriptionPaymentRequest,)
+  }
+);}
+
+
+
+
+export const getCreateSubscriptionPaymentMutationOptions = <TError = ErrorType<BadRequestResponse | UnauthorizedResponse | ApiError>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createSubscriptionPayment>>, TError,{data: BodyType<CreateSubscriptionPaymentRequest>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof createSubscriptionPayment>>, TError,{data: BodyType<CreateSubscriptionPaymentRequest>}, TContext> => {
+
+const mutationKey = ['createSubscriptionPayment'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof createSubscriptionPayment>>, {data: BodyType<CreateSubscriptionPaymentRequest>}> = (props) => {
+          const {data} = props ?? {};
+
+          return  createSubscriptionPayment(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type CreateSubscriptionPaymentMutationResult = NonNullable<Awaited<ReturnType<typeof createSubscriptionPayment>>>
+    export type CreateSubscriptionPaymentMutationBody = BodyType<CreateSubscriptionPaymentRequest>
+    export type CreateSubscriptionPaymentMutationError = ErrorType<BadRequestResponse | UnauthorizedResponse | ApiError>
+
+    /**
+ * @summary Create a hosted checkout for a configured subscription plan
+ */
+export const useCreateSubscriptionPayment = <TError = ErrorType<BadRequestResponse | UnauthorizedResponse | ApiError>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createSubscriptionPayment>>, TError,{data: BodyType<CreateSubscriptionPaymentRequest>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof createSubscriptionPayment>>,
+        TError,
+        {data: BodyType<CreateSubscriptionPaymentRequest>},
+        TContext
+      > => {
+      return useMutation(getCreateSubscriptionPaymentMutationOptions(options));
+    }
+
