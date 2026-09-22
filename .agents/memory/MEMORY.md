@@ -18,3 +18,4 @@
 - [PostgreSQL readiness roles](postgresql-readiness-roles.md) — information_schema constraint metadata may require object ownership, not only SELECT grants
 - [PostgreSQL constraint probes](postgresql-constraint-probes.md) — expected constraint failures inside a write transaction need savepoints before later checks can continue
 - [GitHub connector sync limits](github-connector-sync-limits.md) — managed GitHub writes can sync normal files but may block `.github` paths and Git commit mutations
+- [SAS Pay preparation](saspay-preparation.md) — payment remains server-only and opt-in until pricing, customer data, and webhook rollout are explicitly validated
