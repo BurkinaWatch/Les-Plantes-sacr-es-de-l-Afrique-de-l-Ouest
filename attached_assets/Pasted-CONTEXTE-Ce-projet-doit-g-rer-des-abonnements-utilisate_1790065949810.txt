@@ -1,0 +1,367 @@
+CONTEXTE
+Ce projet doit gérer des abonnements utilisateurs avec une facturation mensuelle et annuelle via SAS Pay.
+Les clés API SAS Pay et la documentation technique complète ne sont PAS encore disponibles.
+Ne rien activer en production et ne rien inventer concernant l'API SAS Pay.
+Le travail doit être réalisé en deux phases.
+
+PHASE 1 — AUDIT ET RETRAIT PROPRE DU MOYEN DE PAIEMENT EXISTANT
+1. INVENTAIRE COMPLET
+Commence par faire l'inventaire de tout ce qui concerne un éventuel système de paiement actuellement présent dans le projet.
+Recherche notamment :
+Stripe
+PayPal
+Flutterwave
+CinetPay
+FedaPay
+Paystack
+Orange Money
+Moov Money
+tout autre PSP ou fournisseur de paiement.
+Inspecte notamment :
+Backend
+dépendances/packages ;
+services de paiement ;
+fichiers de configuration ;
+variables d'environnement ;
+routes API ;
+endpoints ;
+webhooks ;
+middleware ;
+tâches cron/jobs ;
+logique de validation des paiements.
+Base de données
+tables de paiement ;
+transactions ;
+abonnements ;
+factures ;
+plans ;
+statuts ;
+identifiants de transaction externes ;
+relations avec les utilisateurs.
+Frontend / Mobile
+page pricing ;
+boutons d'abonnement ;
+checkout ;
+formulaires de paiement ;
+pages de confirmation ;
+pages d'échec ;
+états de paiement ;
+composants liés au fournisseur actuel.
+Infrastructure
+variables Railway/Replit/production ;
+configuration de déploiement ;
+secrets ;
+scripts ;
+fichiers de configuration.
+
+2. RAPPORT AVANT MODIFICATION
+Ne supprime ni ne modifie rien immédiatement.
+Présente d'abord un inventaire clair contenant :
+fichier ;
+fonction ;
+fournisseur concerné ;
+dépendance ;
+niveau de risque ;
+action proposée : conserver / modifier / supprimer.
+Distingue clairement :
+A. Spécifique au fournisseur actuel
+Peut être retiré ou remplacé.
+B. Générique au système d'abonnement
+Doit être conservé et réutilisé.
+C. Incertain
+Ne pas modifier sans confirmation.
+
+3. VALIDATION AVANT SUPPRESSION
+Après avoir présenté l'inventaire, attends ma confirmation explicite avant toute suppression ou modification destructive.
+Ne suppose jamais que quelque chose est supprimable simplement parce que son nom contient "payment".
+Si un élément possède une fonction métier indépendante du fournisseur de paiement, conserve-le.
+
+4. RETRAIT PROPRE
+Après validation :
+retire uniquement ce qui est strictement lié à l'ancien fournisseur ;
+désinstalle uniquement les dépendances devenues inutiles ;
+supprime uniquement les variables d'environnement obsolètes ;
+retire les routes spécifiques au fournisseur ;
+retire les webhooks spécifiques ;
+retire les composants UI spécifiques ;
+conserve les données historiques ;
+conserve les utilisateurs ;
+conserve les abonnements génériques ;
+conserve les plans génériques ;
+conserve les transactions historiques lorsqu'elles sont utiles à l'historique utilisateur ou comptable.
+Ne supprime aucune table de données contenant de l'historique sans migration sûre et justification explicite.
+
+5. RÉVERSIBILITÉ
+Chaque modification doit être facilement réversible.
+Privilégier :
+un commit séparé ;
+des modifications ciblées ;
+aucune refactorisation inutile.
+Créer ou mettre à jour un CHANGELOG.md uniquement si cela correspond à la structure du projet.
+Documenter ce qui a été retiré et pourquoi.
+
+PHASE 2 — PRÉPARATION DE L'INTÉGRATION SAS PAY
+1. COUCHE D'ABSTRACTION
+Créer ou adapter une couche d'abstraction dédiée au paiement.
+Exemple :
+services/payment/
+
+ou l'équivalent adapté à la stack du projet.
+L'objectif est que le reste de l'application ne dépende pas directement de SAS Pay.
+Architecture souhaitée :
+Application
+     ↓
+Payment Service
+     ↓
+SAS Pay Provider
+     ↓
+SAS Pay API
+
+Cette architecture doit permettre de remplacer ultérieurement SAS Pay par un autre fournisseur sans réécrire toute la logique d'abonnement.
+
+2. SAS PAY — NE RIEN INVENTER
+Les informations techniques officielles de SAS Pay ne sont pas encore fournies.
+Par conséquent :
+NE PAS :
+inventer des endpoints SAS Pay ;
+inventer des paramètres ;
+inventer des headers ;
+inventer des signatures ;
+inventer des méthodes d'authentification ;
+inventer des payloads ;
+inventer des statuts ;
+inventer des webhooks ;
+inventer un mécanisme de paiement récurrent ;
+inventer des URLs sandbox ou production.
+Ne réaliser aucun appel réel à SAS Pay pour le moment.
+Créer uniquement l'architecture nécessaire pour accueillir ultérieurement la documentation officielle.
+
+3. VARIABLES D'ENVIRONNEMENT
+Préparer les emplacements nécessaires sous forme de placeholders.
+Exemples :
+SAS_PAY_API_KEY=
+SAS_PAY_SECRET=
+SAS_PAY_ENV=
+SAS_PAY_API_URL=
+SAS_PAY_MERCHANT_ID=
+SAS_PAY_WEBHOOK_SECRET=
+
+Important :
+Ces noms sont provisoires.
+Lorsque je fournirai la documentation officielle SAS Pay, utilise les noms et paramètres réellement nécessaires.
+Ne hardcode jamais les credentials.
+Ne mets jamais de secret dans :
+Git ;
+frontend ;
+application mobile ;
+bundle JavaScript ;
+fichiers publics.
+Mettre à jour .env.example si le projet en possède un.
+
+4. PLANS D'ABONNEMENT
+Préparer deux périodes :
+MONTHLY
+YEARLY
+
+Chaque plan doit pouvoir contenir :
+id ;
+nom ;
+description ;
+prix ;
+devise ;
+période ;
+statut actif/inactif.
+Ne pas inventer les prix.
+Si des prix existent déjà dans le projet, les conserver.
+Sinon utiliser des placeholders clairement identifiés.
+Exemple :
+MONTHLY_PRICE_PLACEHOLDER
+YEARLY_PRICE_PLACEHOLDER
+
+
+5. MODÈLE D'ABONNEMENT
+Si une structure d'abonnement existe déjà, la réutiliser et l'améliorer plutôt que créer un deuxième système.
+Elle doit pouvoir représenter au minimum :
+utilisateur ;
+plan ;
+période ;
+statut ;
+date de début ;
+date d'expiration ;
+fournisseur de paiement ;
+identifiant de transaction externe ;
+date de création ;
+date de dernière mise à jour.
+Prévoir notamment des statuts tels que :
+PENDING
+ACTIVE
+EXPIRED
+CANCELLED
+PAYMENT_FAILED
+
+N'ajoute pas de statuts spécifiques à SAS Pay sans justification issue de sa documentation officielle.
+
+6. ENDPOINTS INTERNES
+Préparer uniquement les endpoints internes à cette application nécessaires au futur système.
+Exemples conceptuels :
+POST   /api/subscriptions/create-payment
+GET    /api/subscriptions/status
+POST   /api/payments/webhook
+POST   /api/subscriptions/cancel
+POST   /api/subscriptions/renew
+
+Ces routes sont des exemples d'architecture interne.
+Adapte-les à la convention API déjà utilisée par le projet.
+Ne pas confondre ces routes avec les endpoints officiels de SAS Pay.
+Ne faire aucun appel à SAS Pay tant que sa documentation officielle n'est pas fournie.
+
+7. WEBHOOK
+Préparer la structure interne permettant de recevoir ultérieurement un webhook SAS Pay.
+Pour le moment :
+ne pas prétendre connaître son format ;
+ne pas prétendre connaître sa signature ;
+ne pas activer de validation fictive ;
+ne pas considérer un webhook simulé comme une vraie confirmation.
+Préparer simplement l'architecture.
+Lorsque la documentation officielle sera fournie, implémenter :
+authentification/signature ;
+validation du payload ;
+idempotence ;
+gestion des doublons ;
+gestion des paiements réussis ;
+paiements échoués ;
+paiements en attente ;
+annulations.
+
+8. PAIEMENT ET ACTIVATION DE L'ABONNEMENT
+Le frontend ne doit jamais pouvoir déclarer lui-même qu'un paiement est réussi.
+Le principe doit être :
+Utilisateur
+↓
+Choix du plan
+↓
+Backend
+↓
+SAS Pay
+↓
+Paiement
+↓
+Confirmation fiable
+↓
+Backend
+↓
+Validation transaction
+↓
+Activation abonnement
+
+Ne jamais activer définitivement un abonnement simplement parce que l'utilisateur arrive sur une page success.
+
+9. RENOUVELLEMENT
+Préparer l'architecture pour le renouvellement.
+Mais :
+NE PAS implémenter de prélèvement automatique récurrent tant que la documentation officielle SAS Pay n'a pas confirmé que cette fonctionnalité est réellement disponible.
+Si SAS Pay fonctionne avec une nouvelle transaction à chaque renouvellement, l'architecture devra pouvoir créer une nouvelle demande de paiement.
+
+10. INTERFACE UTILISATEUR
+Préparer ou adapter :
+page des plans ;
+sélection mensuelle/annuelle ;
+bouton "S'abonner" ;
+état du paiement ;
+confirmation ;
+échec ;
+abonnement actuel ;
+date d'expiration.
+Tant que SAS Pay n'est pas configuré, afficher clairement :
+Paiement temporairement indisponible.
+Ne pas simuler un paiement réel.
+Ne pas afficher une transaction comme réussie sans confirmation backend.
+
+11. SÉCURITÉ
+Vérifier notamment :
+aucune clé API dans le frontend ;
+aucune clé API dans l'application mobile ;
+secrets uniquement côté serveur ;
+montant déterminé côté serveur ;
+plan validé côté serveur ;
+protection contre la modification du prix côté client ;
+validation des webhooks ;
+idempotence ;
+protection contre les transactions dupliquées ;
+logs sans credentials ;
+gestion correcte des erreurs.
+
+12. TESTS
+Après préparation :
+lancer les tests existants ;
+ajouter des tests pour la logique d'abonnement ;
+tester MONTHLY ;
+tester YEARLY ;
+tester PENDING ;
+tester ACTIVE ;
+tester EXPIRED ;
+tester CANCELLED ;
+tester PAYMENT_FAILED ;
+tester les doublons de webhook ;
+tester les permissions ;
+lancer le build.
+Ne pas déclarer l'intégration SAS Pay fonctionnelle en production.
+À ce stade, elle est uniquement préparée.
+
+13. PRODUCTION
+Ne déploie aucune configuration SAS Pay active en production tant que je n'ai pas fourni :
+documentation officielle SAS Pay ;
+credentials ;
+environnement ;
+informations marchand nécessaires ;
+paramètres officiels ;
+informations webhook ;
+et confirmation explicite de ma part.
+
+14. RAPPORT FINAL
+À la fin, donne-moi :
+AUDIT
+fournisseur existant ;
+fichiers concernés ;
+routes ;
+dépendances ;
+tables ;
+variables ;
+composants UI.
+MODIFICATIONS
+fichiers créés ;
+fichiers modifiés ;
+fichiers supprimés ;
+dépendances supprimées ;
+migrations éventuelles.
+SAS PAY
+architecture préparée ;
+variables d'environnement préparées ;
+endpoints internes préparés ;
+webhook préparé ;
+état actuel de l'intégration.
+RESTE À FAIRE
+Liste précisément les informations nécessaires lorsque je fournirai la documentation et les credentials SAS Pay.
+TESTS
+Indique :
+tests réussis ;
+tests échoués ;
+build ;
+migrations ;
+éventuels problèmes restants.
+
+RÈGLE ABSOLUE
+En cas de doute :
+NE PAS DEVINER.
+Ne pas modifier une partie dont le lien avec le paiement n'est pas certain.
+Ne pas inventer le fonctionnement de SAS Pay.
+Ne pas supprimer de données historiques.
+Ne pas activer de paiement réel.
+Ne pas exposer de credentials.
+Priorités :
+intégrité des données ;
+sécurité ;
+non-régression ;
+architecture indépendante du fournisseur ;
+préparation SAS Pay ;
+expérience utilisateur.
