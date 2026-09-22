@@ -28,7 +28,7 @@ export default function AbonnementScreen() {
 
   const plansQuery = useGetSubscriptionPlans();
   const statusQuery = useGetSubscriptionStatus({
-    query: { enabled: Boolean(user) },
+    query: { enabled: Boolean(user), queryKey: ["subscription-status"] },
   });
   const paymentMutation = useCreateSubscriptionPayment();
 
