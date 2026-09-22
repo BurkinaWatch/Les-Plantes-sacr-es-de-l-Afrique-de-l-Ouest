@@ -1,4 +1,4 @@
-import express, { type Express } from "express";
+import express, { type Express, type Request } from "express";
 import cors from "cors";
 import pinoHttp from "pino-http";
 import router from "./routes";
@@ -89,7 +89,7 @@ app.use(
   express.json({
     limit: "8mb",
     verify: (req, _res, buffer) => {
-      req.rawBody = Buffer.from(buffer);
+      (req as Request).rawBody = Buffer.from(buffer);
     },
   }),
 );
