@@ -363,6 +363,9 @@ router.post("/webhook", async (req, res) => {
       .where(eq(paymentEventsTable.id, event.id));
     return res.status(500).json({ error: "Webhook non traité." });
   }
-});
+  });
 
-export default router;
+  return router;
+}
+
+export default createSubscriptionsRouter();
