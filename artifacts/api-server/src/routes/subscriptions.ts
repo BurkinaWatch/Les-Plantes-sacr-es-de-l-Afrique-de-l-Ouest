@@ -87,7 +87,7 @@ export function createSubscriptionsRouter(
   const router = Router();
 
   router.get("/plans", async (_req, res) => {
-  const plans = await db
+  const plans = await database
     .select({
       code: subscriptionPlansTable.code,
       name: subscriptionPlansTable.name,
@@ -104,7 +104,7 @@ export function createSubscriptionsRouter(
 });
 
 router.get("/status", requireJwt, async (req, res) => {
-  const [subscription] = await db
+  const [subscription] = await database
     .select({
       id: subscriptionsTable.id,
       planCode: subscriptionPlansTable.code,
@@ -139,7 +139,7 @@ router.post("/create-payment", requireJwt, async (req, res) => {
     });
   }
 
-  const [plan] = await db
+  const [plan] = await database
     .select()
     .from(subscriptionPlansTable)
     .where(
@@ -157,7 +157,7 @@ router.post("/create-payment", requireJwt, async (req, res) => {
     });
   }
 
-  const [subscription] = await db
+  const [subscription] = await database
     .insert(subscriptionsTable)
     .values({
       userId: req.user!.id,
@@ -186,7 +186,7 @@ router.post("/create-payment", requireJwt, async (req, res) => {
       },
     });
 
-    await db
+    await database
       .update(subscriptionsTable)
       .set({
         providerCheckoutId: checkout.id,
@@ -262,7 +262,7 @@ router.post("/webhook", async (req, res) => {
 
   const payload = body;
   const payloadHash = createHash("sha256").update(rawBody).digest("hex");
-  const [event] = await db
+  const [event] = await database
     .insert(paymentEventsTable)
     .values({
       provider: paymentProvider.name,
@@ -296,7 +296,7 @@ router.post("/webhook", async (req, res) => {
         ? [eq(paymentAttemptsTable.subscriptionId, subscriptionId)]
         : []),
     ];
-    const [attempt] = await db
+    const [attempt] = await database
       .select()
       .from(paymentAttemptsTable)
       .where(or(...conditions))
@@ -309,7 +309,7 @@ router.post("/webhook", async (req, res) => {
         : isFailedPayment(status)
           ? "FAILED"
           : "PENDING";
-      await db
+      await database
         .update(paymentAttemptsTable)
         .set({
           status: nextStatus,
@@ -320,7 +320,7 @@ router.post("/webhook", async (req, res) => {
         .where(eq(paymentAttemptsTable.id, attempt.id));
 
       if (nextStatus === "SUCCEEDED") {
-        const [subscription] = await db
+        const [subscription] = await database
           .select({
             period: subscriptionsTable.period,
           })
@@ -328,7 +328,7 @@ router.post("/webhook", async (req, res) => {
           .where(eq(subscriptionsTable.id, attempt.subscriptionId))
           .limit(1);
         const startsAt = new Date();
-        await db
+        await database
           .update(subscriptionsTable)
           .set({
             status: "ACTIVE",
@@ -340,21 +340,21 @@ router.post("/webhook", async (req, res) => {
           })
           .where(eq(subscriptionsTable.id, attempt.subscriptionId));
       } else if (nextStatus === "FAILED") {
-        await db
+        await database
           .update(subscriptionsTable)
           .set({ status: "FAILED", updatedAt: new Date() })
           .where(eq(subscriptionsTable.id, attempt.subscriptionId));
       }
     }
 
-    await db
+    await database
       .update(paymentEventsTable)
       .set({ processingStatus: "PROCESSED", processedAt: new Date() })
       .where(eq(paymentEventsTable.id, event.id));
     return res.status(200).json({ received: true });
   } catch (error) {
     logger.error({ err: error, eventId: event.id }, "Failed to process SAS Pay webhook");
-    await db
+    await database
       .update(paymentEventsTable)
       .set({
         processingStatus: "FAILED",
