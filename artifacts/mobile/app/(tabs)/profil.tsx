@@ -121,6 +121,7 @@ export default function ProfilScreen() {
         </View>
 
         {!quizResult && (
+          <>
           <View style={[styles.quizPromo, { backgroundColor: colors.card, borderColor: colors.border }]}>
             <Text style={[styles.quizPromoLabel, { color: colors.gold }]}>{t.profile_quiz_promo_label}</Text>
             <Text style={[styles.quizPromoTitle, { color: colors.ivory }]}>{t.profile_quiz_promo_title}</Text>
@@ -145,6 +146,7 @@ export default function ProfilScreen() {
               Les formules mensuelle et annuelle seront bientôt disponibles.
             </Text>
           </Pressable>
+          </>
         )}
 
         <View style={[styles.infoSection, { backgroundColor: colors.card, borderColor: colors.border }]}>
