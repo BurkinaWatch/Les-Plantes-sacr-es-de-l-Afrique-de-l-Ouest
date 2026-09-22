@@ -12,8 +12,8 @@ import {
 import { requireJwt } from "../lib/auth-middleware.js";
 import { logger } from "../lib/logger.js";
 import { SasPayProvider, SasPayProviderError } from "../lib/saspay-provider.js";
+import type { PaymentProvider } from "../lib/payment-provider.js";
 
-const router = Router();
 const provider = new SasPayProvider();
 
 const createPaymentSchema = z
@@ -80,7 +80,13 @@ export function verifySasPayWebhook(
   );
 }
 
-router.get("/plans", async (_req, res) => {
+export function createSubscriptionsRouter(
+  database: typeof db = db,
+  paymentProvider: PaymentProvider = provider,
+): Router {
+  const router = Router();
+
+  router.get("/plans", async (_req, res) => {
   const plans = await db
     .select({
       code: subscriptionPlansTable.code,
