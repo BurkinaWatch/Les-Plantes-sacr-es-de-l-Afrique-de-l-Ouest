@@ -7,13 +7,6 @@ import type {
 
 const DEFAULT_API_URL = "https://api.saspay.me/api/v1";
 
-type SasPayCheckoutResponse = {
-  id?: unknown;
-  checkout_url?: unknown;
-  status?: unknown;
-  transaction?: unknown;
-};
-
 type JsonRecord = Record<string, unknown>;
 
 function isRecord(value: unknown): value is JsonRecord {
