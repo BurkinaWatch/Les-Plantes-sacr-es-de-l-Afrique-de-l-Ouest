@@ -14,3 +14,9 @@ Webhook delivery is an at-least-once message flow: the unique event key must be 
 **Why:** Providers retry deliveries, so a valid duplicate is normal operational behavior rather than an error condition.
 
 **How to apply:** Preserve the provider/event/transaction idempotency boundary when changing event handling or adding new payment states.
+
+The documented `transaction.success` payload contains the transaction id, reference, status, amount, net amount, and currency, but not the checkout metadata or checkout-session id.
+
+**Why:** The checkout request accepts metadata, while the official webhook example does not echo it. A webhook alone therefore cannot safely identify the local subscription attempt.
+
+**How to apply:** Persist the checkout-session id and verify the known session through SAS Pay before activating an unmatched payment event; never guess the subscription from amount, customer, or event order alone.
