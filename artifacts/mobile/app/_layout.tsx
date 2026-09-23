@@ -4,6 +4,7 @@ import { Stack, useRouter, useSegments } from "expo-router";
 import React, { useEffect, useRef, useState } from "react";
 import {
   Animated,
+  ActivityIndicator,
   Dimensions,
   Image,
   Platform,
@@ -302,10 +303,24 @@ function NotificationsSetup() {
   return null;
 }
 
+function StartupFallback() {
+  return (
+    <View style={styles.startupFallback}>
+      <Image
+        source={require("@/assets/images/logo-plantes-sacrees.png")}
+        style={styles.startupLogo}
+        resizeMode="contain"
+      />
+      <ActivityIndicator color="#D4A017" size="small" />
+      <Text style={styles.startupText}>Chargement de votre espace…</Text>
+    </View>
+  );
+}
+
 /* ── Navigation ────────────────────────────────────────────────── */
 function RootLayoutNav() {
   const { isLoading } = useAuth();
-  if (isLoading) return null;
+  if (isLoading) return <StartupFallback />;
 
   return (
     <View style={{ flex: 1 }}>
@@ -374,6 +389,23 @@ export default function RootLayout() {
 
 /* ── Styles ────────────────────────────────────────────────────── */
 const styles = StyleSheet.create({
+  startupFallback: {
+    flex: 1,
+    backgroundColor: "#0A1F0A",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 18,
+  },
+  startupLogo: {
+    width: 170,
+    height: 170,
+    borderRadius: 28,
+  },
+  startupText: {
+    color: "#F0EAD6",
+    fontSize: 14,
+    textAlign: "center",
+  },
   splashContainer: {
     flex: 1,
     backgroundColor: "#0A1F0A",

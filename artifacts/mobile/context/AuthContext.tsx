@@ -41,17 +41,30 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   // Restore session from storage on mount
   useEffect(() => {
+    let cancelled = false;
+    const timeout = setTimeout(() => {
+      if (!cancelled) setIsLoading(false);
+    }, 2000);
+
     (async () => {
       try {
         const raw = await AsyncStorage.getItem(AUTH_KEY);
         if (raw) {
           const stored: StoredAuth = JSON.parse(raw);
-          setUser(stored.user);
-          setToken(stored.token);
+          if (stored?.user && typeof stored.token === 'string' && !cancelled) {
+            setUser(stored.user);
+            setToken(stored.token);
+          }
         }
       } catch (_) {}
-      setIsLoading(false);
+      clearTimeout(timeout);
+      if (!cancelled) setIsLoading(false);
     })();
+
+    return () => {
+      cancelled = true;
+      clearTimeout(timeout);
+    };
   }, []);
 
   const persist = useCallback(async (u: AuthUser, t: string) => {
