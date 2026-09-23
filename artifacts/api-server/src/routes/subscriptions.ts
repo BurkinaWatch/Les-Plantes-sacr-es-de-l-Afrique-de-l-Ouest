@@ -338,10 +338,13 @@ router.post("/webhook", async (req, res) => {
             }
           }),
       );
-      attempt = matches.find(
+      const matchedAttempt = matches.find(
         (candidate): candidate is NonNullable<(typeof matches)[number]> =>
           candidate !== undefined,
       );
+      if (matchedAttempt) {
+        attempt = matchedAttempt;
+      }
     }
 
     if (attempt) {
