@@ -21,6 +21,7 @@ export * from './subscriptionPayment';
 export * from './subscriptionPlan';
 export * from './subscriptionPlanCode';
 export * from './subscriptionPlanPeriod';
+export * from './subscriptionReconciliation';
 export * from './subscriptionStatus';
 export * from './subscriptionStatusStatus';
 export * from './unauthorizedResponse';

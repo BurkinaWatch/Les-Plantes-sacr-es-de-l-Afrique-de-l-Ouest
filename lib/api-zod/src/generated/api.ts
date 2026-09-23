@@ -56,6 +56,16 @@ export const GetSubscriptionStatusResponse = zod.object({
 
 
 /**
+ * @summary Reconcile pending hosted checkout sessions
+ */
+export const ReconcileSubscriptionPaymentResponse = zod.object({
+  "checked": zod.number(),
+  "activated": zod.number(),
+  "failed": zod.number()
+})
+
+
+/**
  * @summary Create a hosted checkout for a configured subscription plan
  */
 export const createSubscriptionPaymentBodyCustomerNameMax = 120;

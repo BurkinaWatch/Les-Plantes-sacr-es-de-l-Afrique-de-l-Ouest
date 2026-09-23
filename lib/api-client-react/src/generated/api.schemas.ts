@@ -82,6 +82,12 @@ export interface SubscriptionPayment {
   status: string;
 }
 
+export interface SubscriptionReconciliation {
+  checked: number;
+  activated: number;
+  failed: number;
+}
+
 export type HealthStatusStatus = typeof HealthStatusStatus[keyof typeof HealthStatusStatus];
 
 

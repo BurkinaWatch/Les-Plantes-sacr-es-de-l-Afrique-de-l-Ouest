@@ -27,6 +27,7 @@ import type {
   GetSubscriptionStatus200,
   HealthStatus,
   SubscriptionPayment,
+  SubscriptionReconciliation,
   UnauthorizedResponse
 } from './api.schemas';
 
@@ -273,6 +274,76 @@ export function useGetSubscriptionStatus<TData = Awaited<ReturnType<typeof getSu
 
 
 
+
+export const getReconcileSubscriptionPaymentUrl = () => {
+
+
+
+
+  return `/api/subscriptions/reconcile`
+}
+
+/**
+ * @summary Reconcile pending hosted checkout sessions
+ */
+export const reconcileSubscriptionPayment = async ( options?: RequestInit): Promise<SubscriptionReconciliation> => {
+
+  return customFetch<SubscriptionReconciliation>(getReconcileSubscriptionPaymentUrl(),
+  {
+    ...options,
+    method: 'POST'
+
+
+  }
+);}
+
+
+
+
+export const getReconcileSubscriptionPaymentMutationOptions = <TError = ErrorType<UnauthorizedResponse | ApiError>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof reconcileSubscriptionPayment>>, TError,void, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof reconcileSubscriptionPayment>>, TError,void, TContext> => {
+
+const mutationKey = ['reconcileSubscriptionPayment'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof reconcileSubscriptionPayment>>, void> = () => {
+
+
+          return  reconcileSubscriptionPayment(requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type ReconcileSubscriptionPaymentMutationResult = NonNullable<Awaited<ReturnType<typeof reconcileSubscriptionPayment>>>
+
+    export type ReconcileSubscriptionPaymentMutationError = ErrorType<UnauthorizedResponse | ApiError>
+
+    /**
+ * @summary Reconcile pending hosted checkout sessions
+ */
+export const useReconcileSubscriptionPayment = <TError = ErrorType<UnauthorizedResponse | ApiError>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof reconcileSubscriptionPayment>>, TError,void, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof reconcileSubscriptionPayment>>,
+        TError,
+        void,
+        TContext
+      > => {
+      return useMutation(getReconcileSubscriptionPaymentMutationOptions(options));
+    }
 
 export const getCreateSubscriptionPaymentUrl = () => {
 
