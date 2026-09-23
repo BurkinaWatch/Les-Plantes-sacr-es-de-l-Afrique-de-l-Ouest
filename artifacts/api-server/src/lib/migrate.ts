@@ -8,7 +8,7 @@ export const REQUIRED_SCHEMA_TABLES = [
   "payment_attempts",
   "payment_events",
 ] as const;
-export const CURRENT_SCHEMA_VERSION = 2;
+export const CURRENT_SCHEMA_VERSION = 3;
 
 type RequiredSchemaColumn = {
   tableName: string;
@@ -734,6 +734,33 @@ async function ensurePaymentSchemaObjects(client: SchemaClient): Promise<void> {
   `);
 }
 
+async function activateSubscriptionPlans(client: SchemaClient): Promise<void> {
+  await client.query(`
+    UPDATE subscription_plans
+    SET
+      amount = CASE code
+        WHEN 'MONTHLY' THEN 2000.00
+        WHEN 'YEARLY' THEN 20000.00
+        ELSE amount
+      END,
+      currency = CASE
+        WHEN code IN ('MONTHLY', 'YEARLY') THEN 'XOF'
+        ELSE currency
+      END,
+      description = CASE code
+        WHEN 'MONTHLY' THEN 'Accès soutien mensuel'
+        WHEN 'YEARLY' THEN 'Accès soutien annuel — deux mois offerts'
+        ELSE description
+      END,
+      active = CASE
+        WHEN code IN ('MONTHLY', 'YEARLY') THEN TRUE
+        ELSE active
+      END,
+      updated_at = NOW()
+    WHERE code IN ('MONTHLY', 'YEARLY')
+  `);
+}
+
 const SCHEMA_MIGRATIONS: readonly SchemaMigration[] = [
   {
     version: 1,
@@ -758,6 +785,28 @@ const SCHEMA_MIGRATIONS: readonly SchemaMigration[] = [
         await client.query("DROP TABLE IF EXISTS payment_attempts");
         await client.query("DROP TABLE IF EXISTS subscriptions");
         await client.query("DROP TABLE IF EXISTS subscription_plans");
+      },
+    },
+  },
+  {
+    version: 3,
+    up: activateSubscriptionPlans,
+    rollback: {
+      strategy: "reverse-migration",
+      reviewed: true,
+      notes:
+        "Rollback de la tarification SAS Pay vers les plans préparés mais inactifs, sans supprimer les tentatives ou les abonnements existants.",
+      down: async (client) => {
+        await client.query(`
+          UPDATE subscription_plans
+          SET
+            amount = NULL,
+            currency = NULL,
+            description = 'Prix à définir',
+            active = FALSE,
+            updated_at = NOW()
+          WHERE code IN ('MONTHLY', 'YEARLY')
+        `);
       },
     },
   },
