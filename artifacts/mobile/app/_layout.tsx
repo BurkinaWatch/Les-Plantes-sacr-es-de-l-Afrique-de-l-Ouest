@@ -57,11 +57,22 @@ function AnimatedSplash({ onFinish }: { onFinish: () => void }) {
   const logoOpacity = useRef(new Animated.Value(0)).current;
   const titleOpacity    = useRef(new Animated.Value(0)).current;
   const screenOpacity   = useRef(new Animated.Value(1)).current;
+  const onFinishRef = useRef(onFinish);
+  onFinishRef.current = onFinish;
 
   useEffect(() => {
     const native = isNative;
+    let finished = false;
+    const finish = () => {
+      if (finished) return;
+      finished = true;
+      onFinishRef.current();
+    };
 
-    Animated.sequence([
+    // Never let a native animation failure trap the app on the splash screen.
+    const fallbackTimer = setTimeout(finish, 4200);
+
+    const animation = Animated.sequence([
       Animated.delay(150),
       Animated.parallel([
         Animated.spring(logoScale, {
@@ -88,7 +99,15 @@ function AnimatedSplash({ onFinish }: { onFinish: () => void }) {
         duration: 500,
         useNativeDriver: native,
       }),
-    ]).start(() => onFinish());
+    ]);
+    animation.start(({ finished: animationFinished }) => {
+      if (animationFinished) finish();
+    });
+
+    return () => {
+      clearTimeout(fallbackTimer);
+      animation.stop();
+    };
   }, []);
 
   return (
@@ -311,10 +330,12 @@ function RootLayoutNav() {
 /* ── Root Layout ───────────────────────────────────────────────── */
 export default function RootLayout() {
   const [showSplash, setShowSplash] = useState(true);
-  const [fontsReady, setFontsReady] = useState(false);
 
   useEffect(() => {
-    SplashScreen.hideAsync();
+    // The native splash must never depend on font loading or a custom
+    // animation. The React splash below takes over immediately after the root
+    // mounts, while fonts load in the background.
+    SplashScreen.hideAsync().catch(() => {});
 
     const loadFonts = async () => {
       try {
@@ -329,15 +350,11 @@ export default function RootLayout() {
         }
       } catch {
         // Les icônes se dégradent gracieusement si les polices échouent
-      } finally {
-        setFontsReady(true);
       }
     };
 
     loadFonts();
   }, []);
-
-  if (!fontsReady) return null;
 
   return (
     <SafeAreaProvider>
