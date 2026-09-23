@@ -32,7 +32,7 @@
     },
     "android": {
       "package": "com.ouedraogophillips.plantessacrees",
-      "versionCode": 2,
+      "versionCode": 3,
       "backgroundColor": "#120A05",
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/logo-plantes-sacrees.png",
