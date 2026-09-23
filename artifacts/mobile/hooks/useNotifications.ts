@@ -68,21 +68,27 @@ export function useNotifications(): UseNotificationsReturn {
     }
     const nativeNotifications = notifications;
 
-    // How delivered notifications appear while the app is in the foreground.
-    nativeNotifications.setNotificationHandler({
-      handleNotification: async () => ({
-        shouldShowAlert: true,
-        shouldPlaySound: true,
-        shouldSetBadge: false,
-        shouldShowBanner: true,
-        shouldShowList: true,
-      }),
-    });
-
     let cancelled = false;
 
     async function setup() {
       try {
+        // Notification setup is optional and must never block the app's first
+        // render if the native module is unavailable or partially configured.
+        try {
+          nativeNotifications.setNotificationHandler({
+            handleNotification: async () => ({
+              shouldShowAlert: true,
+              shouldPlaySound: true,
+              shouldSetBadge: false,
+              shouldShowBanner: true,
+              shouldShowList: true,
+            }),
+          });
+        } catch {
+          if (!cancelled) setPushToken(null);
+          return;
+        }
+
         // Request permission
         // Cast to any because PermissionResponse from 'expo' may not resolve in
         // all TypeScript configs; the runtime shape always has `granted: boolean`.
@@ -134,11 +140,15 @@ export function useNotifications(): UseNotificationsReturn {
     setup();
 
     // Listen for notification taps (brings app to foreground)
-    listenerRef.current = nativeNotifications.addNotificationResponseReceivedListener(
-      (_response) => {
-        // Future: navigate to the relevant screen based on response.notification.request.content.data
-      }
-    );
+    try {
+      listenerRef.current = nativeNotifications.addNotificationResponseReceivedListener(
+        (_response) => {
+          // Future: navigate to the relevant screen based on response.notification.request.content.data
+        }
+      );
+    } catch {
+      // Notification response listeners are optional.
+    }
 
     return () => {
       cancelled = true;
