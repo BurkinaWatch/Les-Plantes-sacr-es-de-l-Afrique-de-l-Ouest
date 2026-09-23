@@ -1,7 +1,6 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import * as Font from "expo-font";
 import { Stack, useRouter, useSegments } from "expo-router";
-import * as SplashScreen from "expo-splash-screen";
 import React, { useEffect, useRef, useState } from "react";
 import {
   Animated,
@@ -44,8 +43,6 @@ if (Platform.OS === "web" && typeof window !== "undefined") {
     return origError ? origError(msg, src, _line, _col, _err) : false;
   };
 }
-
-SplashScreen.preventAutoHideAsync();
 
 const queryClient = new QueryClient();
 const { width } = Dimensions.get("window");
@@ -332,11 +329,6 @@ export default function RootLayout() {
   const [showSplash, setShowSplash] = useState(true);
 
   useEffect(() => {
-    // The native splash must never depend on font loading or a custom
-    // animation. The React splash below takes over immediately after the root
-    // mounts, while fonts load in the background.
-    SplashScreen.hideAsync().catch(() => {});
-
     const loadFonts = async () => {
       try {
         if (Platform.OS !== "web") {
