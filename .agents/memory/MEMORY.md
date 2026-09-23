@@ -8,6 +8,7 @@
 - [EAS build constraints](eas-build-constraints.md) — imported project access, remote keystore setup, and Android build quota can block APK builds
 - [Native startup splash](native-startup-splash.md) — never gate the root render or native splash dismissal on fonts or a custom animation
 - [Native SVG verification](native-svg-verification.md) — device/emulator is required for final visuals; preview may stop on the animated splash
+- [Expo standalone startup](expo-standalone-startup.md) — validate native peer dependencies with expo-doctor; the first navigation render must not wait on decorative UI or storage
 - [Static URL validation](static-url-validation.md) — validate the raw decoded request path before URL parsing because WHATWG URL normalizes encoded dot segments and backslashes
 - [Image parser security](image-parser-security.md) — image-size advisories may have no patched release; replace Metro's parser dependency rather than only bumping its version
 - [Expo asset paths](expo-asset-paths.md) — Metro asset sources may resolve through workspace dependencies; validate resolved sources, but publish only sanitized output paths
