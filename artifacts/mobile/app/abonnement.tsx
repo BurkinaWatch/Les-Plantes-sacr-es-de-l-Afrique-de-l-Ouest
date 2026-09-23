@@ -39,13 +39,16 @@ export default function AbonnementScreen() {
   const reconcileMutation = useReconcileSubscriptionPayment();
 
   useEffect(() => {
-    if (!user) return;
+    const hasConfiguredPlan = plansQuery.data?.plans.some(
+      (plan) => plan.active && Boolean(plan.amount && plan.currency),
+    );
+    if (!user || !hasConfiguredPlan) return;
     reconcileMutation.mutate(undefined, {
       onSuccess: () => {
         statusQuery.refetch();
       },
     });
-  }, [user]);
+  }, [user, plansQuery.data?.plans]);
 
   const selected = useMemo(
     () => plansQuery.data?.plans.find((plan) => plan.code === selectedPlan),
