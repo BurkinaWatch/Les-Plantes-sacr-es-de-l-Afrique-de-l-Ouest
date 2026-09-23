@@ -1,5 +1,5 @@
 import { useRouter } from "expo-router";
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import {
   ActivityIndicator,
   Linking,
@@ -15,7 +15,12 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { SacredIcon } from "@/components/SacredIcon";
 import { useAuth } from "@/context/AuthContext";
 import { useColors } from "@/hooks/useColors";
-import { useGetSubscriptionPlans, useGetSubscriptionStatus, useCreateSubscriptionPayment } from "@workspace/api-client-react";
+import {
+  useCreateSubscriptionPayment,
+  useGetSubscriptionPlans,
+  useGetSubscriptionStatus,
+  useReconcileSubscriptionPayment,
+} from "@workspace/api-client-react";
 
 export default function AbonnementScreen() {
   const colors = useColors();
@@ -31,6 +36,16 @@ export default function AbonnementScreen() {
     query: { enabled: Boolean(user), queryKey: ["subscription-status"] },
   });
   const paymentMutation = useCreateSubscriptionPayment();
+  const reconcileMutation = useReconcileSubscriptionPayment();
+
+  useEffect(() => {
+    if (!user) return;
+    reconcileMutation.mutate(undefined, {
+      onSuccess: () => {
+        statusQuery.refetch();
+      },
+    });
+  }, [user]);
 
   const selected = useMemo(
     () => plansQuery.data?.plans.find((plan) => plan.code === selectedPlan),

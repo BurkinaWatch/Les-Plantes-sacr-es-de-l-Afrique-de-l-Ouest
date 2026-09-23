@@ -59,6 +59,71 @@ function isFailedPayment(status: string): boolean {
   );
 }
 
+type PaymentAttemptRow = typeof paymentAttemptsTable.$inferSelect;
+type PaymentTransition = "SUCCEEDED" | "FAILED" | "PENDING" | "UNCHANGED";
+
+async function settlePaymentAttempt(
+  database: typeof db,
+  attempt: PaymentAttemptRow,
+  status: string,
+  transactionId?: string,
+  reference?: string,
+): Promise<PaymentTransition> {
+  const nextStatus = isSuccessfulPayment(status)
+    ? "SUCCEEDED"
+    : isFailedPayment(status)
+      ? "FAILED"
+      : "PENDING";
+  const [claimedAttempt] = await database
+    .update(paymentAttemptsTable)
+    .set({
+      status: nextStatus,
+      providerTransactionId: transactionId ?? attempt.providerTransactionId,
+      providerReference: reference ?? attempt.providerReference,
+      updatedAt: new Date(),
+    })
+    .where(
+      and(
+        eq(paymentAttemptsTable.id, attempt.id),
+        eq(paymentAttemptsTable.status, "PENDING"),
+      ),
+    )
+    .returning({ id: paymentAttemptsTable.id });
+
+  // A webhook and a reconciliation request can arrive together. Only the
+  // request that changes PENDING may apply the subscription transition.
+  if (!claimedAttempt) return "UNCHANGED";
+
+  if (nextStatus === "SUCCEEDED") {
+    const [subscription] = await database
+      .select({
+        period: subscriptionsTable.period,
+      })
+      .from(subscriptionsTable)
+      .where(eq(subscriptionsTable.id, attempt.subscriptionId))
+      .limit(1);
+    const startsAt = new Date();
+    await database
+      .update(subscriptionsTable)
+      .set({
+        status: "ACTIVE",
+        startsAt,
+        expiresAt: addPeriod(startsAt, subscription?.period ?? "MONTHLY"),
+        providerTransactionId: transactionId ?? attempt.providerTransactionId,
+        providerReference: reference ?? attempt.providerReference,
+        updatedAt: startsAt,
+      })
+      .where(eq(subscriptionsTable.id, attempt.subscriptionId));
+  } else if (nextStatus === "FAILED") {
+    await database
+      .update(subscriptionsTable)
+      .set({ status: "FAILED", updatedAt: new Date() })
+      .where(eq(subscriptionsTable.id, attempt.subscriptionId));
+  }
+
+  return nextStatus;
+}
+
 export function createSubscriptionsRouter(
   database: typeof db = db,
   paymentProvider: PaymentProvider = provider,
@@ -103,6 +168,62 @@ router.get("/status", requireJwt, async (req, res) => {
     .limit(1);
 
   return res.json({ subscription: subscription ?? null });
+});
+
+router.post("/reconcile", requireJwt, async (req, res) => {
+  if (!paymentProvider.isConfigured() || !paymentProvider.getCheckoutSession) {
+    return res.status(503).json({
+      code: "PAYMENTS_NOT_CONFIGURED",
+      error: "La vérification des paiements n'est pas encore disponible.",
+    });
+  }
+
+  const pendingAttempts = await database
+    .select()
+    .from(paymentAttemptsTable)
+    .where(
+      and(
+        eq(paymentAttemptsTable.userId, req.user!.id),
+        eq(paymentAttemptsTable.provider, paymentProvider.name),
+        eq(paymentAttemptsTable.status, "PENDING"),
+      ),
+    )
+    .orderBy(desc(paymentAttemptsTable.createdAt));
+
+  let activated = 0;
+  let failed = 0;
+  for (const attempt of pendingAttempts) {
+    if (!attempt.providerCheckoutId) continue;
+
+    try {
+      const checkout = await paymentProvider.getCheckoutSession(attempt.providerCheckoutId);
+      const checkoutStatus = checkout.status.toUpperCase();
+      if (checkoutStatus === "PAID" && checkout.transactionId) {
+        const transition = await settlePaymentAttempt(
+          database,
+          attempt,
+          "SUCCESS",
+          checkout.transactionId,
+          checkout.transactionReference,
+        );
+        if (transition === "SUCCEEDED") activated += 1;
+      } else if (["EXPIRED", "CANCELLED"].includes(checkoutStatus)) {
+        const transition = await settlePaymentAttempt(database, attempt, "EXPIRED");
+        if (transition === "FAILED") failed += 1;
+      }
+    } catch (error) {
+      logger.warn(
+        { err: error, checkoutId: attempt.providerCheckoutId, userId: req.user!.id },
+        "Unable to reconcile a SAS Pay checkout session",
+      );
+    }
+  }
+
+  return res.json({
+    checked: pendingAttempts.length,
+    activated,
+    failed,
+  });
 });
 
 router.post("/create-payment", requireJwt, async (req, res) => {
@@ -348,47 +469,7 @@ router.post("/webhook", async (req, res) => {
     }
 
     if (attempt) {
-      const nextStatus = isSuccessfulPayment(status)
-        ? "SUCCEEDED"
-        : isFailedPayment(status)
-          ? "FAILED"
-          : "PENDING";
-      await database
-        .update(paymentAttemptsTable)
-        .set({
-          status: nextStatus,
-          providerTransactionId: transactionId,
-          providerReference: reference ?? attempt.providerReference,
-          updatedAt: new Date(),
-        })
-        .where(eq(paymentAttemptsTable.id, attempt.id));
-
-      if (nextStatus === "SUCCEEDED") {
-        const [subscription] = await database
-          .select({
-            period: subscriptionsTable.period,
-          })
-          .from(subscriptionsTable)
-          .where(eq(subscriptionsTable.id, attempt.subscriptionId))
-          .limit(1);
-        const startsAt = new Date();
-        await database
-          .update(subscriptionsTable)
-          .set({
-            status: "ACTIVE",
-            startsAt,
-            expiresAt: addPeriod(startsAt, subscription?.period ?? "MONTHLY"),
-            providerTransactionId: transactionId,
-            providerReference: reference,
-            updatedAt: startsAt,
-          })
-          .where(eq(subscriptionsTable.id, attempt.subscriptionId));
-      } else if (nextStatus === "FAILED") {
-        await database
-          .update(subscriptionsTable)
-          .set({ status: "FAILED", updatedAt: new Date() })
-          .where(eq(subscriptionsTable.id, attempt.subscriptionId));
-      }
+      await settlePaymentAttempt(database, attempt, status, transactionId, reference);
     }
 
     await database
