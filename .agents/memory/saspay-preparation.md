@@ -20,3 +20,9 @@ The documented `transaction.success` payload contains the transaction id, refere
 **Why:** The checkout request accepts metadata, while the official webhook example does not echo it. A webhook alone therefore cannot safely identify the local subscription attempt.
 
 **How to apply:** Persist the checkout-session id and verify the known session through SAS Pay before activating an unmatched payment event; never guess the subscription from amount, customer, or event order alone.
+
+Payment settlement must claim a pending attempt before activating its subscription.
+
+**Why:** A webhook and a user-triggered checkout reconciliation can legitimately observe the same paid session at the same time.
+
+**How to apply:** Make the payment-attempt transition conditional on `PENDING`; only the request that successfully changes that state may set the subscription active.
