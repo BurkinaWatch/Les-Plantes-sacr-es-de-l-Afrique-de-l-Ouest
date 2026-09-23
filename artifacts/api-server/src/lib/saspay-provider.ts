@@ -1,5 +1,6 @@
 import type {
   CheckoutSession,
+  CheckoutSessionStatus,
   CreateCheckoutInput,
   PaymentProvider,
 } from "./payment-provider.js";
@@ -10,6 +11,7 @@ type SasPayCheckoutResponse = {
   id?: unknown;
   checkout_url?: unknown;
   status?: unknown;
+  transaction?: unknown;
 };
 
 export class SasPayProviderError extends Error {
@@ -92,6 +94,63 @@ export class SasPayProvider implements PaymentProvider {
       id: payload.id,
       checkoutUrl: payload.checkout_url,
       status: payload.status,
+    };
+  }
+
+  async getCheckoutSession(checkoutId: string): Promise<CheckoutSessionStatus> {
+    if (!this.isConfigured() || !this.apiKey) {
+      throw new SasPayProviderError("Le paiement SAS Pay est indisponible.", 503);
+    }
+
+    const response = await fetch(
+      `${this.apiUrl}/checkout-sessions/${encodeURIComponent(checkoutId)}/`,
+      {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${this.apiKey}`,
+          Accept: "application/json",
+        },
+        signal: AbortSignal.timeout(10_000),
+      },
+    );
+
+    let payload: SasPayCheckoutResponse = {};
+    try {
+      payload = (await response.json()) as SasPayCheckoutResponse;
+    } catch {
+      // The status below is enough to produce a safe provider error.
+    }
+
+    if (!response.ok) {
+      throw new SasPayProviderError(
+        `SAS Pay n'a pas pu vérifier la session de paiement (${response.status}).`,
+        response.status,
+      );
+    }
+
+    if (typeof payload.id !== "string" || typeof payload.status !== "string") {
+      throw new SasPayProviderError(
+        "La réponse SAS Pay ne contient pas une session de checkout valide.",
+        502,
+      );
+    }
+
+    const transaction =
+      typeof payload.transaction === "string"
+        ? { id: payload.transaction }
+        : payload.transaction && typeof payload.transaction === "object"
+          ? (payload.transaction as Record<string, unknown>)
+          : undefined;
+
+    return {
+      id: payload.id,
+      status: payload.status,
+      transactionId:
+        transaction && typeof transaction.id === "string" ? transaction.id : undefined,
+      transactionReference:
+        transaction && typeof transaction.reference === "string"
+          ? transaction.reference
+          : undefined,
     };
   }
 }

@@ -234,6 +234,16 @@ router.post("/webhook", async (req, res) => {
     body.transactionId,
   );
   const reference = firstString(data.reference, data.external_reference, body.reference);
+  const checkoutId = firstString(
+    data.checkout_session_id,
+    data.checkoutSessionId,
+    data.checkout_id,
+    data.checkoutId,
+    body.checkout_session_id,
+    body.checkoutSessionId,
+    body.checkout_id,
+    body.checkoutId,
+  );
   const status = firstString(data.status, body.status, eventType) ?? eventType;
   if (!transactionId) {
     return res.status(400).json({ error: "Événement webhook incomplet." });
@@ -274,17 +284,65 @@ router.post("/webhook", async (req, res) => {
     const subscriptionId = Number(metadata.subscription_id);
     const conditions = [
       eq(paymentAttemptsTable.providerTransactionId, transactionId),
+      ...(checkoutId ? [eq(paymentAttemptsTable.providerCheckoutId, checkoutId)] : []),
       ...(reference ? [eq(paymentAttemptsTable.providerReference, reference)] : []),
       ...(Number.isInteger(subscriptionId) && subscriptionId > 0
         ? [eq(paymentAttemptsTable.subscriptionId, subscriptionId)]
         : []),
     ];
-    const [attempt] = await database
+    let [attempt] = await database
       .select()
       .from(paymentAttemptsTable)
       .where(or(...conditions))
       .orderBy(desc(paymentAttemptsTable.createdAt))
       .limit(1);
+
+    // SAS Pay's documented transaction.success payload does not carry the
+    // checkout metadata or checkout id. Resolve the transaction through the
+    // checkout sessions created by this application before changing state.
+    if (!attempt && paymentProvider.getCheckoutSession) {
+      const pendingAttempts = await database
+        .select()
+        .from(paymentAttemptsTable)
+        .where(
+          and(
+            eq(paymentAttemptsTable.provider, paymentProvider.name),
+            eq(paymentAttemptsTable.status, "PENDING"),
+          ),
+        )
+        .orderBy(desc(paymentAttemptsTable.createdAt));
+
+      const matches = await Promise.all(
+        pendingAttempts
+          .filter((candidate) => Boolean(candidate.providerCheckoutId))
+          .map(async (candidate) => {
+            try {
+              const checkout = await paymentProvider.getCheckoutSession!(
+                candidate.providerCheckoutId!,
+              );
+              const checkoutStatus = checkout.status.toUpperCase();
+              const transactionMatches =
+                checkout.transactionId === transactionId ||
+                (reference !== undefined && checkout.transactionReference === reference);
+              return checkoutStatus === "PAID" && transactionMatches ? candidate : undefined;
+            } catch (error) {
+              logger.warn(
+                {
+                  err: error,
+                  checkoutId: candidate.providerCheckoutId,
+                  transactionId,
+                },
+                "Unable to verify a SAS Pay checkout session",
+              );
+              return undefined;
+            }
+          }),
+      );
+      attempt = matches.find(
+        (candidate): candidate is NonNullable<(typeof matches)[number]> =>
+          candidate !== undefined,
+      );
+    }
 
     if (attempt) {
       const nextStatus = isSuccessfulPayment(status)

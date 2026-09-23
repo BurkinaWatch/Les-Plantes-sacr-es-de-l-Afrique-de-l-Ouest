@@ -16,8 +16,16 @@ export type CheckoutSession = {
   status: string;
 };
 
+export type CheckoutSessionStatus = {
+  id: string;
+  status: string;
+  transactionId?: string;
+  transactionReference?: string;
+};
+
 export interface PaymentProvider {
   readonly name: PaymentProviderName;
   isConfigured(): boolean;
   createCheckout(input: CreateCheckoutInput): Promise<CheckoutSession>;
+  getCheckoutSession?(checkoutId: string): Promise<CheckoutSessionStatus>;
 }
