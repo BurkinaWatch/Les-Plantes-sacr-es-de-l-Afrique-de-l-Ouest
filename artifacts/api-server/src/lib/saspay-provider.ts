@@ -14,6 +14,94 @@ type SasPayCheckoutResponse = {
   transaction?: unknown;
 };
 
+type JsonRecord = Record<string, unknown>;
+
+function isRecord(value: unknown): value is JsonRecord {
+  return typeof value === "object" && value !== null && !Array.isArray(value);
+}
+
+function firstString(record: JsonRecord, keys: readonly string[]): string | undefined {
+  for (const key of keys) {
+    const value = record[key];
+    if (typeof value === "string" && value.length > 0) return value;
+  }
+  return undefined;
+}
+
+function findRecord(
+  value: unknown,
+  predicate: (record: JsonRecord) => boolean,
+  depth = 0,
+): JsonRecord | undefined {
+  if (depth > 5) return undefined;
+  if (Array.isArray(value)) {
+    for (const item of value) {
+      const match = findRecord(item, predicate, depth + 1);
+      if (match) return match;
+    }
+    return undefined;
+  }
+  if (!isRecord(value)) return undefined;
+  if (predicate(value)) return value;
+  for (const child of Object.values(value)) {
+    const match = findRecord(child, predicate, depth + 1);
+    if (match) return match;
+  }
+  return undefined;
+}
+
+function checkoutId(record: JsonRecord): string | undefined {
+  return firstString(record, ["id", "checkout_id", "checkoutId", "checkout_session_id"]);
+}
+
+function checkoutUrl(record: JsonRecord): string | undefined {
+  return firstString(record, [
+    "checkout_url",
+    "checkoutUrl",
+    "checkout_link",
+    "checkoutLink",
+    "payment_url",
+    "paymentUrl",
+    "redirect_url",
+    "redirectUrl",
+    "url",
+  ]);
+}
+
+function checkoutStatus(record: JsonRecord): string | undefined {
+  return firstString(record, ["status", "payment_status", "paymentStatus", "state"]);
+}
+
+function findTransaction(value: unknown, depth = 0): JsonRecord | undefined {
+  if (depth > 5) return undefined;
+  if (Array.isArray(value)) {
+    for (const item of value) {
+      const match = findTransaction(item, depth + 1);
+      if (match) return match;
+    }
+    return undefined;
+  }
+  if (!isRecord(value)) return undefined;
+
+  const transaction = value.transaction;
+  if (isRecord(transaction)) return transaction;
+  if (typeof transaction === "string" && transaction.length > 0) {
+    return { id: transaction };
+  }
+  if (firstString(value, ["transaction_id", "transactionId"])) {
+    return {
+      id: firstString(value, ["transaction_id", "transactionId"]),
+      reference: firstString(value, ["reference", "transaction_reference", "transactionReference"]),
+    };
+  }
+
+  for (const child of Object.values(value)) {
+    const match = findTransaction(child, depth + 1);
+    if (match) return match;
+  }
+  return undefined;
+}
+
 export class SasPayProviderError extends Error {
   readonly status: number;
 
@@ -65,9 +153,9 @@ export class SasPayProvider implements PaymentProvider {
       }),
     });
 
-    let payload: SasPayCheckoutResponse = {};
+    let payload: unknown = {};
     try {
-      payload = (await response.json()) as SasPayCheckoutResponse;
+      payload = (await response.json()) as unknown;
     } catch {
       // The status below is enough to produce a safe provider error.
     }
@@ -79,11 +167,13 @@ export class SasPayProvider implements PaymentProvider {
       );
     }
 
-    if (
-      typeof payload.id !== "string" ||
-      typeof payload.checkout_url !== "string" ||
-      typeof payload.status !== "string"
-    ) {
+    const checkout = findRecord(
+      payload,
+      (record) => Boolean(checkoutId(record) && checkoutUrl(record)),
+    );
+    const id = checkout ? checkoutId(checkout) : undefined;
+    const url = checkout ? checkoutUrl(checkout) : undefined;
+    if (!id || !url) {
       throw new SasPayProviderError(
         "La réponse SAS Pay ne contient pas une session de checkout valide.",
         502,
@@ -91,9 +181,9 @@ export class SasPayProvider implements PaymentProvider {
     }
 
     return {
-      id: payload.id,
-      checkoutUrl: payload.checkout_url,
-      status: payload.status,
+      id,
+      checkoutUrl: url,
+      status: (checkout && checkoutStatus(checkout)) ?? "PENDING",
     };
   }
 
@@ -114,9 +204,9 @@ export class SasPayProvider implements PaymentProvider {
       },
     );
 
-    let payload: SasPayCheckoutResponse = {};
+    let payload: unknown = {};
     try {
-      payload = (await response.json()) as SasPayCheckoutResponse;
+      payload = (await response.json()) as unknown;
     } catch {
       // The status below is enough to produce a safe provider error.
     }
@@ -128,23 +218,24 @@ export class SasPayProvider implements PaymentProvider {
       );
     }
 
-    if (typeof payload.id !== "string" || typeof payload.status !== "string") {
+    const checkout = findRecord(
+      payload,
+      (record) => Boolean(checkoutId(record) && checkoutStatus(record)),
+    );
+    const id = checkout ? checkoutId(checkout) : undefined;
+    const status = checkout ? checkoutStatus(checkout) : undefined;
+    if (!id || !status) {
       throw new SasPayProviderError(
         "La réponse SAS Pay ne contient pas une session de checkout valide.",
         502,
       );
     }
 
-    const transaction =
-      typeof payload.transaction === "string"
-        ? { id: payload.transaction }
-        : payload.transaction && typeof payload.transaction === "object"
-          ? (payload.transaction as Record<string, unknown>)
-          : undefined;
+    const transaction = findTransaction(checkout);
 
     return {
-      id: payload.id,
-      status: payload.status,
+      id,
+      status,
       transactionId:
         transaction && typeof transaction.id === "string" ? transaction.id : undefined,
       transactionReference:
