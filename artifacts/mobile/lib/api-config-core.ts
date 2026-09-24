@@ -8,7 +8,7 @@ export interface ApiBaseUrlInputs {
 
 export function normalizeApiBaseUrl(value: unknown): string | null {
   if (typeof value !== 'string' || value.trim() === '') return null;
-  return value.trim().replace(/\/+$/, '');
+  return value.trim().replace(/\/+$/, '').replace(/\/api$/i, '');
 }
 
 /**
@@ -23,15 +23,15 @@ export function resolveApiBaseUrl(inputs: ApiBaseUrlInputs): string | null {
   if (releaseBaseUrl) return releaseBaseUrl;
 
   const developmentDomain = normalizeApiBaseUrl(inputs.developmentDomain);
-  if (developmentDomain) return `https://${developmentDomain}/api`;
+  if (developmentDomain) return `https://${developmentDomain}`;
 
   if (inputs.platform === 'web' && typeof inputs.webHostname === 'string') {
     const host = inputs.webHostname.trim();
     if (host.includes('replit.dev') || host.includes('replit.app')) {
-      return `https://${host}:8080/api`;
+      return `https://${host}:8080`;
     }
     if (host === 'localhost' || host === '127.0.0.1') {
-      return `http://${host}:8080/api`;
+      return `http://${host}:8080`;
     }
   }
 
