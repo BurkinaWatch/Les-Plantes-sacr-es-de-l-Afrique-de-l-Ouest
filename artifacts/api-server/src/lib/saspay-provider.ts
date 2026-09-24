@@ -176,7 +176,7 @@ export class SasPayProvider implements PaymentProvider {
     return {
       id,
       checkoutUrl: url,
-      status: (checkout && checkoutStatus(checkout)) ?? "PENDING",
+      status: (checkout && readCheckoutStatus(checkout)) ?? "PENDING",
     };
   }
 
