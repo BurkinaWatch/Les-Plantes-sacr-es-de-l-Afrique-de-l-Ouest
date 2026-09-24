@@ -35,17 +35,6 @@ minimumReleaseAge: 1440
 minimumReleaseAgeExclude:
   - '@replit/*'
   - stripe-replit-sync
-  - expo
-  - expo-*
-  - '@expo/*'
-  - babel-preset-expo
-  - react
-  - react-dom
-  - react-native
-  - react-native-*
-  - '@react-native/*'
-  - '@types/react*'
-  - typescript
 
 onlyBuiltDependencies:
   - '@swc/core'
