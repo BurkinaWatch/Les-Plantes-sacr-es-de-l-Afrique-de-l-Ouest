@@ -17,6 +17,7 @@ function firstString(record: JsonRecord, keys: readonly string[]): string | unde
   for (const key of keys) {
     const value = record[key];
     if (typeof value === "string" && value.length > 0) return value;
+    if (typeof value === "number" && Number.isFinite(value)) return String(value);
   }
   return undefined;
 }
@@ -44,7 +45,21 @@ function findRecord(
 }
 
 function readCheckoutId(record: JsonRecord): string | undefined {
-  return firstString(record, ["id", "checkout_id", "checkoutId", "checkout_session_id"]);
+  return firstString(record, [
+    "id",
+    "checkout_id",
+    "checkoutId",
+    "checkout_session_id",
+    "checkoutSessionId",
+    "session_id",
+    "sessionId",
+    "payment_id",
+    "paymentId",
+    "transaction_id",
+    "transactionId",
+    "uuid",
+    "reference",
+  ]);
 }
 
 function readCheckoutUrl(record: JsonRecord): string | undefined {
@@ -55,8 +70,12 @@ function readCheckoutUrl(record: JsonRecord): string | undefined {
     "checkoutLink",
     "payment_url",
     "paymentUrl",
+    "payment_link",
+    "paymentLink",
     "redirect_url",
     "redirectUrl",
+    "link",
+    "href",
     "url",
   ]);
 }
