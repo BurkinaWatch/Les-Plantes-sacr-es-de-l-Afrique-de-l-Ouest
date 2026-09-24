@@ -8,3 +8,9 @@ The API base URL embedded in the mobile release configuration must take priority
 **Why:** A production bundle built with the mobile host as `EXPO_PUBLIC_DOMAIN` reached the mobile service, which returned `502` for `/api/healthz`, while the explicitly configured API domain was ready.
 
 **How to apply:** Keep `EXPO_PUBLIC_API_BASE_URL` as the highest-priority override, then use the release `extra.apiBaseUrl`; only derive `/api` from the Expo domain for development when no API release URL is available.
+
+For production API calls, Expo Go's native networking is not subject to browser CORS. Replit's browser-based Expo preview is, so it may be blocked when the Railway API allowlist excludes the preview origin.
+
+**Why:** The production API correctly rejected a browser request from the temporary Replit preview origin even though the same API host was reachable; adding broad CORS access would unnecessarily expose the production API to other websites.
+
+**How to apply:** Prefer Expo Go for real production checkout tests. Only allowlist the exact current preview origin when browser testing is specifically required, and remove the temporary origin afterward.
