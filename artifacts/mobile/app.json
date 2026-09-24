@@ -77,7 +77,7 @@
       "reactCompiler": true
     },
     "extra": {
-      "apiBaseUrl": "https://46dafea5-f278-4767-b5cb-589ce6a23240-00-3tutxu1ynx4tn.janeway.replit.dev/api",
+      "apiBaseUrl": "https://les-plantes-sacr-es-de-l-afrique-de-l-ouest-production.up.railway.app/api",
       "eas": {
         "projectId": "cb62d8b0-1962-4974-9bc9-987d7c68a92e"
       }
