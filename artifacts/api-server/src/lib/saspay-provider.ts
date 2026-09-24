@@ -43,11 +43,11 @@ function findRecord(
   return undefined;
 }
 
-function checkoutId(record: JsonRecord): string | undefined {
+function readCheckoutId(record: JsonRecord): string | undefined {
   return firstString(record, ["id", "checkout_id", "checkoutId", "checkout_session_id"]);
 }
 
-function checkoutUrl(record: JsonRecord): string | undefined {
+function readCheckoutUrl(record: JsonRecord): string | undefined {
   return firstString(record, [
     "checkout_url",
     "checkoutUrl",
@@ -61,7 +61,7 @@ function checkoutUrl(record: JsonRecord): string | undefined {
   ]);
 }
 
-function checkoutStatus(record: JsonRecord): string | undefined {
+function readCheckoutStatus(record: JsonRecord): string | undefined {
   return firstString(record, ["status", "payment_status", "paymentStatus", "state"]);
 }
 
@@ -162,10 +162,10 @@ export class SasPayProvider implements PaymentProvider {
 
     const checkout = findRecord(
       payload,
-      (record) => Boolean(checkoutId(record) && checkoutUrl(record)),
+      (record) => Boolean(readCheckoutId(record) && readCheckoutUrl(record)),
     );
-    const id = checkout ? checkoutId(checkout) : undefined;
-    const url = checkout ? checkoutUrl(checkout) : undefined;
+    const id = checkout ? readCheckoutId(checkout) : undefined;
+    const url = checkout ? readCheckoutUrl(checkout) : undefined;
     if (!id || !url) {
       throw new SasPayProviderError(
         "La réponse SAS Pay ne contient pas une session de checkout valide.",
@@ -213,10 +213,10 @@ export class SasPayProvider implements PaymentProvider {
 
     const checkout = findRecord(
       payload,
-      (record) => Boolean(checkoutId(record) && checkoutStatus(record)),
+      (record) => Boolean(readCheckoutId(record) && readCheckoutStatus(record)),
     );
-    const id = checkout ? checkoutId(checkout) : undefined;
-    const status = checkout ? checkoutStatus(checkout) : undefined;
+    const id = checkout ? readCheckoutId(checkout) : undefined;
+    const status = checkout ? readCheckoutStatus(checkout) : undefined;
     if (!id || !status) {
       throw new SasPayProviderError(
         "La réponse SAS Pay ne contient pas une session de checkout valide.",
