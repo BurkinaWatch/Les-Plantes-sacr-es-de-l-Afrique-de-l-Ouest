@@ -56,6 +56,47 @@ test("SAS Pay creates a hosted checkout with the documented request shape", asyn
   }
 });
 
+test("SAS Pay accepts a wrapped hosted checkout response", async () => {
+  const originalFetch = globalThis.fetch;
+  globalThis.fetch = async () =>
+    new Response(
+      JSON.stringify({
+        data: {
+          checkout_session: {
+            checkout_id: "checkout-wrapped-123",
+            checkout_url: "https://pay.saspay.me/checkout/checkout-wrapped-123",
+            state: "CREATED",
+          },
+        },
+      }),
+      { status: 200, headers: { "content-type": "application/json" } },
+    );
+
+  try {
+    const provider = new SasPayProvider({
+      SAS_PAY_ENABLED: "true",
+      SAS_PAY_API_KEY: "sk_test_provider",
+    });
+    assert.deepEqual(
+      await provider.createCheckout({
+        amount: "2000.00",
+        currency: "XOF",
+        customerEmail: "client@example.com",
+        customerName: "Awa Sossou",
+        description: "Abonnement mensuel",
+        metadata: { subscription_id: "42" },
+      }),
+      {
+        id: "checkout-wrapped-123",
+        checkoutUrl: "https://pay.saspay.me/checkout/checkout-wrapped-123",
+        status: "CREATED",
+      },
+    );
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
+});
+
 test("SAS Pay resolves the transaction attached to a paid checkout session", async () => {
   const originalFetch = globalThis.fetch;
   globalThis.fetch = async () =>
