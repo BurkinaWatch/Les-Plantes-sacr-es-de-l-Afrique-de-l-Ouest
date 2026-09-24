@@ -22,6 +22,55 @@ import { PLANTS } from '@/data/animals';
 import { TOTEM_RESULTS } from '@/data/quiz';
 import { useColors } from '@/hooks/useColors';
 import { useTranslation, LANG_CODES, LANG_NAMES, type LangCode } from '@/i18n';
+import { useGetSubscriptionPlans } from '@workspace/api-client-react';
+
+function formatPlanAmount(amount: string): string {
+  const value = Number(amount);
+  return Number.isFinite(value)
+    ? new Intl.NumberFormat('fr-FR', { maximumFractionDigits: 0 }).format(value)
+    : amount;
+}
+
+function SubscriptionPromoCard() {
+  const colors = useColors();
+  const router = useRouter();
+  const plansQuery = useGetSubscriptionPlans();
+  const availablePrices = (plansQuery.data?.plans ?? [])
+    .filter((plan) => plan.active && plan.amount && plan.currency)
+    .map((plan) => {
+      const period = plan.period === 'MONTHLY' ? 'mois' : 'an';
+      return `${formatPlanAmount(plan.amount!)} ${plan.currency} / ${period}`;
+    });
+  const description = plansQuery.isLoading
+    ? 'Chargement des tarifs…'
+    : plansQuery.isError
+      ? 'Touchez pour réessayer et consulter les formules disponibles.'
+      : availablePrices.length > 0
+        ? availablePrices.join(' · ')
+        : 'Consultez les formules et tarifs disponibles.';
+
+  return (
+    <Pressable
+      accessibilityRole="button"
+      accessibilityLabel="Découvrir les abonnements"
+      onPress={() => router.push('/abonnement' as any)}
+      style={({ pressed }) => [
+        styles.card,
+        styles.subscriptionPromo,
+        {
+          backgroundColor: colors.card,
+          borderColor: colors.border,
+          opacity: pressed ? 0.86 : 1,
+        },
+      ]}
+    >
+      <Text style={[styles.quizPromoLabel, { color: colors.gold }]}>SOUTENIR LA TRANSMISSION</Text>
+      <Text style={[styles.quizPromoTitle, { color: colors.ivory }]}>Découvrir les abonnements</Text>
+      <Text style={[styles.quizPromoDesc, { color: colors.mutedForeground }]}>{description}</Text>
+      <Text style={[styles.subscriptionPromoLink, { color: colors.gold }]}>Voir les formules →</Text>
+    </Pressable>
+  );
+}
 
 export default function ProfilScreen() {
   const colors = useColors();
@@ -56,6 +105,7 @@ export default function ProfilScreen() {
               <Text style={[styles.quizBtnText, { color: colors.deepBrown }]}>Se connecter</Text>
             </LinearGradient>
           </Pressable>
+          <SubscriptionPromoCard />
         </View>
       </ScrollView>
     );
@@ -136,18 +186,10 @@ export default function ProfilScreen() {
             </Pressable>
           </View>
 
-          <Pressable
-            onPress={() => router.push('/abonnement' as any)}
-            style={[styles.card, { backgroundColor: colors.card, borderColor: colors.border, marginTop: 18 }]}
-          >
-            <Text style={[styles.quizPromoLabel, { color: colors.gold }]}>SOUTENIR LA TRANSMISSION</Text>
-            <Text style={[styles.quizPromoTitle, { color: colors.ivory }]}>Découvrir les abonnements</Text>
-            <Text style={[styles.quizPromoDesc, { color: colors.mutedForeground }]}>
-              Les formules mensuelle et annuelle seront bientôt disponibles.
-            </Text>
-          </Pressable>
           </>
         )}
+
+        <SubscriptionPromoCard />
 
         <View style={[styles.infoSection, { backgroundColor: colors.card, borderColor: colors.border }]}>
           <Text style={[styles.infoLabel, { color: colors.gold }]}>{t.profile_about}</Text>
@@ -261,6 +303,8 @@ const styles = StyleSheet.create({
   infoTitle: { fontSize: 14, fontWeight: '400' as const },
   infoValue: { fontSize: 14, fontWeight: '600' as const },
   card: { borderRadius: 16, padding: 18, borderWidth: 1, gap: 12 },
+  subscriptionPromo: { marginTop: 0 },
+  subscriptionPromoLink: { fontSize: 14, fontWeight: '700' as const, marginTop: 2 },
   langRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
   langChip: { paddingHorizontal: 12, paddingVertical: 7, borderRadius: 20, borderWidth: 1 },
   langText: { fontSize: 13, fontWeight: '600' as const },
