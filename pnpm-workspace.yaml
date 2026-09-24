@@ -36,35 +36,14 @@ minimumReleaseAgeExclude:
   - '@replit/*'
   - stripe-replit-sync
   - expo
-  - expo-asset
-  - expo-audio
-  - expo-image-picker
-  - expo-notifications
-  - expo-updates
-  - expo-blur
-  - expo-constants
-  - expo-font
-  - expo-haptics
-  - expo-image
-  - expo-linear-gradient
-  - expo-linking
-  - expo-router
-  - expo-splash-screen
-  - expo-status-bar
-  - expo-symbols
-  - expo-system-ui
-  - expo-web-browser
+  - expo-*
+  - '@expo/*'
   - react
   - react-dom
   - react-native
-  - react-native-gesture-handler
-  - react-native-reanimated
-  - react-native-safe-area-context
-  - react-native-screens
-  - react-native-svg
-  - react-native-worklets
-  - '@types/react'
-  - '@types/react-dom'
+  - react-native-*
+  - '@react-native/*'
+  - '@types/react*'
   - typescript
 
 onlyBuiltDependencies:

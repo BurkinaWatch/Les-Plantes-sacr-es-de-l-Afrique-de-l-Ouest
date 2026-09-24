@@ -49,7 +49,7 @@
       ]
     },
     "web": {
-    "favicon": "./assets/images/logo-plantes-sacrees.png"
+      "favicon": "./assets/images/logo-plantes-sacrees.png"
     },
     "plugins": [
       "expo-router",
@@ -70,7 +70,9 @@
           "color": "#D4A017",
           "sounds": []
         }
-      ]
+      ],
+      "expo-asset",
+      "expo-audio"
     ],
     "experiments": {
       "typedRoutes": true,
