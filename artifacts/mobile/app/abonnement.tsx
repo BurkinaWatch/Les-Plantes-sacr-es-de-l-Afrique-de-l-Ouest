@@ -41,6 +41,21 @@ export default function AbonnementScreen() {
   const reconcileMutation = useReconcileSubscriptionPayment();
 
   useEffect(() => {
+    const error = plansQuery.error;
+    if (!error) return;
+
+    const details = error as Error & { status?: unknown };
+    console.warn("[subscription-plans] request failed", {
+      name: typeof details.name === "string" ? details.name : "UnknownError",
+      status: typeof details.status === "number" ? details.status : undefined,
+      message:
+        typeof details.message === "string"
+          ? details.message.slice(0, 180)
+          : "Unknown error",
+    });
+  }, [plansQuery.error]);
+
+  useEffect(() => {
     const hasConfiguredPlan = plansQuery.data?.plans.some(
       (plan) => plan.active && Boolean(plan.amount && plan.currency),
     );
