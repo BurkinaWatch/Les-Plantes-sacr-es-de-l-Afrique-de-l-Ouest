@@ -1,6 +1,7 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import React, { createContext, useCallback, useContext, useEffect, useState } from 'react';
 import { getApiBase } from '@/lib/api-config';
+import { loginAccount, registerAccount } from '@workspace/api-client-react';
 
 /**
  * Auth storage key (v2 — uses server-issued JWTs, not local fake tokens).
@@ -31,6 +32,16 @@ interface AuthContextType {
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
+
+function getAuthApiError(error: unknown): string | undefined {
+  if (!error || typeof error !== 'object') return undefined;
+
+  const data = (error as { data?: unknown }).data;
+  if (!data || typeof data !== 'object') return undefined;
+
+  const message = (data as { error?: unknown }).error;
+  return typeof message === 'string' && message.trim() ? message : undefined;
+}
 
 // ── Provider ──────────────────────────────────────────────────────────────────
 
@@ -79,19 +90,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       return { error: 'Serveur non disponible. Vérifie ta connexion.' };
     }
     try {
-      const res = await fetch(`${apiBase}/auth/register`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username: username.trim().toLowerCase(), password }),
+      const data = await registerAccount({
+        username: username.trim().toLowerCase(),
+        password,
       });
-      const data = await res.json().catch(() => ({}));
-      if (!res.ok) {
-        return { error: data.error ?? 'Erreur lors de l\'inscription' };
-      }
       await persist(data.user as AuthUser, data.token as string);
       return {};
-    } catch {
-      return { error: 'Impossible de contacter le serveur' };
+    } catch (error) {
+      return {
+        error: getAuthApiError(error) ?? 'Impossible de contacter le serveur',
+      };
     }
   }, [persist]);
 
@@ -101,19 +109,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       return { error: 'Serveur non disponible. Vérifie ta connexion.' };
     }
     try {
-      const res = await fetch(`${apiBase}/auth/login`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username: username.trim().toLowerCase(), password }),
+      const data = await loginAccount({
+        username: username.trim().toLowerCase(),
+        password,
       });
-      const data = await res.json().catch(() => ({}));
-      if (!res.ok) {
-        return { error: data.error ?? 'Identifiant ou mot de passe incorrect' };
-      }
       await persist(data.user as AuthUser, data.token as string);
       return {};
-    } catch {
-      return { error: 'Impossible de contacter le serveur' };
+    } catch (error) {
+      return {
+        error: getAuthApiError(error) ?? 'Impossible de contacter le serveur',
+      };
     }
   }, [persist]);
 
