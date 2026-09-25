@@ -19,6 +19,7 @@ export function getApiBase(): string | null {
     releaseApiBaseUrl: configuredApiBaseUrl,
     developmentDomain: process.env.EXPO_PUBLIC_DOMAIN,
     platform: Platform.OS,
+    preferDevelopmentDomain: Platform.OS === 'web' && __DEV__,
     webHostname:
       typeof window !== 'undefined' ? window.location.hostname : undefined,
   });

@@ -4,6 +4,7 @@ export interface ApiBaseUrlInputs {
   developmentDomain?: unknown;
   platform?: string;
   webHostname?: unknown;
+  preferDevelopmentDomain?: boolean;
 }
 
 export function normalizeApiBaseUrl(value: unknown): string | null {
@@ -16,13 +17,17 @@ export function normalizeApiBaseUrl(value: unknown): string | null {
  * bundles. The generic Expo/mobile domain is intentionally only a fallback.
  */
 export function resolveApiBaseUrl(inputs: ApiBaseUrlInputs): string | null {
+  const developmentDomain = normalizeApiBaseUrl(inputs.developmentDomain);
+  if (inputs.preferDevelopmentDomain && developmentDomain) {
+    return `https://${developmentDomain}`;
+  }
+
   const explicitBaseUrl = normalizeApiBaseUrl(inputs.explicitApiBaseUrl);
   if (explicitBaseUrl) return explicitBaseUrl;
 
   const releaseBaseUrl = normalizeApiBaseUrl(inputs.releaseApiBaseUrl);
   if (releaseBaseUrl) return releaseBaseUrl;
 
-  const developmentDomain = normalizeApiBaseUrl(inputs.developmentDomain);
   if (developmentDomain) return `https://${developmentDomain}`;
 
   if (inputs.platform === 'web' && typeof inputs.webHostname === 'string') {

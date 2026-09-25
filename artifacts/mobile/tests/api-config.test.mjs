@@ -14,6 +14,27 @@ test("prefers an explicit API URL over release and development hosts", () => {
   );
 });
 
+test("uses the Replit API for web development without changing native API routing", () => {
+  const apiUrls = {
+    explicitApiBaseUrl: "https://production-api.example.com/api",
+    releaseApiBaseUrl: "https://release-api.example.com/api",
+    developmentDomain: "workspace.replit.dev",
+  };
+
+  assert.equal(
+    resolveApiBaseUrl({
+      ...apiUrls,
+      platform: "web",
+      preferDevelopmentDomain: true,
+    }),
+    "https://workspace.replit.dev",
+  );
+  assert.equal(
+    resolveApiBaseUrl({ ...apiUrls, platform: "android" }),
+    "https://production-api.example.com",
+  );
+});
+
 test("uses the release API URL when no explicit URL is provided", () => {
   assert.equal(
     resolveApiBaseUrl({
