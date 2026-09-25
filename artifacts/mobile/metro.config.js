@@ -24,6 +24,7 @@ const localAndroidBuildBlockList = localAndroidBuildPaths.map((buildPath) => {
   return new RegExp(`^${escapedBuildPath}(?:[\\\\/].*)?$`);
 });
 const nativeCmakeBuildBlockList = /(?:^|[\\/])\.cxx(?:[\\/]|$)/;
+const nativePlatformSourceBlockList = /(?:^|[\\/])(?:android|ios)(?:[\\/]|$)/;
 
 const existingBlockList = config.resolver?.blockList;
 const newBlockListEntry = new RegExp(`^${escapedPath}\\/.*$`);
@@ -31,9 +32,26 @@ config.resolver = {
   ...config.resolver,
   blockList: existingBlockList
     ? Array.isArray(existingBlockList)
-      ? [...existingBlockList, newBlockListEntry, ...localAndroidBuildBlockList, nativeCmakeBuildBlockList]
-      : [existingBlockList, newBlockListEntry, ...localAndroidBuildBlockList, nativeCmakeBuildBlockList]
-    : [newBlockListEntry, ...localAndroidBuildBlockList, nativeCmakeBuildBlockList],
+      ? [
+          ...existingBlockList,
+          newBlockListEntry,
+          ...localAndroidBuildBlockList,
+          nativeCmakeBuildBlockList,
+          nativePlatformSourceBlockList,
+        ]
+      : [
+          existingBlockList,
+          newBlockListEntry,
+          ...localAndroidBuildBlockList,
+          nativeCmakeBuildBlockList,
+          nativePlatformSourceBlockList,
+        ]
+    : [
+        newBlockListEntry,
+        ...localAndroidBuildBlockList,
+        nativeCmakeBuildBlockList,
+        nativePlatformSourceBlockList,
+      ],
 };
 
 module.exports = config;
