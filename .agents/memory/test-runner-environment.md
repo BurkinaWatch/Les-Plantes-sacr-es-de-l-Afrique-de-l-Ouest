@@ -65,3 +65,15 @@ terminated child and leave the test waiting forever.
 
 **How to apply:** Consider a child settled when both `exitCode` and `signalCode` are
 non-null, and only await `exit` after confirming it is still running.
+
+With TypeScript 6, a command that names source files directly while a
+`tsconfig.json` is present fails with TS5112 unless it explicitly opts out of
+loading that config.
+
+**Why:** The compiler now rejects the older focused-test pattern that supplied
+individual files plus CLI compiler options, preventing the package test script
+from reaching its Node tests.
+
+**How to apply:** Add `--ignoreConfig` to targeted `tsc` commands that list
+source files explicitly. Keep project-wide checks using `tsc -p tsconfig.json`
+unchanged.
