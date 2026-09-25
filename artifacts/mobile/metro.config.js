@@ -24,10 +24,12 @@ const localAndroidBuildBlockList = localAndroidBuildPaths.map((buildPath) => {
   return new RegExp(`^${escapedBuildPath}(?:[\\\\/].*)?$`);
 });
 const nativeCmakeBuildBlockList = /(?:^|[\\/])\.cxx(?:[\\/]|$)/;
-const nativePlatformSourceBlockList = /(?:^|[\\/])(?:android|ios)(?:[\\/]|$)/;
+const nativeAndroidSourceBlockList = /(?:^|[\\/])android[\\/](?:src|build|\.gradle)(?:[\\/]|$)/;
 
 const existingBlockList = config.resolver?.blockList;
 const newBlockListEntry = new RegExp(`^${escapedPath}\\/.*$`);
+// Keep native build trees and local toolchain caches out of Metro's file map;
+// they are not JavaScript inputs and can exhaust the fallback watcher's quota.
 config.resolver = {
   ...config.resolver,
   blockList: existingBlockList
@@ -37,20 +39,20 @@ config.resolver = {
           newBlockListEntry,
           ...localAndroidBuildBlockList,
           nativeCmakeBuildBlockList,
-          nativePlatformSourceBlockList,
+          nativeAndroidSourceBlockList,
         ]
       : [
           existingBlockList,
           newBlockListEntry,
           ...localAndroidBuildBlockList,
           nativeCmakeBuildBlockList,
-          nativePlatformSourceBlockList,
+          nativeAndroidSourceBlockList,
         ]
     : [
         newBlockListEntry,
         ...localAndroidBuildBlockList,
         nativeCmakeBuildBlockList,
-        nativePlatformSourceBlockList,
+        nativeAndroidSourceBlockList,
       ],
 };
 
