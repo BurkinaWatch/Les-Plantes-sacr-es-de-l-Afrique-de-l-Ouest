@@ -24,6 +24,52 @@ export const HealthCheckResponse = zod.object({
 
 
 /**
+ * @summary Create an account with a username and password
+ */
+export const registerAccountBodyUsernameMin = 3;
+export const registerAccountBodyUsernameMax = 30;
+
+
+export const registerAccountBodyUsernameRegExp = new RegExp('^[A-Za-z0-9_]+$');
+export const registerAccountBodyPasswordMin = 6;
+export const registerAccountBodyPasswordMax = 128;
+
+
+
+export const RegisterAccountBody = zod.object({
+  "username": zod.string().min(registerAccountBodyUsernameMin).max(registerAccountBodyUsernameMax).regex(registerAccountBodyUsernameRegExp),
+  "password": zod.string().min(registerAccountBodyPasswordMin).max(registerAccountBodyPasswordMax)
+})
+
+
+/**
+ * @summary Sign in with a username and password
+ */
+export const loginAccountBodyUsernameMin = 3;
+export const loginAccountBodyUsernameMax = 30;
+
+
+export const loginAccountBodyUsernameRegExp = new RegExp('^[A-Za-z0-9_]+$');
+export const loginAccountBodyPasswordMin = 6;
+export const loginAccountBodyPasswordMax = 128;
+
+
+
+export const LoginAccountBody = zod.object({
+  "username": zod.string().min(loginAccountBodyUsernameMin).max(loginAccountBodyUsernameMax).regex(loginAccountBodyUsernameRegExp),
+  "password": zod.string().min(loginAccountBodyPasswordMin).max(loginAccountBodyPasswordMax)
+})
+
+export const LoginAccountResponse = zod.object({
+  "token": zod.string(),
+  "user": zod.object({
+  "id": zod.number(),
+  "username": zod.string()
+})
+})
+
+
+/**
  * @summary List available subscription plans
  */
 export const GetSubscriptionPlansResponse = zod.object({

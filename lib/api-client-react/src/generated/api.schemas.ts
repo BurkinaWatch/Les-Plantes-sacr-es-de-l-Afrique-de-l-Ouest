@@ -10,6 +10,30 @@ export interface ApiError {
   error: string;
 }
 
+export interface AuthCredentials {
+  /**
+     * @minLength 3
+     * @maxLength 30
+     * @pattern ^[A-Za-z0-9_]+$
+     */
+  username: string;
+  /**
+     * @minLength 6
+     * @maxLength 128
+     */
+  password: string;
+}
+
+export interface AuthUser {
+  id: number;
+  username: string;
+}
+
+export interface AuthSession {
+  token: string;
+  user: AuthUser;
+}
+
 export type SubscriptionPlanCode = typeof SubscriptionPlanCode[keyof typeof SubscriptionPlanCode];
 
 
@@ -135,6 +159,11 @@ export type BadRequestResponse = ApiError;
  * Authentication required
  */
 export type UnauthorizedResponse = ApiError;
+
+/**
+ * Too many authentication attempts
+ */
+export type TooManyRequestsResponse = ApiError;
 
 export type GetSubscriptionPlans200 = {
   plans: SubscriptionPlan[];
