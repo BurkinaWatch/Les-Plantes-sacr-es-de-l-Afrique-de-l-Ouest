@@ -14,3 +14,9 @@ When the workspace provides `REPLIT_EXPO_SESSION_SECRET`, a pre-existing `EXPO_T
 **Why:** The conflicting token prevents the managed Expo Go 57 account login, while scoped masking lets `create-launch` use the supplied short-lived session without changing other workspace operations.
 
 **How to apply:** Use `env -u EXPO_TOKEN` for the mobile workflow's login and Expo start commands, then confirm its log says it logged into the project's managed Expo account. Expo CLI 57 ignores the old `--non-interactive` flag; `CI=1` disables reloads, so omit both when live reload is needed.
+
+For local Gradle builds, keep the Android SDK, Android user data, and Gradle caches in ignored project-local directories rather than under `/home/runner`.
+
+**Why:** A workspace restart discarded Android tooling installed outside the mounted project, while ignored files inside the workspace persisted.
+
+**How to apply:** Point `ANDROID_SDK_ROOT`/`ANDROID_HOME`, `ANDROID_USER_HOME`, and `GRADLE_USER_HOME` to ignored directories under the mobile artifact, and keep generated toolchain files out of version control.
