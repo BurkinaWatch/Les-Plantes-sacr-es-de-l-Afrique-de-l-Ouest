@@ -16,6 +16,14 @@ config.server = {
 
 const mockupSandboxPath = path.resolve(__dirname, "../../artifacts/mockup-sandbox");
 const escapedPath = mockupSandboxPath.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+const localAndroidBuildPaths = [".android-sdk", ".android-user", ".gradle-cache"].map((directory) =>
+  path.resolve(__dirname, directory),
+);
+const localAndroidBuildBlockList = localAndroidBuildPaths.map((buildPath) => {
+  const escapedBuildPath = buildPath.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  return new RegExp(`^${escapedBuildPath}(?:[\\\\/].*)?$`);
+});
+const nativeCmakeBuildBlockList = /(?:^|[\\/])\.cxx(?:[\\/]|$)/;
 
 const existingBlockList = config.resolver?.blockList;
 const newBlockListEntry = new RegExp(`^${escapedPath}\\/.*$`);
@@ -23,9 +31,9 @@ config.resolver = {
   ...config.resolver,
   blockList: existingBlockList
     ? Array.isArray(existingBlockList)
-      ? [...existingBlockList, newBlockListEntry]
-      : [existingBlockList, newBlockListEntry]
-    : newBlockListEntry,
+      ? [...existingBlockList, newBlockListEntry, ...localAndroidBuildBlockList, nativeCmakeBuildBlockList]
+      : [existingBlockList, newBlockListEntry, ...localAndroidBuildBlockList, nativeCmakeBuildBlockList]
+    : [newBlockListEntry, ...localAndroidBuildBlockList, nativeCmakeBuildBlockList],
 };
 
 module.exports = config;
