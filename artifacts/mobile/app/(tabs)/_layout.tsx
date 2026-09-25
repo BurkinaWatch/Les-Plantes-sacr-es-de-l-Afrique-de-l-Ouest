@@ -1,7 +1,13 @@
 import { BlurView } from "expo-blur";
 import { Tabs } from "expo-router";
 import React from "react";
-import { Platform, StyleSheet, View, useColorScheme } from "react-native";
+import {
+  Platform,
+  StyleSheet,
+  View,
+  useColorScheme,
+  type ColorValue,
+} from "react-native";
 
 import { SacredIcon, type SacredIconName } from "@/components/SacredIcon";
 import { useColors } from "@/hooks/useColors";
@@ -35,12 +41,12 @@ export default function TabLayout() {
     size = 22,
     webIcon: SacredIconName = "circle",
   ) =>
-    ({ color }: { color: string }) => {
+    ({ color }: { color: ColorValue }) => {
       if (isIOS && SymbolView) {
         return <SymbolView name={sfName} tintColor={color} size={size} />;
       }
       if (isWeb) {
-        return <SacredIcon name={webIcon} size={size} color={color} />;
+        return <SacredIcon name={webIcon} size={size} color={String(color)} />;
       }
       if (androidIconSet === "mci") {
         return (

@@ -541,7 +541,7 @@ export default function SavoirScreen() {
               <LinearGradient
                 colors={[recipe.couleur + '22', 'transparent']}
                 start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}
-                style={StyleSheet.absoluteFillObject}
+                style={StyleSheet.absoluteFill}
               />
               <View style={[styles.iconWrap, { backgroundColor: recipe.couleur + '28' }]}>
                 <SacredIcon
@@ -602,7 +602,7 @@ export default function SavoirScreen() {
               <LinearGradient
                 colors={[article.couleur + '20', 'transparent']}
                 start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}
-                style={StyleSheet.absoluteFillObject}
+                style={StyleSheet.absoluteFill}
               />
               <View style={{ flex: 1, gap: 5 }}>
                 <View style={styles.cardMetaRow}>
@@ -672,7 +672,7 @@ export default function SavoirScreen() {
               <LinearGradient
                 colors={[plante.couleur + '22', 'transparent']}
                 start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}
-                style={StyleSheet.absoluteFillObject}
+                style={StyleSheet.absoluteFill}
               />
               <View style={[styles.iconWrap, { backgroundColor: plante.couleur + '28' }]}>
                 <SacredIcon

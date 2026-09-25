@@ -7,11 +7,6 @@
     "icon": "./assets/images/logo-plantes-sacrees.png",
     "scheme": "plantessacrees",
     "userInterfaceStyle": "dark",
-    "splash": {
-      "image": "./assets/images/logo-plantes-sacrees.png",
-      "resizeMode": "contain",
-      "backgroundColor": "#120A05"
-    },
     "updates": {
       "url": "https://u.expo.dev/cb62d8b0-1962-4974-9bc9-987d7c68a92e",
       "checkAutomatically": "ON_LOAD",
@@ -53,6 +48,14 @@
     "plugins": [
       "expo-router",
       "expo-font",
+      [
+        "expo-splash-screen",
+        {
+          "image": "./assets/images/logo-plantes-sacrees.png",
+          "resizeMode": "contain",
+          "backgroundColor": "#120A05"
+        }
+      ],
       "expo-web-browser",
       [
         "expo-image-picker",

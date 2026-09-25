@@ -45,7 +45,7 @@ export const PlanteCard = memo(function PlanteCard({ plante, compact = false, nu
       >
         <LinearGradient
           colors={['rgba(0,0,0,0.08)', 'rgba(0,0,0,0.62)']}
-          style={StyleSheet.absoluteFillObject}
+          style={StyleSheet.absoluteFill}
         />
 
         <View style={styles.content}>

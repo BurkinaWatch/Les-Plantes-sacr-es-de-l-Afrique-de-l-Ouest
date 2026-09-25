@@ -459,7 +459,7 @@ const styles = StyleSheet.create({
   container: { flex: 1 },
 
   startHero: { paddingHorizontal: 28, paddingBottom: 48, overflow: 'hidden', position: 'relative' },
-  startDecor: { ...StyleSheet.absoluteFillObject },
+  startDecor: { ...StyleSheet.absoluteFill },
   sdRing1: { position: 'absolute', right: -60, top: 20, width: 220, height: 220, borderRadius: 110, borderWidth: 1 },
   sdRing2: { position: 'absolute', right: -40, top: 0, width: 300, height: 300, borderRadius: 150, borderWidth: 1 },
   startLabel: { fontSize: 11, fontWeight: '700' as const, letterSpacing: 2.5, marginBottom: 12 },

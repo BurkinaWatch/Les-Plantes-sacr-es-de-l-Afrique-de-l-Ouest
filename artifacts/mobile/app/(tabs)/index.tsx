@@ -122,12 +122,12 @@ export default function HomeScreen() {
         <LinearGradient
           colors={['rgba(4,12,4,0.80)', 'rgba(4,12,4,0.30)', 'rgba(4,12,4,0.06)', 'rgba(0,0,0,0)']}
           locations={[0, 0.28, 0.48, 1]}
-          style={StyleSheet.absoluteFillObject}
+          style={StyleSheet.absoluteFill}
         />
         <LinearGradient
           colors={['rgba(0,0,0,0)', 'rgba(4,12,4,0.55)']}
           locations={[0.55, 1]}
-          style={StyleSheet.absoluteFillObject}
+          style={StyleSheet.absoluteFill}
         />
 
         <Animated.View style={[styles.heroContent, { paddingTop: topPad + 8, opacity: fadeAnim, transform: [{ translateY: slideAnim }] }]}>
@@ -184,20 +184,20 @@ export default function HomeScreen() {
                   {imageSource ? (
                     <Image
                       source={imageSource}
-                      style={[StyleSheet.absoluteFillObject, styles.featuredImage]}
+                      style={[StyleSheet.absoluteFill, styles.featuredImage]}
                       resizeMode="contain"
                       fadeDuration={0}
                     />
                   ) : (
                     <LinearGradient
                       colors={[plante.couleur, plante.couleurSecondaire]}
-                      style={StyleSheet.absoluteFillObject}
+                      style={StyleSheet.absoluteFill}
                     />
                   )}
                   <LinearGradient
                     colors={['rgba(0,0,0,0.08)', 'rgba(0,0,0,0.72)']}
                     locations={[0.3, 1]}
-                    style={StyleSheet.absoluteFillObject}
+                    style={StyleSheet.absoluteFill}
                     pointerEvents="none"
                   />
                   <View style={styles.featuredTextBlock}>

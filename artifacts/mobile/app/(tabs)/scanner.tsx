@@ -576,7 +576,7 @@ const styles = StyleSheet.create({
   },
   previewImage: { width: '100%', height: '100%' },
   analyzingOverlay: {
-    ...StyleSheet.absoluteFillObject,
+    ...StyleSheet.absoluteFill,
     backgroundColor: 'rgba(10,31,10,0.75)',
     alignItems: 'center',
     justifyContent: 'center',

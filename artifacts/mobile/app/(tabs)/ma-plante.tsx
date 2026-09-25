@@ -194,7 +194,7 @@ export default function MaPlanteScreen() {
 
 const styles = StyleSheet.create({
   container: { flex: 1 },
-  emptyBg: { ...StyleSheet.absoluteFillObject },
+  emptyBg: { ...StyleSheet.absoluteFill },
   emptyScroll: { flexGrow: 1, justifyContent: 'center' },
   emptyContent: { padding: 32, alignItems: 'center', gap: 12, width: '100%' },
   emptyTitle: { fontSize: 32, fontWeight: '800' as const, letterSpacing: 0.5 },
@@ -203,7 +203,7 @@ const styles = StyleSheet.create({
   ctaBtn: { padding: 18, borderRadius: 16, alignItems: 'center' },
   ctaBtnText: { fontSize: 16, fontWeight: '700' as const, letterSpacing: 0.5 },
   hero: { padding: 24, paddingBottom: 40, overflow: 'hidden', position: 'relative' },
-  heroDecor: { ...StyleSheet.absoluteFillObject },
+  heroDecor: { ...StyleSheet.absoluteFill },
   hr1: { position: 'absolute', right: -40, top: -40, width: 250, height: 250, borderRadius: 125, borderWidth: 1 },
   hr2: { position: 'absolute', right: -20, top: -20, width: 320, height: 320, borderRadius: 160, borderWidth: 1 },
   heroLabel: { fontSize: 11, fontWeight: '700' as const, letterSpacing: 2.5, marginBottom: 8 },

@@ -372,7 +372,7 @@ const styles = StyleSheet.create({
 
   heroWrap: { overflow: 'hidden' },
   heroGrad: { paddingHorizontal: 20, paddingBottom: 0, overflow: 'hidden', position: 'relative', minHeight: 380 },
-  heroDecor: { ...StyleSheet.absoluteFillObject },
+  heroDecor: { ...StyleSheet.absoluteFill },
   hd1: { position: 'absolute', right: -50, top: 60, width: 250, height: 250, borderRadius: 125, borderWidth: 1 },
   hd2: { position: 'absolute', right: -30, top: 40, width: 320, height: 320, borderRadius: 160, borderWidth: 1 },
   hd3: { position: 'absolute', left: -60, bottom: 20, width: 200, height: 200, borderRadius: 100, borderWidth: 1 },
