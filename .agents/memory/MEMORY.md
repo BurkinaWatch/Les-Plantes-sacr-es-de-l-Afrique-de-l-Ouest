@@ -20,5 +20,5 @@
 - [Railway PostgreSQL TLS checks](postgres-railway-ssl.md) — pg 8.20 treats sslmode=require as verified TLS; disposable checks need a trusted CA
 - [PostgreSQL readiness roles](postgresql-readiness-roles.md) — information_schema constraint metadata may require object ownership, not only SELECT grants
 - [PostgreSQL constraint probes](postgresql-constraint-probes.md) — expected constraint failures inside a write transaction need savepoints before later checks can continue
-- [GitHub connector sync limits](github-connector-sync-limits.md) — managed GitHub writes can sync normal files but may block `.github` paths and Git commit mutations
+- [GitHub connector sync limits](github-connector-sync-limits.md) — API write permission does not authenticate local Git pushes; Replit Git Providers auth is separate
 - [SAS Pay preparation](saspay-preparation.md) — payment remains server-only and opt-in until pricing, customer data, and webhook rollout are explicitly validated
