@@ -1,6 +1,8 @@
 import { LinearGradient } from 'expo-linear-gradient';
 import React, { useState } from 'react';
 import {
+  Alert,
+  Linking,
   Platform,
   Pressable,
   ScrollView,
@@ -15,7 +17,7 @@ import { useColors } from '@/hooks/useColors';
 import { RECIPES, type Recipe } from '@/data/recipes';
 import { ARTICLES, type Article } from '@/data/articles';
 import {
-  PLANTES_MEDICINALES,
+  PLANTES_SAVOIR,
   searchPlantes,
   type PlanteMedicinale,
 } from '@/data/plantes-medicinales';
@@ -39,6 +41,11 @@ export default function SavoirScreen() {
   const [planteSearch,    setPlanteSearch]    = useState('');
 
   const topPad = Platform.OS === 'web' ? Math.max(insets.top, 67) : insets.top;
+  const openSource = (url: string) => {
+    void Linking.openURL(url).catch(() => {
+      Alert.alert('Source indisponible', 'Impossible d’ouvrir ce lien. Vérifiez votre connexion.');
+    });
+  };
 
   /* ════════════════════════════════════════════════════
      RECIPE DETAIL VIEW
@@ -284,6 +291,29 @@ export default function SavoirScreen() {
             </View>
           )}
 
+          {a.sourceLinks && a.sourceLinks.length > 0 && (
+            <View style={[styles.sourceBox, { borderColor: colors.border, backgroundColor: colors.card }]}>
+              <Text style={[styles.sourceLabel, { color: colors.mutedForeground }]}>SOURCES CONSULTABLES</Text>
+              {a.sourceLinks.map((src, i) => (
+                <Pressable
+                  key={`${src.url}-${i}`}
+                  accessibilityRole="link"
+                  accessibilityLabel={`Ouvrir la source : ${src.title}`}
+                  style={({ pressed }) => [styles.sourceLinkRow, { opacity: pressed ? 0.7 : 1 }]}
+                  onPress={() => openSource(src.url)}
+                >
+                  <SacredIcon name="external-link" size={15} color={a.couleur} />
+                  <View style={{ flex: 1 }}>
+                    <Text style={[styles.sourceLinkTitle, { color: a.couleur }]}>{src.title}</Text>
+                    <Text style={[styles.sourceLinkMeta, { color: colors.mutedForeground }]}>
+                      {src.kind.toUpperCase()} · {src.note}
+                    </Text>
+                  </View>
+                </Pressable>
+              ))}
+            </View>
+          )}
+
           <View style={[styles.sourceBox, { borderColor: colors.border, backgroundColor: colors.card, marginTop: 8 }]}>
             <Text style={[styles.sourceLabel, { color: colors.mutedForeground }]}>PUBLICATION</Text>
             <Text style={[styles.sourceText, { color: colors.mutedForeground }]}>
@@ -314,7 +344,7 @@ export default function SavoirScreen() {
           >
             <View style={styles.backBtnRow}>
               <SacredIcon name="arrow-left" size={17} color={p.couleur} />
-              <Text style={[styles.backBtnText, { color: p.couleur }]}>Plantes médicinales</Text>
+              <Text style={[styles.backBtnText, { color: p.couleur }]}>Plantes & savoirs</Text>
             </View>
           </Pressable>
 
@@ -386,7 +416,13 @@ export default function SavoirScreen() {
           <View style={[styles.sectionCard, { backgroundColor: colors.card, borderColor: colors.border }]}>
             <View style={styles.iconLabelRow}>
               <SacredIcon name="mortar" size={14} color={p.couleur} />
-              <Text style={[styles.sectionCardTitle, { color: p.couleur, marginBottom: 0 }]}>ACTION CURATIVE</Text>
+              <Text style={[styles.sectionCardTitle, { color: p.couleur, marginBottom: 0 }]}>
+                {p.typeSavoir === 'alimentaire'
+                  ? 'INTÉRÊT ALIMENTAIRE'
+                  : p.typeSavoir === 'agroecologique'
+                    ? 'INTÉRÊT AGROÉCOLOGIQUE'
+                    : 'ACTION CURATIVE'}
+              </Text>
             </View>
             <Text style={[styles.paragraph, { color: colors.ivory, marginTop: 4 }]}>{p.actionCurative}</Text>
           </View>
@@ -395,7 +431,11 @@ export default function SavoirScreen() {
           <View style={[styles.partiesRow, { backgroundColor: colors.card, borderColor: colors.border }]}>
             <View style={styles.iconLabelRow}>
               <SacredIcon name="root" size={14} color={p.couleur} />
-              <Text style={[styles.sectionCardTitle, { color: p.couleur, marginBottom: 0 }]}>PARTIES UTILISÉES</Text>
+              <Text style={[styles.sectionCardTitle, { color: p.couleur, marginBottom: 0 }]}>
+                {p.typeSavoir === 'alimentaire' || p.typeSavoir === 'agroecologique'
+                  ? 'PARTIES DOCUMENTÉES'
+                  : 'PARTIES UTILISÉES'}
+              </Text>
             </View>
             <View style={styles.partiesChips}>
               {p.partiesUtilisees.map((partie, i) => (
@@ -407,7 +447,13 @@ export default function SavoirScreen() {
           </View>
 
           {/* Emplois */}
-          <Text style={[styles.readingSubtitle, { color: p.couleur }]}>EMPLOIS PRATIQUES</Text>
+          <Text style={[styles.readingSubtitle, { color: p.couleur }]}>
+            {p.typeSavoir === 'alimentaire'
+              ? 'USAGES ALIMENTAIRES'
+              : p.typeSavoir === 'agroecologique'
+                ? 'USAGES AGROÉCOLOGIQUES'
+                : 'EMPLOIS PRATIQUES'}
+          </Text>
           {p.emplois.map((emploi, i) => (
             <LinearGradient
               key={i}
@@ -434,8 +480,27 @@ export default function SavoirScreen() {
           <View style={[styles.sourceBox, { borderColor: colors.border, backgroundColor: colors.card }]}>
             <Text style={[styles.sourceLabel, { color: colors.mutedForeground }]}>SOURCE</Text>
             <Text style={[styles.sourceText, { color: colors.mutedForeground }]}>{p.source}</Text>
+            {p.sourceLinks?.map((src, i) => (
+              <Pressable
+                key={`${src.url}-${i}`}
+                accessibilityRole="link"
+                accessibilityLabel={`Ouvrir la source : ${src.title}`}
+                style={({ pressed }) => [styles.sourceLinkRow, { opacity: pressed ? 0.7 : 1 }]}
+                onPress={() => openSource(src.url)}
+              >
+                <SacredIcon name="external-link" size={15} color={p.couleur} />
+                <View style={{ flex: 1 }}>
+                  <Text style={[styles.sourceLinkTitle, { color: p.couleur }]}>{src.title}</Text>
+                  <Text style={[styles.sourceLinkMeta, { color: colors.mutedForeground }]}>
+                    {src.kind.toUpperCase()} · {src.note}
+                  </Text>
+                </View>
+              </Pressable>
+            ))}
             <Text style={[styles.sourceDisclaimer, { color: colors.mutedForeground }]}>
-              Ces informations sont à titre éducatif. Consultez un professionnel de santé avant tout usage thérapeutique.
+              {p.typeSavoir === 'alimentaire' || p.typeSavoir === 'agroecologique'
+                ? 'Fiche alimentaire ou agroécologique, pas une indication médicale. Les publications sociales sont des témoignages de pratiques, jamais des preuves d’efficacité médicale.'
+                : 'Ces informations sont à titre éducatif. Consultez un professionnel de santé avant tout usage thérapeutique.'}
             </Text>
           </View>
         </ScrollView>
@@ -446,18 +511,18 @@ export default function SavoirScreen() {
   /* ════════════════════════════════════════════════════
      MAIN LIST VIEW
   ═════════════════════════════════════════════════════*/
-  const filteredPlantes = planteSearch.trim() ? searchPlantes(planteSearch) : PLANTES_MEDICINALES;
+  const filteredPlantes = planteSearch.trim() ? searchPlantes(planteSearch) : PLANTES_SAVOIR;
 
   const headerTitles: Record<Tab, string> = {
     recettes: 'Recettes de Plantes',
     articles: 'Articles & Savoirs',
-    plantes:  'Plantes Médicinales',
+    plantes:  'Plantes & Savoirs',
   };
 
   const headerSubs: Record<Tab, string> = {
     recettes: `${RECIPES.length} recettes · Plantes médicinales & cuisine`,
     articles: `${ARTICLES.length} articles · Ethnobotanique & culture`,
-    plantes:  `${PLANTES_MEDICINALES.length} plantes · Pharmacopée africaine`,
+    plantes:  `${PLANTES_SAVOIR.length} fiches · médicinales, alimentaires et agroécologiques`,
   };
 
   return (
@@ -508,7 +573,7 @@ export default function SavoirScreen() {
             <SacredIcon name="search" size={17} color={colors.mutedForeground} />
             <TextInput
               style={[styles.searchInput, { color: colors.ivory }]}
-              placeholder="Rechercher une plante, indication..."
+              placeholder="Rechercher une plante, un nom ou un usage..."
               placeholderTextColor={colors.mutedForeground}
               value={planteSearch}
               onChangeText={setPlanteSearch}
@@ -889,5 +954,8 @@ const styles = StyleSheet.create({
   sourceLabel: { fontSize: 9, fontWeight: '800', letterSpacing: 2 },
   sourceText: { fontSize: 12, lineHeight: 18, fontStyle: 'italic' },
   sourceRef: { fontSize: 11, lineHeight: 18, fontStyle: 'italic' },
+  sourceLinkRow: { flexDirection: 'row', alignItems: 'flex-start', gap: 8, paddingVertical: 5 },
+  sourceLinkTitle: { fontSize: 12, lineHeight: 17, fontWeight: '700' },
+  sourceLinkMeta: { fontSize: 10, lineHeight: 15, marginTop: 2 },
   sourceDisclaimer: { fontSize: 10, lineHeight: 16, marginTop: 4, fontStyle: 'italic' },
 });
