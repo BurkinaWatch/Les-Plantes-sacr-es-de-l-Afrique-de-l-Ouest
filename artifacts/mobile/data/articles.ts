@@ -1,3 +1,5 @@
+import type { SourceReference } from './source-reference';
+
 export interface ArticleSection {
   type: 'paragraph' | 'quote' | 'subtitle' | 'list';
   content: string;
@@ -20,6 +22,7 @@ export interface Article {
   contenu: ArticleSection[];
   tags: string[];
   sources?: string[];
+  sourceLinks?: SourceReference[];
 }
 
 export const ARTICLES: Article[] = [
@@ -701,6 +704,103 @@ export const ARTICLES: Article[] = [
       'Pousset, J.-L. (1989), Plantes Médicinales Africaines — Utilisation Pratique, Éditions ESTEM / AUPELF, Paris.',
       'Organisation mondiale de la Santé (2013), Stratégie de l’OMS pour la médecine traditionnelle 2014–2023 : https://www.who.int/publications/i/item/9789241506096',
       'Convention sur la diversité biologique, Traditional Knowledge : https://www.cbd.int/traditional/',
+    ],
+  },
+  {
+    id: 'plantes-reseaux-sociaux-temoignages',
+    titre: 'Plantes sur les réseaux : écouter sans confondre',
+    sousTitre: 'Des publications publiques comme pistes, pas comme preuves médicales',
+    auteur: 'Équipe éditoriale des Plantes Sacrées',
+    source: 'Extraits publics indexés de Facebook, Instagram et TikTok',
+    annee: '2026',
+    duree: '5 min',
+    categorie: 'ethnobotanique',
+    categorieLabel: 'Savoirs partagés',
+    planteIcon: '📱',
+    couleur: '#668A56',
+    resume:
+      'Trois publications publiques font circuler des informations sur le moringa, les feuilles d’emballage et un légume nommé ayoyo/ademe. Elles documentent des pistes culturelles, pas une efficacité médicale.',
+    tags: ['réseaux sociaux', 'moringa', 'Thaumatococcus', 'ayoyo', 'sources', 'prudence'],
+    contenu: [
+      {
+        type: 'paragraph',
+        content:
+          'Les réseaux sociaux peuvent montrer comment des cultivateurs, des cuisiniers et des communautés parlent des plantes. Les trois liens ci-dessous proviennent de résultats publics indexés le 27 septembre 2026. Les pages complètes n’ont pas pu être ouvertes ; les dates de publication ne sont pas visibles dans les extraits. Les résumés restent donc limités à ce que ces extraits affichent.',
+      },
+      {
+        type: 'subtitle',
+        content: 'Des pistes de savoirs partagés',
+      },
+      {
+        type: 'list',
+        content: 'Les extraits consultés évoquent :',
+        items: [
+          'Facebook : une page publique consacrée au moringa au Sénégal annonce des informations sur sa production et sa transformation, en renvoyant à un manuel. Le manuel lui-même n’a pas été consulté.',
+          'Instagram : une publication intitulée « Ethnobotany 101: Ebieba » associe Thaumatococcus daniellii à des feuilles d’emballage pour certaines préparations nigérianes. Cette attribution reste un témoignage social à recouper.',
+          'TikTok : un résultat intitulé « Ayoyo (Ademe) African Green Leafy Vegetable » parle d’un légume-feuille sous les noms ayoyo/ademe. L’extrait n’identifie pas l’espèce botanique.',
+        ],
+      },
+      {
+        type: 'subtitle',
+        content: 'Ce que ces publications ne démontrent pas',
+      },
+      {
+        type: 'paragraph',
+        content:
+          'Un témoignage, une vidéo de cuisine ou une page de producteurs peut orienter une enquête ethnobotanique ; cela ne confirme ni l’identité d’une plante, ni la sécurité d’une préparation, ni un effet sur la santé. En particulier, ayoyo/ademe n’est pas attribué ici à Corchorus olitorius. Une publication sociale ne justifie aucun dosage, traitement ou promesse médicale.',
+      },
+      {
+        type: 'subtitle',
+        content: 'Comment poursuivre la vérification',
+      },
+      {
+        type: 'paragraph',
+        content:
+          'Pour documenter une pratique, il faut préciser le pays, la langue, le nom local, la partie utilisée et le contexte, avec le consentement et la reconnaissance des personnes qui transmettent le savoir. L’identité botanique se vérifie séparément auprès d’une source taxonomique ou d’une flore régionale. Dans cette bibliothèque, les réseaux sociaux restent explicitement étiquetés comme témoignages ; les références scientifiques ne sont utilisées que pour les points qu’elles documentent réellement.',
+      },
+    ],
+    sourceLinks: [
+      {
+        title: 'Facebook — Moringa Senegal-Nebedaye, publication sur production et transformation',
+        url: 'https://www.facebook.com/MoringalSen/posts/ces-informations-sont-tirees-du-manuel-sur-la-production-et-la-transformation-du/197205320820454/',
+        kind: 'publication sociale',
+        note:
+          'Résultat public indexé ; publication non ouverte et date non visible. Piste de transmission communautaire, pas preuve d’efficacité ni de sécurité.',
+      },
+      {
+        title: 'Instagram — « Ethnobotany 101: Ebieba »',
+        url: 'https://www.instagram.com/reel/DdeLB_VoR2X/',
+        kind: 'publication sociale',
+        note:
+          'Extrait public indexé sur l’usage des feuilles comme emballage ; publication non ouverte. Témoignage culturel, pas preuve médicale.',
+      },
+      {
+        title: 'TikTok — « Ayoyo (Ademe) African Green Leafy Vegetable: Uses & Recipes »',
+        url: 'https://www.tiktok.com/@cheflifestyle_/video/7679522645712375061',
+        kind: 'publication sociale',
+        note:
+          'Extrait public indexé ; vidéo non ouverte et espèce non identifiée dans l’extrait. Témoignage culturel, pas preuve médicale.',
+      },
+      {
+        title: 'GBIF — Thaumatococcus daniellii',
+        url: 'https://www.gbif.org/species/11066824',
+        kind: 'taxonomie',
+        note: 'Référence de nom scientifique, pas vérification d’un usage culturel.',
+      },
+      {
+        title: 'Article ouvert sur Thaumatococcus daniellii et la thaumatine (2026)',
+        url: 'https://pmc.ncbi.nlm.nih.gov/articles/PMC13441740/',
+        kind: 'scientifique',
+        note:
+          'Source indépendante sur l’origine ouest-africaine et les thaumatines du fruit ; elle ne valide pas l’extrait Instagram sur les feuilles.',
+      },
+      {
+        title: 'Revue systématique sur les essais humains de Moringa oleifera (2026)',
+        url: 'https://pmc.ncbi.nlm.nih.gov/articles/PMC13238855/',
+        kind: 'scientifique',
+        note:
+          'La revue conclut que les données disponibles ne suffisent pas à établir un lien causal pour les effets étudiés sur le poids et la pression artérielle.',
+      },
     ],
   },
 ];

@@ -1,4 +1,6 @@
 import { PLANTES_COMPLEMENTAIRES } from './plantes-medicinales-complementaires';
+import { PLANTES_SAVOIRS_COMPLEMENTAIRES } from './plantes-savoirs-complementaires';
+import type { SourceReference } from './source-reference';
 
 /**
  * Plantes médicinales africaines
@@ -32,6 +34,7 @@ export interface PlanteMedicinale {
   famille: string;
   nomsAfricains: NomsAfricains;
   categorieTherapeutique: string; // titre principal du chapitre PDF
+  typeSavoir?: 'medicinale' | 'alimentaire' | 'agroecologique';
   couleur: string;
   icone: string;
   historique: string;
@@ -41,6 +44,7 @@ export interface PlanteMedicinale {
   partiesUtilisees: string[];
   precautions?: string;
   source: string;
+  sourceLinks?: SourceReference[];
 }
 
 const PLANTES_PDF: PlanteMedicinale[] = [
@@ -1193,48 +1197,67 @@ const PLANTES_PDF: PlanteMedicinale[] = [
   },
 ];
 
+function normalizeScientificName(name: string): string {
+  return name
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
 /**
- * Catalogue documentaire complet.
- *
- * Le filtre par nom scientifique évite de créer deux fiches pour une espèce
- * déjà présente dans la première série de monographies.
+ * Catalogue documentaire complet : fiches médicinales, alimentaires et
+ * agroécologiques sont conservées ensemble pour la recherche dans « Savoir ».
  */
-export const PLANTES_MEDICINALES: PlanteMedicinale[] = [
+const PLANTES_DE_BASE: PlanteMedicinale[] = [
   ...PLANTES_PDF,
   ...PLANTES_COMPLEMENTAIRES.filter(
     (complement) =>
       !PLANTES_PDF.some(
         (existing) =>
-          existing.nomScientifique
-            .normalize('NFD')
-            .replace(/[\u0300-\u036f]/g, '')
-            .toLowerCase()
-            .replace(/\s+/g, ' ')
-            .trim() ===
-          complement.nomScientifique
-            .normalize('NFD')
-            .replace(/[\u0300-\u036f]/g, '')
-            .toLowerCase()
-            .replace(/\s+/g, ' ')
-            .trim(),
+          normalizeScientificName(existing.nomScientifique) ===
+          normalizeScientificName(complement.nomScientifique),
       ),
   ),
 ];
 
-/** Retourne toutes les catégories thérapeutiques uniques */
+export const PLANTES_SAVOIR: PlanteMedicinale[] = [
+  ...PLANTES_DE_BASE,
+  ...PLANTES_SAVOIRS_COMPLEMENTAIRES.filter(
+    (candidate) =>
+      !PLANTES_DE_BASE.some(
+        (existing) =>
+          normalizeScientificName(existing.nomScientifique) ===
+          normalizeScientificName(candidate.nomScientifique),
+      ),
+  ),
+];
+
+/** Alias conservé pour les écrans et tests qui utilisent encore l’ancien nom. */
+export const PLANTES_MEDICINALES = PLANTES_SAVOIR;
+
+/** Retourne toutes les catégories documentées dans la bibliothèque. */
 export function getCategories(): string[] {
-  return [...new Set(PLANTES_MEDICINALES.map((p) => p.categorieTherapeutique))].sort();
+  return [...new Set(PLANTES_SAVOIR.map((p) => p.categorieTherapeutique))].sort();
 }
 
-/** Recherche textuelle sur nom vulgaire, scientifique ou indication */
+/** Recherche textuelle sur noms, catégories, descriptions, usages et parties. */
 export function searchPlantes(query: string): PlanteMedicinale[] {
   const q = query.toLowerCase();
-  return PLANTES_MEDICINALES.filter(
-    (p) =>
-      p.nomVulgaire.toLowerCase().includes(q) ||
-      p.nomScientifique.toLowerCase().includes(q) ||
-      p.categorieTherapeutique.toLowerCase().includes(q) ||
-      p.emplois.some((e) => e.indication.toLowerCase().includes(q)) ||
-      Object.values(p.nomsAfricains).some((n) => n?.toLowerCase().includes(q)),
+  return PLANTES_SAVOIR.filter((p) =>
+    [
+      p.nomVulgaire,
+      p.nomScientifique,
+      p.famille,
+      p.categorieTherapeutique,
+      p.historique,
+      p.descriptionPlante,
+      p.actionCurative,
+      p.precautions ?? '',
+      ...p.partiesUtilisees,
+      ...p.emplois.flatMap((emploi) => [emploi.indication, emploi.preparation]),
+      ...Object.values(p.nomsAfricains).filter((name): name is string => Boolean(name)),
+    ].some((value) => value.toLowerCase().includes(q)),
   );
 }
