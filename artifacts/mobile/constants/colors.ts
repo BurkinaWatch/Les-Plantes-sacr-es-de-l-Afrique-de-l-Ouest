@@ -40,6 +40,7 @@ const colors = {
     deepGreen: "#0A1F0A",
     warmGreen: "#1A3A1A",
     softWhite: "#E8F0E0",
+    featureSurface: "#1C140E",
   },
 
   radius: 16,

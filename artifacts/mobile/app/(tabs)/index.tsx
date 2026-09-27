@@ -167,7 +167,7 @@ export default function HomeScreen() {
         </Animated.View>
       </View>
 
-      <View style={[styles.section, { paddingHorizontal: 20 }]}>
+      <View style={[styles.featuredSection, { backgroundColor: colors.featureSurface }]}>
         <Text style={[styles.sectionLabel, { color: colors.gold }]}>{t.home_sacred_animals_label}</Text>
         <Text style={[styles.sectionTitle, { color: colors.ivory }]}>{t.home_guardians}</Text>
         <View style={[styles.featuredGrid, { gap: GRID_GAP }]}>
@@ -179,39 +179,33 @@ export default function HomeScreen() {
                 key={plante.id}
                 style={({ pressed }) => [styles.featuredCard, { width: cardWidth, height: cardHeight, opacity: pressed ? 0.85 : 1 }]}
                 onPress={() => router.push(`/animal/${plante.id}` as any)}
+                testID={`featured-plant-${plante.id}`}
               >
-                <View style={[styles.featuredCardContent, { backgroundColor: colors.background }]}>
-                  <View style={styles.featuredImageArea}>
-                    {imageSource ? (
-                      <Image
-                        source={imageSource}
-                        style={styles.featuredImage}
-                        resizeMode="contain"
-                        fadeDuration={0}
-                      />
-                    ) : (
-                      <LinearGradient
-                        colors={[plante.couleur, plante.couleurSecondaire]}
-                        style={StyleSheet.absoluteFill}
-                      />
-                    )}
-                  </View>
+                <View style={[styles.featuredCardContent, { backgroundColor: colors.card }]}>
+                  {imageSource ? (
+                    <>
+                      <Image source={imageSource} style={styles.featuredBackdrop} resizeMode="cover" blurRadius={8} fadeDuration={0} />
+                      <Image source={imageSource} style={styles.featuredImage} resizeMode="contain" fadeDuration={0} />
+                    </>
+                  ) : (
+                    <LinearGradient colors={[plante.couleur, plante.couleurSecondaire]} style={StyleSheet.absoluteFill} />
+                  )}
                   <LinearGradient
-                    colors={[colors.card, colors.warmBrown]}
-                    style={styles.featuredTextBlock}
-                  >
-                    <Text style={[styles.featuredNom, isTablet && styles.featuredNomTablet]}>{plante.nom}</Text>
-                    <Text style={[styles.featuredPouvoir, isTablet && styles.featuredPouvoirTablet]}>{plante.pouvoirs[0]}</Text>
-                  </LinearGradient>
+                    colors={['rgba(12,9,5,0.14)', 'rgba(12,9,5,0.05)', 'rgba(12,9,5,0.88)']}
+                    locations={[0, 0.5, 1]}
+                    style={StyleSheet.absoluteFill}
+                  />
+                  <View style={styles.featuredTextBlock}>
+                    <Text style={[styles.featuredNom, isTablet && styles.featuredNomTablet, { color: colors.ivory }]} numberOfLines={2}>{plante.nom}</Text>
+                    <Text style={[styles.featuredPouvoir, isTablet && styles.featuredPouvoirTablet]} numberOfLines={2}>{plante.pouvoirs[0]}</Text>
+                  </View>
                 </View>
               </Pressable>
             );
           })}
         </View>
-      </View>
-
-      <View style={[styles.section, { paddingHorizontal: 20 }]}>
         <Pressable
+          testID="discover-plants"
           style={({ pressed }) => [{ opacity: pressed ? 0.88 : 1 }]}
           onPress={() => router.push('/(tabs)/animaux' as any)}
         >
@@ -225,7 +219,9 @@ export default function HomeScreen() {
             <SacredIcon name="chevron-right" size={20} color={colors.deepBrown} />
           </LinearGradient>
         </Pressable>
+      </View>
 
+      <View style={[styles.section, { paddingHorizontal: 20 }]}>
         <Pressable
           style={({ pressed }) => [styles.quizButton, { borderColor: colors.terracotta, opacity: pressed ? 0.8 : 1 }]}
           onPress={() => router.push('/(tabs)/quiz' as any)}
@@ -383,10 +379,17 @@ const styles = StyleSheet.create({
     letterSpacing: 2.5,
   },
   sectionTitle: {
-    fontSize: 22,
+    fontSize: 19,
     fontWeight: '700',
-    letterSpacing: 0.3,
+    letterSpacing: 0,
     marginTop: -4,
+  },
+  featuredSection: {
+    marginTop: 32,
+    paddingHorizontal: 20,
+    paddingTop: 24,
+    paddingBottom: 20,
+    gap: 12,
   },
   featuredGrid: {
     flexDirection: 'row',
@@ -394,31 +397,37 @@ const styles = StyleSheet.create({
     marginTop: 4,
   },
   featuredCard: {
-    borderRadius: 18,
+    borderRadius: 12,
     overflow: 'hidden',
   },
   featuredCardContent: {
     flex: 1,
-  },
-  featuredImageArea: {
-    flex: 1,
-    minHeight: 0,
-    padding: 8,
-    alignItems: 'center',
-    justifyContent: 'center',
     position: 'relative',
   },
+  featuredBackdrop: {
+    position: 'absolute',
+    top: 0,
+    right: 0,
+    bottom: 0,
+    left: 0,
+    opacity: 0.5,
+  },
   featuredImage: {
-    width: '100%',
-    height: '100%',
+    position: 'absolute',
+    top: 6,
+    right: 6,
+    bottom: 52,
+    left: 6,
   },
   featuredTextBlock: {
-    padding: 12,
-    paddingBottom: 14,
-    borderTopWidth: StyleSheet.hairlineWidth,
-    borderTopColor: 'rgba(200,160,32,0.35)',
+    position: 'absolute',
+    right: 0,
+    bottom: 0,
+    left: 0,
+    paddingHorizontal: 11,
+    paddingBottom: 12,
   },
-  featuredNom: { color: '#FFFFFF', fontSize: 15, fontWeight: '800', letterSpacing: 0.3 },
+  featuredNom: { fontSize: 15, fontWeight: '800', letterSpacing: 0.3 },
   featuredNomTablet: { fontSize: 19 },
   featuredPouvoir: { color: 'rgba(255,255,255,0.82)', fontSize: 11, marginTop: 3, lineHeight: 15 },
   featuredPouvoirTablet: { fontSize: 13, lineHeight: 18 },
@@ -426,11 +435,11 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingHorizontal: 22,
-    paddingVertical: 18,
-    borderRadius: 16,
+    paddingHorizontal: 18,
+    paddingVertical: 15,
+    borderRadius: 10,
   },
-  ctaText: { fontSize: 15, fontWeight: '700', letterSpacing: 0.3 },
+  ctaText: { fontSize: 14, fontWeight: '700', letterSpacing: 0.2 },
   quizButton: {
     alignItems: 'center',
     paddingVertical: 16,
