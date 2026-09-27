@@ -8,3 +8,5 @@ When the Replit package firewall rejects an older transitive package archive wit
 **Why:** The workspace install can fail before any service starts even when the lockfile is otherwise valid; the firewall may allow the current release while blocking the older transitive archive.
 
 **How to apply:** Identify the parent dependency, check whether its latest compatible version still requests the blocked release, and use a narrow pnpm override only when updating the parent would cross the app's compatibility boundary.
+
+The registry may advertise a newest release that pnpm rejects with `ERR_PNPM_NO_MATURE_MATCHING_VERSION` because the firewall's metadata snapshot predates that release. In that case choose an older, mature compatible release and pin it exactly rather than bypassing the release-age check or retrying the advertised latest version.

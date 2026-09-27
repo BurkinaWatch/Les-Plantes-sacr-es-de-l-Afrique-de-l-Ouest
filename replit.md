@@ -31,7 +31,7 @@ For the mobile preview, the dev script supplies the Replit Expo proxy and public
 
 ## Stack
 
-- pnpm workspaces, Node.js 24, Expo SDK 54, TypeScript 5.9
+- pnpm workspaces, Expo SDK 57, TypeScript
 - Mobile: React Native, Expo Router, React Query, AsyncStorage
 - API: Express 5
 - DB: PostgreSQL + Drizzle ORM
