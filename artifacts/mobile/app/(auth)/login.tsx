@@ -17,6 +17,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useAuth } from '@/context/AuthContext';
 import { useColors } from '@/hooks/useColors';
 import { useTranslation } from '@/i18n';
+import { isValidUsername } from '@/lib/auth-validation';
 
 export default function LoginScreen() {
   const colors = useColors();
@@ -33,6 +34,10 @@ export default function LoginScreen() {
   async function handleLogin() {
     if (!username.trim() || !password) {
       setError(t.auth_fields_required);
+      return;
+    }
+    if (!isValidUsername(username)) {
+      setError(t.auth_username_hint);
       return;
     }
     setError('');
@@ -65,7 +70,10 @@ export default function LoginScreen() {
               <TextInput
                 style={[styles.input, { color: colors.ivory, borderColor: colors.border, backgroundColor: colors.warmBrown }]}
                 value={username}
-                onChangeText={setUsername}
+                onChangeText={(value) => {
+                  setUsername(value);
+                  if (error) setError('');
+                }}
                 placeholder={t.auth_username_placeholder}
                 placeholderTextColor={colors.mutedForeground}
                 autoCapitalize="none"
