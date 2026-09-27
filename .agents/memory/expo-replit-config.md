@@ -55,3 +55,11 @@ The mobile static build validates installed Expo package versions against the SD
 **Why:** The static export bundles native-compatible packages, so a working development preview does not guarantee a deployable Expo Go build.
 
 **How to apply:** When the static build reports outdated Expo packages, align them with the exact versions requested by the installed SDK before treating the build as deployable.
+
+## React Native DevTools Linux libraries
+
+React Native DevTools is a downloaded dotslash-managed Linux binary and needs a set of GTK, NSS, X11, audio, and graphics runtime libraries. Installing only `glib` may uncover further missing libraries one at a time. In Replit, inspect the cached executable with `ldd` and add the missing Nix packages; `libgbm` is an accepted package name, while `mesa.drivers` is not present in the Replit package index.
+
+**Why:** Metro can start even when its debugger binary cannot load, so an incomplete library set leaves the preview running but silently removes native debugging controls.
+
+**How to apply:** When Metro reports that React Native DevTools cannot load a shared library, inspect the underlying cached binary's complete `ldd` output and provide every missing runtime library before verifying the Expo workflow again.
