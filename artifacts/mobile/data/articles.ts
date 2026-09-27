@@ -716,7 +716,7 @@ export const ARTICLES: Article[] = [
     duree: '5 min',
     categorie: 'ethnobotanique',
     categorieLabel: 'Savoirs partagés',
-    planteIcon: '📱',
+    planteIcon: '📖',
     couleur: '#668A56',
     resume:
       'Trois publications publiques font circuler des informations sur le moringa, les feuilles d’emballage et un légume nommé ayoyo/ademe. Elles documentent des pistes culturelles, pas une efficacité médicale.',

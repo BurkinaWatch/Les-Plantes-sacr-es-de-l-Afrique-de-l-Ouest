@@ -302,7 +302,7 @@ export default function SavoirScreen() {
                   style={({ pressed }) => [styles.sourceLinkRow, { opacity: pressed ? 0.7 : 1 }]}
                   onPress={() => openSource(src.url)}
                 >
-                  <SacredIcon name="external-link" size={15} color={a.couleur} />
+                  <SacredIcon name="book" size={15} color={a.couleur} />
                   <View style={{ flex: 1 }}>
                     <Text style={[styles.sourceLinkTitle, { color: a.couleur }]}>{src.title}</Text>
                     <Text style={[styles.sourceLinkMeta, { color: colors.mutedForeground }]}>
@@ -488,7 +488,7 @@ export default function SavoirScreen() {
                 style={({ pressed }) => [styles.sourceLinkRow, { opacity: pressed ? 0.7 : 1 }]}
                 onPress={() => openSource(src.url)}
               >
-                <SacredIcon name="external-link" size={15} color={p.couleur} />
+                <SacredIcon name="book" size={15} color={p.couleur} />
                 <View style={{ flex: 1 }}>
                   <Text style={[styles.sourceLinkTitle, { color: p.couleur }]}>{src.title}</Text>
                   <Text style={[styles.sourceLinkMeta, { color: colors.mutedForeground }]}>

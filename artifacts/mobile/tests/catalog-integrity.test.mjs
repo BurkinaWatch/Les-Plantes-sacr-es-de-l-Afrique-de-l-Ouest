@@ -3,6 +3,7 @@ import test from "node:test";
 
 import { PLANTS } from "../.data-test-dist/data/animals.js";
 import { PLANTES_MEDICINALES } from "../.data-test-dist/data/plantes-medicinales.js";
+import { ARTICLES } from "../.data-test-dist/data/articles.js";
 
 function normalize(value) {
   return value
@@ -94,7 +95,7 @@ function monographHasSafetyContext(monograph) {
   return cautiousFormulation.test(text);
 }
 
-test("each medicinal monograph has source, safety context, and an employment", () => {
+test("each plant monograph has source, safety context, and an employment", () => {
   const incomplete = PLANTES_MEDICINALES.filter(
     (monograph) =>
       !monograph.source?.trim() ||
@@ -125,4 +126,53 @@ test("each medicinal monograph has source, safety context, and an employment", (
     [],
     `Fiches incomplètes:\n${incomplete.join("\n")}`,
   );
+});
+
+test("food and agroecology profiles link both taxonomy and supporting research", () => {
+  const nonMedicinal = PLANTES_MEDICINALES.filter(
+    (plant) =>
+      plant.typeSavoir === "alimentaire" ||
+      plant.typeSavoir === "agroecologique",
+  );
+
+  assert.ok(nonMedicinal.length >= 8, "La bibliothèque doit proposer plusieurs fiches non médicinales.");
+  const incomplete = nonMedicinal
+    .filter(
+      (plant) =>
+        !plant.sourceLinks?.some((source) => source.kind === "taxonomie") ||
+        !plant.sourceLinks?.some((source) => source.kind === "scientifique"),
+    )
+    .map((plant) => plant.id);
+
+  assert.deepEqual(
+    incomplete,
+    [],
+    `Chaque fiche non médicinale doit lier sa taxonomie et sa source scientifique: ${incomplete.join(", ")}`,
+  );
+});
+
+test("social-media references are labeled as testimony, not medical evidence", () => {
+  const article = ARTICLES.find(
+    (entry) => entry.id === "plantes-reseaux-sociaux-temoignages",
+  );
+
+  assert.ok(article, "L’article de contextualisation des réseaux sociaux doit exister.");
+  const socialSources = article.sourceLinks?.filter(
+    (source) => source.kind === "publication sociale",
+  ) ?? [];
+
+  assert.equal(socialSources.length, 3, "L’article doit citer les trois publications publiques repérées.");
+  assert.ok(
+    socialSources.every(
+      (source) =>
+        source.url.startsWith("https://") &&
+        /témoignage|piste/i.test(source.note ?? "") &&
+        /pas (?:une )?preuve médicale/i.test(source.note ?? ""),
+    ),
+    "Chaque publication sociale doit avoir un lien et une mise en garde explicite.",
+  );
+
+  const content = article.contenu.map((section) => section.content).join(" ");
+  assert.match(content, /espèce botanique/);
+  assert.match(content, /ne justifie aucun dosage/);
 });

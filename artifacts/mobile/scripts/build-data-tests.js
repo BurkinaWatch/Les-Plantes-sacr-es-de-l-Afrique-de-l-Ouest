@@ -5,8 +5,11 @@ const ts = require("typescript");
 const root = path.resolve(__dirname, "..");
 const outputRoot = path.join(root, ".data-test-dist");
 const sources = [
+  "data/source-reference.ts",
   "data/plantes-medicinales-complementaires.ts",
+  "data/plantes-savoirs-complementaires.ts",
   "data/plantes-medicinales.ts",
+  "data/articles.ts",
   "data/animals.ts",
 ];
 
