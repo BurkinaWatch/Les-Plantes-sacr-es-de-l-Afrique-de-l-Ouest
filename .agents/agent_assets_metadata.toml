@@ -917,339 +917,410 @@ id = "a_w4uSYXiM09eT84cCfYU"
 uri = "file://artifacts/mobile/assets/sounds/elephant.mp3"
 type = "audio"
 title = "sound_effect"
+logical_id = "7d6acbd9-c7fd-4e38-9c97-cd7af538fffb"
 
 [[outputs]]
 id = "pxu9PqGfkcNSvlGKuP7I3"
 uri = "file://artifacts/mobile/assets/sounds/leopard.mp3"
 type = "audio"
 title = "sound_effect"
+logical_id = "cae0bb62-ffbb-47fb-8c80-b3c97a0d3461"
 
 [[outputs]]
 id = "3iJZTE4m2_NDNB5TkkVfz"
 uri = "file://artifacts/mobile/assets/sounds/lion.mp3"
 type = "audio"
 title = "sound_effect"
+logical_id = "73a00abf-970e-405f-bdc6-51699b931ec0"
 
 [[outputs]]
 id = "Wgh96uQhEURCfOOORQ6Mg"
 uri = "file://artifacts/mobile/assets/sounds/aigle.mp3"
 type = "audio"
 title = "sound_effect"
+logical_id = "fca14d8a-24c5-4710-bd6e-63933138a96f"
 
 [[outputs]]
 id = "BYqNcD5L09dCBPAAhXvom"
 uri = "file://artifacts/mobile/assets/sounds/serpent.mp3"
 type = "audio"
 title = "sound_effect"
+logical_id = "2b6b3496-7041-4313-9dbc-8fd7a0eeb4aa"
 
 [[outputs]]
 id = "10CVHhQEIQ9A2HmdGQiHo"
 uri = "file://artifacts/mobile/assets/sounds/crocodile.mp3"
 type = "audio"
 title = "sound_effect"
+logical_id = "7ece6b42-5897-479d-8c11-979598b35a3f"
 
 [[outputs]]
 id = "64-RoR4jE23YQxFXJYgep"
 uri = "file://artifacts/mobile/assets/sounds/grenouille.mp3"
 type = "audio"
 title = "sound_effect"
+logical_id = "d150cdb5-8210-4a75-8589-5fe5d62a9051"
 
 [[outputs]]
 id = "oirgWu5pcn5N87Ynl3fql"
 uri = "file://artifacts/mobile/assets/sounds/hippopotame.mp3"
 type = "audio"
 title = "hippopotame"
+logical_id = "d71d301c-906e-44b4-b987-ed3820067e4f"
 
 [[outputs]]
 id = "OEL-ajBFZe2seLIIdBO-u"
 uri = "file://artifacts/mobile/assets/sounds/panthere.mp3"
 type = "audio"
 title = "sound_effect"
+logical_id = "af124c10-fefa-47bf-ac49-2cc7a7ba6547"
 
 [[outputs]]
 id = "IbK0wN4J8N_GnWRWCjICQ"
 uri = "file://artifacts/mobile/assets/sounds/cigogne.mp3"
 type = "audio"
 title = "sound_effect"
+logical_id = "77c7e8cb-565d-4403-9ee7-0812c8751285"
 
 [[outputs]]
 id = "tis0aSnNQfPTmKQUG-QuZ"
 uri = "file://artifacts/mobile/assets/sounds/tortue.mp3"
 type = "audio"
 title = "sound_effect"
+logical_id = "cca8474f-875c-44d4-a4e1-6ae09d98be5e"
 
 [[outputs]]
 id = "ITGQbuaIUndutSdJJv9D2"
 uri = "file://artifacts/mobile/assets/sounds/cameleon.mp3"
 type = "audio"
 title = "sound_effect"
+logical_id = "f6a2161f-6bd4-438c-95da-fb064c1b51e3"
 
 [[outputs]]
 id = "mPjETYtDrKyT0WPRg2S3W"
 uri = "file://artifacts/mobile/assets/sounds/hyene.mp3"
 type = "audio"
 title = "sound_effect"
+logical_id = "938519a6-91e7-45a3-b61b-c5f47d62c6d6"
 
 [[outputs]]
 id = "CAZdCINP7dOdJNkYBXXFz"
 uri = "file://artifacts/mobile/assets/sounds/poisson-chat.mp3"
 type = "audio"
 title = "sound_effect"
+logical_id = "65a926c7-ba8d-442f-b6d7-3d7650729d6f"
 
 [[outputs]]
 id = "muNjp_2DnF8z1lfMfFruw"
 uri = "file://artifacts/mobile/assets/sounds/lezard.mp3"
 type = "audio"
 title = "sound_effect"
+logical_id = "dc0a17b4-94f2-4ecc-8073-c79fc3a87f00"
 
 [[outputs]]
 id = "v8KzEvGjp1TaLx4EoS0-m"
 uri = "file://artifacts/mobile/assets/sounds/singe.mp3"
 type = "audio"
 title = "sound_effect"
+logical_id = "32f4cb9f-0095-4eaf-b663-820845c89a48"
 
 [[outputs]]
 id = "7FwP7yNDjuKtHCY_YG9cm"
 uri = "file://artifacts/mobile/assets/sounds/souris.mp3"
 type = "audio"
 title = "sound_effect"
+logical_id = "228ac82c-6da7-4acf-82f6-a3f7c78e0a57"
 
 [[outputs]]
 id = "DtuzywRRcYZNq14on_26t"
 uri = "file://artifacts/mobile/assets/sounds/calao.mp3"
 type = "audio"
 title = "sound_effect"
+logical_id = "bf1360b3-a867-43a4-a2a2-7d4eadf6873f"
 
 [[outputs]]
 id = "cxzcfIkXQ2RZzORtpQM3y"
 uri = "file://artifacts/mobile/assets/sounds/cheval.mp3"
 type = "audio"
 title = "sound_effect"
+logical_id = "34ddc1d4-6aec-4fe6-ba8c-f3ffca7ec3a8"
 
 [[outputs]]
 id = "JSARu_Qn-QLBUlZKvPkWW"
 uri = "file://artifacts/mobile/assets/sounds/chevre.mp3"
 type = "audio"
 title = "sound_effect"
+logical_id = "8e7e5c02-e365-42e1-a839-24748468460c"
 
 [[outputs]]
 id = "Dyr39wVRC8Xsq6q3gfjmX"
 uri = "file://artifacts/mobile/assets/sounds/pintade.mp3"
 type = "audio"
 title = "pintade"
+logical_id = "aa1b9e82-30db-4d05-9fdf-aa123399bd16"
 
 [[outputs]]
 id = "SYEAjZcRVdgI-9CAtefgP"
 uri = "file://artifacts/mobile/assets/sounds/lievre.mp3"
 type = "audio"
 title = "sound_effect"
+logical_id = "ea8ea52e-c614-4208-b8ca-836a0071878b"
 
 [[outputs]]
 id = "d8--bDdaA-Yxb2iDdZNvX"
 uri = "file://artifacts/mobile/assets/sounds/poisson.mp3"
 type = "audio"
 title = "sound_effect"
+logical_id = "e0e5905e-ec28-4b84-bb00-ea6ef480469a"
 
 [[outputs]]
 id = "77CDUjqh_AQ8P0AjRSiN4"
 uri = "file://artifacts/mobile/assets/sounds/colombe.mp3"
 type = "audio"
 title = "sound_effect"
+logical_id = "22b465f3-a5f5-4007-99ee-02b207c3d747"
 
 [[outputs]]
 id = "nDzenjtc6Oj30cn7JE2GI"
 uri = "file://artifacts/mobile/assets/sounds/ane.mp3"
 type = "audio"
 title = "sound_effect"
+logical_id = "b9bfd7cf-6a31-477a-bd82-a655c3127697"
 
 [[outputs]]
 id = "WQMeLBCMTGNP4560SeXH1"
 uri = "file://artifacts/mobile/assets/sounds/chien.mp3"
 type = "audio"
 title = "sound_effect"
+logical_id = "cc5ecc9b-cb0a-405e-93bf-5b9c1284f4c3"
 
 [[outputs]]
 id = "vgtc_Q-j2rReBYO6HOR22"
 uri = "file://artifacts/mobile/assets/sounds/antilope.mp3"
 type = "audio"
 title = "sound_effect"
+logical_id = "fe884702-1549-490a-bce9-7f4cfe80df2f"
 
 [[outputs]]
 id = "eifnqpZoaaGcQ3jQU9TPd"
 uri = "file://artifacts/mobile/assets/sounds/vautour.mp3"
 type = "audio"
 title = "sound_effect"
+logical_id = "edcfdd3a-20ba-4f33-976a-84a07eac9ac2"
 
 [[outputs]]
 id = "tp8ATnKOuzy_-YNodIObD"
 uri = "file://artifacts/mobile/assets/sounds/iguane.mp3"
 type = "audio"
 title = "sound_effect"
+logical_id = "7d6abcd5-df9e-4999-b223-2669ddb04c13"
 
 [[outputs]]
 id = "731sZh6_Mjh2exUGatt5W"
 uri = "file://artifacts/mobile/assets/sounds/cerf.mp3"
 type = "audio"
 title = "sound_effect"
+logical_id = "3392f219-de6e-4d79-bbaa-ddd77454bd2f"
 
 [[outputs]]
 id = "c7IWf4wuo-8QTxCsLv_y2"
 uri = "file://artifacts/mobile/assets/sounds/cochon.mp3"
 type = "audio"
 title = "sound_effect"
+logical_id = "15c38ce5-bdeb-4c4b-b49d-61217672611d"
 
 [[outputs]]
 id = "hH_YUhoKvLHaxbFz9uEdG"
 uri = "file://artifacts/mobile/assets/sounds/poulet.mp3"
 type = "audio"
 title = "sound_effect"
+logical_id = "8df93aa5-2871-4ace-818e-021aad1b5080"
 
 [[outputs]]
 id = "QbAYhx09Efc7MeZlYPa9j"
 uri = "file://artifacts/mobile/assets/sounds/tatou.mp3"
 type = "audio"
 title = "sound_effect"
+logical_id = "8d6533ba-a44f-4193-bbe4-2a3840a3e363"
 
 [[outputs]]
 id = "0GKUZ890TDIBx_zM3u9Xt"
 uri = "file://artifacts/mobile/assets/sounds/lapin.mp3"
 type = "audio"
 title = "sound_effect"
+logical_id = "25ee74ac-a384-4e4d-a4c8-053ece5a5194"
 
 [[outputs]]
 id = "ULxLzBwp-OKOGwfpPJhAV"
 uri = "file://artifacts/mobile/assets/sounds/escargot.mp3"
 type = "audio"
 title = "sound_effect"
+logical_id = "98dd0b07-77cd-40b4-a3f3-2580f6a1be02"
 
 [[outputs]]
 id = "POeqipyfWladk_PWrZ7Vr"
 uri = "file://artifacts/mobile/assets/sounds/porc-epic.mp3"
 type = "audio"
 title = "sound_effect"
+logical_id = "44dad3fa-9a8b-49f5-b6e2-9e5581d2b442"
 
 [[outputs]]
 id = "HV-n_ybbzpvBsMRetrolY"
 uri = "file://artifacts/mobile/assets/sounds/ecureuil.mp3"
 type = "audio"
 title = "sound_effect"
+logical_id = "1707c688-4fb1-4300-85c7-4e5c5e177da7"
 
 [[outputs]]
 id = "9npQMTBPem3muSubJPaXA"
 uri = "file://artifacts/mobile/assets/sounds/cygne.mp3"
 type = "audio"
 title = "sound_effect"
+logical_id = "dd412ea7-0e9d-416f-85db-c863e619037d"
 
 [[outputs]]
 id = "zXl3TxYmchUJ13EY0e7Uh"
 uri = "file://artifacts/mobile/assets/sounds/gorille.mp3"
 type = "audio"
 title = "gorille"
+logical_id = "6e93e38d-fd9e-4643-a0b4-f0fe06f74a09"
 
 [[outputs]]
 id = "U8otB5OOVYERW-IC2vzJ_"
 uri = "file://artifacts/mobile/assets/sounds/araignee.mp3"
 type = "audio"
 title = "araignee"
+logical_id = "8e255144-d3ec-4fc2-a58b-a4bcdfbe285b"
 
 [[outputs]]
 id = "yBy9IMlKXUOAC4R81NCQk"
 uri = "file://artifacts/mobile/assets/sounds/gnou.mp3"
 type = "audio"
 title = "gnou"
+logical_id = "c2e5f130-961e-442f-8a00-2b568aa58e89"
 
 [[outputs]]
 id = "t_jrOtPQPZP8qZSHnn8rt"
 uri = "file://artifacts/mobile/assets/sounds/guepard.mp3"
 type = "audio"
 title = "guepard"
+logical_id = "2c4123f3-f727-40f4-a760-0c04dc627742"
 
 [[outputs]]
 id = "xjnaMbQWx4bK9pp4VIacK"
 uri = "file://artifacts/mobile/assets/sounds/pangolin.mp3"
 type = "audio"
 title = "pangolin"
+logical_id = "966d52da-4ab7-405f-94b3-3e36b08c0c13"
 
 [[outputs]]
 id = "PZK0Y6Dh3jASUK5TarY4U"
 uri = "file://artifacts/mobile/assets/sounds/ibis.mp3"
 type = "audio"
 title = "ibis"
+logical_id = "9e6c49b4-47ac-40be-8e5e-4f52e97a0d90"
 
 [[outputs]]
 id = "RVA9FVd9WrnUBgdJ64w1Q"
 uri = "file://artifacts/mobile/assets/sounds/perroquet.mp3"
 type = "audio"
 title = "perroquet"
+logical_id = "597c8247-720c-449a-a1f5-460f00c83ec4"
 
 [[outputs]]
 id = "mzwqBSz8VM4lX8cFHJNqL"
 uri = "file://artifacts/mobile/assets/sounds/flamant.mp3"
 type = "audio"
 title = "flamant"
+logical_id = "8f4fb5b6-32f8-4e4f-9139-f319a254e469"
 
 [[outputs]]
 id = "aoF7fMpNWaMQMlktFDIAD"
 uri = "file://artifacts/mobile/assets/sounds/heron.mp3"
 type = "audio"
 title = "heron"
+logical_id = "773155dc-8a09-4166-afbc-2c65e3c60d7c"
 
 [[outputs]]
 id = "h_bVzIy2phAXhQsgRn2Wm"
 uri = "file://artifacts/mobile/assets/sounds/zebre.mp3"
 type = "audio"
 title = "zebre"
+logical_id = "d70a3f7b-9a75-49b0-ba06-604407e0cf61"
 
 [[outputs]]
 id = "bqSMKtWCBMzqktAhMsOGs"
 uri = "file://artifacts/mobile/assets/sounds/girafe.mp3"
 type = "audio"
 title = "girafe"
+logical_id = "3d14af3d-57a4-478f-a7af-2d03da8741e4"
 
 [[outputs]]
 id = "EQriy4uyToquJTiaZhlxE"
 uri = "file://artifacts/mobile/assets/sounds/mangouste.mp3"
 type = "audio"
 title = "mangouste"
+logical_id = "0199ff58-03a9-4a0c-8b79-6355b08435f1"
 
 [[outputs]]
 id = "SgYezBUTB82QgU58AVSWu"
 uri = "file://artifacts/mobile/assets/sounds/phacochère.mp3"
 type = "audio"
 title = "phacochère"
+logical_id = "00e26c91-12fe-4581-9167-11fc98d59ee0"
 
 [[outputs]]
 id = "Df01pBPGkeer9yKI5CAmY"
 uri = "file://attached_assets/logo_lion.png"
 type = "image"
 title = "Option 1 — Lion géométrique"
+logical_id = "c8d1334e-67f8-491a-8314-3e69b8d59239"
 
 [[outputs]]
 id = "SKLY0KRAtgZo2ywa4SKUf"
 uri = "file://attached_assets/logo_elephant.png"
 type = "image"
 title = "Option 2 — Emblème Éléphant"
+logical_id = "480559b7-0f1b-456d-a770-2d0e5b19b975"
 
 [[outputs]]
 id = "3gdF3FDm77W1DOTPjilqy"
 uri = "file://attached_assets/logo_baobab.png"
 type = "image"
 title = "Option 3 — Baobab & Animaux"
+logical_id = "fff797a1-789c-4277-8e94-5e4233b0aa8b"
 
 [[outputs]]
 id = "IPkaaq0hKiP7v6mDYWylM"
 uri = "file://artifacts/mobile/assets/images/hero.png"
 type = "image"
 title = "Nouvelle image héro générée"
+logical_id = "2dcecbe8-d4a2-4bec-a2b4-c38523b7dbb6"
 
 [[outputs]]
 id = "y3erg_MNCLwIO6qz9V-23"
 uri = "file://artifacts/mobile/assets/images/hero-plants.png"
 type = "image"
 title = "Hero — Baobab réaliste"
+logical_id = "d6bbf2bf-8e8e-4b4f-90e1-fcf9494d1102"
 
 [[outputs]]
 id = "lek2jb12d_NqRPYyp_MDX"
 uri = "file://artifacts/mobile/assets/images/icon-plants.png"
 type = "image"
 title = "Médaillon — Splash Screen Plantes"
+logical_id = "684f4484-1701-45e7-8ded-dff0eeee189b"
+
+[[outputs]]
+id = "IqTl_0w0fU4VraPkA7845"
+uri = "file://research/notes.md"
+type = "text"
+title = "Recherche : plantes ouest-africaines"
+description = "Plan de recherche et sources en cours pour enrichir la rubrique Savoir."
+logical_id = "5af21df4-6078-4f3e-b6bb-b10a0e6ec8ce"
+content_hash = "sha256:7879c306cf6436cf4f340cd9ada506323923759489b1adf1368dfd91add58ff9"
+size = 2267
+mtime_ms = 1790550418948
+storage_uri = "gcs://replit-rams-assets-janeway/rams/assets/repl:7adaeed1-7d38-484c-8840-7d2a2b49a838/5af21df4-6078-4f3e-b6bb-b10a0e6ec8ce/4061a193-00d2-4c57-80e0-f93a5be96277"
+storage_version_token = "1790550434182725"
+content_type = "text/markdown"
