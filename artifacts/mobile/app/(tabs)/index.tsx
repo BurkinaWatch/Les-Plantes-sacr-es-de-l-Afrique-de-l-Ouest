@@ -180,30 +180,29 @@ export default function HomeScreen() {
                 style={({ pressed }) => [styles.featuredCard, { width: cardWidth, height: cardHeight, opacity: pressed ? 0.85 : 1 }]}
                 onPress={() => router.push(`/animal/${plante.id}` as any)}
               >
-                <View style={styles.featuredGradient}>
-                  {imageSource ? (
-                    <Image
-                      source={imageSource}
-                      style={[StyleSheet.absoluteFill, styles.featuredImage]}
-                      resizeMode="contain"
-                      fadeDuration={0}
-                    />
-                  ) : (
-                    <LinearGradient
-                      colors={[plante.couleur, plante.couleurSecondaire]}
-                      style={StyleSheet.absoluteFill}
-                    />
-                  )}
+                <View style={[styles.featuredCardContent, { backgroundColor: colors.background }]}>
+                  <View style={styles.featuredImageArea}>
+                    {imageSource ? (
+                      <Image
+                        source={imageSource}
+                        style={styles.featuredImage}
+                        resizeMode="contain"
+                        fadeDuration={0}
+                      />
+                    ) : (
+                      <LinearGradient
+                        colors={[plante.couleur, plante.couleurSecondaire]}
+                        style={StyleSheet.absoluteFill}
+                      />
+                    )}
+                  </View>
                   <LinearGradient
-                    colors={['rgba(0,0,0,0.08)', 'rgba(0,0,0,0.72)']}
-                    locations={[0.3, 1]}
-                    style={StyleSheet.absoluteFill}
-                    pointerEvents="none"
-                  />
-                  <View style={styles.featuredTextBlock}>
+                    colors={[colors.card, colors.warmBrown]}
+                    style={styles.featuredTextBlock}
+                  >
                     <Text style={[styles.featuredNom, isTablet && styles.featuredNomTablet]}>{plante.nom}</Text>
                     <Text style={[styles.featuredPouvoir, isTablet && styles.featuredPouvoirTablet]}>{plante.pouvoirs[0]}</Text>
-                  </View>
+                  </LinearGradient>
                 </View>
               </Pressable>
             );
@@ -398,19 +397,26 @@ const styles = StyleSheet.create({
     borderRadius: 18,
     overflow: 'hidden',
   },
-  featuredGradient: {
+  featuredCardContent: {
     flex: 1,
-    justifyContent: 'flex-end',
+  },
+  featuredImageArea: {
+    flex: 1,
+    minHeight: 0,
+    padding: 8,
+    alignItems: 'center',
+    justifyContent: 'center',
     position: 'relative',
-    backgroundColor: '#142414',
   },
   featuredImage: {
-    borderRadius: 18,
+    width: '100%',
+    height: '100%',
   },
   featuredTextBlock: {
     padding: 12,
     paddingBottom: 14,
-    zIndex: 2,
+    borderTopWidth: StyleSheet.hairlineWidth,
+    borderTopColor: 'rgba(200,160,32,0.35)',
   },
   featuredNom: { color: '#FFFFFF', fontSize: 15, fontWeight: '800', letterSpacing: 0.3 },
   featuredNomTablet: { fontSize: 19 },
