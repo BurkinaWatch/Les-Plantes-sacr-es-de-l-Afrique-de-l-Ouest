@@ -430,7 +430,7 @@ const styles = StyleSheet.create({
     paddingVertical: 13,
     borderRadius: 10,
   },
-  ctaText: { fontSize: 14, fontWeight: '700', letterSpacing: 0.2 },
+  ctaText: { maxWidth: 130, flexShrink: 1, fontSize: 12, fontWeight: '700', letterSpacing: 0.2, lineHeight: 15 },
   quizButton: {
     alignItems: 'center',
     paddingVertical: 13,
