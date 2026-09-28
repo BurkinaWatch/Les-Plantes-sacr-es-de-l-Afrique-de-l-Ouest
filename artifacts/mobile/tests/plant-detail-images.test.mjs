@@ -320,6 +320,9 @@ test("plant image opens in a zoomable viewer and the detail page navigates by sw
       "Le contrôle d’agrandissement doit zoomer dans l’image",
     );
 
+    act(() => {
+      renderer.root.findByProps({ testID: "plant-image-viewer-close" }).props.onPress();
+    });
     const scrollView = renderer.root.findByType("ScrollView");
     act(() => {
       scrollView.props.onTouchStart({
