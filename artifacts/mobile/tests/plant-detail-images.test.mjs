@@ -314,8 +314,9 @@ test("plant image opens in a zoomable viewer and the detail page navigates by sw
     act(() => {
       renderer.root.findByProps({ testID: "plant-image-zoom-in" }).props.onPress();
     });
-    assert.ok(
-      renderer.root.findAllByType("Text").some((node) => node.props.children === "150%"),
+    assert.equal(
+      renderer.root.findByProps({ testID: "plant-image-viewer-image" }).props.style[1].transform[2].scale,
+      1.5,
       "Le contrôle d’agrandissement doit zoomer dans l’image",
     );
 
