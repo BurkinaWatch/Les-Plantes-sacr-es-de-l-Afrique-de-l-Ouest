@@ -765,7 +765,7 @@ export const ARTICLES: Article[] = [
         url: 'https://www.facebook.com/MoringalSen/posts/ces-informations-sont-tirées-du-manuel-sur-la-production-et-la-transformation-du/197205320820454/',
         kind: 'publication sociale',
         note:
-          'Résultat public indexé ; publication non ouverte et date non visible. Piste de transmission communautaire, pas preuve d’efficacité ni de sécurité.',
+          'Résultat public indexé ; publication non ouverte et date non visible. Témoignage et piste de transmission communautaire, pas une preuve médicale ni de sécurité.',
       },
       {
         title: 'Instagram — « Ethnobotany 101: Ebieba »',
