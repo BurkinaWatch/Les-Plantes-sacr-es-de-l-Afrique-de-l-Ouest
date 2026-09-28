@@ -1,10 +1,7 @@
 import { PLANTS, type Plante } from './animals';
 
-// ─────────────────────────────────────────────────────────────────────────────
-// Quiz éditorial de réflexion — cinq axes construits à partir des fiches
-// botaniques de l'application. Il ne s'agit ni d'un test psychométrique ni d'un
-// diagnostic spirituel.
-// ─────────────────────────────────────────────────────────────────────────────
+// Quiz éditorial de réflexion, non un test psychométrique ou un diagnostic
+// spirituel. Les axes sont rapprochés des valeurs écrites dans les fiches.
 
 export type PlantId = string;
 /** @deprecated Retained as a source-compatible alias; quiz results are plant IDs. */
@@ -39,9 +36,8 @@ export interface SpiritualReference {
 }
 
 /**
- * Sources used to frame the quiz. They document living cultural traditions;
- * they are not evidence that a personality score can reveal a person's
- * spiritual identity.
+ * These sources document living cultural traditions and botanical naming.
+ * They do not validate a personality score or an automated spiritual identity.
  */
 export const SPIRITUAL_REFERENCES: SpiritualReference[] = [
   {
@@ -78,12 +74,177 @@ export const SPIRITUAL_REFERENCES: SpiritualReference[] = [
   },
 ];
 
+// Twenty prompts are interleaved across the five reflection axes.
+export const QUIZ_QUESTIONS: QuizStatement[] = [
+  { id: 1, dimension: 'E', dimensionLabel: 'Ancrage', statement: 'Quand un choix m’importe, je prends en compte ce que l’expérience et la mémoire m’ont appris.', reversed: false },
+  { id: 2, dimension: 'O', dimensionLabel: 'Écoute', statement: 'Avant d’agir, je prends le temps d’observer ce qui change autour de moi.', reversed: false },
+  { id: 3, dimension: 'C', dimensionLabel: 'Protection', statement: 'Quand quelqu’un traverse une difficulté, je cherche une aide concrète qui respecte ses besoins.', reversed: false },
+  { id: 4, dimension: 'A', dimensionLabel: 'Transmission', statement: 'J’aime partager ce que j’ai appris en laissant aux autres la liberté de leur propre chemin.', reversed: false },
+  { id: 5, dimension: 'S', dimensionLabel: 'Transformation', statement: 'Quand une étape se termine, je prends le temps d’en comprendre les leçons avant d’en commencer une autre.', reversed: false },
+  { id: 6, dimension: 'E', dimensionLabel: 'Ancrage', statement: 'Je me sens nourri par des lieux, des pratiques ou des liens qui s’inscrivent dans la durée.', reversed: false },
+  { id: 7, dimension: 'O', dimensionLabel: 'Écoute', statement: 'Je peux écouter mon intuition sans la confondre avec une certitude.', reversed: false },
+  { id: 8, dimension: 'C', dimensionLabel: 'Protection', statement: 'Je sais poser une limite pour protéger mon équilibre sans rabaisser l’autre.', reversed: false },
+  { id: 9, dimension: 'A', dimensionLabel: 'Transmission', statement: 'Je préfère une réussite collective à une réussite qui m’isole.', reversed: false },
+  { id: 10, dimension: 'S', dimensionLabel: 'Transformation', statement: 'Je peux abandonner une habitude qui ne m’aide plus, même si elle me rassurait.', reversed: false },
+  { id: 11, dimension: 'E', dimensionLabel: 'Ancrage', statement: 'Je reviens volontiers à mes repères pour traverser les périodes d’incertitude.', reversed: false },
+  { id: 12, dimension: 'O', dimensionLabel: 'Écoute', statement: 'Les récits, les symboles ou les rêves peuvent ouvrir des questions utiles, sans dicter mes décisions.', reversed: false },
+  { id: 13, dimension: 'C', dimensionLabel: 'Protection', statement: 'Avant d’agir, je pense aux effets de mes choix sur les personnes et le vivant.', reversed: false },
+  { id: 14, dimension: 'A', dimensionLabel: 'Transmission', statement: 'Dans un désaccord, je cherche d’abord ce qui peut permettre de se parler avec respect.', reversed: false },
+  { id: 15, dimension: 'S', dimensionLabel: 'Transformation', statement: 'Face à un revers, j’essaie un ajustement précis plutôt que de me juger.', reversed: false },
+  { id: 16, dimension: 'A', dimensionLabel: 'Transmission', statement: 'Les savoirs reçus de ma famille ou de ma communauté méritent d’être préservés.', reversed: false },
+  { id: 17, dimension: 'O', dimensionLabel: 'Écoute', statement: 'Je revois mon interprétation quand de nouveaux faits apparaissent.', reversed: false },
+  { id: 18, dimension: 'C', dimensionLabel: 'Protection', statement: 'Je prends la parole quand une personne ou un lieu fragile risque d’être maltraité.', reversed: false },
+  { id: 19, dimension: 'E', dimensionLabel: 'Ancrage', statement: 'Je fais une place aux récits et aux savoirs des générations qui m’ont précédé.', reversed: false },
+  { id: 20, dimension: 'S', dimensionLabel: 'Transformation', statement: 'Je sais adapter mon rythme aux cycles, aux saisons et à mon énergie du moment.', reversed: false },
+];
+
+export type LikertValue = 1 | 2 | 3 | 4 | 5;
+export type QuizAnswers = Record<number, LikertValue>;
+
+const DIMS = ['E', 'O', 'C', 'A', 'S'] as const;
+type Dim = typeof DIMS[number];
+
+interface SignalGroup {
+  terms: readonly string[];
+  weight: number;
+}
+
+/*
+ * A small, deterministic, value-only classifier. Each group represents one
+ * theme in the plant fiche; a theme contributes once even if repeated across
+ * the fiche. Adding a plant requires no hard-coded result profile.
+ */
+const PLANT_VALUE_SIGNALS: Record<Dim, readonly SignalGroup[]> = {
+  E: [
+    { terms: ['memoire', 'ancetre', 'ancestral', 'heritage', 'generation'], weight: 2 },
+    { terms: ['racine', 'ancrage', 'enracine', 'terre'], weight: 2 },
+    { terms: ['tradition', 'transmission', 'patrimoine', 'griot'], weight: 1 },
+    { terms: ['duree', 'continu', 'longtemps', 'millenaire', 'permanent'], weight: 1 },
+    { terms: ['repere', 'stabilite', 'stable', 'perennite'], weight: 1 },
+    { terms: ['histoire', 'origine', 'fondateur', 'fonde'], weight: 1 },
+  ],
+  O: [
+    { terms: ['observation', 'observer', 'ecoute', 'silence', 'attention'], weight: 2 },
+    { terms: ['symbole', 'symbolique', 'reve', 'intuition', 'signe'], weight: 2 },
+    { terms: ['esprit', 'invisible', 'mystere', 'sacre', 'sacree'], weight: 2 },
+    { terms: ['discernement', 'sagesse', 'connaissance', 'comprendre'], weight: 1 },
+    { terms: ['legende', 'recit', 'conte', 'parole', 'mythe'], weight: 1 },
+    { terms: ['rituel', 'divination', 'vision', 'perception'], weight: 1 },
+  ],
+  C: [
+    { terms: ['protection', 'protecteur', 'proteger', 'defense', 'garde'], weight: 2 },
+    { terms: ['soin', 'soigner', 'sante', 'guerison', 'guerir'], weight: 2 },
+    { terms: ['limite', 'preserver', 'preservation', 'fragile', 'abriter'], weight: 2 },
+    { terms: ['resistance', 'resister', 'resilient', 'endurant', 'survivre'], weight: 1 },
+    { terms: ['nourrir', 'nourriture', 'aliment', 'ressource', 'eau'], weight: 1 },
+    { terms: ['veiller', 'securite', 'defendre', 'soutien'], weight: 1 },
+  ],
+  A: [
+    { terms: ['communaute', 'village', 'collectif', 'ensemble', 'peuple'], weight: 2 },
+    { terms: ['partage', 'partager', 'donner', 'generosite', 'offrir'], weight: 2 },
+    { terms: ['transmission', 'enseigner', 'enseignement', 'savoir', 'apprendre'], weight: 2 },
+    { terms: ['lien', 'relation', 'alliance', 'rassembler', 'accueillir'], weight: 1 },
+    { terms: ['aider', 'entraide', 'service', 'hospitalite', 'solidarite'], weight: 1 },
+    { terms: ['parole', 'dialogue', 'echange', 'griot', 'conseil'], weight: 1 },
+  ],
+  S: [
+    { terms: ['transformation', 'transformer', 'metamorphose', 'changer', 'changement'], weight: 2 },
+    { terms: ['renaissance', 'renaitre', 'renaissance', 'regeneration', 'renouveau'], weight: 2 },
+    { terms: ['cycle', 'saison', 'floraison', 'croissance', 'evolution'], weight: 2 },
+    { terms: ['adapter', 'adaptation', 'adaptabilite', 'rebond', 'recommencer'], weight: 1 },
+    { terms: ['renouveler', 'renouvellement', 'revenir', 'reprise', 'transition'], weight: 1 },
+    { terms: ['secheresse', 'mue', 'germination', 'mutation', 'vivant'], weight: 1 },
+  ],
+};
+
+function normalizeText(value: string): string {
+  return value
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLocaleLowerCase('fr-FR');
+}
+
+function getPlantValueText(plant: Plante): string {
+  return normalizeText([
+    plant.symboliqueAfricaine,
+    plant.symboliqueSpirirtuelle,
+    plant.symbolique,
+    ...plant.qualites,
+    ...plant.defauts,
+    ...plant.pouvoirs,
+    ...plant.enseignements,
+    plant.citation,
+    ...plant.proverbes,
+    ...plant.legendes,
+    ...plant.conseilsDeVie,
+    plant.enseignementDuJour,
+  ].filter(Boolean).join(' '));
+}
+
+export function derivePlantProfile(plant: Plante): Record<Dim, number> {
+  const text = getPlantValueText(plant);
+  const profile = {} as Record<Dim, number>;
+
+  for (const dimension of DIMS) {
+    const evidence = PLANT_VALUE_SIGNALS[dimension].reduce(
+      (total, group) => total + (group.terms.some((term) => text.includes(term)) ? group.weight : 0),
+      0,
+    );
+    profile[dimension] = Math.min(100, 12 + evidence * 8);
+  }
+
+  return profile;
+}
+
+function firstNonEmpty(values: readonly (string | undefined)[]): string | undefined {
+  return values.find((value) => typeof value === 'string' && value.trim().length > 0)?.trim();
+}
+
+function listOrFallback(values: readonly string[], fallback: string): string[] {
+  const unique = [...new Set(values.map((value) => value.trim()).filter(Boolean))];
+  return unique.length > 0 ? unique.slice(0, 4) : [fallback];
+}
+
+function makeTotemResult(plant: Plante): TotemResult {
+  const description = firstNonEmpty([
+    plant.symbolique,
+    plant.symboliqueAfricaine,
+    plant.symboliqueSpirirtuelle,
+    plant.description,
+  ]) ?? `La fiche de ${plant.nom} ne contient pas encore de description.`;
+  const fallback = 'Cette fiche sera enrichie avec de nouveaux repères.';
+  const citation = firstNonEmpty([
+    plant.citation,
+    plant.proverbes[0],
+    plant.enseignements[0],
+    plant.enseignementDuJour,
+    plant.conseilsDeVie[0],
+  ]) ?? description;
+  const couleur = /^#[\da-f]{6}$/i.test(plant.couleur) ? plant.couleur : '#5C7A3E';
+
+  return {
+    id: plant.id,
+    nom: plant.nom,
+    description,
+    forces: listOrFallback(plant.qualites.length > 0 ? plant.qualites : plant.pouvoirs, fallback),
+    defis: listOrFallback(plant.defauts.length > 0 ? plant.defauts : plant.conseilsDeVie, fallback),
+    citation,
+    couleur,
+    profilDimensions: derivePlantProfile(plant),
+  };
+}
+
+export const TOTEM_RESULTS: Record<PlantId, TotemResult> = Object.fromEntries(
+  PLANTS.map((plant) => [plant.id, makeTotemResult(plant)]),
+) as Record<PlantId, TotemResult>;
+
 export const TOTEM_REFLECTIONS: Record<PlantId, string> = Object.fromEntries(
   PLANTS.map((plant) => {
-    const idea =
-      plant.conseilsDeVie.find((item) => item.trim()) ??
-      plant.enseignements.find((item) => item.trim()) ??
-      plant.enseignementDuJour.trim();
+    const idea = firstNonEmpty([
+      plant.conseilsDeVie[0],
+      plant.enseignements[0],
+      plant.enseignementDuJour,
+    ]);
     return [
       plant.id,
       idea
@@ -93,308 +254,79 @@ export const TOTEM_REFLECTIONS: Record<PlantId, string> = Object.fromEntries(
   }),
 ) as Record<PlantId, string>;
 
-// ── 20 affirmations · 4 par dimension · 1 item inversé par dimension (★)
-export const QUIZ_QUESTIONS: QuizStatement[] = [
-
-  // D1 : EXTRAVERSION / LEADERSHIP (E)
-  {
-    id: 1,
-    dimension: 'E',
-    dimensionLabel: 'Leadership',
-    statement: "Je prends naturellement les rênes quand un groupe manque de direction.",
-    reversed: false,
-  },
-  {
-    id: 2,
-    dimension: 'E',
-    dimensionLabel: 'Leadership',
-    statement: "Le contact avec les autres me donne de l'énergie plutôt que de me fatiguer.",
-    reversed: false,
-  },
-  {
-    id: 3,
-    dimension: 'E',
-    dimensionLabel: 'Leadership',
-    statement: "Je préfère rester en retrait et observer plutôt qu'intervenir en premier. ★",
-    reversed: true,
-  },
-  {
-    id: 4,
-    dimension: 'E',
-    dimensionLabel: 'Leadership',
-    statement: "Mon influence sur les autres passe avant tout par ma présence directe et mon charisme.",
-    reversed: false,
-  },
-
-  // D2 : OUVERTURE / INTUITION (O)
-  {
-    id: 5,
-    dimension: 'O',
-    dimensionLabel: 'Intuition',
-    statement: "Je fais confiance à mon intuition pour les décisions importantes, même sans preuve tangible.",
-    reversed: false,
-  },
-  {
-    id: 6,
-    dimension: 'O',
-    dimensionLabel: 'Intuition',
-    statement: "Les rêves, les symboles et le monde invisible m'interpellent profondément.",
-    reversed: false,
-  },
-  {
-    id: 7,
-    dimension: 'O',
-    dimensionLabel: 'Intuition',
-    statement: "Je préfère les faits concrets et vérifiables aux interprétations symboliques. ★",
-    reversed: true,
-  },
-  {
-    id: 8,
-    dimension: 'O',
-    dimensionLabel: 'Intuition',
-    statement: "Je cherche mon propre chemin spirituel plutôt que de suivre une tradition toute tracée.",
-    reversed: false,
-  },
-
-  // D3 : CONSCIENCIOSITÉ / ENDURANCE (C)
-  {
-    id: 9,
-    dimension: 'C',
-    dimensionLabel: 'Endurance',
-    statement: "Je tiens mes engagements jusqu'au bout, même quand les circonstances se compliquent.",
-    reversed: false,
-  },
-  {
-    id: 10,
-    dimension: 'C',
-    dimensionLabel: 'Endurance',
-    statement: "Mon énergie est constante et durable — je suis fiable sur le long terme.",
-    reversed: false,
-  },
-  {
-    id: 11,
-    dimension: 'C',
-    dimensionLabel: 'Endurance',
-    statement: "Je m'adapte facilement à un nouveau plan quand l'ancien ne fonctionne plus. ★",
-    reversed: true,
-  },
-  {
-    id: 12,
-    dimension: 'C',
-    dimensionLabel: 'Endurance',
-    statement: "La discipline et la méthode sont au cœur de ma façon d'avancer.",
-    reversed: false,
-  },
-
-  // D4 : AGRÉABILITÉ / COMMUNAUTÉ (A)
-  {
-    id: 13,
-    dimension: 'A',
-    dimensionLabel: 'Communauté',
-    statement: "La transmission de la sagesse aux générations suivantes est une mission sacrée pour moi.",
-    reversed: false,
-  },
-  {
-    id: 14,
-    dimension: 'A',
-    dimensionLabel: 'Communauté',
-    statement: "Quand quelqu'un de proche souffre, je suis immédiatement présent avec chaleur et soutien.",
-    reversed: false,
-  },
-  {
-    id: 15,
-    dimension: 'A',
-    dimensionLabel: 'Communauté',
-    statement: "Ma mission personnelle prime souvent sur les attentes de mon entourage. ★",
-    reversed: true,
-  },
-  {
-    id: 16,
-    dimension: 'A',
-    dimensionLabel: 'Communauté',
-    statement: "La mémoire de mes ancêtres guide activement mes choix de vie.",
-    reversed: false,
-  },
-
-  // D5 : STABILITÉ / TRANSFORMATION (S)
-  {
-    id: 17,
-    dimension: 'S',
-    dimensionLabel: 'Transformation',
-    statement: "Un bouleversement majeur me transforme profondément — je n'en ressors pas le même. ★",
-    reversed: true,
-  },
-  {
-    id: 18,
-    dimension: 'S',
-    dimensionLabel: 'Transformation',
-    statement: "Mon identité reste stable et cohérente même dans les périodes de crise.",
-    reversed: false,
-  },
-  {
-    id: 19,
-    dimension: 'S',
-    dimensionLabel: 'Transformation',
-    statement: "Face à l'échec, je reprends le même chemin avec plus de force plutôt que de tout recommencer.",
-    reversed: false,
-  },
-  {
-    id: 20,
-    dimension: 'S',
-    dimensionLabel: 'Transformation',
-    statement: "Je porte mon passé comme une ressource précieuse qui me nourrit encore aujourd'hui.",
-    reversed: false,
-  },
-];
-
-// ── Profils totem (0–100 par dimension)
-// Calibrés sur la symbolique ethnobotanique documentée de chaque espèce
-export const TOTEM_RESULTS: Record<TotemAnimalId, TotemResult> = {
-  kolatier: {
-    id: 'kolatier',
-    nom: 'Kolatier',
-    description: "Votre profil révèle un fort leadership social et un sens de l'hospitalité sacrée, traits associés au Kolatier dans les traditions mandingues et akan. Le Kolatier est l'arbre de l'alliance — il rassemble, scelle les accords et crée des ponts là où il y avait des distances.",
-    forces: ["Leadership chaleureux et fédérateur", "Art de la relation et de l'alliance", "Présence mobilisatrice", "Sens du rassemblement"],
-    defis: ["Disperser son énergie dans trop de liens", "Difficulté à agir seul sans validation", "Fatigue de la représentation constante"],
-    mantra: "Je crée des liens sacrés et je rassemble autour de moi ce qui doit s'unir.",
-    animalSecondaire: 'fromager',
-    couleur: '#D4A017',
-    profilDimensions: { E: 85, O: 30, C: 50, A: 80, S: 50 },
-  },
-  baobab: {
-    id: 'baobab',
-    nom: 'Baobab',
-    description: "Votre profil révèle une sagesse profonde et un sens aigu de la mémoire collective, traits que les traditions mandingues et wolof associent au Grand Baobab. Arbre des ancêtres, gardien des villages, il symbolise la sagesse qui grandit dans la durée et le service silencieux.",
-    forces: ["Sagesse ancestrale et mémoire collective", "Sens de la justice et de la continuité", "Stabilité émotionnelle profonde", "Générosité sans calcul"],
-    defis: ["Résistance aux changements rapides", "Difficulté à lâcher ce qui appartient au passé", "Lenteur dans les décisions urgentes"],
-    mantra: "Je porte la mémoire de mon peuple et j'en fais une force pour demain.",
-    animalSecondaire: 'ronier',
-    couleur: '#8B4513',
-    profilDimensions: { E: 50, O: 25, C: 80, A: 85, S: 80 },
-  },
-  neem: {
-    id: 'neem',
-    nom: 'Neem',
-    description: "Votre profil révèle une haute précision et une autonomie intérieure, caractéristiques du Neem dans les traditions sahéliennes. Protecteur discret, purificateur des espaces, il agit par sa simple présence — sans bruit, sans violence, avec une efficacité redoutable.",
-    forces: ["Précision et discernement remarquables", "Autonomie et maîtrise de soi", "Protection naturelle de l'espace", "Efficacité sans ostentation"],
-    defis: ["Tendance à l'isolement par excès de pureté", "Difficulté à tolérer les imperfections", "Perfectionnisme parfois paralysant"],
-    mantra: "J'agis avec précision et je protège ce qui est sacré par ma seule présence.",
-    animalSecondaire: 'moringa',
-    couleur: '#2C5F2E',
-    profilDimensions: { E: 20, O: 55, C: 85, A: 25, S: 55 },
-  },
-  nere: {
-    id: 'nere',
-    nom: 'Néré',
-    description: "Votre profil révèle une ouverture mystique profonde et une stabilité enracinée, attributs du Néré dans les traditions bambara et peule. Arbre de l'abondance contre-cyclique, il fleurit quand tout le reste se tait et nourrit la communauté dans les temps difficiles.",
-    forces: ["Vision mystique et lecture des profondeurs", "Patience stratégique et longue vue", "Abondance dans l'adversité", "Connaissance des cycles"],
-    defis: ["Difficulté à communiquer sa profondeur intérieure", "Méfiance envers ce qui est superficiel", "Risque d'incompréhension sociale"],
-    mantra: "Je plonge dans les profondeurs et j'en remonte la sagesse nourricière.",
-    animalSecondaire: 'moringa',
-    couleur: '#5C7A3E',
-    profilDimensions: { E: 20, O: 80, C: 50, A: 55, S: 80 },
-  },
-  fromager: {
-    id: 'fromager',
-    nom: 'Fromager',
-    description: "Votre profil révèle une vision transcendante et une ouverture spirituelle rare, traits que les traditions yoruba et akan associent au Fromager sacré. Axe du monde, demeure des esprits, il voit ce que les autres ne peuvent apercevoir depuis le sol.",
-    forces: ["Vision transcendante et stratégique", "Connexion spirituelle profonde", "Capacité à percevoir les patterns cachés", "Hauteur de vue naturelle"],
-    defis: ["Détachement excessif du quotidien concret", "Difficulté à s'ancrer dans le présent", "Isolement dans les hauteurs spirituelles"],
-    mantra: "Je m'élève pour voir la vérité complète et je redescends pour la mettre au service des autres.",
-    animalSecondaire: 'kolatier',
-    couleur: '#4A7A4A',
-    profilDimensions: { E: 75, O: 85, C: 50, A: 50, S: 50 },
-  },
-  moringa: {
-    id: 'moringa',
-    nom: 'Moringa',
-    description: "Votre profil révèle une haute capacité de transformation et une adaptabilité profonde, marque du Moringa dans les traditions haoussa et mandingue. L'Arbre Miraculeux se transforme, guérit, nourrit — chaque phase de vie est une renaissance plus puissante.",
-    forces: ["Capacité de transformation profonde", "Polyvalence et adaptabilité sacrée", "Guérison et renaissance par la métamorphose", "Résilience indestructible"],
-    defis: ["Dispersion dans trop de directions à la fois", "Difficulté à maintenir les engagements sur le long terme", "Instabilité dans les phases de transition"],
-    mantra: "Je me transforme dans chaque cycle et j'émerge plus puissant et plus nourrissant.",
-    animalSecondaire: 'nere',
-    couleur: '#5C7A3E',
-    profilDimensions: { E: 25, O: 80, C: 25, A: 25, S: 20 },
-  },
-  ronier: {
-    id: 'ronier',
-    nom: 'Rônier',
-    description: "Votre profil révèle une endurance et une générosité constantes, valeurs incarnées par le Rônier dans les traditions sahéliennes. Il porte le monde sur lui sans vaciller, donne sans compter et continue à produire même dans les conditions les plus arides.",
-    forces: ["Endurance et constance incomparables", "Générosité totale et service profond", "Fiabilité et engagement sans faille", "Majesté tranquille dans l'adversité"],
-    defis: ["Résistance au changement rapide", "Difficulté à recevoir autant qu'à donner", "Épuisement par excès de service"],
-    mantra: "Je donne sans compter et je persévère avec la majesté de celui qui sait pourquoi il sert.",
-    animalSecondaire: 'baobab',
-    couleur: '#8B4513',
-    profilDimensions: { E: 20, O: 20, C: 85, A: 55, S: 80 },
-  },
-};
-
-// ── Type de réponse : 1 (pas du tout d'accord) → 5 (tout à fait d'accord)
-export type LikertValue = 1 | 2 | 3 | 4 | 5;
-export type QuizAnswers = Record<number, LikertValue>;
-
-const DIMS = ['E', 'O', 'C', 'A', 'S'] as const;
-type Dim = typeof DIMS[number];
-
-// ── Calcul par distance euclidienne (BFI standard)
-export function calculateTotem(answers: QuizAnswers): {
-  primary: TotemAnimalId;
-  secondary: TotemAnimalId;
-  scores: Record<TotemAnimalId, number>;
+export interface TotemCalculation {
+  primary: PlantId;
+  secondary: PlantId;
+  primaryScore: number;
+  secondaryScore: number;
+  scores: Record<PlantId, number>;
   dimensionScores: Record<Dim, number>;
-} {
-  // 1. Somme brute par dimension (avec inversion des items ★)
+}
+
+export function calculateTotem(
+  answers: QuizAnswers,
+  candidates: readonly Plante[] = PLANTS,
+): TotemCalculation {
+  if (candidates.length === 0) {
+    throw new Error('At least one plant candidate is required.');
+  }
+
+  const candidateIds = new Set<string>();
+  for (const plant of candidates) {
+    if (!plant.id.trim() || candidateIds.has(plant.id)) {
+      throw new Error(`Plant candidate IDs must be non-empty and unique: "${plant.id}".`);
+    }
+    candidateIds.add(plant.id);
+  }
+
   const dimRaw: Record<Dim, number> = { E: 0, O: 0, C: 0, A: 0, S: 0 };
   const dimCount: Record<Dim, number> = { E: 0, O: 0, C: 0, A: 0, S: 0 };
 
-  QUIZ_QUESTIONS.forEach((stmt) => {
-    const raw = answers[stmt.id];
-    if (raw == null) return;
-    const corrected = stmt.reversed ? (6 - raw) : raw;
-    dimRaw[stmt.dimension] += corrected;
-    dimCount[stmt.dimension]++;
-  });
-
-  // 2. Normalisation 0–100
-  //    min = count × 1, max = count × 5, range = count × 4
-  const dimensionScores = {} as Record<Dim, number>;
-  DIMS.forEach((d) => {
-    const count = dimCount[d] || 4;
-    const min = count * 1;
-    const max = count * 5;
-    dimensionScores[d] = Math.round(((dimRaw[d] - min) / (max - min)) * 100);
-  });
-
-  // 3. Distance euclidienne entre profil répondant et chaque totem
-  //    Plus la distance est faible, plus le totem correspond
-  const MAX_DIST = Math.sqrt(DIMS.length * 100 * 100); // ≈ 223.6
-  const scores = {} as Record<TotemAnimalId, number>;
-
-  (Object.entries(TOTEM_RESULTS) as [TotemAnimalId, TotemResult][]).forEach(([id, totem]) => {
-    const dist = Math.sqrt(
-      DIMS.reduce((acc, d) => acc + Math.pow(dimensionScores[d] - totem.profilDimensions[d], 2), 0)
-    );
-    scores[id] = Math.round((1 - dist / MAX_DIST) * 100);
-  });
-
-  // 4. Tri décroissant par score de similarité
-  const sorted = (Object.entries(scores) as [TotemAnimalId, number][]).sort((a, b) => b[1] - a[1]);
-  const primary = sorted[0][0];
-  const primaryProfile = TOTEM_RESULTS[primary].profilDimensions;
-
-  // 5. Totem secondaire : profil suffisamment distinct (≥ 2 dims écartées de > 20 pts)
-  let secondary = sorted[1][0];
-  for (let i = 1; i < sorted.length; i++) {
-    const candidate = sorted[i][0];
-    const candidateProfile = TOTEM_RESULTS[candidate].profilDimensions;
-    const largeDiffs = DIMS.filter(
-      (d) => Math.abs(primaryProfile[d] - candidateProfile[d]) > 20
-    ).length;
-    if (largeDiffs >= 2) {
-      secondary = candidate;
-      break;
+  for (const question of QUIZ_QUESTIONS) {
+    const answer = answers[question.id];
+    if (!Number.isInteger(answer) || answer < 1 || answer > 5) {
+      throw new Error(`A valid answer from 1 to 5 is required for question ${question.id}.`);
     }
+    dimRaw[question.dimension] += question.reversed ? 6 - answer : answer;
+    dimCount[question.dimension] += 1;
   }
 
-  return { primary, secondary, scores, dimensionScores };
+  const dimensionScores = {} as Record<Dim, number>;
+  for (const dimension of DIMS) {
+    const count = dimCount[dimension];
+    if (count === 0) throw new Error(`No quiz questions are configured for axis ${dimension}.`);
+    dimensionScores[dimension] = Math.round(
+      ((dimRaw[dimension] - count) / (count * 4)) * 100,
+    );
+  }
+
+  const maxDistance = Math.sqrt(DIMS.length * 100 * 100);
+  const rankings = candidates.map((plant) => {
+    const profile = derivePlantProfile(plant);
+    const distance = Math.sqrt(
+      DIMS.reduce(
+        (sum, dimension) => sum + (dimensionScores[dimension] - profile[dimension]) ** 2,
+        0,
+      ),
+    );
+    return {
+      id: plant.id,
+      score: Math.max(0, Math.min(100, 100 * (1 - distance / maxDistance))),
+    };
+  }).sort((a, b) => b.score - a.score || a.id.localeCompare(b.id));
+
+  const scores = Object.fromEntries(
+    rankings.map(({ id, score }) => [id, Math.round(score)]),
+  ) as Record<PlantId, number>;
+  const primary = rankings[0];
+  const secondary = rankings[1] ?? primary;
+
+  return {
+    primary: primary.id,
+    secondary: secondary.id,
+    primaryScore: Math.round(primary.score),
+    secondaryScore: Math.round(secondary.score),
+    scores,
+    dimensionScores,
+  };
 }
