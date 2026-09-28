@@ -166,89 +166,92 @@ function PlantImageViewer({
       onRequestClose={onClose}
       testID="plant-image-viewer"
     >
-      <View
-        style={[
-          styles.viewerContainer,
-          { backgroundColor, paddingTop: topInset, paddingBottom: bottomInset },
-        ]}
-      >
-        <View style={styles.viewerHeader}>
-          <Pressable
-            accessibilityRole="button"
-            accessibilityLabel="Fermer l’image"
-            testID="plant-image-viewer-close"
-            onPress={onClose}
-            style={styles.viewerIconButton}
-          >
-            <SacredIcon name="close" size={22} color={foregroundColor} />
-          </Pressable>
-          <Text style={[styles.viewerTitle, { color: foregroundColor }]} numberOfLines={1}>
-            {plantName}
-          </Text>
-          <View style={styles.viewerHeaderSpacer} />
-        </View>
-
+      {visible ? (
         <View
-          testID="plant-image-viewer-stage"
-          style={styles.viewerStage}
-          {...panResponder.panHandlers}
+          style={[
+            styles.viewerContainer,
+            { backgroundColor, paddingTop: topInset, paddingBottom: bottomInset },
+          ]}
         >
-          <View
-            style={[
-              styles.viewerImageFrame,
-              {
-                width: imageSize,
-                height: imageSize,
-                transform: [
-                  { translateX: offset.x },
-                  { translateY: offset.y },
-                  { scale },
-                ],
-              },
-            ]}
-          >
-            {source ? (
-              <Image source={source} resizeMode="contain" style={styles.viewerImage} />
-            ) : (
-              <View style={styles.viewerFallback}>
-                <SacredIcon name={fallbackIcon} size={88} color={accentColor} />
-                <Text style={[styles.viewerFallbackText, { color: foregroundColor }]}>
-                  Illustration indisponible
-                </Text>
-              </View>
-            )}
-          </View>
-        </View>
-
-        <View style={styles.viewerFooter}>
-          <Text style={[styles.viewerHint, { color: foregroundColor }]}>
-            Pincez pour zoomer · Faites glisser pour déplacer
-          </Text>
-          <View style={styles.viewerControls}>
+          <View style={styles.viewerHeader}>
             <Pressable
               accessibilityRole="button"
-              accessibilityLabel="Réduire l’image"
-              testID="plant-image-zoom-out"
-              onPress={() => zoomBy(-0.5)}
+              accessibilityLabel="Fermer l’image"
+              testID="plant-image-viewer-close"
+              onPress={onClose}
               style={styles.viewerIconButton}
             >
-              <Text style={[styles.viewerZoomSymbol, { color: foregroundColor }]}>−</Text>
+              <SacredIcon name="close" size={22} color={foregroundColor} />
             </Pressable>
-            <Text style={[styles.viewerZoomValue, { color: accentColor }]}>
-              {Math.round(scale * 100)}%
+            <Text style={[styles.viewerTitle, { color: foregroundColor }]} numberOfLines={1}>
+              {plantName}
             </Text>
-            <Pressable
-              accessibilityRole="button"
-              accessibilityLabel="Agrandir l’image"
-              testID="plant-image-zoom-in"
-              onPress={() => zoomBy(0.5)}
-              style={styles.viewerIconButton}
+            <View style={styles.viewerHeaderSpacer} />
+          </View>
+
+          <View
+            testID="plant-image-viewer-stage"
+            style={styles.viewerStage}
+            {...panResponder.panHandlers}
+          >
+            <View
+              testID="plant-image-viewer-image"
+              style={[
+                styles.viewerImageFrame,
+                {
+                  width: imageSize,
+                  height: imageSize,
+                  transform: [
+                    { translateX: offset.x },
+                    { translateY: offset.y },
+                    { scale },
+                  ],
+                },
+              ]}
             >
-              <SacredIcon name="plus" size={22} color={foregroundColor} />
-            </Pressable>
+              {source ? (
+                <Image source={source} resizeMode="contain" style={styles.viewerImage} />
+              ) : (
+                <View style={styles.viewerFallback}>
+                  <SacredIcon name={fallbackIcon} size={88} color={accentColor} />
+                  <Text style={[styles.viewerFallbackText, { color: foregroundColor }]}>
+                    Illustration indisponible
+                  </Text>
+                </View>
+              )}
+            </View>
+          </View>
+
+          <View style={styles.viewerFooter}>
+            <Text style={[styles.viewerHint, { color: foregroundColor }]}>
+              Pincez pour zoomer · Faites glisser pour déplacer
+            </Text>
+            <View style={styles.viewerControls}>
+              <Pressable
+                accessibilityRole="button"
+                accessibilityLabel="Réduire l’image"
+                testID="plant-image-zoom-out"
+                onPress={() => zoomBy(-0.5)}
+                style={styles.viewerIconButton}
+              >
+                <Text style={[styles.viewerZoomSymbol, { color: foregroundColor }]}>−</Text>
+              </Pressable>
+              <Text style={[styles.viewerZoomValue, { color: accentColor }]}>
+                {Math.round(scale * 100)}%
+              </Text>
+              <Pressable
+                accessibilityRole="button"
+                accessibilityLabel="Agrandir l’image"
+                testID="plant-image-zoom-in"
+                onPress={() => zoomBy(0.5)}
+                style={styles.viewerIconButton}
+              >
+                <SacredIcon name="plus" size={22} color={foregroundColor} />
+              </Pressable>
+            </View>
           </View>
         </View>
-      </View>
+      ) : null}
     </Modal>
   );
 }
