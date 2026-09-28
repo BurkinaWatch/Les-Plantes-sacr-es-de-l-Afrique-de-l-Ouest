@@ -43,7 +43,7 @@ export default function HomeScreen() {
   const { t } = useTranslation();
 
   const { width, height } = useWindowDimensions();
-  const heroHeight = Math.round(height * 0.72);
+  const heroHeight = Math.min(Math.max(Math.round(height * 0.3), 235), 300);
 
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const slideAnim = useRef(new Animated.Value(30)).current;
@@ -103,7 +103,7 @@ export default function HomeScreen() {
   const GRID_GAP = isTablet ? 14 : 10;
   const SECTION_PAD = 20;
   const cardWidth = Math.floor((width - SECTION_PAD * 2 - GRID_GAP) / 2);
-  const cardHeight = Math.round(cardWidth * 1.18);
+  const cardHeight = Math.round(cardWidth * 1.02);
 
   const topPad = Platform.OS === 'web' ? Math.max(insets.top, 67) : insets.top;
 
@@ -160,13 +160,6 @@ export default function HomeScreen() {
         </Animated.View>
       </ImageBackground>
 
-      <View style={[styles.section, { paddingHorizontal: 20 }]}>
-        <Animated.View style={{ opacity: fadeAnim }}>
-          <Text style={[styles.sectionLabel, { color: colors.gold }]}>{t.home_wisdom_today}</Text>
-          <QuoteCard quote={dailyQuote} />
-        </Animated.View>
-      </View>
-
       <View style={[styles.featuredSection, { backgroundColor: colors.featureSurface }]}>
         <Text style={[styles.sectionLabel, { color: colors.gold }]}>{t.home_sacred_animals_label}</Text>
         <Text style={[styles.sectionTitle, { color: colors.ivory }]}>{t.home_guardians}</Text>
@@ -184,15 +177,14 @@ export default function HomeScreen() {
                 <View style={[styles.featuredCardContent, { backgroundColor: colors.card }]}>
                   {imageSource ? (
                     <>
-                      <Image source={imageSource} style={styles.featuredBackdrop} resizeMode="cover" blurRadius={8} fadeDuration={0} />
                       <Image source={imageSource} style={styles.featuredImage} resizeMode="contain" fadeDuration={0} />
                     </>
                   ) : (
                     <LinearGradient colors={[plante.couleur, plante.couleurSecondaire]} style={StyleSheet.absoluteFill} />
                   )}
                   <LinearGradient
-                    colors={['rgba(12,9,5,0.14)', 'rgba(12,9,5,0.05)', 'rgba(12,9,5,0.88)']}
-                    locations={[0, 0.5, 1]}
+                    colors={['rgba(12,9,5,0.02)', 'rgba(12,9,5,0.04)', 'rgba(12,9,5,0.94)']}
+                    locations={[0, 0.46, 1]}
                     style={StyleSheet.absoluteFill}
                   />
                   <View style={styles.featuredTextBlock}>
@@ -242,6 +234,13 @@ export default function HomeScreen() {
           </View>
         ))}
       </View>
+
+      <View style={[styles.section, { paddingHorizontal: 20 }]}>
+        <Animated.View style={{ opacity: fadeAnim }}>
+          <Text style={[styles.sectionLabel, { color: colors.gold }]}>{t.home_wisdom_today}</Text>
+          <QuoteCard quote={dailyQuote} />
+        </Animated.View>
+      </View>
     </ScrollView>
   );
 }
@@ -263,17 +262,17 @@ const styles = StyleSheet.create({
   },
 
   logoWrapper: {
-    width: 78,
-    height: 78,
-    marginBottom: 8,
+    width: 58,
+    height: 58,
+    marginBottom: 5,
     alignItems: 'center',
     justifyContent: 'center',
   },
   logoGlowOuter: {
     position: 'absolute',
-    width: 96,
-    height: 96,
-    borderRadius: 48,
+    width: 74,
+    height: 74,
+    borderRadius: 37,
     backgroundColor: 'rgba(200,160,32,0.16)',
     ...Platform.select({
       web: { boxShadow: '0 0 28px 14px rgba(200,160,32,0.28)' },
@@ -281,41 +280,41 @@ const styles = StyleSheet.create({
   },
   logoGlowInner: {
     position: 'absolute',
-    width: 86,
-    height: 86,
-    borderRadius: 43,
+    width: 66,
+    height: 66,
+    borderRadius: 33,
     borderWidth: 1,
     borderColor: 'rgba(200,160,32,0.38)',
     backgroundColor: 'rgba(92,122,62,0.12)',
   },
   heroLogo: {
-    width: 78,
-    height: 78,
-    borderRadius: 14,
+    width: 58,
+    height: 58,
+    borderRadius: 12,
     ...Platform.select({
       web: { filter: 'brightness(1.1) saturate(1.1) drop-shadow(0 0 10px rgba(200,160,32,0.50))' },
     }),
   },
   logoMoonOverlay: {
     position: 'absolute',
-    width: 78,
-    height: 78,
-    borderRadius: 14,
+    width: 58,
+    height: 58,
+    borderRadius: 12,
     backgroundColor: 'rgba(200,160,32,0.08)',
   },
 
   logoRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 8,
-    marginBottom: 6,
+    gap: 6,
+    marginBottom: 4,
     width: '100%',
   },
   logoDivider: { height: 1, flex: 1, opacity: 0.8 },
   logoSub: {
-    fontSize: 11,
+    fontSize: 10,
     fontWeight: '800',
-    letterSpacing: 3,
+    letterSpacing: 2,
     ...Platform.select({
       web: { textShadow: '0px 1px 4px rgba(0,0,0,0.6)' },
       default: {
@@ -326,7 +325,7 @@ const styles = StyleSheet.create({
     }),
   },
   title: {
-    fontSize: 36,
+    fontSize: 28,
     fontWeight: '900',
     letterSpacing: -0.5,
     textAlign: 'center',
@@ -344,16 +343,16 @@ const styles = StyleSheet.create({
     width: 48,
     height: 2,
     borderRadius: 2,
-    marginTop: 6,
-    marginBottom: 6,
+    marginTop: 4,
+    marginBottom: 4,
     opacity: 0.8,
   },
   westBadge: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 10,
-    paddingHorizontal: 16,
-    paddingVertical: 6,
+    gap: 8,
+    paddingHorizontal: 12,
+    paddingVertical: 4,
     borderWidth: 1,
     borderRadius: 6,
   },
@@ -364,13 +363,13 @@ const styles = StyleSheet.create({
     opacity: 0.7,
   },
   titleSub: {
-    fontSize: 13,
+    fontSize: 11,
     fontWeight: '700',
-    letterSpacing: 5,
+    letterSpacing: 3,
     textAlign: 'center',
   },
   section: {
-    marginTop: 32,
+    marginTop: 24,
     gap: 12,
   },
   sectionLabel: {
@@ -385,11 +384,11 @@ const styles = StyleSheet.create({
     marginTop: -4,
   },
   featuredSection: {
-    marginTop: 32,
+    marginTop: 14,
     paddingHorizontal: 20,
-    paddingTop: 24,
-    paddingBottom: 20,
-    gap: 12,
+    paddingTop: 18,
+    paddingBottom: 18,
+    gap: 10,
   },
   featuredGrid: {
     flexDirection: 'row',
@@ -404,28 +403,20 @@ const styles = StyleSheet.create({
     flex: 1,
     position: 'relative',
   },
-  featuredBackdrop: {
+  featuredImage: {
     position: 'absolute',
     top: 0,
     right: 0,
     bottom: 0,
     left: 0,
-    opacity: 0.5,
-  },
-  featuredImage: {
-    position: 'absolute',
-    top: 6,
-    right: 6,
-    bottom: 52,
-    left: 6,
   },
   featuredTextBlock: {
     position: 'absolute',
     right: 0,
     bottom: 0,
     left: 0,
-    paddingHorizontal: 11,
-    paddingBottom: 12,
+    paddingHorizontal: 10,
+    paddingBottom: 10,
   },
   featuredNom: { fontSize: 15, fontWeight: '800', letterSpacing: 0.3 },
   featuredNomTablet: { fontSize: 19 },
@@ -436,13 +427,13 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     paddingHorizontal: 18,
-    paddingVertical: 15,
+    paddingVertical: 13,
     borderRadius: 10,
   },
   ctaText: { fontSize: 14, fontWeight: '700', letterSpacing: 0.2 },
   quizButton: {
     alignItems: 'center',
-    paddingVertical: 16,
+    paddingVertical: 13,
     borderRadius: 16,
     borderWidth: 1.5,
   },
@@ -450,16 +441,16 @@ const styles = StyleSheet.create({
   statsRow: {
     flexDirection: 'row',
     gap: 12,
-    marginTop: 24,
+    marginTop: 16,
     marginBottom: 8,
   },
   statItem: {
     flex: 1,
     alignItems: 'center',
-    paddingVertical: 16,
+    paddingVertical: 12,
     borderRadius: 14,
     borderWidth: 1,
   },
-  statValue: { fontSize: 28, fontWeight: '800' },
+  statValue: { fontSize: 24, fontWeight: '800' },
   statLabel: { fontSize: 10, marginTop: 2, textAlign: 'center', letterSpacing: 0.3, fontWeight: '500' },
 });
