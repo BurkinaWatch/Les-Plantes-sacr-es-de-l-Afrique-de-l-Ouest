@@ -160,6 +160,13 @@ export default function HomeScreen() {
         </Animated.View>
       </ImageBackground>
 
+      <View style={[styles.section, { paddingHorizontal: 20 }]}>
+        <Animated.View style={{ opacity: fadeAnim }}>
+          <Text style={[styles.sectionLabel, { color: colors.gold }]}>{t.home_wisdom_today}</Text>
+          <QuoteCard quote={dailyQuote} />
+        </Animated.View>
+      </View>
+
       <View style={[styles.featuredSection, { backgroundColor: colors.featureSurface }]}>
         <Text style={[styles.sectionLabel, { color: colors.gold }]}>{t.home_sacred_animals_label}</Text>
         <Text style={[styles.sectionTitle, { color: colors.ivory }]}>{t.home_guardians}</Text>
@@ -233,13 +240,6 @@ export default function HomeScreen() {
             <Text style={[styles.statLabel, { color: colors.mutedForeground }]}>{stat.label}</Text>
           </View>
         ))}
-      </View>
-
-      <View style={[styles.section, { paddingHorizontal: 20 }]}>
-        <Animated.View style={{ opacity: fadeAnim }}>
-          <Text style={[styles.sectionLabel, { color: colors.gold }]}>{t.home_wisdom_today}</Text>
-          <QuoteCard quote={dailyQuote} />
-        </Animated.View>
       </View>
     </ScrollView>
   );
