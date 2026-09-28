@@ -20,6 +20,10 @@ const supersededRegistryIdAliases = new Map([
   ["mangifera-indica", "manguier"],
 ]);
 
+function read(filePath) {
+  return fs.readFileSync(filePath, "utf8");
+}
+
 function normalizeAssetId(value) {
   return value
     .normalize("NFD")
