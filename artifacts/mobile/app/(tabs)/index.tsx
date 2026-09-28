@@ -422,6 +422,8 @@ const styles = StyleSheet.create({
     right: 0,
     bottom: 0,
     left: 0,
+    width: '100%',
+    height: '100%',
     opacity: 0.42,
     transform: [{ scale: 1.08 }],
   },
@@ -432,6 +434,8 @@ const styles = StyleSheet.create({
     right: 0,
     bottom: 0,
     left: 0,
+    width: '100%',
+    height: '100%',
   },
   featuredImageGradient: {
     zIndex: 2,
