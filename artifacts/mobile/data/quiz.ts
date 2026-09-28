@@ -1,5 +1,7 @@
 import { PLANTS, type Plante } from './animals';
 
+export { PLANTS };
+
 // Quiz éditorial de réflexion, non un test psychométrique ou un diagnostic
 // spirituel. Les axes sont rapprochés des valeurs écrites dans les fiches.
 
