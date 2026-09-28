@@ -1,0 +1,252 @@
+
+Tu travailles actuellement sur une application web appartenant à l'écosystème SOTYSSI.
+SOTYSSI est la maison mère / marque ombrelle qui conçoit et développe plusieurs produits numériques.
+Signature officielle :
+SOTYSSI
+« Nous Construisons ce qui connecte »
+L'identité de SOTYSSI repose notamment sur l'idée de croisée des chemins / carrefour, qui symbolise la rencontre des personnes, des idées, des cultures, des communautés et des opportunités.
+L'application sur laquelle tu travailles est donc un produit de SOTYSSI, mais elle doit conserver sa propre identité visuelle et son propre branding.
+
+OBJECTIF
+Intégrer proprement la marque SOTYSSI comme maison mère de cette application.
+L'intégration doit être :
+professionnelle ;
+discrète ;
+cohérente avec le design existant ;
+responsive ;
+accessible ;
+adaptée au web desktop et mobile ;
+cohérente avec une véritable architecture de marque ;
+facilement réutilisable sur les futures applications SOTYSSI.
+IMPORTANT : SOTYSSI ne doit pas remplacer ou écraser l'identité propre de l'application.
+L'utilisateur doit comprendre :
+« Cette application appartient à SOTYSSI »
+et non :
+« Je suis actuellement sur le site de SOTYSSI au lieu du produit. »
+
+ÉTAPE 1 — AUDIT AVANT MODIFICATION
+Avant de modifier le code :
+Analyse la structure actuelle du projet.
+Identifie le framework utilisé.
+Identifie le système de routing.
+Identifie la structure actuelle du Header.
+Identifie la structure actuelle du Footer.
+Identifie les composants UI réutilisables.
+Identifie le système de design existant.
+Identifie les fichiers contenant les logos et assets.
+Vérifie s'il existe déjà :
+un footer ;
+une section copyright ;
+une mention de propriété ;
+une page About / À propos ;
+une page Legal ;
+une page Terms ;
+une page Privacy ;
+une page Contact ;
+une page d'information sur l'application.
+Vérifie également la version mobile.
+Ne modifie rien pendant cette première phase d'audit.
+Présente brièvement tes conclusions avant de commencer les modifications si une décision importante est nécessaire.
+
+ÉTAPE 2 — ARCHITECTURE DE MARQUE
+L'application doit être présentée comme :
+[NOM DE L'APPLICATION]
+Un produit SOTYSSI
+ou, selon le contexte :
+A SOTYSSI product
+Le branding principal reste celui de l'application.
+SOTYSSI intervient comme marque ombrelle / maison mère.
+Ne crée pas de nouvelle navigation principale vers SOTYSSI sauf si l'architecture existante le justifie réellement.
+
+ÉTAPE 3 — FOOTER PRINCIPAL
+Si l'application possède déjà un footer, améliore-le sans casser sa structure actuelle.
+Si elle n'en possède pas, crée un footer professionnel.
+La présence SOTYSSI doit normalement être placée dans la partie basse de la page d'accueil et/ou dans le footer global.
+Créer une zone de marque similaire à :
+SOTYSSI
+Nous Construisons ce qui connecte
+Puis une mention discrète du type :
+© [année courante] SOTYSSI. Tous droits réservés.
+ou, lorsque cela est juridiquement plus pertinent :
+© [année courante] [Nom de l'application]. Un produit SOTYSSI.
+Choisis la formulation la plus cohérente avec la structure juridique et les informations déjà présentes dans le projet. N'invente aucune information juridique.
+L'année doit être générée dynamiquement afin qu'elle se mette automatiquement à jour.
+
+ÉTAPE 4 — LOGO SOTYSSI
+Utilise le véritable logo SOTYSSI fourni dans les assets du projet s'il existe déjà.
+Avant de créer un nouvel asset :
+recherche les fichiers existants ;
+vérifie PNG, SVG, WebP et autres formats ;
+identifie la version avec transparence ;
+identifie séparément, si disponibles :
+le symbole ;
+le logotype ;
+la version complète ;
+la version monochrome.
+Ne recrée pas artificiellement le logo avec du texte HTML si un véritable asset existe.
+Si plusieurs versions existent, choisis celle qui correspond le mieux au fond et au contexte du footer.
+
+ÉTAPE 5 — HIÉRARCHIE VISUELLE
+La hiérarchie doit être claire :
+1. Produit
+L'application reste la marque principale.
+2. SOTYSSI
+SOTYSSI est présenté comme la maison mère.
+3. Signature
+« Nous Construisons ce qui connecte » reste secondaire.
+Le logo SOTYSSI ne doit donc pas avoir une taille comparable au logo principal de l'application dans le footer.
+Il doit être suffisamment visible pour être reconnu, mais suffisamment discret pour ne pas détourner l'attention.
+
+ÉTAPE 6 — DESIGN DU FOOTER
+Respecte impérativement le design system existant.
+Ne crée PAS un footer générique de type "AI-generated website".
+Évite notamment :
+les gradients inutiles ;
+les énormes logos ;
+les cartes décoratives ;
+les effets glassmorphism gratuits ;
+les ombres excessives ;
+les animations permanentes ;
+les icônes génériques inutiles ;
+les polices fantaisistes ;
+les éléments décoratifs qui ne correspondent pas à l'application.
+Le footer doit donner l'impression qu'il a toujours fait partie du produit.
+
+ÉTAPE 7 — RESPONSIVE
+Le résultat doit être parfaitement adapté :
+desktop ;
+tablette ;
+mobile ;
+petits écrans.
+Sur mobile :
+le logo SOTYSSI doit rester lisible ;
+la signature ne doit pas être trop petite ;
+le copyright doit rester lisible ;
+éviter tout débordement horizontal ;
+éviter les éléments compressés ;
+conserver des espacements propres.
+Si nécessaire, adapter la disposition du footer plutôt que simplement réduire tous les éléments.
+
+ÉTAPE 8 — AUTRES EMPLACEMENTS
+Après avoir intégré SOTYSSI dans le footer, inspecte l'ensemble de l'application pour déterminer si une présence supplémentaire est pertinente.
+Envisage notamment :
+Page d'accueil
+Footer / zone de propriété.
+Page À propos
+Mention claire de SOTYSSI comme maison mère.
+Pages légales
+Lorsque juridiquement pertinent, conserver les informations de propriété déjà présentes et ajouter SOTYSSI uniquement si les informations du projet le permettent.
+Écran de chargement / splash
+Uniquement si cela correspond naturellement à l'architecture du produit.
+Page "À propos de l'application"
+Possible mention :
+[APPLICATION]
+Un produit SOTYSSI.
+Pages internes
+Ne pas ajouter automatiquement SOTYSSI partout.
+Ne pas sur-brandinguer l'application.
+
+ÉTAPE 9 — COMPOSANT RÉUTILISABLE
+Si l'architecture du projet le permet, créer un composant réutilisable du type :
+SotyssiBranding
+ou
+SotyssiFooter
+ou une structure équivalente cohérente avec les conventions existantes du projet.
+Le composant doit permettre de réutiliser facilement l'identité SOTYSSI dans d'autres produits de l'écosystème.
+Prévoir si pertinent des variantes :
+full : logo + signature ;
+compact : logo uniquement ;
+footer : logo + signature + copyright ;
+symbol : symbole seul.
+Ne crée ces variantes que si elles sont réellement utiles à l'architecture du projet.
+
+ÉTAPE 10 — ACCESSIBILITÉ
+Respecter les bonnes pratiques :
+alt pertinent pour le logo ;
+contraste suffisant ;
+navigation clavier ;
+aucune information essentielle uniquement basée sur la couleur ;
+tailles de texte lisibles ;
+liens clairement identifiables ;
+aucun élément interactif uniquement accessible au survol.
+Si le logo est décoratif dans certains contextes, utiliser correctement l'attribut alt selon son usage.
+
+ÉTAPE 11 — PERFORMANCE
+Le branding SOTYSSI ne doit pas dégrader les performances.
+Vérifier :
+poids du logo ;
+format d'image ;
+chargement ;
+dimensions ;
+lazy loading lorsque pertinent ;
+absence de duplication inutile des assets.
+Si un SVG officiel optimisé existe, privilégie-le lorsque cela ne dégrade pas la qualité du logo.
+Ne convertis pas automatiquement le logo en une image lourde si une version vectorielle propre est disponible.
+
+ÉTAPE 12 — SEO
+Ne pas transformer la présence de SOTYSSI en contenu SEO artificiel.
+Si une page "À propos" existe, la relation entre l'application et SOTYSSI peut être expliquée naturellement.
+Ne pas ajouter de mots-clés artificiels du type :
+SOTYSSI Burkina Faso application technologie digitale africaine...
+uniquement pour le référencement.
+
+ÉTAPE 13 — COPYRIGHT
+Utiliser automatiquement l'année courante.
+Exemple :
+© 2026 SOTYSSI. Tous droits réservés.
+Mais si l'application possède déjà une structure juridique ou une entité propriétaire explicitement définie dans le projet, ne la remplace pas arbitrairement par SOTYSSI.
+SOTYSSI est ici la marque maison mère / marque ombrelle.
+Respecter les informations juridiques réellement présentes dans le projet.
+
+ÉTAPE 14 — NE RIEN CASSER
+Cette intégration doit être NON DESTRUCTIVE.
+Ne supprime :
+aucune fonctionnalité existante ;
+aucun lien existant ;
+aucun élément légal existant ;
+aucun branding existant ;
+aucun composant utilisé ailleurs ;
+aucune route ;
+aucune logique métier.
+Ne modifie pas la logique backend.
+Ne modifie pas la base de données.
+Ne modifie pas l'authentification.
+Ne modifie pas les API.
+Ne modifie pas les paiements.
+Ne modifie pas les fonctionnalités de l'application qui n'ont aucun rapport avec cette tâche.
+
+ÉTAPE 15 — VÉRIFICATION FINALE
+Après implémentation :
+Lance le build.
+Vérifie qu'il n'y a aucune erreur TypeScript.
+Vérifie qu'il n'y a aucune erreur ESLint si ESLint est utilisé.
+Vérifie le rendu desktop.
+Vérifie le rendu mobile.
+Vérifie le footer sur les principales pages.
+Vérifie les liens.
+Vérifie que le logo ne déborde jamais.
+Vérifie que la signature est lisible.
+Vérifie que l'année du copyright est dynamique.
+Vérifie que le branding principal de l'application reste dominant.
+Vérifie qu'aucun élément existant n'a été cassé.
+
+RÈGLE IMPORTANTE
+Ne fais pas de SOTYSSI un élément décoratif ajouté artificiellement.
+L'objectif est de construire progressivement une architecture de marque cohérente :
+SOTYSSI
+→ maison mère
+[APPLICATION ACTUELLE]
+→ produit
+Ainsi, dans le futur, d'autres applications pourront utiliser exactement la même logique :
+SOTYSSI → Produit A
+SOTYSSI → Produit B
+SOTYSSI → Produit C
+Le résultat doit être suffisamment professionnel pour être considéré comme l'identité d'une véritable maison de produits numériques.
+À la fin, fournis un rapport court indiquant :
+ce que tu as trouvé ;
+ce que tu as modifié ;
+les fichiers modifiés ;
+les assets SOTYSSI utilisés ;
+les emplacements où SOTYSSI a été intégré ;
+les éventuelles recommandations ;
+le résultat du build et des vérifications.
