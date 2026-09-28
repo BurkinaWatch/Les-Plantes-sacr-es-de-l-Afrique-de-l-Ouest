@@ -11,6 +11,7 @@ const sources = [
   "data/plantes-medicinales.ts",
   "data/articles.ts",
   "data/animals.ts",
+  "data/quiz.ts",
 ];
 
 fs.rmSync(outputRoot, { recursive: true, force: true });
