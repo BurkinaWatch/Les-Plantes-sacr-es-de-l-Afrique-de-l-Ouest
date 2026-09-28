@@ -315,10 +315,10 @@ export default function QuizScreen() {
           </View>
 
           <View style={[styles.card, { backgroundColor: colors.gold + '10', borderColor: colors.gold + '35' }]}>
-            <Text style={[styles.cardLabel, { color: colors.gold }]}>PRATIQUE D’ANCRAGE</Text>
+            <Text style={[styles.cardLabel, { color: colors.gold }]}>QUESTION DE RÉFLEXION</Text>
             <Text style={[styles.cardText, { color: colors.ivory }]}>{TOTEM_REFLECTIONS[result.primary]}</Text>
             <Text style={[styles.sourceText, { color: colors.mutedForeground }]}>
-              Proposition de réflexion inspirée par les relations au vivant documentées dans les sources, pas une prescription rituelle.
+              Piste éditoriale tirée de la fiche de cette plante, pas une prescription rituelle ni un diagnostic.
             </Text>
           </View>
 
@@ -344,7 +344,7 @@ export default function QuizScreen() {
 
           <LinearGradient colors={[totem.couleur + '40', colors.card]} style={[styles.mantraCard, { borderColor: totem.couleur + '60' }]}>
             <Text style={[styles.mantraLabel, { color: totem.couleur }]}>{t.quiz_result_mantra_label}</Text>
-            <Text style={[styles.mantraText, { color: colors.ivory }]}>"{totem.mantra}"</Text>
+            <Text style={[styles.mantraText, { color: colors.ivory }]}>"{totem.citation}"</Text>
           </LinearGradient>
 
           <View style={[styles.card, { backgroundColor: secondary.couleur + '15', borderColor: secondary.couleur + '40' }]}>

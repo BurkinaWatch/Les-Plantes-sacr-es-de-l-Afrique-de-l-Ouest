@@ -133,7 +133,7 @@ export default function MaPlanteScreen() {
           style={[styles.mantraCard, { borderColor: primaryTotem.couleur + '60' }]}
         >
           <Text style={[styles.mantraLabel, { color: primaryTotem.couleur }]}>{t.my_animal_daily_mantra}</Text>
-          <Text style={[styles.mantraText, { color: colors.ivory }]}>"{primaryTotem.mantra}"</Text>
+          <Text style={[styles.mantraText, { color: colors.ivory }]}>"{primaryTotem.citation}"</Text>
         </LinearGradient>
 
         {primaryPlante && (

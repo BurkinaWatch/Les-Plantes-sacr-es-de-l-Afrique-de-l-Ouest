@@ -1,15 +1,15 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import React, { createContext, useCallback, useContext, useEffect, useState } from 'react';
 
-import type { TotemAnimalId } from '@/data/quiz';
+import type { PlantId } from '@/data/quiz';
 import { getQuoteDuJour } from '@/data/quotes';
 import type { Quote } from '@/data/quotes';
 
 interface QuizResult {
-  primary: TotemAnimalId;
-  secondary: TotemAnimalId;
+  primary: PlantId;
+  secondary: PlantId;
   completedAt: string;
-  scores?: Record<TotemAnimalId, number>;
+  scores?: Record<PlantId, number>;
   dimensionScores?: Record<'E' | 'O' | 'C' | 'A' | 'S', number>;
 }
 
