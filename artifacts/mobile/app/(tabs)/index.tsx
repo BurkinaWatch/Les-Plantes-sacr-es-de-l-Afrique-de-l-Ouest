@@ -204,7 +204,7 @@ export default function HomeScreen() {
                   <LinearGradient
                     colors={['rgba(12,9,5,0)', 'rgba(12,9,5,0.08)', 'rgba(12,9,5,0.74)']}
                     locations={[0.32, 0.55, 1]}
-                    style={StyleSheet.absoluteFill}
+                    style={[StyleSheet.absoluteFill, styles.featuredImageGradient]}
                   />
                   <View style={styles.featuredTextBlock}>
                     <Text style={[styles.featuredNom, isTablet && styles.featuredNomTablet, { color: colors.ivory }]} numberOfLines={2}>{plante.nom}</Text>
@@ -416,6 +416,7 @@ const styles = StyleSheet.create({
     position: 'relative',
   },
   featuredImageBackdrop: {
+    zIndex: 0,
     position: 'absolute',
     top: 0,
     right: 0,
@@ -425,13 +426,18 @@ const styles = StyleSheet.create({
     transform: [{ scale: 1.08 }],
   },
   featuredImageForeground: {
+    zIndex: 1,
     position: 'absolute',
     top: 0,
     right: 0,
     bottom: 0,
     left: 0,
   },
+  featuredImageGradient: {
+    zIndex: 2,
+  },
   featuredTextBlock: {
+    zIndex: 3,
     position: 'absolute',
     right: 0,
     bottom: 0,
