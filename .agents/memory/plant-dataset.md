@@ -37,16 +37,16 @@ rebuild the asset map. Before assuming a real bug, verify ids↔keys↔files all
 (they did: 77/77) — if they do, it is a cache/build staleness issue, not code.
 
 ## Plant image framing
-Home featured cards use full-bleed imagery with the name and description overlaid
-directly on the picture; keep the caption transparent and use only a subtle lower
-gradient and text shadow for contrast. For detail heroes, use `contain` when the
-goal is to show the full source illustration.
+Home featured cards must show the whole source image as the sharp focal layer while
+still filling the card with a blurred, low-opacity `cover` layer behind it. Keep the
+name and description directly over the photo with a subtle lower gradient and text
+shadow, not an opaque caption band.
 
-**Why:** The owner explicitly chose the reference style: images fill each card and
-text sits on top without a solid caption band.
+**Why:** The owner wants every plant visible without leaving empty card margins, and
+explicitly chose full-bleed cards with overlaid text.
 
-**How to apply:** Use `cover` on the home card background and keep its text overlay
-transparent; reserve `contain` for views whose purpose is to show the whole image.
+**How to apply:** Layer a `contain` image above a blurred `cover` of the same source
+on home cards; use a transparent caption and retain the lower gradient.
 
 ## Note on type-checking
 `npx tsc --noEmit` in artifacts/mobile reports PRE-EXISTING errors unrelated to data

@@ -183,7 +183,21 @@ export default function HomeScreen() {
               >
                 <View style={[styles.featuredCardContent, { backgroundColor: colors.card }]}>
                   {imageSource ? (
-                    <Image source={imageSource} style={styles.featuredImage} resizeMode="cover" fadeDuration={0} />
+                    <>
+                      <Image
+                        source={imageSource}
+                        style={styles.featuredImageBackdrop}
+                        resizeMode="cover"
+                        blurRadius={14}
+                        fadeDuration={0}
+                      />
+                      <Image
+                        source={imageSource}
+                        style={styles.featuredImageForeground}
+                        resizeMode="contain"
+                        fadeDuration={0}
+                      />
+                    </>
                   ) : (
                     <LinearGradient colors={[plante.couleur, plante.couleurSecondaire]} style={StyleSheet.absoluteFill} />
                   )}
@@ -401,7 +415,16 @@ const styles = StyleSheet.create({
     flex: 1,
     position: 'relative',
   },
-  featuredImage: {
+  featuredImageBackdrop: {
+    position: 'absolute',
+    top: 0,
+    right: 0,
+    bottom: 0,
+    left: 0,
+    opacity: 0.42,
+    transform: [{ scale: 1.08 }],
+  },
+  featuredImageForeground: {
     position: 'absolute',
     top: 0,
     right: 0,

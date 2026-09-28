@@ -31,7 +31,7 @@ const PLANT_IMAGES: Record<string, any> = {
   fonio:              require('@/assets/images/plants/fonio.png'),
   ronier:             require('@/assets/images/plants/ronier.png'),
   dattier:            require('@/assets/images/plants/dattier.png'),
-  'palmier-huile':    require('@/assets/images/plants/palmier-huile.png'),
+  'palmier-huile':    require('@/assets/images/plants/palmier-huile-full-plant.png'),
   cocotier:           require('@/assets/images/plants/cocotier.png'),
 
   // Nouveaux Arbres Sacrés
