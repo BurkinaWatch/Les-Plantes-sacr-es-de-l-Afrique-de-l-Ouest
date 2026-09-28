@@ -3,6 +3,8 @@ import { Image, StyleSheet, Text, useWindowDimensions, View } from "react-native
 
 import { useColors } from "@/hooks/useColors";
 
+const LOGO_SURFACE_PADDING = 8;
+
 type SotyssiBrandingProps = {
   variant?: "footer" | "compact";
 };
@@ -44,7 +46,7 @@ export function SotyssiBranding({
           styles.logoSurface,
           {
             backgroundColor: colors.ivory,
-            width: logoWidth + styles.logoSurface.padding * 2,
+          width: logoWidth + LOGO_SURFACE_PADDING * 2,
           },
         ]}
       >
@@ -87,7 +89,7 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
   },
   logoSurface: {
-    padding: 8,
+    padding: LOGO_SURFACE_PADDING,
   },
   logo: {
     aspectRatio: 3,
