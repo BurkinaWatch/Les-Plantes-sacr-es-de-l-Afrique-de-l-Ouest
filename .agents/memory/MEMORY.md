@@ -24,3 +24,4 @@
 - [GitHub connector sync limits](github-connector-sync-limits.md) — API write permission does not authenticate local Git pushes; Replit Git Providers auth is separate
 - [SAS Pay preparation](saspay-preparation.md) — payment remains server-only and opt-in until pricing, customer data, and webhook rollout are explicitly validated
 - [Expo preview warm-up](expo-preview-warmup.md) — wait for Metro's web bundle after a restart before diagnosing blank preview captures
+- [React Native Web image sizing](rn-web-image-sizing.md) — absolute positioning may leave local images at intrinsic dimensions; constrain layered images explicitly
