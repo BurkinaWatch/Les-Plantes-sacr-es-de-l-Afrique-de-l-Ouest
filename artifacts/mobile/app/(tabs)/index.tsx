@@ -24,6 +24,11 @@ import { useColors } from '@/hooks/useColors';
 import { useTranslation } from '@/i18n';
 import PLANT_IMAGES from '@/constants/plantImages';
 
+const FEATURED_PLANT_COUNT = 4;
+const FEATURED_CHANGE_INTERVAL_MS = 9000;
+const FEATURED_FADE_OUT_MS = 350;
+const FEATURED_FADE_IN_MS = 450;
+
 function shufflePlants(plants: typeof PLANTS): typeof PLANTS {
   const shuffled = [...plants];
 
@@ -33,6 +38,15 @@ function shufflePlants(plants: typeof PLANTS): typeof PLANTS {
   }
 
   return shuffled;
+}
+
+function getFeaturedGroup(plants: typeof PLANTS, startIndex: number): typeof PLANTS {
+  if (plants.length === 0) return [];
+
+  return Array.from(
+    { length: Math.min(FEATURED_PLANT_COUNT, plants.length) },
+    (_, offset) => plants[(startIndex + offset) % plants.length],
+  );
 }
 
 export default function HomeScreen() {
@@ -50,37 +64,46 @@ export default function HomeScreen() {
   const scaleAnim = useRef(new Animated.Value(0.92)).current;
   const glowAnim = useRef(new Animated.Value(0.5)).current;
 
-  const plantsWithImages = useMemo(
-    () => PLANTS.filter((plant) => Boolean(PLANT_IMAGES[plant.id])),
-    [],
+  const featuredCycle = useMemo(() => shufflePlants(PLANTS), []);
+  const featuredStartIndexRef = useRef(0);
+  const [featuredPlantes, setFeaturedPlantes] = useState(() =>
+    getFeaturedGroup(featuredCycle, 0),
   );
-
-  const initialCycle = useMemo(() => shufflePlants(plantsWithImages), [plantsWithImages]);
-  const [featuredPlantes, setFeaturedPlantes] = useState(() => initialCycle.slice(0, 4));
-  const remainingPlantsRef = useRef(initialCycle.slice(4));
-  const hasFocusedOnceRef = useRef(false);
-
-  const showNextFeatured = useCallback(() => {
-    let remainingPlants = remainingPlantsRef.current;
-
-    if (remainingPlants.length === 0) {
-      remainingPlants = shufflePlants(plantsWithImages);
-    }
-
-    setFeaturedPlantes(remainingPlants.slice(0, 4));
-    remainingPlantsRef.current = remainingPlants.slice(4);
-  }, [plantsWithImages]);
+  const featuredCardsOpacity = useRef(new Animated.Value(1)).current;
 
   useFocusEffect(
     useCallback(() => {
-      // The initial state already contains the first group of the cycle.
-      // Advance only when the screen is focused again after being left.
-      if (hasFocusedOnceRef.current) {
-        showNextFeatured();
-      } else {
-        hasFocusedOnceRef.current = true;
-      }
-    }, [showNextFeatured]),
+      if (featuredCycle.length <= FEATURED_PLANT_COUNT) return;
+
+      let isFocused = true;
+      const intervalId = setInterval(() => {
+        Animated.timing(featuredCardsOpacity, {
+          toValue: 0,
+          duration: FEATURED_FADE_OUT_MS,
+          useNativeDriver: Platform.OS !== 'web',
+        }).start(({ finished }) => {
+          if (!finished || !isFocused) return;
+
+          const nextStartIndex =
+            (featuredStartIndexRef.current + FEATURED_PLANT_COUNT) % featuredCycle.length;
+          featuredStartIndexRef.current = nextStartIndex;
+          setFeaturedPlantes(getFeaturedGroup(featuredCycle, nextStartIndex));
+
+          Animated.timing(featuredCardsOpacity, {
+            toValue: 1,
+            duration: FEATURED_FADE_IN_MS,
+            useNativeDriver: Platform.OS !== 'web',
+          }).start();
+        });
+      }, FEATURED_CHANGE_INTERVAL_MS);
+
+      return () => {
+        isFocused = false;
+        clearInterval(intervalId);
+        featuredCardsOpacity.stopAnimation();
+        featuredCardsOpacity.setValue(1);
+      };
+    }, [featuredCardsOpacity, featuredCycle]),
   );
 
   useEffect(() => {
@@ -170,7 +193,12 @@ export default function HomeScreen() {
       <View style={[styles.featuredSection, { backgroundColor: colors.featureSurface }]}>
         <Text style={[styles.sectionLabel, { color: colors.gold }]}>{t.home_sacred_animals_label}</Text>
         <Text style={[styles.sectionTitle, { color: colors.ivory }]}>{t.home_guardians}</Text>
-        <View style={[styles.featuredGrid, { gap: GRID_GAP }]}>
+        <Animated.View
+          style={[
+            styles.featuredGrid,
+            { gap: GRID_GAP, opacity: featuredCardsOpacity },
+          ]}
+        >
           {featuredPlantes.map((plante) => {
             const imageSource = PLANT_IMAGES[plante.id];
 
@@ -214,7 +242,7 @@ export default function HomeScreen() {
               </Pressable>
             );
           })}
-        </View>
+        </Animated.View>
         <Pressable
           testID="discover-plants"
           style={({ pressed }) => [{ opacity: pressed ? 0.88 : 1 }]}
