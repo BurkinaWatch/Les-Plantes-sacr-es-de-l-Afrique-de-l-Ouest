@@ -82,6 +82,20 @@ test("Plant recognition client returns a successful mocked response", async () =
   });
 });
 
+test("Plant recognition client adds the API route prefix to a host-only base URL", async () => {
+  const mock = fakeFetch(response(200, { plant: validPlant }));
+
+  await requestPlantRecognition({
+    apiBase: "https://example.test",
+    token: "jwt-test",
+    imageBase64: "fake-image",
+    lang: "fr",
+    fetchImpl: mock.fetchImpl,
+  });
+
+  assert.equal(mock.calls[0].url, "https://example.test/api/plant-recognition");
+});
+
 test("Totem client rejects a successful response with no usable content", async () => {
   const mock = fakeFetch(response(200, { content: "  " }));
 

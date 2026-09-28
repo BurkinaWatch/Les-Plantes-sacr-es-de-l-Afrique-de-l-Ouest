@@ -87,6 +87,13 @@ export interface PlantResponse {
 
 type FetchLike = typeof fetch;
 
+function buildApiRequestUrl(apiBase: string, path: string): string {
+  const base = apiBase.replace(/\/+$/, '').replace(/\/api$/i, '');
+  const suffix = path.startsWith('/') ? path : `/${path}`;
+  const apiPath = suffix.startsWith('/api/') ? suffix : `/api${suffix}`;
+  return `${base}${apiPath}`;
+}
+
 export function parseRateLimitHeaders(response: Response): RateLimitInfo {
   const remaining = response.headers.get('RateLimit-Remaining') ?? response.headers.get('X-RateLimit-Remaining');
   const reset = response.headers.get('RateLimit-Reset') ?? response.headers.get('X-RateLimit-Reset');
@@ -108,7 +115,7 @@ async function postAiRequest<T>(
 
   let response: Response;
   try {
-    response = await fetchImpl(`${apiBase.replace(/\/$/, '')}${path}`, {
+    response = await fetchImpl(buildApiRequestUrl(apiBase, path), {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
