@@ -747,7 +747,7 @@ export const ARTICLES: Article[] = [
       {
         type: 'paragraph',
         content:
-          'Un témoignage, une vidéo de cuisine ou une page de producteurs peut orienter une enquête ethnobotanique ; cela ne confirme ni l’identité d’une plante, ni la sécurité d’une préparation, ni un effet sur la santé. En particulier, ayoyo/ademe n’est pas attribué ici à Corchorus olitorius. Une publication sociale ne justifie aucun dosage, traitement ou promesse médicale.',
+          'Un témoignage, une vidéo de cuisine ou une page de producteurs peut orienter une enquête ethnobotanique ; cela ne confirme ni l’identité de l’espèce botanique concernée, ni la sécurité d’une préparation, ni un effet sur la santé. En particulier, ayoyo/ademe n’est pas attribué ici à Corchorus olitorius. Une publication sociale ne justifie aucun dosage, traitement ou promesse médicale.',
       },
       {
         type: 'subtitle',
