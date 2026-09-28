@@ -103,7 +103,7 @@ export default function HomeScreen() {
   const GRID_GAP = isTablet ? 14 : 10;
   const SECTION_PAD = 20;
   const cardWidth = Math.floor((width - SECTION_PAD * 2 - GRID_GAP) / 2);
-  const cardHeight = Math.round(cardWidth * 1.02);
+  const cardHeight = Math.round(cardWidth * 1.22);
 
   const topPad = Platform.OS === 'web' ? Math.max(insets.top, 67) : insets.top;
 
@@ -182,19 +182,14 @@ export default function HomeScreen() {
                 testID={`featured-plant-${plante.id}`}
               >
                 <View style={[styles.featuredCardContent, { backgroundColor: colors.card }]}>
-                  {imageSource ? (
-                    <>
+                  <View style={styles.featuredImageFrame}>
+                    {imageSource ? (
                       <Image source={imageSource} style={styles.featuredImage} resizeMode="contain" fadeDuration={0} />
-                    </>
-                  ) : (
-                    <LinearGradient colors={[plante.couleur, plante.couleurSecondaire]} style={StyleSheet.absoluteFill} />
-                  )}
-                  <LinearGradient
-                    colors={['rgba(12,9,5,0.02)', 'rgba(12,9,5,0.04)', 'rgba(12,9,5,0.94)']}
-                    locations={[0, 0.46, 1]}
-                    style={StyleSheet.absoluteFill}
-                  />
-                  <View style={styles.featuredTextBlock}>
+                    ) : (
+                      <LinearGradient colors={[plante.couleur, plante.couleurSecondaire]} style={StyleSheet.absoluteFill} />
+                    )}
+                  </View>
+                  <View style={[styles.featuredTextBlock, { backgroundColor: colors.background }]}>
                     <Text style={[styles.featuredNom, isTablet && styles.featuredNomTablet, { color: colors.ivory }]} numberOfLines={2}>{plante.nom}</Text>
                     <Text style={[styles.featuredPouvoir, isTablet && styles.featuredPouvoirTablet]} numberOfLines={2}>{plante.pouvoirs[0]}</Text>
                   </View>
@@ -403,20 +398,23 @@ const styles = StyleSheet.create({
     flex: 1,
     position: 'relative',
   },
+  featuredImageFrame: {
+    flex: 1,
+    minHeight: 0,
+    position: 'relative',
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: 8,
+  },
   featuredImage: {
-    position: 'absolute',
-    top: 0,
-    right: 0,
-    bottom: 0,
-    left: 0,
+    width: '100%',
+    height: '100%',
   },
   featuredTextBlock: {
-    position: 'absolute',
-    right: 0,
-    bottom: 0,
-    left: 0,
     paddingHorizontal: 10,
+    paddingTop: 7,
     paddingBottom: 10,
+    minHeight: 76,
   },
   featuredNom: { fontSize: 15, fontWeight: '800', letterSpacing: 0.3 },
   featuredNomTablet: { fontSize: 19 },
