@@ -52,7 +52,7 @@ export function SotyssiBranding({
       >
         <Image
           source={require("@/assets/images/sotyssi-cycle.png")}
-          style={[styles.logo, { width: logoWidth }]}
+          style={[styles.logo, { width: logoWidth, height: logoWidth / 3 }]}
           resizeMode="contain"
           accessible
           accessibilityLabel="SOTYSSI — We build what connects us. People, Ideas, Culture, Opportunities."
@@ -93,7 +93,6 @@ const styles = StyleSheet.create({
   },
   logo: {
     aspectRatio: 3,
-    height: undefined,
   },
   copy: {
     alignItems: "center",
