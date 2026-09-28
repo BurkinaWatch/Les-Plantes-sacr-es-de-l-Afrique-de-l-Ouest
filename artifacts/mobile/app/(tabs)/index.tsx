@@ -17,6 +17,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { QuoteCard } from '@/components/QuoteCard';
 import { SacredIcon } from '@/components/SacredIcon';
+import { SotyssiBranding } from '@/components/SotyssiBranding';
 import { useApp } from '@/context/AppContext';
 import { PLANTS } from '@/data/animals';
 import { QUIZ_QUESTIONS } from '@/data/quiz';
@@ -281,6 +282,8 @@ export default function HomeScreen() {
           </View>
         ))}
       </View>
+
+      <SotyssiBranding />
     </ScrollView>
   );
 }

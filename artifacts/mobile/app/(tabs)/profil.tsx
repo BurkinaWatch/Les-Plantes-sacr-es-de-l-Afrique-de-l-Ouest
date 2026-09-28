@@ -16,6 +16,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { PlanteCard } from '@/components/PlanteCard';
 import { SacredIcon } from '@/components/SacredIcon';
+import { SotyssiBranding } from '@/components/SotyssiBranding';
 import { useApp } from '@/context/AppContext';
 import { useAuth } from '@/context/AuthContext';
 import { PLANTS } from '@/data/animals';
@@ -204,6 +205,7 @@ export default function ProfilScreen() {
               <Text style={[styles.infoValue, { color: colors.ivory }]}>{item.value}</Text>
             </View>
           ))}
+          <SotyssiBranding variant="compact" />
         </View>
 
         <View style={[styles.card, { backgroundColor: colors.card, borderColor: colors.border }]}>
