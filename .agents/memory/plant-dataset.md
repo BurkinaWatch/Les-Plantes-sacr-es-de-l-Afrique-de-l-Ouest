@@ -36,13 +36,18 @@ correct. Restart the `artifacts/mobile: expo` workflow (it runs with `--clear`) 
 rebuild the asset map. Before assuming a real bug, verify ids↔keys↔files all match
 (they did: 77/77) — if they do, it is a cache/build staleness issue, not code.
 
-## Full illustration display (no cropping on tablets)
-Plant images are 1:1 squares. The detail hero (`app/animal/[id].tsx`) must use
-`resizeMode="contain"` with a responsive height (`screenWidth*0.82`, clamped) and a
-subtle dark panel bg so the whole illustration shows on any device. `cover` + a
-fixed-height full-width box crops squares badly on wide/tablet screens. Thumbnail
-cards (PlanteCard, home featured grid) intentionally keep `cover` (decorative tiles
-with text overlays).
+## Plant image framing
+For plant cards, show the full source image with `contain` in a dedicated image
+region; keep titles and descriptions in a separate footer so they do not cover the
+plant. If a source image itself is a close-up and the user asks to see the whole
+plant, create a wider-framed variant and keep the original available. A display-mode
+change alone cannot reveal content that is outside the source image.
+
+**Why:** The home cards rotate through many plants, and image crops or caption
+overlays can hide the plant even when the underlying image is correct.
+
+**How to apply:** Use an uncropped image frame on list and home cards; use
+full-plant source images when the original composition is too close.
 
 ## Note on type-checking
 `npx tsc --noEmit` in artifacts/mobile reports PRE-EXISTING errors unrelated to data
