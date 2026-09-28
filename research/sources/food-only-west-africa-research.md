@@ -1,5 +1,7 @@
 # Culturally grounded, food-only recipe research
 
+> **Mise à jour du 27 septembre 2026 — limites de publication :** ce document contient des pistes de recettes issues d’une recherche antérieure, mais elles ne sont pas validées pour l’application. Les résumés Europe PMC et les identifications GBIF enregistrés dans research/sources/open-access-evidence.md appuient les fiches botaniques et alimentaires ajoutées ; ils ne suffisent pas à confirmer les recettes régionales ci-dessous. Aucune nouvelle recette n’a donc été publiée.
+
 ## Key Facts
 
 ### 1. Jute mallow / lalo (Corchorus olitorius)

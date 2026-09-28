@@ -762,7 +762,7 @@ export const ARTICLES: Article[] = [
     sourceLinks: [
       {
         title: 'Facebook — Moringa Senegal-Nebedaye, publication sur production et transformation',
-        url: 'https://www.facebook.com/MoringalSen/posts/ces-informations-sont-tirees-du-manuel-sur-la-production-et-la-transformation-du/197205320820454/',
+        url: 'https://www.facebook.com/MoringalSen/posts/ces-informations-sont-tirées-du-manuel-sur-la-production-et-la-transformation-du/197205320820454/',
         kind: 'publication sociale',
         note:
           'Résultat public indexé ; publication non ouverte et date non visible. Piste de transmission communautaire, pas preuve d’efficacité ni de sécurité.',
