@@ -117,6 +117,33 @@ const PLANT_IMAGES: Record<string, any> = {
   'sclerocarya-birrea':    require('@/assets/images/plants/sclerocarya-birrea.png'),
   'sterculia-setigera':    require('@/assets/images/plants/sterculia-setigera.png'),
   'vitex-doniana':         require('@/assets/images/plants/vitex-doniana.png'),
+
+  // Monographies botaniques complémentaires
+  'ageratum-conyzoides': require('@/assets/images/plants/ageratum-conyzoides.jpg'),
+  'butyrospermum-parkii': require('@/assets/images/plants/karite.png'),
+  'cajanus-cajan': require('@/assets/images/plants/cajanus-cajan.jpg'),
+  'cassia-alata': require('@/assets/images/plants/cassia-alata.jpg'),
+  'cassia-italica': require('@/assets/images/plants/cassia-italica.jpg'),
+  'cassia-occidentalis': require('@/assets/images/plants/cassia-occidentalis.jpg'),
+  'cassia-sieberiana': require('@/assets/images/plants/cassia-sieberiana.jpg'),
+  'catharanthus-roseus': require('@/assets/images/plants/catharanthus-roseus.jpg'),
+  'chenopodium-ambrosioides': require('@/assets/images/plants/chenopodium-ambrosioides.jpg'),
+  'chrysanthellum-americanum': require('@/assets/images/plants/chrysanthellum-americanum.jpg'),
+  'cochlospermum-tinctorium': require('@/assets/images/plants/cochlospermum-tinctorium.jpg'),
+  'combretum-glutinosum': require('@/assets/images/plants/combretum-glutinosum.jpg'),
+  'fagara-xanthoxylo': require('@/assets/images/plants/fagara-xanthoxylo.jpg'),
+  'lippia-multiflora': require('@/assets/images/plants/lippia-multiflora.jpg'),
+  'ocimum-basilicum': require('@/assets/images/plants/ocimum-basilicum.jpg'),
+  'tinospora-bakis': require('@/assets/images/plants/tinospora-bakis.jpg'),
+  'vetiveria-nigritana': require('@/assets/images/plants/vetiveria-nigritana.jpg'),
+  'morinda-lucida': require('@/assets/images/plants/morinda-lucida.jpg'),
+  'angelica-archangelica': require('@/assets/images/plants/angelica-archangelica.jpg'),
+  'betula-alba': require('@/assets/images/plants/betula-alba.jpg'),
+  'corchorus-olitorius': require('@/assets/images/plants/corchorus-olitorius.jpg'),
+  'amaranthus-cruentus': require('@/assets/images/plants/amaranthus-cruentus.jpg'),
+  'gymnanthemum-amygdalinum': require('@/assets/images/plants/vernonia.png'),
+  'thaumatococcus-daniellii': require('@/assets/images/plants/thaumatococcus-daniellii.jpg'),
+  'senegalia-macrostachya': require('@/assets/images/plants/senegalia-macrostachya.jpg'),
 };
 
 export default PLANT_IMAGES;

@@ -3,13 +3,25 @@ const path = require("node:path");
 
 const root = path.resolve(__dirname, "..");
 const catalogPlantsPath = path.join(root, "data", "animals.ts");
+const documentedPlantsPath = path.join(root, "data", "plantes-medicinales.ts");
 const complementaryPlantsPath = path.join(
   root,
   "data",
   "plantes-medicinales-complementaires.ts",
 );
+const complementaryKnowledgePlantsPath = path.join(
+  root,
+  "data",
+  "plantes-savoirs-complementaires.ts",
+);
 const plantImagesPath = path.join(root, "constants", "plantImages.ts");
 const plantImagesDirectory = path.join(root, "assets", "images", "plants");
+
+// True botanical synonyms can reuse the same illustration.
+const registryFileAliases = new Map([
+  ["butyrospermum-parkii", "karite"],
+  ["gymnanthemum-amygdalinum", "vernonia"],
+]);
 
 function read(filePath) {
   return fs.readFileSync(filePath, "utf8");
@@ -31,11 +43,11 @@ function normalizeAssetId(value) {
 function registryEntries(source) {
   const entries = new Map();
   const entryPattern =
-    /^\s*(?:(['"])(.*?)\1|([A-Za-z_$][\w$]*))\s*:\s*require\(\s*['"][^'"\n]*\/([^/'"\n]+)\.png['"]\s*\)\s*,?/gm;
+    /^\s*(?:(['"])(.*?)\1|([A-Za-z_$][\w$]*))\s*:\s*require\(\s*['"][^'"\n]*\/([^/'"\n]+)\.(png|jpe?g)['"]\s*\)\s*,?/gim;
 
   for (const match of source.matchAll(entryPattern)) {
     const key = match[2] ?? match[3];
-    entries.set(key, match[4]);
+    entries.set(key, { file: match[4], extension: match[5].toLowerCase() });
   }
 
   return entries;
@@ -44,19 +56,33 @@ function registryEntries(source) {
 function imageFiles() {
   return fs
     .readdirSync(plantImagesDirectory, { withFileTypes: true })
-    .filter((entry) => entry.isFile() && path.extname(entry.name) === ".png")
-    .map((entry) => path.basename(entry.name, ".png"));
+    .filter(
+      (entry) =>
+        entry.isFile() && /\.(png|jpe?g)$/i.test(path.extname(entry.name)),
+    )
+    .map((entry) => path.basename(entry.name, path.extname(entry.name)));
 }
 
 const corePlantIds = plantIds(read(catalogPlantsPath));
+const documentedPlantIds = plantIds(read(documentedPlantsPath));
 const complementaryPlantIds = plantIds(read(complementaryPlantsPath));
-const ids = [...new Set([...corePlantIds, ...complementaryPlantIds])];
+const complementaryKnowledgePlantIds = plantIds(
+  read(complementaryKnowledgePlantsPath),
+);
+const ids = [
+  ...new Set([
+    ...corePlantIds,
+    ...documentedPlantIds,
+    ...complementaryPlantIds,
+    ...complementaryKnowledgePlantIds,
+  ]),
+];
 const normalizedCatalogIds = new Set(ids.map(normalizeAssetId));
 const registrySource = read(plantImagesPath);
 const registry = registryEntries(registrySource);
 const files = imageFiles();
 const registeredImageIds = new Set(
-  [...registry.values()].map(normalizeAssetId),
+  [...registry.values()].map(({ file }) => normalizeAssetId(file)),
 );
 const missing = [];
 
@@ -67,25 +93,31 @@ if (ids.length === 0) {
 }
 
 for (const id of ids) {
-  const registryFile = registry.get(id);
+  const registryEntry = registry.get(id);
 
-  if (!registryFile) {
+  if (!registryEntry) {
     missing.push(
       `${id}: entrée manquante dans constants/plantImages.ts`,
     );
     continue;
   }
 
-  const registryImagePath = path.join(plantImagesDirectory, `${registryFile}.png`);
+  const { file, extension } = registryEntry;
+  const registryImagePath = path.join(
+    plantImagesDirectory,
+    `${file}.${extension}`,
+  );
   const normalizedId = normalizeAssetId(id);
-  const normalizedRegistryFile = normalizeAssetId(registryFile);
+  const normalizedRegistryFile = normalizeAssetId(file);
   const hasExpectedName =
     normalizedRegistryFile === normalizedId ||
-    normalizedRegistryFile === `${normalizedId}-full-plant`;
+    normalizedRegistryFile === `${normalizedId}-full-plant` ||
+    normalizedRegistryFile ===
+      normalizeAssetId(registryFileAliases.get(id) ?? "");
 
   if (!hasExpectedName || !fs.existsSync(registryImagePath)) {
     missing.push(
-      `${id}: entrée incorrecte ou fichier PNG référencé manquant (${registryFile}.png)`,
+      `${id}: entrée incorrecte ou fichier image référencé manquant (${file}.${extension})`,
     );
   }
 }
@@ -106,7 +138,7 @@ for (const imageFile of files) {
     !registeredImageIds.has(normalizedId)
   ) {
     missing.push(
-      `${imageFile}: illustration PNG orpheline dans assets/images/plants (aucune fiche du catalogue)`,
+      `${imageFile}: illustration orpheline dans assets/images/plants (aucune fiche du catalogue)`,
     );
   }
 }
@@ -119,6 +151,6 @@ if (missing.length > 0) {
   process.exitCode = 1;
 } else {
   console.log(
-    `Plant image verification passed: ${ids.length} catalog plant IDs have a PNG file and a registry entry.`,
+    `Plant image verification passed: ${ids.length} catalog plant IDs have an image file and a registry entry.`,
   );
 }
