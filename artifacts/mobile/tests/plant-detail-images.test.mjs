@@ -323,14 +323,14 @@ test("plant image opens in a zoomable viewer and the detail page navigates by sw
     act(() => {
       renderer.root.findByProps({ testID: "plant-image-viewer-close" }).props.onPress();
     });
-    const scrollView = renderer.root.findByType("ScrollView");
+    const scrollView = renderer.root.findByProps({ testID: "plant-detail-scroll" });
+    assert.equal(
+      scrollView.props.onMoveShouldSetPanResponder({}, { dx: -180, dy: 10 }),
+      true,
+      "Un geste horizontal doit être pris en charge",
+    );
     act(() => {
-      scrollView.props.onTouchStart({
-        nativeEvent: { touches: [{ pageX: 320, pageY: 400 }] },
-      });
-      scrollView.props.onTouchEnd({
-        nativeEvent: { changedTouches: [{ pageX: 140, pageY: 410 }] },
-      });
+      scrollView.props.onPanResponderRelease({}, { dx: -180, dy: 10 });
     });
     assert.deepEqual(routerCalls, ["/animal/fromager"]);
 

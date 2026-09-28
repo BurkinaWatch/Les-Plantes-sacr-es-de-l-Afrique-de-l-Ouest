@@ -264,7 +264,6 @@ export default function PlanteDetailScreen() {
   const { width: screenWidth } = useWindowDimensions();
   const { isFavorite, toggleFavorite } = useApp();
   const scrollRef = useRef<ScrollView>(null);
-  const swipeStartRef = useRef<{ x: number; y: number } | null>(null);
   const [imageViewerVisible, setImageViewerVisible] = useState(false);
 
   // Carré 1:1, affiché entièrement sur tout support (téléphone et tablette).
@@ -286,6 +285,23 @@ export default function PlanteDetailScreen() {
       router.replace(`/animal/${nextPlant.id}` as any);
     },
     [plantIndex, router],
+  );
+  const swipeResponder = useMemo(
+    () =>
+      PanResponder.create({
+        onMoveShouldSetPanResponder: (_event, gestureState) =>
+          Math.abs(gestureState.dx) >= 24 &&
+          Math.abs(gestureState.dx) > Math.abs(gestureState.dy) * 1.25,
+        onPanResponderRelease: (_event, gestureState) => {
+          if (
+            Math.abs(gestureState.dx) >= 72 &&
+            Math.abs(gestureState.dx) > Math.abs(gestureState.dy) * 1.25
+          ) {
+            navigatePlant(gestureState.dx < 0 ? 1 : -1);
+          }
+        },
+      }),
+    [navigatePlant],
   );
 
   if (!plante) {
@@ -315,30 +331,11 @@ export default function PlanteDetailScreen() {
     <>
       <ScrollView
         ref={scrollRef}
+        testID="plant-detail-scroll"
         style={[styles.container, { backgroundColor: colors.background }]}
         contentContainerStyle={{ paddingBottom: 60 + insets.bottom }}
         showsVerticalScrollIndicator={false}
-        onTouchStart={(event: GestureResponderEvent) => {
-          const touch = event.nativeEvent.touches[0];
-          swipeStartRef.current = touch
-            ? { x: touch.pageX, y: touch.pageY }
-            : null;
-        }}
-        onTouchEnd={(event: GestureResponderEvent) => {
-          const start = swipeStartRef.current;
-          const touch = event.nativeEvent.changedTouches[0];
-          swipeStartRef.current = null;
-          if (!start || !touch) return;
-
-          const deltaX = touch.pageX - start.x;
-          const deltaY = touch.pageY - start.y;
-          if (Math.abs(deltaX) >= 72 && Math.abs(deltaX) > Math.abs(deltaY) * 1.25) {
-            navigatePlant(deltaX < 0 ? 1 : -1);
-          }
-        }}
-        onTouchCancel={() => {
-          swipeStartRef.current = null;
-        }}
+        {...swipeResponder.panHandlers}
       >
       {/* ── HERO ── */}
       <View style={[styles.heroWrap, { paddingTop: topPad }]}>
