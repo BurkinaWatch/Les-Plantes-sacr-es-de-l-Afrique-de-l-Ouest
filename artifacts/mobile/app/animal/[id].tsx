@@ -1,14 +1,18 @@
 import * as Haptics from 'expo-haptics';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import React from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
   Image,
+  type ImageSourcePropType,
+  Modal,
+  PanResponder,
   Platform,
   Pressable,
   ScrollView,
   StyleSheet,
   Text,
+  type GestureResponderEvent,
   useWindowDimensions,
   View,
 } from 'react-native';
@@ -17,7 +21,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { useApp } from '@/context/AppContext';
 import { SacredIcon, iconForCategory, type SacredIconName } from '@/components/SacredIcon';
-import { getPlanteById } from '@/data/animals';
+import { getPlanteById, PLANTS } from '@/data/animals';
 import type { Element } from '@/data/animals';
 import { useColors } from '@/hooks/useColors';
 
@@ -41,6 +45,209 @@ function Section({ label, color }: { label: string; color: string }) {
   );
 }
 
+function PlantImageViewer({
+  visible,
+  source,
+  plantName,
+  fallbackIcon,
+  accentColor,
+  backgroundColor,
+  foregroundColor,
+  topInset,
+  bottomInset,
+  onClose,
+}: {
+  visible: boolean;
+  source?: ImageSourcePropType;
+  plantName: string;
+  fallbackIcon: SacredIconName;
+  accentColor: string;
+  backgroundColor: string;
+  foregroundColor: string;
+  topInset: number;
+  bottomInset: number;
+  onClose: () => void;
+}) {
+  const { width, height } = useWindowDimensions();
+  const imageSize = Math.max(1, Math.min(width, height - topInset - bottomInset - 136));
+  const [scale, setScale] = useState(1);
+  const [offset, setOffset] = useState({ x: 0, y: 0 });
+  const scaleRef = useRef(1);
+  const offsetRef = useRef({ x: 0, y: 0 });
+  const dragOriginRef = useRef({ x: 0, y: 0 });
+  const pinchStartRef = useRef({ distance: 0, scale: 1 });
+
+  const resetZoom = useCallback(() => {
+    scaleRef.current = 1;
+    offsetRef.current = { x: 0, y: 0 };
+    setScale(1);
+    setOffset({ x: 0, y: 0 });
+  }, []);
+
+  useEffect(() => {
+    if (visible) resetZoom();
+  }, [visible, source, resetZoom]);
+
+  const zoomBy = useCallback((amount: number) => {
+    const nextScale = Math.min(4, Math.max(1, scaleRef.current + amount));
+    scaleRef.current = nextScale;
+    setScale(nextScale);
+    if (nextScale === 1) {
+      offsetRef.current = { x: 0, y: 0 };
+      setOffset({ x: 0, y: 0 });
+    }
+  }, []);
+
+  const panResponder = useMemo(
+    () =>
+      PanResponder.create({
+        onStartShouldSetPanResponder: (event) =>
+          scaleRef.current > 1.01 && event.nativeEvent.touches.length > 0,
+        onMoveShouldSetPanResponder: (event) =>
+          event.nativeEvent.touches.length > 1 || scaleRef.current > 1.01,
+        onPanResponderGrant: (event) => {
+          dragOriginRef.current = offsetRef.current;
+          const touches = event.nativeEvent.touches;
+          if (touches.length > 1) {
+            const dx = touches[0].pageX - touches[1].pageX;
+            const dy = touches[0].pageY - touches[1].pageY;
+            pinchStartRef.current = {
+              distance: Math.hypot(dx, dy),
+              scale: scaleRef.current,
+            };
+          }
+        },
+        onPanResponderMove: (event, gestureState) => {
+          const touches = event.nativeEvent.touches;
+          if (touches.length > 1) {
+            const dx = touches[0].pageX - touches[1].pageX;
+            const dy = touches[0].pageY - touches[1].pageY;
+            const distance = Math.hypot(dx, dy);
+            if (pinchStartRef.current.distance === 0) {
+              pinchStartRef.current = { distance, scale: scaleRef.current };
+              return;
+            }
+
+            const nextScale = Math.min(
+              4,
+              Math.max(1, pinchStartRef.current.scale * (distance / pinchStartRef.current.distance)),
+            );
+            scaleRef.current = nextScale;
+            setScale(nextScale);
+            return;
+          }
+
+          if (scaleRef.current <= 1.01) return;
+          const maxOffset = (imageSize * (scaleRef.current - 1)) / 2;
+          const nextOffset = {
+            x: Math.max(-maxOffset, Math.min(maxOffset, dragOriginRef.current.x + gestureState.dx)),
+            y: Math.max(-maxOffset, Math.min(maxOffset, dragOriginRef.current.y + gestureState.dy)),
+          };
+          offsetRef.current = nextOffset;
+          setOffset(nextOffset);
+        },
+        onPanResponderRelease: () => {
+          pinchStartRef.current.distance = 0;
+          if (scaleRef.current <= 1.02) resetZoom();
+        },
+        onPanResponderTerminate: () => {
+          pinchStartRef.current.distance = 0;
+        },
+        onPanResponderTerminationRequest: () => false,
+      }),
+    [imageSize, resetZoom],
+  );
+
+  return (
+    <Modal
+      visible={visible}
+      animationType="fade"
+      statusBarTranslucent
+      onRequestClose={onClose}
+    >
+      <View
+        style={[
+          styles.viewerContainer,
+          { backgroundColor, paddingTop: topInset, paddingBottom: bottomInset },
+        ]}
+      >
+        <View style={styles.viewerHeader}>
+          <Pressable
+            accessibilityRole="button"
+            accessibilityLabel="Fermer l’image"
+            testID="plant-image-viewer-close"
+            onPress={onClose}
+            style={styles.viewerIconButton}
+          >
+            <SacredIcon name="close" size={22} color={foregroundColor} />
+          </Pressable>
+          <Text style={[styles.viewerTitle, { color: foregroundColor }]} numberOfLines={1}>
+            {plantName}
+          </Text>
+          <View style={styles.viewerHeaderSpacer} />
+        </View>
+
+        <View style={styles.viewerStage} {...panResponder.panHandlers}>
+          <View
+            style={[
+              styles.viewerImageFrame,
+              {
+                width: imageSize,
+                height: imageSize,
+                transform: [
+                  { translateX: offset.x },
+                  { translateY: offset.y },
+                  { scale },
+                ],
+              },
+            ]}
+          >
+            {source ? (
+              <Image source={source} resizeMode="contain" style={styles.viewerImage} />
+            ) : (
+              <View style={styles.viewerFallback}>
+                <SacredIcon name={fallbackIcon} size={88} color={accentColor} />
+                <Text style={[styles.viewerFallbackText, { color: foregroundColor }]}>
+                  Illustration indisponible
+                </Text>
+              </View>
+            )}
+          </View>
+        </View>
+
+        <View style={styles.viewerFooter}>
+          <Text style={[styles.viewerHint, { color: foregroundColor }]}>
+            Pincez pour zoomer · Faites glisser pour déplacer
+          </Text>
+          <View style={styles.viewerControls}>
+            <Pressable
+              accessibilityRole="button"
+              accessibilityLabel="Réduire l’image"
+              testID="plant-image-zoom-out"
+              onPress={() => zoomBy(-0.5)}
+              style={styles.viewerIconButton}
+            >
+              <Text style={[styles.viewerZoomSymbol, { color: foregroundColor }]}>−</Text>
+            </Pressable>
+            <Text style={[styles.viewerZoomValue, { color: accentColor }]}>
+              {Math.round(scale * 100)}%
+            </Text>
+            <Pressable
+              accessibilityRole="button"
+              accessibilityLabel="Agrandir l’image"
+              testID="plant-image-zoom-in"
+              onPress={() => zoomBy(0.5)}
+              style={styles.viewerIconButton}
+            >
+              <SacredIcon name="plus" size={22} color={foregroundColor} />
+            </Pressable>
+          </View>
+        </View>
+      </View>
+    </Modal>
+  );
+}
+
 export default function PlanteDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const colors = useColors();
@@ -48,12 +255,30 @@ export default function PlanteDetailScreen() {
   const router = useRouter();
   const { width: screenWidth } = useWindowDimensions();
   const { isFavorite, toggleFavorite } = useApp();
+  const scrollRef = useRef<ScrollView>(null);
+  const swipeStartRef = useRef<{ x: number; y: number } | null>(null);
+  const [imageViewerVisible, setImageViewerVisible] = useState(false);
 
   // Carré 1:1, affiché entièrement sur tout support (téléphone et tablette).
   const heroImgHeight = Math.min(Math.max(screenWidth * 0.82, 260), 460);
 
   const plante = getPlanteById(id ?? '');
+  const plantIndex = PLANTS.findIndex((plant) => plant.id === id);
   const topPad = Platform.OS === 'web' ? Math.max(insets.top, 67) : insets.top;
+
+  useEffect(() => {
+    scrollRef.current?.scrollTo({ y: 0, animated: false });
+  }, [id]);
+
+  const navigatePlant = useCallback(
+    (direction: -1 | 1) => {
+      const nextPlant = PLANTS[plantIndex + direction];
+      if (!nextPlant) return;
+      setImageViewerVisible(false);
+      router.replace(`/animal/${nextPlant.id}` as any);
+    },
+    [plantIndex, router],
+  );
 
   if (!plante) {
     return (
@@ -79,11 +304,34 @@ export default function PlanteDetailScreen() {
   }
 
   return (
-    <ScrollView
-      style={[styles.container, { backgroundColor: colors.background }]}
-      contentContainerStyle={{ paddingBottom: 60 + insets.bottom }}
-      showsVerticalScrollIndicator={false}
-    >
+    <>
+      <ScrollView
+        ref={scrollRef}
+        style={[styles.container, { backgroundColor: colors.background }]}
+        contentContainerStyle={{ paddingBottom: 60 + insets.bottom }}
+        showsVerticalScrollIndicator={false}
+        onTouchStart={(event: GestureResponderEvent) => {
+          const touch = event.nativeEvent.touches[0];
+          swipeStartRef.current = touch
+            ? { x: touch.pageX, y: touch.pageY }
+            : null;
+        }}
+        onTouchEnd={(event: GestureResponderEvent) => {
+          const start = swipeStartRef.current;
+          const touch = event.nativeEvent.changedTouches[0];
+          swipeStartRef.current = null;
+          if (!start || !touch) return;
+
+          const deltaX = touch.pageX - start.x;
+          const deltaY = touch.pageY - start.y;
+          if (Math.abs(deltaX) >= 72 && Math.abs(deltaX) > Math.abs(deltaY) * 1.25) {
+            navigatePlant(deltaX < 0 ? 1 : -1);
+          }
+        }}
+        onTouchCancel={() => {
+          swipeStartRef.current = null;
+        }}
+      >
       {/* ── HERO ── */}
       <View style={[styles.heroWrap, { paddingTop: topPad }]}>
         <LinearGradient
@@ -114,7 +362,14 @@ export default function PlanteDetailScreen() {
             </Pressable>
           </View>
 
-          <View style={[styles.planteImagePlaceholder, { height: heroImgHeight }]}>
+          <Pressable
+            accessibilityRole="button"
+            accessibilityLabel={`Afficher l’image de ${plante.nom} en plein écran`}
+            testID="plant-detail-image"
+            disabled={!PLANT_IMAGES[plante.id]}
+            onPress={() => setImageViewerVisible(true)}
+            style={[styles.planteImagePlaceholder, { height: heroImgHeight }]}
+          >
             {PLANT_IMAGES[plante.id] ? (
               <Image
                 source={PLANT_IMAGES[plante.id]}
@@ -127,11 +382,18 @@ export default function PlanteDetailScreen() {
                 <SacredIcon name={categoryIcon} size={80} color="rgba(255,255,255,0.85)" />
               </View>
             )}
-          </View>
+            {PLANT_IMAGES[plante.id] && (
+              <View pointerEvents="none" style={styles.zoomHint}>
+                <SacredIcon name="search" size={15} color="#FFFFFF" />
+                <Text style={styles.zoomHintText}>Agrandir</Text>
+              </View>
+            )}
+          </Pressable>
 
           <LinearGradient
             colors={['transparent', plante.couleurSecondaire, colors.deepBrown]}
             style={styles.imageFade}
+            pointerEvents="none"
           />
 
           <View style={styles.heroInfo}>
@@ -162,6 +424,43 @@ export default function PlanteDetailScreen() {
               <Text style={[styles.levelLabel, { color: 'rgba(255,255,255,0.6)' }]}>
                 Niveau spirituel
               </Text>
+            </View>
+
+            <View style={styles.plantPager}>
+              <Pressable
+                accessibilityRole="button"
+                accessibilityLabel="Plante précédente"
+                testID="plant-previous"
+                disabled={plantIndex <= 0}
+                onPress={() => navigatePlant(-1)}
+                style={({ pressed }) => [
+                  styles.pagerButton,
+                  { opacity: plantIndex <= 0 ? 0.35 : pressed ? 0.65 : 1 },
+                ]}
+              >
+                <SacredIcon name="arrow-left" size={18} color="#FFFFFF" />
+              </Pressable>
+              <View style={styles.pagerCaption}>
+                <Text style={[styles.pagerCount, { color: 'rgba(255,255,255,0.9)' }]}>
+                  {plantIndex + 1} / {PLANTS.length}
+                </Text>
+                <Text style={[styles.pagerHint, { color: 'rgba(255,255,255,0.6)' }]}>
+                  Glisser pour changer de plante
+                </Text>
+              </View>
+              <Pressable
+                accessibilityRole="button"
+                accessibilityLabel="Plante suivante"
+                testID="plant-next"
+                disabled={plantIndex >= PLANTS.length - 1}
+                onPress={() => navigatePlant(1)}
+                style={({ pressed }) => [
+                  styles.pagerButton,
+                  { opacity: plantIndex >= PLANTS.length - 1 ? 0.35 : pressed ? 0.65 : 1 },
+                ]}
+              >
+                <SacredIcon name="chevron-right" size={20} color="#FFFFFF" />
+              </Pressable>
             </View>
           </View>
         </LinearGradient>
@@ -359,7 +658,20 @@ export default function PlanteDetailScreen() {
           </View>
         </Pressable>
       </View>
-    </ScrollView>
+      </ScrollView>
+      <PlantImageViewer
+        visible={imageViewerVisible}
+        source={PLANT_IMAGES[plante.id]}
+        plantName={plante.nom}
+        fallbackIcon={categoryIcon}
+        accentColor={plante.couleur}
+        backgroundColor={colors.deepBrown}
+        foregroundColor={colors.ivory}
+        topInset={insets.top}
+        bottomInset={insets.bottom}
+        onClose={() => setImageViewerVisible(false)}
+      />
+    </>
   );
 }
 
@@ -380,6 +692,8 @@ const styles = StyleSheet.create({
   navBtn: { width: 44, height: 44, borderRadius: 22, alignItems: 'center', justifyContent: 'center' },
   planteImagePlaceholder: { width: '100%', borderRadius: 18, marginTop: 16, alignItems: 'center', justifyContent: 'center', overflow: 'hidden', backgroundColor: 'rgba(0,0,0,0.18)' },
   planteImage: { width: '100%', height: '100%', borderRadius: 18 },
+  zoomHint: { position: 'absolute', right: 12, bottom: 12, flexDirection: 'row', alignItems: 'center', gap: 6, backgroundColor: 'rgba(0,0,0,0.6)', borderRadius: 16, paddingHorizontal: 11, paddingVertical: 7 },
+  zoomHintText: { color: '#FFFFFF', fontSize: 11, fontWeight: '600' as const },
   phInner: { alignItems: 'center', justifyContent: 'center' },
   phCircle: { position: 'absolute', width: 120, height: 120, borderRadius: 60, borderWidth: 1.5 },
   phIcon: { fontSize: 80 },
@@ -391,6 +705,27 @@ const styles = StyleSheet.create({
   levelRow: { flexDirection: 'row', alignItems: 'center', gap: 4, marginTop: 12 },
   levelDot: { height: 5, borderRadius: 2.5 },
   levelLabel: { fontSize: 11, marginLeft: 6, fontWeight: '500' as const },
+  plantPager: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginTop: 18 },
+  pagerButton: { width: 42, height: 42, borderRadius: 21, alignItems: 'center', justifyContent: 'center', backgroundColor: 'rgba(0,0,0,0.28)' },
+  pagerCaption: { flex: 1, alignItems: 'center', gap: 3 },
+  pagerCount: { fontSize: 12, fontWeight: '700' as const, letterSpacing: 1 },
+  pagerHint: { fontSize: 10, fontWeight: '500' as const },
+
+  viewerContainer: { flex: 1 },
+  viewerHeader: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 16, paddingVertical: 8, gap: 12 },
+  viewerIconButton: { width: 46, height: 46, borderRadius: 23, alignItems: 'center', justifyContent: 'center', backgroundColor: 'rgba(255,255,255,0.1)' },
+  viewerTitle: { flex: 1, fontSize: 16, fontWeight: '600' as const, textAlign: 'center' },
+  viewerHeaderSpacer: { width: 46 },
+  viewerStage: { flex: 1, alignItems: 'center', justifyContent: 'center', overflow: 'hidden' },
+  viewerImageFrame: { alignItems: 'center', justifyContent: 'center' },
+  viewerImage: { width: '100%', height: '100%' },
+  viewerFallback: { flex: 1, alignItems: 'center', justifyContent: 'center', gap: 16 },
+  viewerFallbackText: { fontSize: 14, fontWeight: '500' as const },
+  viewerFooter: { alignItems: 'center', paddingHorizontal: 18, paddingTop: 8, paddingBottom: 12, gap: 12 },
+  viewerHint: { fontSize: 12, opacity: 0.72, textAlign: 'center' },
+  viewerControls: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 22 },
+  viewerZoomValue: { minWidth: 50, textAlign: 'center', fontSize: 13, fontWeight: '700' as const },
+  viewerZoomSymbol: { fontSize: 27, fontWeight: '400' as const, lineHeight: 29 },
 
   card: { borderRadius: 16, padding: 18, borderWidth: 1, gap: 12 },
   sectionLabel: { fontSize: 10, fontWeight: '700' as const, letterSpacing: 2.5 },
