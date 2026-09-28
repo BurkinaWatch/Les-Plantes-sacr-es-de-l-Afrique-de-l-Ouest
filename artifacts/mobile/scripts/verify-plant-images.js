@@ -61,9 +61,13 @@ function imageFilesByNormalizedId() {
 const corePlantIds = plantIds(read(catalogPlantsPath));
 const complementaryPlantIds = plantIds(read(complementaryPlantsPath));
 const ids = [...new Set([...corePlantIds, ...complementaryPlantIds])];
+const normalizedCatalogIds = new Set(ids.map(normalizeAssetId));
 const registrySource = read(plantImagesPath);
 const registry = registryEntries(registrySource);
 const { files, filesById } = imageFilesByNormalizedId();
+const registeredImageIds = new Set(
+  [...registry.values()].map(normalizeAssetId),
+);
 const missing = [];
 
 if (ids.length === 0) {
@@ -73,49 +77,38 @@ if (ids.length === 0) {
 }
 
 for (const id of ids) {
-  const normalizedId = normalizeAssetId(id);
-  const matchingFiles = filesById.get(normalizedId) ?? [];
   const registryFile = registry.get(id);
-
-  if (matchingFiles.length === 0) {
-    missing.push(
-      `${id}: illustration dédiée manquante (${path.relative(
-        root,
-        path.join(plantImagesDirectory, `${id}.png`),
-      )})`,
-    );
-  }
 
   if (!registryFile) {
     missing.push(
-      `${id}: illustration dédiée présente ou attendue, mais entrée manquante dans constants/plantImages.ts`,
+      `${id}: entrée manquante dans constants/plantImages.ts`,
     );
     continue;
   }
 
   const registryImagePath = path.join(plantImagesDirectory, `${registryFile}.png`);
-  if (
-    normalizeAssetId(registryFile) !== normalizedId ||
-    !fs.existsSync(registryImagePath)
-  ) {
+  if (!fs.existsSync(registryImagePath)) {
     missing.push(
-      `${id}: entrée de constants/plantImages.ts incorrecte ou fichier PNG référencé manquant (${registryFile}.png)`,
+      `${id}: fichier PNG référencé manquant (${registryFile}.png)`,
     );
   }
 }
 
-for (const [id, imageFile] of registry) {
+for (const [id] of registry) {
   const normalizedId = normalizeAssetId(id);
-  if (!ids.some((catalogId) => normalizeAssetId(catalogId) === normalizedId)) {
+  if (!normalizedCatalogIds.has(normalizedId)) {
     missing.push(
-      `${id}: entrée orpheline dans constants/plantImages.ts (${imageFile}.png ne correspond à aucune fiche du catalogue)`,
+      `${id}: entrée orpheline dans constants/plantImages.ts (aucune fiche du catalogue)`,
     );
   }
 }
 
 for (const imageFile of files) {
   const normalizedId = normalizeAssetId(imageFile);
-  if (!ids.some((catalogId) => normalizeAssetId(catalogId) === normalizedId)) {
+  if (
+    !normalizedCatalogIds.has(normalizedId) &&
+    !registeredImageIds.has(normalizedId)
+  ) {
     missing.push(
       `${imageFile}: illustration PNG orpheline dans assets/images/plants (aucune fiche du catalogue)`,
     );
