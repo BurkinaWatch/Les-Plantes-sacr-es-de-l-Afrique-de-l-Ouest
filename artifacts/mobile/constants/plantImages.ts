@@ -11,7 +11,7 @@ const PLANT_IMAGES: Record<string, any> = {
   gingembre:          require('@/assets/images/plants/gingembre.png'),
   bissap:             require('@/assets/images/plants/bissap.png'),
   kinkeliba:          require('@/assets/images/plants/kinkeliba.png'),
-  kalanchoe:          require('@/assets/images/plants/kalanchoe.png'),
+  kalanchoe:          require('@/assets/images/plants/kalanchoe-full-plant.png'),
   artemisia:          require('@/assets/images/plants/artemisia.png'),
   kolatier:           require('@/assets/images/plants/kolatier.png'),
   nere:               require('@/assets/images/plants/nere.png'),
@@ -50,7 +50,7 @@ const PLANT_IMAGES: Record<string, any> = {
   'poivre-de-guinee': require('@/assets/images/plants/poivre-de-guinee.png'),
   'grains-de-selim':  require('@/assets/images/plants/grains-de-selim.png'),
   vernonia:           require('@/assets/images/plants/vernonia.png'),
-  corossolier:        require('@/assets/images/plants/corossolier.png'),
+  corossolier:        require('@/assets/images/plants/corossolier-full-plant.png'),
   maniguette:         require('@/assets/images/plants/maniguette.png'),
 
   // Nouvelles Plantes Rituelles
@@ -82,7 +82,7 @@ const PLANT_IMAGES: Record<string, any> = {
   ebene:              require('@/assets/images/plants/ebene.png'),
 
   // Extension — Nouvelles Plantes Médicinales
-  'pomme-sodome':     require('@/assets/images/plants/pomme-sodome.png'),
+  'pomme-sodome':     require('@/assets/images/plants/pomme-sodome-full-plant.png'),
   pourghere:          require('@/assets/images/plants/pourghere.png'),
   goyavier:           require('@/assets/images/plants/goyavier.png'),
 
