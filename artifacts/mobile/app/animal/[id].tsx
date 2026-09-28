@@ -280,6 +280,7 @@ export default function PlanteDetailScreen() {
   const navigatePlant = useCallback(
     (direction: -1 | 1) => {
       const nextPlant = PLANTS[plantIndex + direction];
+      console.log('Plant detail navigate', direction, plantIndex, PLANTS.map((plant) => plant.id), nextPlant?.id);
       if (!nextPlant) return;
       setImageViewerVisible(false);
       router.replace(`/animal/${nextPlant.id}` as any);
