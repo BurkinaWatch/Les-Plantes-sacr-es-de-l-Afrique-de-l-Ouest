@@ -392,8 +392,7 @@ export default function PlanteDetailScreen() {
 
           <LinearGradient
             colors={['transparent', plante.couleurSecondaire, colors.deepBrown]}
-            style={styles.imageFade}
-            pointerEvents="none"
+            style={[styles.imageFade, { pointerEvents: 'none' }]}
           />
 
           <View style={styles.heroInfo}>
