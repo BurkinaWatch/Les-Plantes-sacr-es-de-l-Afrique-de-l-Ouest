@@ -103,7 +103,7 @@ export default function HomeScreen() {
   const GRID_GAP = isTablet ? 14 : 10;
   const SECTION_PAD = 20;
   const cardWidth = Math.floor((width - SECTION_PAD * 2 - GRID_GAP) / 2);
-  const cardHeight = Math.round(cardWidth * 1.22);
+  const cardHeight = Math.round(cardWidth * 1.16);
 
   const topPad = Platform.OS === 'web' ? Math.max(insets.top, 67) : insets.top;
 
@@ -182,14 +182,17 @@ export default function HomeScreen() {
                 testID={`featured-plant-${plante.id}`}
               >
                 <View style={[styles.featuredCardContent, { backgroundColor: colors.card }]}>
-                  <View style={styles.featuredImageFrame}>
-                    {imageSource ? (
-                      <Image source={imageSource} style={styles.featuredImage} resizeMode="contain" fadeDuration={0} />
-                    ) : (
-                      <LinearGradient colors={[plante.couleur, plante.couleurSecondaire]} style={StyleSheet.absoluteFill} />
-                    )}
-                  </View>
-                  <View style={[styles.featuredTextBlock, { backgroundColor: colors.background }]}>
+                  {imageSource ? (
+                    <Image source={imageSource} style={styles.featuredImage} resizeMode="cover" fadeDuration={0} />
+                  ) : (
+                    <LinearGradient colors={[plante.couleur, plante.couleurSecondaire]} style={StyleSheet.absoluteFill} />
+                  )}
+                  <LinearGradient
+                    colors={['rgba(12,9,5,0)', 'rgba(12,9,5,0.08)', 'rgba(12,9,5,0.74)']}
+                    locations={[0.32, 0.55, 1]}
+                    style={StyleSheet.absoluteFill}
+                  />
+                  <View style={styles.featuredTextBlock}>
                     <Text style={[styles.featuredNom, isTablet && styles.featuredNomTablet, { color: colors.ivory }]} numberOfLines={2}>{plante.nom}</Text>
                     <Text style={[styles.featuredPouvoir, isTablet && styles.featuredPouvoirTablet]} numberOfLines={2}>{plante.pouvoirs[0]}</Text>
                   </View>
@@ -398,27 +401,50 @@ const styles = StyleSheet.create({
     flex: 1,
     position: 'relative',
   },
-  featuredImageFrame: {
-    flex: 1,
-    minHeight: 0,
-    position: 'relative',
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: 8,
-  },
   featuredImage: {
-    width: '100%',
-    height: '100%',
+    position: 'absolute',
+    top: 0,
+    right: 0,
+    bottom: 0,
+    left: 0,
   },
   featuredTextBlock: {
+    position: 'absolute',
+    right: 0,
+    bottom: 0,
+    left: 0,
     paddingHorizontal: 10,
-    paddingTop: 7,
+    paddingTop: 26,
     paddingBottom: 10,
-    minHeight: 76,
   },
-  featuredNom: { fontSize: 15, fontWeight: '800', letterSpacing: 0.3 },
+  featuredNom: {
+    fontSize: 15,
+    fontWeight: '800',
+    letterSpacing: 0.3,
+    ...Platform.select({
+      web: { textShadow: '0 1px 4px rgba(0,0,0,0.9)' },
+      default: {
+        textShadowColor: 'rgba(0,0,0,0.9)',
+        textShadowOffset: { width: 0, height: 1 },
+        textShadowRadius: 4,
+      },
+    }),
+  },
   featuredNomTablet: { fontSize: 19 },
-  featuredPouvoir: { color: 'rgba(255,255,255,0.82)', fontSize: 11, marginTop: 3, lineHeight: 15 },
+  featuredPouvoir: {
+    color: 'rgba(255,255,255,0.9)',
+    fontSize: 11,
+    marginTop: 3,
+    lineHeight: 15,
+    ...Platform.select({
+      web: { textShadow: '0 1px 3px rgba(0,0,0,0.95)' },
+      default: {
+        textShadowColor: 'rgba(0,0,0,0.95)',
+        textShadowOffset: { width: 0, height: 1 },
+        textShadowRadius: 3,
+      },
+    }),
+  },
   featuredPouvoirTablet: { fontSize: 13, lineHeight: 18 },
   ctaButton: {
     flexDirection: 'row',

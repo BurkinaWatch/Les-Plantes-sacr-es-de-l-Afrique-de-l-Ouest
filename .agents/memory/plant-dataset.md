@@ -37,17 +37,16 @@ rebuild the asset map. Before assuming a real bug, verify ids↔keys↔files all
 (they did: 77/77) — if they do, it is a cache/build staleness issue, not code.
 
 ## Plant image framing
-For plant cards, show the full source image with `contain` in a dedicated image
-region; keep titles and descriptions in a separate footer so they do not cover the
-plant. If a source image itself is a close-up and the user asks to see the whole
-plant, create a wider-framed variant and keep the original available. A display-mode
-change alone cannot reveal content that is outside the source image.
+Home featured cards use full-bleed imagery with the name and description overlaid
+directly on the picture; keep the caption transparent and use only a subtle lower
+gradient and text shadow for contrast. For detail heroes, use `contain` when the
+goal is to show the full source illustration.
 
-**Why:** The home cards rotate through many plants, and image crops or caption
-overlays can hide the plant even when the underlying image is correct.
+**Why:** The owner explicitly chose the reference style: images fill each card and
+text sits on top without a solid caption band.
 
-**How to apply:** Use an uncropped image frame on list and home cards; use
-full-plant source images when the original composition is too close.
+**How to apply:** Use `cover` on the home card background and keep its text overlay
+transparent; reserve `contain` for views whose purpose is to show the whole image.
 
 ## Note on type-checking
 `npx tsc --noEmit` in artifacts/mobile reports PRE-EXISTING errors unrelated to data
