@@ -1,10 +1,14 @@
+import { PLANTS, type Plante } from './animals';
+
 // ─────────────────────────────────────────────────────────────────────────────
-// QUIZ — Big Five Inventory (BFI) adapté aux traditions botaniques d'Afrique de l'Ouest
-// Méthode : échelle de Likert à 5 points + items inversés + correspondance par
-// distance euclidienne (John & Srivastava, 1999 ; Costa & McCrae, 1992).
+// Quiz éditorial de réflexion — cinq axes construits à partir des fiches
+// botaniques de l'application. Il ne s'agit ni d'un test psychométrique ni d'un
+// diagnostic spirituel.
 // ─────────────────────────────────────────────────────────────────────────────
 
-export type TotemAnimalId = 'kolatier' | 'baobab' | 'neem' | 'nere' | 'fromager' | 'moringa' | 'ronier';
+export type PlantId = string;
+/** @deprecated Retained as a source-compatible alias; quiz results are plant IDs. */
+export type TotemAnimalId = PlantId;
 
 export interface QuizStatement {
   id: number;
@@ -15,13 +19,12 @@ export interface QuizStatement {
 }
 
 export interface TotemResult {
-  id: TotemAnimalId;
+  id: PlantId;
   nom: string;
   description: string;
   forces: string[];
   defis: string[];
-  mantra: string;
-  animalSecondaire: TotemAnimalId;
+  citation: string;
   couleur: string;
   profilDimensions: Record<'E' | 'O' | 'C' | 'A' | 'S', number>;
 }
@@ -75,15 +78,20 @@ export const SPIRITUAL_REFERENCES: SpiritualReference[] = [
   },
 ];
 
-export const TOTEM_REFLECTIONS: Record<TotemAnimalId, string> = {
-  kolatier: 'Prenez un instant pour remercier une personne qui a rendu un lien possible. Le geste est une proposition de gratitude, pas un rite attribué à une tradition précise.',
-  baobab: 'Écrivez une parole reçue d’une génération précédente et la manière dont vous souhaitez la transmettre. La mémoire devient une responsabilité choisie.',
-  neem: 'Observez ce qui mérite une limite claire dans votre vie aujourd’hui. Protéger votre espace peut commencer par une décision simple et respectueuse.',
-  nere: 'Notez une ressource que vous pouvez partager avec votre communauté. L’abondance est ici explorée comme relation et non comme promesse surnaturelle.',
-  fromager: 'Levez les yeux, respirez lentement, puis revenez à une action concrète. Une vision spirituelle reste reliée au soin du monde réel.',
-  moringa: 'Identifiez un changement que vous traversez et une petite manière de nourrir votre énergie cette semaine. La transformation n’est pas une prédiction.',
-  ronier: 'Reconnaissez ce que vous donnez déjà et ce que vous êtes prêt à recevoir. L’endurance inclut aussi le repos et l’interdépendance.',
-};
+export const TOTEM_REFLECTIONS: Record<PlantId, string> = Object.fromEntries(
+  PLANTS.map((plant) => {
+    const idea =
+      plant.conseilsDeVie.find((item) => item.trim()) ??
+      plant.enseignements.find((item) => item.trim()) ??
+      plant.enseignementDuJour.trim();
+    return [
+      plant.id,
+      idea
+        ? `À partir de cette idée de la fiche, qu’aimeriez-vous explorer aujourd’hui : « ${idea} »`
+        : `Prenez un instant pour noter ce que la fiche de ${plant.nom} vous évoque.`,
+    ];
+  }),
+) as Record<PlantId, string>;
 
 // ── 20 affirmations · 4 par dimension · 1 item inversé par dimension (★)
 export const QUIZ_QUESTIONS: QuizStatement[] = [
