@@ -293,6 +293,7 @@ export default function PlanteDetailScreen() {
           Math.abs(gestureState.dx) >= 24 &&
           Math.abs(gestureState.dx) > Math.abs(gestureState.dy) * 1.25,
         onPanResponderRelease: (_event, gestureState) => {
+          console.log('Plant detail swipe release', gestureState.dx, gestureState.dy, plantIndex);
           if (
             Math.abs(gestureState.dx) >= 72 &&
             Math.abs(gestureState.dx) > Math.abs(gestureState.dy) * 1.25
