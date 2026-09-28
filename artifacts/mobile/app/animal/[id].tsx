@@ -164,6 +164,7 @@ function PlantImageViewer({
       animationType="fade"
       statusBarTranslucent
       onRequestClose={onClose}
+      testID="plant-image-viewer"
     >
       <View
         style={[
@@ -187,7 +188,11 @@ function PlantImageViewer({
           <View style={styles.viewerHeaderSpacer} />
         </View>
 
-        <View style={styles.viewerStage} {...panResponder.panHandlers}>
+        <View
+          testID="plant-image-viewer-stage"
+          style={styles.viewerStage}
+          {...panResponder.panHandlers}
+        >
           <View
             style={[
               styles.viewerImageFrame,

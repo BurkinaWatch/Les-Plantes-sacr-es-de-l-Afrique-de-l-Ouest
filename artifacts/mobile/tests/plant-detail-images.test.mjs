@@ -81,6 +81,10 @@ function makePlant(id) {
 function makeNativeMock() {
   return {
     Image,
+    Modal: makeHostComponent("Modal"),
+    PanResponder: {
+      create: (config) => ({ panHandlers: config }),
+    },
     Platform: { OS: "web" },
     Pressable: makeHostComponent("Pressable", {
       resolvePressableChildren: true,
@@ -98,6 +102,18 @@ function makeNativeMock() {
 
 function loadDetailScreen() {
   const native = makeNativeMock();
+  const routerCalls = [];
+  const animalData = {
+    getPlanteById: (id) => makePlant(id),
+  };
+  Object.defineProperty(animalData, "PLANTS", {
+    enumerable: true,
+    get() {
+      const currentId = currentPlant.id || "baobab";
+      const nextId = currentId === "baobab" ? "fromager" : "baobab";
+      return [makePlant(currentId), makePlant(nextId)];
+    },
+  });
   const mocks = new Map([
     ["react-native", native],
     [
@@ -112,7 +128,10 @@ function loadDetailScreen() {
       "expo-router",
       {
         useLocalSearchParams: () => ({ id: currentPlant.id }),
-        useRouter: () => ({ back() {} }),
+        useRouter: () => ({
+          back() {},
+          replace: (path) => routerCalls.push(path),
+        }),
       },
     ],
     [
@@ -124,7 +143,7 @@ function loadDetailScreen() {
       "@/context/AppContext",
       { useApp: () => ({ isFavorite: () => false, toggleFavorite() {} }) },
     ],
-    ["@/data/animals", { getPlanteById: (id) => makePlant(id) }],
+    ["@/data/animals", animalData],
     ["@/hooks/useColors", { useColors: () => colors }],
   ]);
 
@@ -145,6 +164,7 @@ function loadDetailScreen() {
   return {
     imageRegistry,
     screen,
+    routerCalls,
     restore() {
       Module._load = originalLoad;
     },
@@ -267,6 +287,50 @@ test("detail screen keeps the existing fallback for plants without an illustrati
     act(() => {
       renderer.unmount();
     });
+  } finally {
+    restore();
+  }
+});
+
+test("plant image opens in a zoomable viewer and the detail page navigates by swipe", () => {
+  const { screen, routerCalls, restore } = loadDetailScreen();
+  currentPlant.id = "baobab";
+
+  try {
+    let renderer;
+    act(() => {
+      renderer = TestRenderer.create(React.createElement(screen));
+    });
+
+    const imageButton = renderer.root.findByProps({ testID: "plant-detail-image" });
+    assert.equal(imageButton.props.disabled, false);
+    act(() => imageButton.props.onPress());
+    assert.equal(
+      renderer.root.findByProps({ testID: "plant-image-viewer" }).props.visible,
+      true,
+      "Toucher l’illustration doit ouvrir le visualiseur",
+    );
+
+    act(() => {
+      renderer.root.findByProps({ testID: "plant-image-zoom-in" }).props.onPress();
+    });
+    assert.ok(
+      renderer.root.findAllByType("Text").some((node) => node.props.children === "150%"),
+      "Le contrôle d’agrandissement doit zoomer dans l’image",
+    );
+
+    const scrollView = renderer.root.findByType("ScrollView");
+    act(() => {
+      scrollView.props.onTouchStart({
+        nativeEvent: { touches: [{ pageX: 320, pageY: 400 }] },
+      });
+      scrollView.props.onTouchEnd({
+        nativeEvent: { changedTouches: [{ pageX: 140, pageY: 410 }] },
+      });
+    });
+    assert.deepEqual(routerCalls, ["/animal/fromager"]);
+
+    act(() => renderer.unmount());
   } finally {
     restore();
   }
