@@ -280,7 +280,6 @@ export default function PlanteDetailScreen() {
   const navigatePlant = useCallback(
     (direction: -1 | 1) => {
       const nextPlant = PLANTS[plantIndex + direction];
-      console.log('Plant detail navigate', direction, plantIndex, PLANTS.map((plant) => plant.id), nextPlant?.id);
       if (!nextPlant) return;
       setImageViewerVisible(false);
       router.replace(`/animal/${nextPlant.id}` as any);
@@ -294,7 +293,6 @@ export default function PlanteDetailScreen() {
           Math.abs(gestureState.dx) >= 24 &&
           Math.abs(gestureState.dx) > Math.abs(gestureState.dy) * 1.25,
         onPanResponderRelease: (_event, gestureState) => {
-          console.log('Plant detail swipe release', gestureState.dx, gestureState.dy, plantIndex);
           if (
             Math.abs(gestureState.dx) >= 72 &&
             Math.abs(gestureState.dx) > Math.abs(gestureState.dy) * 1.25

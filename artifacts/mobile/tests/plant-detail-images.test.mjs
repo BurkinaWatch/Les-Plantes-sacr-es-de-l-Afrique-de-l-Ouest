@@ -160,7 +160,9 @@ function loadDetailScreen() {
     path.join(screenDist, "constants/plantImages.js"),
   ).default;
   mocks.set("@/constants/plantImages", imageRegistry);
-  const screen = require(path.join(screenDist, "app/animal/[id].js")).default;
+  const detailScreenPath = path.join(screenDist, "app/animal/[id].js");
+  delete require.cache[detailScreenPath];
+  const screen = require(detailScreenPath).default;
   return {
     imageRegistry,
     screen,
@@ -332,7 +334,6 @@ test("plant image opens in a zoomable viewer and the detail page navigates by sw
     act(() => {
       scrollView.props.onPanResponderRelease({}, { dx: -180, dy: 10 });
     });
-    console.log("swipe debug", Object.keys(scrollView.props).filter((key) => key.includes("PanResponder")), routerCalls);
     assert.deepEqual(routerCalls, ["/animal/fromager"]);
 
     act(() => renderer.unmount());
