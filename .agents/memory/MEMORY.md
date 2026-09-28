@@ -3,6 +3,7 @@
 - [Expo Replit config](expo-replit-config.md) — REACT_NATIVE_PACKAGER_HOSTNAME must be $REPLIT_EXPO_DEV_DOMAIN; Google Fonts timeout fix; metro.config.js CORS setup
 - [Expo SDK 57 setup](expo-sdk57.md) — native splash uses the plugin; manage Expo Go sign-in and keep local Android tools and caches in ignored workspace paths
 - [Plant dataset](plant-dataset.md) — adding plants to animals.ts; image key MUST equal id; field misspelled `symboliqueSpirirtuelle`; pre-existing tsc errors unrelated
+- [Savoir source attribution](savoir-source-attribution.md) — use exact registry titles for app citations and keep source notes aligned to the evidence they support
 - [AI services config](ai-services-config.md) — totem chat + plant recognition use Groq; lazy-init client or api-server crashes at startup; both auth-protected via x-api-key/CHAT_API_KEY
 - [Package firewall compatibility](package-firewall.md) — Replit package installs may reject an older transitive tar release; use a latest-compatible pnpm override when needed
 - [Test runner environment](test-runner-environment.md) — use Node's built-in runner plus targeted tsc output when workspace package installation cannot target a package
