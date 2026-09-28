@@ -77,9 +77,15 @@ for (const id of ids) {
   }
 
   const registryImagePath = path.join(plantImagesDirectory, `${registryFile}.png`);
-  if (!fs.existsSync(registryImagePath)) {
+  const normalizedId = normalizeAssetId(id);
+  const normalizedRegistryFile = normalizeAssetId(registryFile);
+  const hasExpectedName =
+    normalizedRegistryFile === normalizedId ||
+    normalizedRegistryFile === `${normalizedId}-full-plant`;
+
+  if (!hasExpectedName || !fs.existsSync(registryImagePath)) {
     missing.push(
-      `${id}: fichier PNG référencé manquant (${registryFile}.png)`,
+      `${id}: entrée incorrecte ou fichier PNG référencé manquant (${registryFile}.png)`,
     );
   }
 }
