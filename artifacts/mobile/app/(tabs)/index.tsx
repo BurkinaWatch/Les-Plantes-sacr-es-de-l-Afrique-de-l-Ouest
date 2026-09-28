@@ -43,7 +43,7 @@ export default function HomeScreen() {
   const { t } = useTranslation();
 
   const { width, height } = useWindowDimensions();
-  const heroHeight = Math.min(Math.max(Math.round(height * 0.3), 235), 300);
+  const heroHeight = Math.min(Math.max(Math.round(height * 0.58), 360), 560);
 
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const slideAnim = useRef(new Animated.Value(30)).current;
@@ -120,12 +120,12 @@ export default function HomeScreen() {
         resizeMode="cover"
       >
         <LinearGradient
-          colors={['rgba(4,12,4,0.80)', 'rgba(4,12,4,0.30)', 'rgba(4,12,4,0.06)', 'rgba(0,0,0,0)']}
+          colors={['rgba(4,12,4,0.38)', 'rgba(4,12,4,0.12)', 'rgba(4,12,4,0.04)', 'rgba(0,0,0,0)']}
           locations={[0, 0.28, 0.48, 1]}
           style={StyleSheet.absoluteFill}
         />
         <LinearGradient
-          colors={['rgba(0,0,0,0)', 'rgba(4,12,4,0.55)']}
+          colors={['rgba(0,0,0,0)', 'rgba(4,12,4,0.28)']}
           locations={[0.55, 1]}
           style={StyleSheet.absoluteFill}
         />
