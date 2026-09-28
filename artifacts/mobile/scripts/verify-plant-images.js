@@ -41,21 +41,11 @@ function registryEntries(source) {
   return entries;
 }
 
-function imageFilesByNormalizedId() {
-  const files = fs
+function imageFiles() {
+  return fs
     .readdirSync(plantImagesDirectory, { withFileTypes: true })
     .filter((entry) => entry.isFile() && path.extname(entry.name) === ".png")
     .map((entry) => path.basename(entry.name, ".png"));
-  const filesById = new Map();
-
-  for (const file of files) {
-    const normalizedId = normalizeAssetId(file);
-    const matchingFiles = filesById.get(normalizedId) ?? [];
-    matchingFiles.push(file);
-    filesById.set(normalizedId, matchingFiles);
-  }
-
-  return { files, filesById };
 }
 
 const corePlantIds = plantIds(read(catalogPlantsPath));
@@ -64,7 +54,7 @@ const ids = [...new Set([...corePlantIds, ...complementaryPlantIds])];
 const normalizedCatalogIds = new Set(ids.map(normalizeAssetId));
 const registrySource = read(plantImagesPath);
 const registry = registryEntries(registrySource);
-const { files, filesById } = imageFilesByNormalizedId();
+const files = imageFiles();
 const registeredImageIds = new Set(
   [...registry.values()].map(normalizeAssetId),
 );
