@@ -20,14 +20,19 @@ The app's data lives in `artifacts/mobile/data/animals.ts` as `PLANTS: Plante[]`
 ## Image registration
 - Images are registered in `artifacts/mobile/constants/plantImages.ts`.
   **The map key MUST equal the plant `id`** (not a separate slug). Lookup is by id.
-- PNG files live in `artifacts/mobile/assets/images/plants/<id>.png`.
-- Generate with `generateImage`/`generateImageAsync` (outputPath must end `.png`),
-  saving directly into that folder. Consistent style: naturalistic botanical
-  illustration, warm West African savanna palette.
+- PNG and JPEG files live in `artifacts/mobile/assets/images/plants/`.
+- Use JPEG for opaque photographic assets to keep the mobile bundle smaller; keep
+  PNG for transparency or artwork that needs lossless edges. The verifier accepts
+  both formats and checks the effective `PLANTS` catalog, not just source arrays.
+- Stage generated files under `attached_assets/generated_images/`, then copy them
+  into the mobile asset folder and register a static `require()`. Prefer species-
+  specific naturalistic imagery and the plant's actual habitat, including for
+  non-West-African species in the reference catalog.
 
 **Why:** A missing image registration or an id/key mismatch silently breaks the
 card image with no TS error. The misspelled field name is the most common TS-error
-trap when authoring entries.
+trap when authoring entries. JPEG avoids adding large lossless photo assets to an
+already image-heavy mobile bundle.
 
 ## "Some plants show no image" after adding entries
 Newly added static `require()` entries in `plantImages.ts` are NOT picked up by a
