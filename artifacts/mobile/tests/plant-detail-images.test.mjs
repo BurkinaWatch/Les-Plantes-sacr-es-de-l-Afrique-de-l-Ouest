@@ -332,6 +332,7 @@ test("plant image opens in a zoomable viewer and the detail page navigates by sw
     act(() => {
       scrollView.props.onPanResponderRelease({}, { dx: -180, dy: 10 });
     });
+    console.log("swipe debug", Object.keys(scrollView.props).filter((key) => key.includes("PanResponder")), routerCalls);
     assert.deepEqual(routerCalls, ["/animal/fromager"]);
 
     act(() => renderer.unmount());
