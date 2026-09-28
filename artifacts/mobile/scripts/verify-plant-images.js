@@ -1,19 +1,8 @@
 const fs = require("node:fs");
+const { spawnSync } = require("node:child_process");
 const path = require("node:path");
 
 const root = path.resolve(__dirname, "..");
-const catalogPlantsPath = path.join(root, "data", "animals.ts");
-const documentedPlantsPath = path.join(root, "data", "plantes-medicinales.ts");
-const complementaryPlantsPath = path.join(
-  root,
-  "data",
-  "plantes-medicinales-complementaires.ts",
-);
-const complementaryKnowledgePlantsPath = path.join(
-  root,
-  "data",
-  "plantes-savoirs-complementaires.ts",
-);
 const plantImagesPath = path.join(root, "constants", "plantImages.ts");
 const plantImagesDirectory = path.join(root, "assets", "images", "plants");
 
@@ -23,15 +12,13 @@ const registryFileAliases = new Map([
   ["gymnanthemum-amygdalinum", "vernonia"],
 ]);
 
-function read(filePath) {
-  return fs.readFileSync(filePath, "utf8");
-}
-
-function plantIds(source) {
-  return [...source.matchAll(/^\s*id:\s*["']([^"']+)["']\s*,?\s*$/gm)].map(
-    ([, id]) => id,
-  );
-}
+// Keep legacy scientific-name keys valid when the displayed catalog uses a
+// common-name ID for the same species.
+const supersededRegistryIdAliases = new Map([
+  ["acajou", "caïlcédrat"],
+  ["detarium-senegalense", "ditakh"],
+  ["mangifera-indica", "manguier"],
+]);
 
 function normalizeAssetId(value) {
   return value
@@ -63,20 +50,33 @@ function imageFiles() {
     .map((entry) => path.basename(entry.name, path.extname(entry.name)));
 }
 
-const corePlantIds = plantIds(read(catalogPlantsPath));
-const documentedPlantIds = plantIds(read(documentedPlantsPath));
-const complementaryPlantIds = plantIds(read(complementaryPlantsPath));
-const complementaryKnowledgePlantIds = plantIds(
-  read(complementaryKnowledgePlantsPath),
-);
-const ids = [
-  ...new Set([
-    ...corePlantIds,
-    ...documentedPlantIds,
-    ...complementaryPlantIds,
-    ...complementaryKnowledgePlantIds,
-  ]),
-];
+function catalogPlantIds() {
+  const buildScript = path.join(root, "scripts", "build-data-tests.js");
+  const build = spawnSync(process.execPath, [buildScript], {
+    cwd: root,
+    encoding: "utf8",
+  });
+
+  if (build.error || build.status !== 0) {
+    throw new Error(
+      `Could not load the effective plant catalog.\n${build.stderr || build.error || ""}`,
+    );
+  }
+
+  const { PLANTS } = require(path.join(
+    root,
+    ".data-test-dist",
+    "data",
+    "animals.js",
+  ));
+  if (!Array.isArray(PLANTS) || PLANTS.length === 0) {
+    throw new Error("The effective plant catalog is empty or unavailable.");
+  }
+
+  return [...new Set(PLANTS.map((plant) => plant.id))];
+}
+
+const ids = catalogPlantIds();
 const normalizedCatalogIds = new Set(ids.map(normalizeAssetId));
 const registrySource = read(plantImagesPath);
 const registry = registryEntries(registrySource);
@@ -124,7 +124,12 @@ for (const id of ids) {
 
 for (const [id] of registry) {
   const normalizedId = normalizeAssetId(id);
-  if (!normalizedCatalogIds.has(normalizedId)) {
+  const replacementId = supersededRegistryIdAliases.get(id);
+  const hasCatalogReplacement =
+    replacementId &&
+    ids.includes(replacementId) &&
+    registry.has(replacementId);
+  if (!normalizedCatalogIds.has(normalizedId) && !hasCatalogReplacement) {
     missing.push(
       `${id}: entrée orpheline dans constants/plantImages.ts (aucune fiche du catalogue)`,
     );
