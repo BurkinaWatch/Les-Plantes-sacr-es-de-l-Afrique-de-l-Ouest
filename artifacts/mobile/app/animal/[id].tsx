@@ -391,7 +391,7 @@ export default function PlanteDetailScreen() {
               </View>
             )}
             {PLANT_IMAGES[plante.id] && (
-              <View pointerEvents="none" style={styles.zoomHint}>
+              <View style={[styles.zoomHint, { pointerEvents: 'none' }]}>
                 <SacredIcon name="search" size={15} color="#FFFFFF" />
                 <Text style={styles.zoomHintText}>Agrandir</Text>
               </View>
