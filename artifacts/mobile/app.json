@@ -52,6 +52,7 @@
         "expo-splash-screen",
         {
           "image": "./assets/images/logo-plantes-sacrees.png",
+            "imageWidth": 240,
           "resizeMode": "contain",
           "backgroundColor": "#120A05"
         }
