@@ -14,7 +14,7 @@
 
 | # | Area | Status | Sources |
 |---|---|---|---:|
-| 1 | Espèces et usages alimentaires/agroécologiques | complete | 11 articles + GBIF |
+| 1 | Espèces et usages alimentaires/agroécologiques | complete | 12 articles + GBIF |
 | 2 | Identité botanique et noms scientifiques | complete | 13 correspondances GBIF, dont un synonyme |
 | 3 | Sécurité et limites médicales | complete | Revue Moringa, étude animale Xylopia, limites des études d’extraits |
 | 4 | Publications publiques sur les réseaux sociaux | limited | 3 extraits indexés, pages non ouvertes |

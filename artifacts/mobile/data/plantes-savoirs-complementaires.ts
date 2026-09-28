@@ -56,7 +56,7 @@ export const PLANTES_SAVOIRS_COMPLEMENTAIRES: PlanteMedicinale[] = [
     sourceLinks: [
       gbif(2982583, 'Vigna unguiculata'),
       article(
-        'Cowpea: production, genetic resources and breeding priorities (2025)',
+        'Cowpea (Vigna unguiculata L.) production, genetic resources and strategic breeding priorities for sustainable food security: a review',
         'PMC12339483',
         'La revue décrit les usages alimentaires et agricoles du niébé, notamment en Afrique.',
       ),
@@ -92,7 +92,7 @@ export const PLANTES_SAVOIRS_COMPLEMENTAIRES: PlanteMedicinale[] = [
     sourceLinks: [
       gbif(3152084, 'Corchorus olitorius'),
       article(
-        'Dietary-derived Corchorus olitorius (2026)',
+        'Dietary-Derived Corchorus olitorius L. Extract Suppresses KRAS-Mutant Pancreatic Cancer by Activating Ferritinophagy-Dependent Ferroptosis',
         'PMC13525489',
         'Le résumé décrit la plante comme comestible, surtout dans un contexte asiatique ; il ne valide pas les noms locaux cités dans la vidéo.',
       ),
@@ -134,7 +134,7 @@ export const PLANTES_SAVOIRS_COMPLEMENTAIRES: PlanteMedicinale[] = [
     sourceLinks: [
       gbif(5384390, 'Amaranthus cruentus'),
       article(
-        'Farmer participatory evaluation of Amaranthus cruentus (2026)',
+        'Farmer participatory evaluation of Amaranthus cruentus L. breeding lines for marketable vegetable yield and organoleptic quality under on-farm and on-station conditions',
         'PMC13199344',
         'L’étude décrit cette espèce comme légume-feuille important en Afrique subsaharienne.',
       ),
@@ -170,7 +170,7 @@ export const PLANTES_SAVOIRS_COMPLEMENTAIRES: PlanteMedicinale[] = [
     sourceLinks: [
       gbif(2929847, 'Solanum aethiopicum'),
       article(
-        'Impact of ripeness and culinary treatments on Solanum aethiopicum (2026)',
+        'Impact of State of Ripeness and Culinary Treatments on the Hypoglycemic, Antioxidant, and Nutritional Properties of Two Varieties of Solanum aethiopicum L. Fruit',
         'PMC13139839',
         'L’étude compare des fruits de deux variétés et des traitements culinaires.',
       ),
@@ -206,7 +206,7 @@ export const PLANTES_SAVOIRS_COMPLEMENTAIRES: PlanteMedicinale[] = [
     sourceLinks: [
       gbif(2928551, 'Ipomoea batatas'),
       article(
-        'From source to utilization: sweet potato leaves (2026)',
+        'From Source to Utilization: A Review of Influencing Factors and Safety Assessment for High-Value Utilization of Sweet Potato (Ipomoea batatas L.) Leaves',
         'PMC13409526',
         'Revue générale sur les feuilles comme ressource alimentaire ; elle ne décrit pas une recette régionale ouest-africaine.',
       ),
@@ -242,12 +242,12 @@ export const PLANTES_SAVOIRS_COMPLEMENTAIRES: PlanteMedicinale[] = [
     sourceLinks: [
       gbif(5348812, 'Parkia biglobosa'),
       article(
-        'Microbial diversity and composition of Ghanaian dawadawa (2025)',
+        'Microbial Diversity, Nutritional Composition, and Health Implications of Fermented Locust Bean Seed (Dawadawa) From Ghana',
         'PMC12447108',
         'Étude consacrée au dawadawa fermenté à partir de graines de Parkia biglobosa au Ghana.',
       ),
       article(
-        'Sensory properties of fermented Zamné and comparison with soumbala (2025)',
+        'Sensory properties of fermented Zamné (Senegalia macrostachya seeds) and their influence on the broth quality and sensory profile',
         'PMC12318027',
         'L’article compare le zamné au soumbala, condiment fermenté de Parkia biglobosa.',
       ),
@@ -283,7 +283,7 @@ export const PLANTES_SAVOIRS_COMPLEMENTAIRES: PlanteMedicinale[] = [
     sourceLinks: [
       gbif(3130899, 'Gymnanthemum amygdalinum'),
       article(
-        'Processing and food applications of Vernonia amygdalina (2026)',
+        'Processing, Bioaccessibility, Predicted Bioavailability, Gut Microbiome Interactions and Potential Food Applications of Vernonia amygdalina (Bitter Leaf): Bridging the Evidence-to-Practice Gap',
         'PMC13565637',
         'La revue traite de la plante comme légume-feuille et des méthodes de transformation.',
       ),
@@ -319,7 +319,7 @@ export const PLANTES_SAVOIRS_COMPLEMENTAIRES: PlanteMedicinale[] = [
     sourceLinks: [
       gbif(2927094, 'Ocimum gratissimum'),
       article(
-        'Ocimum gratissimum: composition and uses review (2026)',
+        'Ocimum gratissimum: Chemical Composition, Phytochemical Properties, Antioxidants, and Pharmacological Activities: A Review',
         'PMC13259028',
         'Le résumé décrit le basilic africain et son emploi aromatique dans les plats.',
       ),
@@ -355,7 +355,7 @@ export const PLANTES_SAVOIRS_COMPLEMENTAIRES: PlanteMedicinale[] = [
     sourceLinks: [
       gbif(3157151, 'Xylopia aethiopica'),
       article(
-        'Toxicity evaluation of dried Xylopia aethiopica fruit spice (2026)',
+        'Acute (14-Day) and Subchronic (90-Day) Toxicity Evaluation of the Dried Fruit Spice Xylopia aethiopica (Dunal) A. Rich. (Annonaceae) in Male and Female Wistar Rats',
         'PMC13195186',
         'Le résumé décrit l’usage culinaire et une étude chez le rat ; celle-ci ne valide pas un traitement humain.',
       ),
@@ -391,7 +391,7 @@ export const PLANTES_SAVOIRS_COMPLEMENTAIRES: PlanteMedicinale[] = [
     sourceLinks: [
       gbif(5360150, 'Faidherbia albida'),
       article(
-        'Decomposition and nutrient release from West African agroforestry trees (2026)',
+        'Decomposition and nutrient release from leaves of some common agroforestry tree/shrub species of Sudano-Sahelian West Africa',
         'PMC12835154',
         'L’étude suit la décomposition des feuilles et leur libération de nutriments au Sahel.',
       ),
@@ -432,7 +432,7 @@ export const PLANTES_SAVOIRS_COMPLEMENTAIRES: PlanteMedicinale[] = [
     sourceLinks: [
       gbif(11066824, 'Thaumatococcus daniellii'),
       article(
-        'Techno-economic assessment of Thaumatococcus daniellii thaumatin (2026)',
+        'Techno-economic assessment for plant seed-based production of Thaumatin II: a natural high intensity protein sweetener',
         'PMC13441740',
         'La revue décrit la plante ouest-africaine et la thaumatine du fruit.',
       ),
@@ -474,7 +474,7 @@ export const PLANTES_SAVOIRS_COMPLEMENTAIRES: PlanteMedicinale[] = [
     sourceLinks: [
       gbif(7936172, 'Senegalia macrostachya'),
       article(
-        'Sensory properties of fermented Zamné (2025)',
+        'Sensory properties of fermented Zamné (Senegalia macrostachya seeds) and their influence on the broth quality and sensory profile',
         'PMC12318027',
         'Étude sur le zamné du centre du Burkina Faso et comparaison avec le soumbala.',
       ),
