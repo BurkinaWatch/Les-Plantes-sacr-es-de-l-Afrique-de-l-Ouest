@@ -1,7 +1,6 @@
 import { Router, type RequestHandler } from "express";
 import bcrypt from "bcryptjs";
 import rateLimit from "express-rate-limit";
-import { pool } from "@workspace/db";
 import { z } from "zod";
 
 import { requireJwt } from "../lib/auth-middleware.js";
@@ -211,7 +210,7 @@ export function createAccountDeletionRouter(options: {
   comparePassword?: PasswordComparer;
   authenticate?: RequestHandler;
 } = {}): Router {
-  const connect = options.connect ?? (() => pool.connect());
+  const connect = options.connect ?? (async () => (await import("@workspace/db")).pool.connect());
   const comparePassword = options.comparePassword ?? bcrypt.compare;
   const authenticate = options.authenticate ?? requireJwt;
   const accountRouter = Router();
