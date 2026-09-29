@@ -32,6 +32,27 @@ export interface AccountDeletionRequest {
   password: string;
 }
 
+export type AccountDeletionFormInputConfirm = typeof AccountDeletionFormInputConfirm[keyof typeof AccountDeletionFormInputConfirm];
+
+
+export const AccountDeletionFormInputConfirm = {
+  yes: 'yes',
+} as const;
+
+export interface AccountDeletionFormInput {
+  /**
+     * @minLength 3
+     * @maxLength 30
+     */
+  username: string;
+  /**
+     * @minLength 6
+     * @maxLength 128
+     */
+  password: string;
+  confirm: AccountDeletionFormInputConfirm;
+}
+
 export interface AuthUser {
   id: number;
   username: string;

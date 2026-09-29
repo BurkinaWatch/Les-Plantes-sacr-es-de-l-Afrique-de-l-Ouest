@@ -20,6 +20,7 @@ import type {
 } from '@tanstack/react-query';
 
 import type {
+  AccountDeletionFormInput,
   AccountDeletionRequest,
   ApiError,
   AuthCredentials,
@@ -403,6 +404,177 @@ export const useDeleteAccount = <TError = ErrorType<BadRequestResponse | Unautho
         TContext
       > => {
       return useMutation(getDeleteAccountMutationOptions(options));
+    }
+
+export const getGetAccountDeletionPageUrl = () => {
+
+
+
+
+  return `/api/auth/account-deletion`
+}
+
+/**
+ * Provides an unauthenticated web form for deleting an account when the user no longer has the app.
+ * @summary Show the public account deletion form
+ */
+export const getAccountDeletionPage = async ( options?: Parameters<typeof customFetch>[1]): Promise<string> => {
+
+  return customFetch<string>(getGetAccountDeletionPageUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetAccountDeletionPageQueryKey = () => {
+    return [
+    `/api/auth/account-deletion`
+    ] as const;
+    }
+
+
+export const getGetAccountDeletionPageQueryOptions = <TData = Awaited<ReturnType<typeof getAccountDeletionPage>>, TError = ErrorType<unknown>>( options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getAccountDeletionPage>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetAccountDeletionPageQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getAccountDeletionPage>>> = ({ signal }) => getAccountDeletionPage({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getAccountDeletionPage>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetAccountDeletionPageQueryResult = NonNullable<Awaited<ReturnType<typeof getAccountDeletionPage>>>
+export type GetAccountDeletionPageQueryError = ErrorType<unknown>
+
+
+/**
+ * @summary Show the public account deletion form
+ */
+
+export function useGetAccountDeletionPage<TData = Awaited<ReturnType<typeof getAccountDeletionPage>>, TError = ErrorType<unknown>>(
+  options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getAccountDeletionPage>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetAccountDeletionPageQueryOptions(options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export const getSubmitAccountDeletionRequestUrl = () => {
+
+
+
+
+  return `/api/auth/account-deletion`
+}
+
+/**
+ * Verifies the username and password, then deletes the account and linked records.
+ * @summary Submit the public account deletion form
+ */
+export const submitAccountDeletionRequest = async (accountDeletionFormInput: AccountDeletionFormInput, options?: Parameters<typeof customFetch>[1]): Promise<string> => {
+    const formUrlEncoded = new URLSearchParams();
+formUrlEncoded.append(`username`, accountDeletionFormInput.username);
+formUrlEncoded.append(`password`, accountDeletionFormInput.password);
+formUrlEncoded.append(`confirm`, accountDeletionFormInput.confirm);
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return customFetch<string>(getSubmitAccountDeletionRequestUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded', ...getHeaders(options?.headers) },
+    body: formUrlEncoded
+  }
+);}
+
+
+
+
+
+export const getSubmitAccountDeletionRequestMutationKey = () => ['submitAccountDeletionRequest'] as const;
+
+export const getSubmitAccountDeletionRequestMutationOptions = <TError = ErrorType<string | TooManyRequestsResponse>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof submitAccountDeletionRequest>>, TError,SubmitAccountDeletionRequestMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof submitAccountDeletionRequest>>, TError,SubmitAccountDeletionRequestMutationVariables, TContext> => {
+
+const mutationKey = getSubmitAccountDeletionRequestMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof submitAccountDeletionRequest>>, SubmitAccountDeletionRequestMutationVariables> = (props) => {
+          const {data} = props ?? {};
+
+          return  submitAccountDeletionRequest(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type SubmitAccountDeletionRequestMutationResult = NonNullable<Awaited<ReturnType<typeof submitAccountDeletionRequest>>>
+    export type SubmitAccountDeletionRequestMutationBody = BodyType<AccountDeletionFormInput>
+    export type SubmitAccountDeletionRequestMutationError = ErrorType<string | TooManyRequestsResponse>
+    export type SubmitAccountDeletionRequestMutationVariables = {data: BodyType<AccountDeletionFormInput>}
+
+    /**
+ * @summary Submit the public account deletion form
+ */
+export const useSubmitAccountDeletionRequest = <TError = ErrorType<string | TooManyRequestsResponse>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof submitAccountDeletionRequest>>, TError,SubmitAccountDeletionRequestMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof submitAccountDeletionRequest>>,
+        TError,
+        SubmitAccountDeletionRequestMutationVariables,
+        TContext
+      > => {
+      return useMutation(getSubmitAccountDeletionRequestMutationOptions(options));
     }
 
 export const getGetSubscriptionPlansUrl = () => {

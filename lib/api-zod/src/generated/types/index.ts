@@ -6,6 +6,8 @@
  * OpenAPI spec version: 0.1.0
  */
 
+export * from './accountDeletionFormInput';
+export * from './accountDeletionFormInputConfirm';
 export * from './accountDeletionRequest';
 export * from './apiError';
 export * from './authCredentials';

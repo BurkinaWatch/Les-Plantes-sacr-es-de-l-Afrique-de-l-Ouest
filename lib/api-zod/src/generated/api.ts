@@ -94,6 +94,34 @@ export const DeleteAccountResponse = zod.void()
 
 
 /**
+ * Provides an unauthenticated web form for deleting an account when the user no longer has the app.
+ * @summary Show the public account deletion form
+ */
+export const GetAccountDeletionPageResponse = zod.unknown()
+
+
+/**
+ * Verifies the username and password, then deletes the account and linked records.
+ * @summary Submit the public account deletion form
+ */
+export const submitAccountDeletionRequestBodyUsernameMin = 3;
+export const submitAccountDeletionRequestBodyUsernameMax = 30;
+
+export const submitAccountDeletionRequestBodyPasswordMin = 6;
+export const submitAccountDeletionRequestBodyPasswordMax = 128;
+
+
+
+export const SubmitAccountDeletionRequestBody = zod.object({
+  "username": zod.string().min(submitAccountDeletionRequestBodyUsernameMin).max(submitAccountDeletionRequestBodyUsernameMax),
+  "password": zod.string().min(submitAccountDeletionRequestBodyPasswordMin).max(submitAccountDeletionRequestBodyPasswordMax),
+  "confirm": zod.enum(['yes'])
+})
+
+export const SubmitAccountDeletionRequestResponse = zod.unknown()
+
+
+/**
  * @summary List available subscription plans
  */
 export const GetSubscriptionPlansResponse = zod.object({
