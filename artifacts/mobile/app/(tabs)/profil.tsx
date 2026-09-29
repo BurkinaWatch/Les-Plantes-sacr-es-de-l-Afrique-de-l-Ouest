@@ -317,6 +317,8 @@ const styles = StyleSheet.create({
   card: { borderRadius: 16, padding: 18, borderWidth: 1, gap: 12 },
   subscriptionPromo: { marginTop: 0 },
   subscriptionPromoLink: { fontSize: 14, fontWeight: '700' as const, marginTop: 2 },
+  deleteAccountLink: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 16, paddingVertical: 14, borderTopWidth: StyleSheet.hairlineWidth },
+  deleteAccountText: { fontSize: 14, fontWeight: '700' as const },
   langRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
   langChip: { paddingHorizontal: 12, paddingVertical: 7, borderRadius: 20, borderWidth: 1 },
   langText: { fontSize: 13, fontWeight: '600' as const },
