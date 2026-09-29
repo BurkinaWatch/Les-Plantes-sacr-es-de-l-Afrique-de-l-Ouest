@@ -7,7 +7,7 @@
 import { Router } from "express";
 import { z } from "zod";
 import { pool } from "@workspace/db";
-import { requireJwt } from "../lib/auth-middleware.js";
+import { requireActiveUserJwt } from "../lib/auth-middleware.js";
 import { logger } from "../lib/logger.js";
 
 const router = Router();
@@ -44,7 +44,7 @@ export async function sendExpoPushNotification(
   }
 }
 
-router.post("/", requireJwt, async (req, res) => {
+router.post("/", requireActiveUserJwt, async (req, res) => {
   const parsed = tokenSchema.safeParse(req.body);
   if (!parsed.success) {
     return res.status(400).json({ error: "Token invalide" });

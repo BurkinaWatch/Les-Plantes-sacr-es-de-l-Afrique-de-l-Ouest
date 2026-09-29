@@ -1,5 +1,6 @@
-import { Request, Response, NextFunction } from "express";
+import { Request, Response, NextFunction, type RequestHandler } from "express";
 import jwt from "jsonwebtoken";
+import { pool } from "@workspace/db";
 
 // Extend Express Request to carry a server-verified user identity
 declare global {
@@ -48,20 +49,48 @@ function attachVerifiedUser(req: Request, token: string): boolean {
  * Requires a server-issued JWT and attaches only its verified identity.
  * AI and push-token routes must not be callable with a public client key.
  */
-export function requireJwt(req: Request, res: Response, next: NextFunction): void {
-  const auth = req.headers["authorization"];
-  if (typeof auth !== "string" || !auth.startsWith("Bearer ")) {
-    res.status(401).json({ error: "Authentification requise" });
-    return;
-  }
+export function createRequireJwt(
+  accountExists?: (userId: number) => Promise<boolean>,
+): RequestHandler {
+  return async (req: Request, res: Response, next: NextFunction) => {
+    const auth = req.headers["authorization"];
+    if (typeof auth !== "string" || !auth.startsWith("Bearer ")) {
+      res.status(401).json({ error: "Authentification requise" });
+      return;
+    }
 
-  if (!attachVerifiedUser(req, auth.slice(7).trim())) {
-    res.status(401).json({ error: "Session invalide ou expirée" });
-    return;
-  }
+    if (!attachVerifiedUser(req, auth.slice(7).trim())) {
+      res.status(401).json({ error: "Session invalide ou expirée" });
+      return;
+    }
 
-  next();
+    if (accountExists) {
+      try {
+        if (!(await accountExists(req.user!.id))) {
+          res.status(401).json({ error: "Ce compte n’existe plus" });
+          return;
+        }
+      } catch (error) {
+        next(error);
+        return;
+      }
+    }
+
+    next();
+  };
 }
+
+/** Verifies a server-issued JWT without requiring a live account row. */
+export const requireJwt = createRequireJwt();
+
+/**
+ * Protects account data and prevents deleted accounts' still-valid JWTs from
+ * continuing to call authenticated APIs until their normal expiry.
+ */
+export const requireActiveUserJwt = createRequireJwt(async (userId) => {
+  const result = await pool.query("SELECT 1 FROM users WHERE id = $1 LIMIT 1", [userId]);
+  return (result.rowCount ?? 0) > 0;
+});
 
 export function signUserToken(user: { id: number; username: string }): string {
   const jwtSecret = process.env["JWT_SECRET"];

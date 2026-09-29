@@ -5,11 +5,13 @@ import chatRouter from "./chat";
 import plantRecognitionRouter from "./plant-recognition";
 import pushTokensRouter from "./push-tokens";
 import subscriptionsRouter from "./subscriptions";
+import accountDeletionRouter from "./account-deletion";
 
 const router: IRouter = Router();
 
 router.use(healthRouter);
 router.use("/auth", authRouter);
+router.use("/auth", accountDeletionRouter);
 router.use("/chat", chatRouter);
 router.use("/plant-recognition", plantRecognitionRouter);
 router.use("/push-tokens", pushTokensRouter);

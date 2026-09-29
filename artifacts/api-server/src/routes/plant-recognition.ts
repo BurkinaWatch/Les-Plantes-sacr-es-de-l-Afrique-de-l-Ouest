@@ -1,7 +1,7 @@
-import { Router } from "express";
+import { Router, type RequestHandler } from "express";
 import Groq from "groq-sdk";
 import { z } from "zod";
-import { requireJwt } from "../lib/auth-middleware.js";
+import { requireActiveUserJwt } from "../lib/auth-middleware.js";
 import {
   createUserRateLimiter,
   monthlyQuotaMiddleware,
@@ -121,10 +121,13 @@ Si l'image ne montre pas clairement une plante ou que tu ne peux pas l'identifie
 Retourne UNIQUEMENT du JSON valide. Pas de markdown, pas d'explication, pas de blocs de code.`;
 }
 
-export function createPlantRecognitionRouter(getClient: () => ChatClient = getGroq): Router {
+export function createPlantRecognitionRouter(
+  getClient: () => ChatClient = getGroq,
+  authenticate: RequestHandler = requireActiveUserJwt,
+): Router {
   const router = Router();
 
-  router.post("/", requireJwt, recognitionLimiter, monthlyQuotaMiddleware, async (req, res) => {
+  router.post("/", authenticate, recognitionLimiter, monthlyQuotaMiddleware, async (req, res) => {
   const parsed = recognitionSchema.safeParse(req.body);
   if (!parsed.success) {
     return res.status(400).json({ error: "Données invalides" });

@@ -9,7 +9,7 @@ import {
   subscriptionPlansTable,
   subscriptionsTable,
 } from "@workspace/db";
-import { requireJwt } from "../lib/auth-middleware.js";
+import { requireActiveUserJwt } from "../lib/auth-middleware.js";
 import { logger } from "../lib/logger.js";
 import { SasPayProvider, SasPayProviderError } from "../lib/saspay-provider.js";
 import type { PaymentProvider } from "../lib/payment-provider.js";
@@ -147,7 +147,7 @@ export function createSubscriptionsRouter(
   return res.json({ plans });
 });
 
-router.get("/status", requireJwt, async (req, res) => {
+  router.get("/status", requireActiveUserJwt, async (req, res) => {
   const [subscription] = await database
     .select({
       id: subscriptionsTable.id,
@@ -170,7 +170,7 @@ router.get("/status", requireJwt, async (req, res) => {
   return res.json({ subscription: subscription ?? null });
 });
 
-router.post("/reconcile", requireJwt, async (req, res) => {
+  router.post("/reconcile", requireActiveUserJwt, async (req, res) => {
   if (!paymentProvider.isConfigured() || !paymentProvider.getCheckoutSession) {
     return res.status(503).json({
       code: "PAYMENTS_NOT_CONFIGURED",
@@ -226,7 +226,7 @@ router.post("/reconcile", requireJwt, async (req, res) => {
   });
 });
 
-router.post("/create-payment", requireJwt, async (req, res) => {
+  router.post("/create-payment", requireActiveUserJwt, async (req, res) => {
   const parsed = createPaymentSchema.safeParse(req.body);
   if (!parsed.success) {
     return res.status(400).json({ error: "Informations de paiement invalides." });

@@ -1,7 +1,7 @@
-import { Router } from "express";
+import { Router, type RequestHandler } from "express";
 import Groq from "groq-sdk";
 import { z } from "zod";
-import { requireJwt } from "../lib/auth-middleware.js";
+import { requireActiveUserJwt } from "../lib/auth-middleware.js";
 import {
   createUserRateLimiter,
   monthlyQuotaMiddleware,
@@ -126,10 +126,13 @@ ${animal.conseilsDeVie.join("\n")}
 9. ${langInstruction}`;
 }
 
-export function createChatRouter(getClient: () => ChatClient = getGroq): Router {
+export function createChatRouter(
+  getClient: () => ChatClient = getGroq,
+  authenticate: RequestHandler = requireActiveUserJwt,
+): Router {
   const router = Router();
 
-  router.post("/totem", requireJwt, chatLimiter, monthlyQuotaMiddleware, async (req, res) => {
+  router.post("/totem", authenticate, chatLimiter, monthlyQuotaMiddleware, async (req, res) => {
   const parsed = chatSchema.safeParse(req.body);
   if (!parsed.success) {
     return res.status(400).json({ error: "Données invalides" });
