@@ -1,7 +1,11 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import React, { createContext, useCallback, useContext, useEffect, useState } from 'react';
 import { getApiBase } from '@/lib/api-config';
-import { loginAccount, registerAccount } from '@workspace/api-client-react';
+import {
+  deleteAccount as deleteAccountRequest,
+  loginAccount,
+  registerAccount,
+} from '@workspace/api-client-react';
 
 /**
  * Auth storage key (v2 — uses server-issued JWTs, not local fake tokens).
@@ -28,6 +32,7 @@ interface AuthContextType {
   isLoading: boolean;
   register: (username: string, password: string) => Promise<{ error?: string }>;
   login: (username: string, password: string) => Promise<{ error?: string }>;
+  deleteAccount: (password: string) => Promise<{ error?: string }>;
   logout: () => Promise<void>;
 }
 
@@ -128,8 +133,27 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     await AsyncStorage.removeItem(AUTH_KEY);
   }, []);
 
+  const deleteAccount = useCallback(async (password: string) => {
+    try {
+      await deleteAccountRequest({ password });
+    } catch (error) {
+      return {
+        error: getAuthApiError(error) ?? 'Impossible de supprimer le compte pour le moment.',
+      };
+    }
+
+    setToken(null);
+    setUser(null);
+    try {
+      await AsyncStorage.removeItem(AUTH_KEY);
+    } catch {
+      // The server has deleted the account; keep the in-memory session cleared.
+    }
+    return {};
+  }, []);
+
   return (
-    <AuthContext.Provider value={{ user, token, isLoading, register, login, logout }}>
+    <AuthContext.Provider value={{ user, token, isLoading, register, login, deleteAccount, logout }}>
       {children}
     </AuthContext.Provider>
   );

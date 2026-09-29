@@ -315,6 +315,7 @@ function RootLayoutNav() {
         <Stack.Screen name="progression-spirituelle" options={{ headerShown: false, presentation: "card" }} />
         <Stack.Screen name="error-fallback" options={{ headerShown: false, presentation: "card" }} />
         <Stack.Screen name="abonnement" options={{ headerShown: false, presentation: "card" }} />
+        <Stack.Screen name="account-deletion" options={{ headerShown: false, presentation: "card" }} />
       </Stack>
       <ScannerFab />
     </View>

@@ -20,6 +20,7 @@ interface AppContextType {
   quizResult: QuizResult | null;
   setQuizResult: (result: QuizResult) => void;
   clearQuizResult: () => void;
+  clearPersonalData: () => Promise<void>;
   dailyQuote: Quote;
   refreshQuote: () => void;
 }
@@ -73,13 +74,31 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     } catch (_) {}
   }, []);
 
+  const clearPersonalData = useCallback(async () => {
+    setFavorites([]);
+    setQuizResultState(null);
+    try {
+      await AsyncStorage.multiRemove([FAVORITES_KEY, QUIZ_RESULT_KEY]);
+    } catch (_) {}
+  }, []);
+
   const refreshQuote = useCallback(() => {
     setDailyQuote(getQuoteDuJour());
   }, []);
 
   return (
     <AppContext.Provider
-      value={{ favorites, toggleFavorite, isFavorite, quizResult, setQuizResult, clearQuizResult, dailyQuote, refreshQuote }}
+      value={{
+        favorites,
+        toggleFavorite,
+        isFavorite,
+        quizResult,
+        setQuizResult,
+        clearQuizResult,
+        clearPersonalData,
+        dailyQuote,
+        refreshQuote,
+      }}
     >
       {children}
     </AppContext.Provider>

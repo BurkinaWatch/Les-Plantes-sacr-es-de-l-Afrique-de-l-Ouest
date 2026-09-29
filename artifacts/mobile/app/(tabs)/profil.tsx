@@ -241,6 +241,16 @@ export default function ProfilScreen() {
             <Text style={[styles.infoTitle, { color: colors.mutedForeground }]}>{t.auth_username}</Text>
             <Text style={[styles.infoValue, { color: colors.ivory }]}>{user?.username}</Text>
           </View>
+          <Pressable
+            testID="profile-delete-account"
+            accessibilityRole="button"
+            onPress={() => router.push('/account-deletion' as any)}
+            style={({ pressed }) => [styles.deleteAccountLink, { borderTopColor: colors.border, opacity: pressed ? 0.75 : 1 }]}
+          >
+            <Text style={[styles.deleteAccountText, { color: colors.terracotta }]}>
+              {lang === 'en' ? 'Delete my account' : 'Supprimer mon compte'}
+            </Text>
+          </Pressable>
         </View>
 
         <Pressable
