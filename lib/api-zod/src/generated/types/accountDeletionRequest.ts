@@ -6,8 +6,10 @@
  * OpenAPI spec version: 0.1.0
  */
 
-export interface SubscriptionPayment {
-  subscriptionId: number;
-  checkoutUrl: string;
-  status: string;
+export interface AccountDeletionRequest {
+  /**
+     * @minLength 6
+     * @maxLength 128
+     */
+  password: string;
 }
