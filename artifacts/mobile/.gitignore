@@ -17,6 +17,7 @@ android/
 .gradle-cache/
 *.orig.*
 *.jks
+*.aab
 *.p8
 *.p12
 *.key
