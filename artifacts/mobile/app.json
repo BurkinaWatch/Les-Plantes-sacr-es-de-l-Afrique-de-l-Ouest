@@ -24,7 +24,7 @@
       }
     },
     "android": {
-      "package": "com.ouedraogophillips.plantessacrees",
+      "package": "com.sotyssi.plantessacrees",
       "versionCode": 4,
       "backgroundColor": "#120A05",
       "adaptiveIcon": {
