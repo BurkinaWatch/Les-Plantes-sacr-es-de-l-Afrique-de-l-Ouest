@@ -20,7 +20,7 @@
       "bundleIdentifier": "com.ouedraogophillips.plantessacrees",
       "infoPlist": {
         "NSCameraUsageDescription": "Utilisé pour prendre des photos de plantes afin de les identifier.",
-        "NSPhotoLibraryUsageDescription": "Utilisé pour sélectionner des photos de plantes depuis votre galerie.",
+        "NSPhotoLibraryUsageDescription": "Utilisé pour sélectionner des photos de plantes depuis votre galerie."
       }
     },
     "android": {
