@@ -1,6 +1,5 @@
 import { Request, Response, NextFunction, type RequestHandler } from "express";
 import jwt from "jsonwebtoken";
-import { pool } from "@workspace/db";
 
 // Extend Express Request to carry a server-verified user identity
 declare global {
@@ -88,6 +87,7 @@ export const requireJwt = createRequireJwt();
  * continuing to call authenticated APIs until their normal expiry.
  */
 export const requireActiveUserJwt = createRequireJwt(async (userId) => {
+  const { pool } = await import("@workspace/db");
   const result = await pool.query("SELECT 1 FROM users WHERE id = $1 LIMIT 1", [userId]);
   return (result.rowCount ?? 0) > 0;
 });
