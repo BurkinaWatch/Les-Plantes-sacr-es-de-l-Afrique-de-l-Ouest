@@ -1,0 +1,318 @@
+MODIFICATION OFFICIELLE DE L'IDENTIFIANT ANDROID
+PROJET : LES ANIMAUX SACRÉS
+
+OBJECTIF
+
+Je veux remplacer définitivement l'identifiant Android actuel :
+
+com.ouedraogophillips.animauxsacres
+
+par :
+
+com.sotyssi.animauxsacres
+
+Le nouvel identifiant officiel de l'application doit être :
+
+com.sotyssi.animauxsacres
+
+SOTYSSI est l'identité sous laquelle je souhaite désormais rattacher cette application.
+
+==================================================
+ÉTAPE 1 — AUDIT AVANT MODIFICATION
+==================================================
+
+Avant toute modification, inspecte le projet et recherche toutes les références à :
+
+com.ouedraogophillips.animauxsacres
+ouedraogophillips
+
+Vérifie notamment :
+
+- app.json
+- app.config.js
+- app.config.ts
+- app.config.json
+- package.json
+- eas.json
+- android/
+- android/app/
+- AndroidManifest.xml
+- build.gradle
+- build.gradle.kts
+- gradle.properties
+- settings.gradle
+- settings.gradle.kts
+- fichiers Kotlin
+- fichiers Java
+- fichiers XML
+- configuration Expo
+- configuration EAS
+- scripts de build
+- CI/CD
+- documentation
+- éventuelles configurations de soumission Google Play
+
+Ne modifie encore rien pendant cette étape.
+
+==================================================
+ÉTAPE 2 — VÉRIFICATION GOOGLE PLAY
+==================================================
+
+Détermine si le repository contient des indices permettant de savoir si :
+
+com.ouedraogophillips.animauxsacres
+
+a déjà été utilisé pour une application publiée sur Google Play.
+
+Si tu ne peux pas le vérifier depuis le repository, indique clairement :
+
+« Publication Google Play : NON VÉRIFIABLE DEPUIS LE REPOSITORY »
+
+NE PAS inventer une vérification.
+
+IMPORTANT :
+
+Si tu trouves des éléments indiquant que cette application est déjà publiée sur Google Play avec :
+
+com.ouedraogophillips.animauxsacres
+
+ALORS ARRÊTE-TOI AVANT DE MODIFIER LE PACKAGE NAME.
+
+Dans ce cas, explique-moi le problème et attends ma confirmation.
+
+Si aucune publication existante n'est identifiée et que le changement peut être effectué sans risque connu, continue.
+
+==================================================
+ÉTAPE 3 — REMPLACEMENT DE L'IDENTIFIANT
+==================================================
+
+Remplace proprement :
+
+com.ouedraogophillips.animauxsacres
+
+par :
+
+com.sotyssi.animauxsacres
+
+Le nouvel identifiant doit devenir la source officielle de configuration de l'application Android.
+
+Vérifie en particulier la configuration Expo.
+
+Si le projet utilise Expo, la configuration attendue doit être équivalente à :
+
+{
+  "expo": {
+    "android": {
+      "package": "com.sotyssi.animauxsacres"
+    }
+  }
+}
+
+Si la configuration utilise app.config.ts ou app.config.js, adapte-la au format réellement utilisé par le projet.
+
+NE CRÉE PAS une deuxième configuration concurrente.
+
+==================================================
+ÉTAPE 4 — ANDROID NATIF
+==================================================
+
+Si le projet contient un dossier Android natif, vérifie et mets à jour toutes les références nécessaires afin que l'application utilise :
+
+com.sotyssi.animauxsacres
+
+comme Android application ID / package.
+
+Vérifie notamment :
+
+- applicationId
+- namespace lorsque nécessaire
+- AndroidManifest
+- chemins de packages Java/Kotlin si concernés
+- configurations Gradle
+
+Attention :
+
+NE FAIS PAS un remplacement textuel aveugle de toutes les occurrences de « ouedraogophillips ».
+
+Certaines occurrences peuvent être historiques, documentaires ou appartenir à des chemins/classes qui nécessitent une modification structurelle.
+
+Analyse chaque occurrence avant de la modifier.
+
+==================================================
+ÉTAPE 5 — EAS
+==================================================
+
+Vérifie que la configuration EAS reste cohérente avec le nouveau package.
+
+Inspecte notamment :
+
+- eas.json
+- projectId
+- owner
+- build profiles
+- submit profiles
+- configuration Expo
+- variables liées au build
+
+NE SUPPRIME PAS le projectId Expo/EAS existant simplement parce que le package name change.
+
+NE RECRÉE PAS inutilement un projet Expo/EAS.
+
+Si une association existante nécessite une action manuelle sur Expo/EAS, indique-la clairement au lieu de la modifier arbitrairement.
+
+==================================================
+ÉTAPE 6 — SIGNATURE ANDROID
+==================================================
+
+Ne régénère PAS de keystore inutilement.
+
+Ne supprime PAS les credentials existants.
+
+Ne modifie aucune clé privée.
+
+Vérifie simplement si le changement de package nécessite une nouvelle configuration de signature ou une action particulière.
+
+Si un secret est rencontré :
+
+- ne l'affiche jamais ;
+- ne le copie pas dans le rapport ;
+- indique uniquement qu'un secret existe et où il intervient.
+
+==================================================
+ÉTAPE 7 — RECHERCHE APRÈS MODIFICATION
+==================================================
+
+Après la modification, effectue une recherche globale du repository.
+
+Recherche :
+
+com.ouedraogophillips.animauxsacres
+ouedraogophillips
+
+L'objectif est qu'aucune référence ACTIVE et incorrecte à l'ancien package ne subsiste.
+
+S'il reste des occurrences légitimes dans :
+- historique ;
+- documentation ;
+- rapport d'audit ;
+- fichiers non utilisés ;
+
+ne les supprime pas automatiquement.
+
+Signale-les dans le rapport.
+
+Ensuite recherche :
+
+com.sotyssi.animauxsacres
+
+et liste tous les endroits où le nouveau package est correctement configuré.
+
+==================================================
+ÉTAPE 8 — VERSION ANDROID
+==================================================
+
+NE CHANGE PAS la version de l'application sauf nécessité technique.
+
+Conserve :
+
+versionName : 1.0.1
+versionCode : 2
+
+sauf si le système de build impose une modification.
+
+Si une modification est nécessaire, explique pourquoi avant de la faire.
+
+==================================================
+ÉTAPE 9 — VALIDATION
+==================================================
+
+Effectue les validations disponibles sans publier l'application.
+
+Vérifie au minimum :
+
+- TypeScript si applicable
+- configuration Expo
+- configuration EAS
+- configuration Android
+- Gradle si projet natif disponible
+- production build si possible
+- absence d'erreur liée au nouveau package
+
+Si un build complet est trop coûteux ou impossible dans l'environnement actuel, ne simule PAS le résultat.
+
+Indique exactement ce qui a été vérifié et ce qui n'a pas pu l'être.
+
+==================================================
+ÉTAPE 10 — RAPPORT FINAL
+==================================================
+
+À la fin, produis :
+
+# MODIFICATION DE L'IDENTIFIANT ANDROID — RAPPORT
+
+## Ancien identifiant
+
+com.ouedraogophillips.animauxsacres
+
+## Nouvel identifiant
+
+com.sotyssi.animauxsacres
+
+## Fichiers modifiés
+
+Liste précise des fichiers modifiés.
+
+## Modifications effectuées
+
+Explique précisément ce qui a été changé.
+
+## Expo
+
+Indique si Expo utilise maintenant :
+
+com.sotyssi.animauxsacres
+
+## EAS
+
+Indique l'état de la configuration EAS.
+
+## Android natif
+
+Indique l'état de applicationId / namespace / package.
+
+## Signing
+
+Indique si les credentials ont été conservés et s'ils nécessitent une action.
+
+## Anciennes références
+
+Indique toutes les occurrences restantes de :
+
+ouedraogophillips
+
+et explique pourquoi elles restent éventuellement présentes.
+
+## Validation
+
+Liste les tests effectués et leurs résultats.
+
+## Build
+
+Indique si un build Android a été exécuté.
+
+## État final
+
+Le résultat attendu est :
+
+APPLICATION ID = com.sotyssi.animauxsacres
+
+IMPORTANT :
+
+Ne publie rien sur Google Play.
+Ne soumets rien à Google Play.
+Ne crée pas de nouvelle application Google Play.
+Ne déploie rien en production.
+
+Cette tâche concerne uniquement la modification et la validation du projet local.
+
+À la fin, arrête-toi et attends mes instructions.
