@@ -2,7 +2,6 @@ import { Router, type RequestHandler } from "express";
 import bcrypt from "bcryptjs";
 import rateLimit from "express-rate-limit";
 import { pool } from "@workspace/db";
-import type { PoolClient } from "pg";
 import { z } from "zod";
 
 import { requireJwt } from "../lib/auth-middleware.js";
@@ -12,7 +11,8 @@ const router = Router();
 type UserSelector = { userId: number } | { username: string };
 type DeletionResult = "deleted" | "invalid_credentials" | "missing";
 type PasswordComparer = (password: string, hash: string) => Promise<boolean>;
-type ConnectClient = () => Promise<PoolClient>;
+type AccountDbClient = Awaited<ReturnType<typeof pool.connect>>;
+type ConnectClient = () => Promise<AccountDbClient>;
 
 const deleteLimit = rateLimit({
   windowMs: 15 * 60 * 1000,
@@ -68,7 +68,7 @@ function deletionPage(notice?: { title: string; message: string; success?: boole
 <body>
 <main>
   <h1>Demander la suppression de votre compte</h1>
-  <p>Cette page permet de supprimer votre compte « Les Plantes Sacrées » même si vous n’avez plus accès à l’application. La vérification se fait avec votre nom d’utilisateur et votre mot de passe; aucun e-mail n’est demandé ni enregistré par ce formulaire.</p>
+<p>Cette page permet de supprimer votre compte « Les Plantes Sacrées » même si vous n’avez plus accès à l’application. La vérification se fait avec votre nom d’utilisateur et votre mot de passe; aucun e-mail n’est demandé par ce formulaire.</p>
   ${noticeHtml}
   <h2>Conséquences de la suppression</h2>
   <ul>
@@ -91,7 +91,7 @@ function deletionPage(notice?: { title: string; message: string; success?: boole
 </html>`;
 }
 
-async function removeAccountRecords(client: PoolClient, userId: number): Promise<void> {
+async function removeAccountRecords(client: AccountDbClient, userId: number): Promise<void> {
   const attempts = await client.query<{
     provider: string;
     provider_transaction_id: string | null;

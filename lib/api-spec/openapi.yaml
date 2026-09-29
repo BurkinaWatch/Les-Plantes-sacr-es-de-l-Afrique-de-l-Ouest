@@ -86,6 +86,29 @@ paths:
           $ref: "#/components/responses/Unauthorized"
         "429":
           $ref: "#/components/responses/TooManyRequests"
+  /auth/account:
+    delete:
+      operationId: deleteAccount
+      tags: [auth]
+      summary: Permanently delete the authenticated account
+      description: Re-authenticates with the current password, deletes account-linked records, and removes the session from the client.
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AccountDeletionRequest"
+      responses:
+        "204":
+          description: Account deleted, or already absent
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "429":
+          $ref: "#/components/responses/TooManyRequests"
   /subscriptions/plans:
     get:
       operationId: getSubscriptionPlans
@@ -222,6 +245,15 @@ components:
           minLength: 3
           maxLength: 30
           pattern: "^[A-Za-z0-9_]+$"
+        password:
+          type: string
+          minLength: 6
+          maxLength: 128
+    AccountDeletionRequest:
+      type: object
+      additionalProperties: false
+      required: [password]
+      properties:
         password:
           type: string
           minLength: 6

@@ -6,6 +6,7 @@ import jwt from "jsonwebtoken";
 
 import { createChatRouter } from "../.test-dist/src/routes/chat.js";
 import { createPlantRecognitionRouter } from "../.test-dist/src/routes/plant-recognition.js";
+import { createRequireJwt } from "../.test-dist/src/lib/auth-middleware.js";
 
 const JWT_SECRET = "test-jwt-secret";
 const TOKEN = jwt.sign(
@@ -75,8 +76,9 @@ function createMockGroq({ chatContent, plantContent, plantError } = {}) {
 async function withApp(mock, callback) {
   const app = express();
   app.use(express.json());
-  app.use("/api/chat", createChatRouter(() => mock.client));
-  app.use("/api/plant-recognition", createPlantRecognitionRouter(() => mock.client));
+  const authenticate = createRequireJwt(async () => true);
+  app.use("/api/chat", createChatRouter(() => mock.client, authenticate));
+  app.use("/api/plant-recognition", createPlantRecognitionRouter(() => mock.client, authenticate));
   const server = createServer(app);
   await new Promise((resolve) => server.listen(0, "127.0.0.1", resolve));
   const { port } = server.address();
