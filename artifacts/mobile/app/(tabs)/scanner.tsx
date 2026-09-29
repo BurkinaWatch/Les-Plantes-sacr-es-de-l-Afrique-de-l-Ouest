@@ -31,40 +31,6 @@ type PlantResult = PlantRecognitionSuccess;
 
 const API_BASE = getApiBase();
 
-async function pickImage(source: 'camera' | 'gallery'): Promise<string | null> {
-  if (source === 'camera') {
-    const { status } = await ImagePicker.requestCameraPermissionsAsync();
-    if (status !== 'granted') {
-      Alert.alert('Permission refusée', 'L\'accès à la caméra est nécessaire.');
-      return null;
-    }
-    const result = await ImagePicker.launchCameraAsync({
-      mediaTypes: ['images'],
-      quality: 0.7,
-      base64: true,
-      allowsEditing: true,
-      aspect: [4, 3],
-    });
-    if (result.canceled || !result.assets[0]) return null;
-    return result.assets[0].base64 ?? null;
-  } else {
-    const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
-    if (status !== 'granted') {
-      Alert.alert('Permission refusée', 'L\'accès à la galerie est nécessaire.');
-      return null;
-    }
-    const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ['images'],
-      quality: 0.7,
-      base64: true,
-      allowsEditing: true,
-      aspect: [4, 3],
-    });
-    if (result.canceled || !result.assets[0]) return null;
-    return result.assets[0].base64 ?? null;
-  }
-}
-
 function ConfidenceBadge({ level, t }: { level: string; t: any }) {
   const color =
     level === 'high' ? '#4CAF50' : level === 'medium' ? '#FF9800' : '#F44336';
@@ -190,13 +156,10 @@ export default function ScannerScreen() {
       ? ImagePicker.launchCameraAsync
       : ImagePicker.launchImageLibraryAsync;
 
-    if (Platform.OS !== 'web') {
-      const perm =
-        source === 'camera'
-          ? await ImagePicker.requestCameraPermissionsAsync()
-          : await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (Platform.OS !== 'web' && source === 'camera') {
+      const perm = await ImagePicker.requestCameraPermissionsAsync();
       if (perm.status !== 'granted') {
-        Alert.alert('Permission refusée', 'Accès nécessaire pour utiliser cette fonctionnalité.');
+        Alert.alert('Permission refusée', 'L\'accès à la caméra est nécessaire.');
         return;
       }
     }
