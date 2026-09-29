@@ -81,7 +81,8 @@
           "sounds": []
         }
       ],
-      "expo-asset"
+      "expo-asset",
+      "./plugins/withPlayUploadSigning"
     ],
     "experiments": {
       "typedRoutes": true,
