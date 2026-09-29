@@ -111,7 +111,7 @@ test("public form accepts URL-encoded requests and returns generic errors for in
   await withApp(router, async (baseUrl) => {
     const page = await fetch(`${baseUrl}/api/auth/account-deletion`);
     assert.equal(page.status, 200);
-    assert.match(await page.text(), /demande de suppression/i);
+    assert.match(await page.text(), /demander la suppression/i);
     assert.equal(page.headers.get("cache-control"), "no-store");
 
     const response = await fetch(`${baseUrl}/api/auth/account-deletion`, {
