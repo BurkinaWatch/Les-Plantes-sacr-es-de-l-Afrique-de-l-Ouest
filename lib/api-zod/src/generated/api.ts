@@ -44,7 +44,7 @@ export const RegisterAccountBody = zod.object({
 export const RegisterAccountResponse = zod.object({
   "token": zod.string(),
   "user": zod.object({
-  "id": zod.int(),
+  "id": zod.number().int(),
   "username": zod.string()
 })
 })
@@ -71,7 +71,7 @@ export const LoginAccountBody = zod.object({
 export const LoginAccountResponse = zod.object({
   "token": zod.string(),
   "user": zod.object({
-  "id": zod.int(),
+  "id": zod.number().int(),
   "username": zod.string()
 })
 })
@@ -142,7 +142,7 @@ export const GetSubscriptionPlansResponse = zod.object({
  */
 export const GetSubscriptionStatusResponse = zod.object({
   "subscription": zod.union([zod.object({
-  "id": zod.int(),
+  "id": zod.number().int(),
   "planCode": zod.string(),
   "planName": zod.string(),
   "period": zod.string(),
@@ -157,9 +157,9 @@ export const GetSubscriptionStatusResponse = zod.object({
  * @summary Reconcile pending hosted checkout sessions
  */
 export const ReconcileSubscriptionPaymentResponse = zod.object({
-  "checked": zod.int(),
-  "activated": zod.int(),
-  "failed": zod.int()
+  "checked": zod.number().int(),
+  "activated": zod.number().int(),
+  "failed": zod.number().int()
 })
 
 
@@ -172,14 +172,14 @@ export const createSubscriptionPaymentBodyCustomerNameMax = 120;
 
 export const CreateSubscriptionPaymentBody = zod.object({
   "planCode": zod.enum(['MONTHLY', 'YEARLY']),
-  "customerEmail": zod.email(),
+  "customerEmail": zod.string().email(),
   "customerName": zod.string().min(1).max(createSubscriptionPaymentBodyCustomerNameMax),
-  "returnUrl": zod.url().optional()
+  "returnUrl": zod.string().url().optional()
 })
 
 export const CreateSubscriptionPaymentResponse = zod.object({
-  "subscriptionId": zod.int(),
-  "checkoutUrl": zod.url(),
+  "subscriptionId": zod.number().int(),
+  "checkoutUrl": zod.string().url(),
   "status": zod.string()
 })
 
