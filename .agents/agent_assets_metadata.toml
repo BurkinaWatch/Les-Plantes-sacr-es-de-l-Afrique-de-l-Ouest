@@ -1338,3 +1338,129 @@ mtime_ms = 1790681139561
 storage_uri = "gcs://replit-rams-assets-janeway/rams/assets/repl:46dafea5-f278-4767-b5cb-589ce6a23240/2c781c1f-d8d4-4feb-8809-b791ab3a1e39/779263e3-41f1-4e3a-86f5-3875f9679500"
 storage_version_token = "1790681902171986"
 content_type = "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+
+[[outputs]]
+id = "wX_6JxWMxGnQzSOHQm2Q9"
+uri = "file://artifacts/mobile/assets/google-play/icone-google-play-512.png"
+type = "image"
+title = "Icône Google Play — 512 × 512"
+description = "PNG RGBA 512 × 512 px, 505 KB. Emblème végétal doré sans texte."
+logical_id = "1419d149-de53-4641-aa04-7dfb9a86fb0d"
+content_hash = "sha256:e2343f848d43664d7b2f8540b513197a0287a02151dae15fcc58c0807ca4f886"
+size = 505281
+mtime_ms = 1790720452435
+storage_uri = "gcs://replit-rams-assets-janeway/rams/assets/repl:46dafea5-f278-4767-b5cb-589ce6a23240/1419d149-de53-4641-aa04-7dfb9a86fb0d/aedb42b5-2942-4a7d-a132-c6c434d20691"
+storage_version_token = "1790721350638797"
+content_type = "image/png"
+
+[[outputs]]
+id = "_vXour5t9OHndEi5ZHpEa"
+uri = "file://artifacts/mobile/assets/google-play/visuel-vedette-1024x500.jpg"
+type = "image"
+title = "Visuel vedette — 1024 × 500"
+description = "JPEG RVB 1024 × 500 px, sans transparence. Créé avec le baobab et les couleurs existantes de l’application."
+logical_id = "e722d8de-cbc5-4f23-8216-77ca5b4a9f53"
+content_hash = "sha256:9fc4ebcc88b816feecdf18f14dcedf364c60c954289df7d09162d82632cc04fc"
+size = 171291
+mtime_ms = 1790721245149
+storage_uri = "gcs://replit-rams-assets-janeway/rams/assets/repl:46dafea5-f278-4767-b5cb-589ce6a23240/e722d8de-cbc5-4f23-8216-77ca5b4a9f53/f49cce0e-f2de-461e-abfc-3fc6ecd14a0a"
+storage_version_token = "1790721351240845"
+content_type = "image/jpeg"
+
+[[outputs]]
+id = "OkEvTB8NpywWZ8MAcuSBl"
+uri = "file://artifacts/mobile/assets/google-play/logo-plantes-sacrees-1024.png"
+type = "image"
+title = "Logo carré — 1024 × 1024"
+description = "PNG RVB carré, export du logo existant; version facultative pour les autres emplacements de marque."
+logical_id = "905f401a-cdf1-4689-9656-9c77479af865"
+content_hash = "sha256:dac1135f7d0bebbb06ebdd0a8d3ce3a128c18672b52faf93fc9fa7336011ff4a"
+size = 1729108
+mtime_ms = 1790720454043
+storage_uri = "gcs://replit-rams-assets-janeway/rams/assets/repl:46dafea5-f278-4767-b5cb-589ce6a23240/905f401a-cdf1-4689-9656-9c77479af865/9ad9bbcd-ec82-4a37-afb4-8f54d2fe0195"
+storage_version_token = "1790721351845262"
+content_type = "image/png"
+
+[[outputs]]
+id = "xxKBlGP2Ercg8AGnee8D5"
+uri = "file://artifacts/mobile/assets/google-play/capture-01-accueil.png"
+type = "image"
+title = "Capture Play 1 — Accueil"
+description = "Écran d’accueil réel, PNG 1080 × 1920 px."
+logical_id = "b6f32866-bb61-4ee7-9ca2-9e1404292e4d"
+content_hash = "sha256:81473757479b26f697d1a831e4ae2de95ffce4ac493ee28b8648d5a868b415c4"
+size = 1975717
+mtime_ms = 1790720454746
+storage_uri = "gcs://replit-rams-assets-janeway/rams/assets/repl:46dafea5-f278-4767-b5cb-589ce6a23240/b6f32866-bb61-4ee7-9ca2-9e1404292e4d/8b02a9a0-a422-4eec-bb4b-66ac0ab15058"
+storage_version_token = "1790721352385806"
+content_type = "image/png"
+
+[[outputs]]
+id = "zGr28s0vz5Q1Ka_zBRBl_"
+uri = "file://artifacts/mobile/assets/google-play/capture-02-plantes.png"
+type = "image"
+title = "Capture Play 2 — Catalogue des plantes"
+description = "Catalogue mobile réel, PNG 1080 × 1920 px."
+logical_id = "83d319da-9ba1-4f17-ab1e-3f81f5761065"
+content_hash = "sha256:c4d7e6b33897e8ceecbf76e04acfcf9499523f2bc8943d2ef873ab16ab21b46b"
+size = 1582988
+mtime_ms = 1790720454752
+storage_uri = "gcs://replit-rams-assets-janeway/rams/assets/repl:46dafea5-f278-4767-b5cb-589ce6a23240/83d319da-9ba1-4f17-ab1e-3f81f5761065/cb1ed960-1981-4daa-9f1d-54a0b806a529"
+storage_version_token = "1790721352965884"
+content_type = "image/png"
+
+[[outputs]]
+id = "XPafsuM7NqlFg05hCGDSJ"
+uri = "file://artifacts/mobile/assets/google-play/capture-03-baobab.png"
+type = "image"
+title = "Capture Play 3 — Fiche du baobab"
+description = "Fiche détaillée réelle du baobab, PNG 1080 × 1920 px."
+logical_id = "20dae509-7ce7-4cff-b77e-adfcbbd767f8"
+content_hash = "sha256:e9ee397946aa4eb2209d332100dcf1ce61847da3a27d745ad3e961257a3be943"
+size = 1161973
+mtime_ms = 1790720454756
+storage_uri = "gcs://replit-rams-assets-janeway/rams/assets/repl:46dafea5-f278-4767-b5cb-589ce6a23240/20dae509-7ce7-4cff-b77e-adfcbbd767f8/55c3c766-9218-422e-a4db-61a987bb55e1"
+storage_version_token = "1790721353504209"
+content_type = "image/png"
+
+[[outputs]]
+id = "BUjOJISv61eQORWuUPly3"
+uri = "file://artifacts/mobile/assets/google-play/capture-04-savoir.png"
+type = "image"
+title = "Capture Play 4 — Savoir et recettes"
+description = "Écran de recettes réel, PNG 1080 × 1920 px."
+logical_id = "49454cdb-d507-47a4-b572-a4672d5c7edb"
+content_hash = "sha256:0d6ee8e179ce57d676804dcc18982d4f16235d4590320aed401d232b6ae000a3"
+size = 467524
+mtime_ms = 1790720454999
+storage_uri = "gcs://replit-rams-assets-janeway/rams/assets/repl:46dafea5-f278-4767-b5cb-589ce6a23240/49454cdb-d507-47a4-b572-a4672d5c7edb/86f7a76b-9a66-4514-a12a-a65fa7cce4c8"
+storage_version_token = "1790721354101702"
+content_type = "image/png"
+
+[[outputs]]
+id = "5xtg7u06C_YoC_mGWNiGQ"
+uri = "file://artifacts/mobile/assets/google-play/capture-05-scanner.png"
+type = "image"
+title = "Capture Play 5 — Reconnaissance"
+description = "Écran de reconnaissance réel, PNG 1080 × 1920 px."
+logical_id = "9d57af07-cbc4-4ad2-9e16-59843997bca9"
+content_hash = "sha256:3b4704474986b9de9a0f4fd9695bb98474a97dd0f0dcbbea7508c1aac7d09653"
+size = 101009
+mtime_ms = 1790720455006
+storage_uri = "gcs://replit-rams-assets-janeway/rams/assets/repl:46dafea5-f278-4767-b5cb-589ce6a23240/9d57af07-cbc4-4ad2-9e16-59843997bca9/34d828f9-858d-4757-991c-37481a4e1434"
+storage_version_token = "1790721354702639"
+content_type = "image/png"
+
+[[outputs]]
+id = "wyrB3TPcCCjkKz7NlXZhu"
+uri = "file://artifacts/mobile/assets/google-play/capture-06-quiz.png"
+type = "image"
+title = "Capture Play 6 — Quiz"
+description = "Écran de réflexion/quiz réel, PNG 1080 × 1920 px."
+logical_id = "0af3c473-941d-4d4c-853a-8b8243e9b7df"
+content_hash = "sha256:385f476f8c09b4b11050a6736cfdf8abf82537e5bbc7a72fb8c3989dffdde0bd"
+size = 225140
+mtime_ms = 1790720455010
+storage_uri = "gcs://replit-rams-assets-janeway/rams/assets/repl:46dafea5-f278-4767-b5cb-589ce6a23240/0af3c473-941d-4d4c-853a-8b8243e9b7df/40fde97e-b4c9-49e1-ac77-9c407040b2f3"
+storage_version_token = "1790721355342969"
+content_type = "image/png"
