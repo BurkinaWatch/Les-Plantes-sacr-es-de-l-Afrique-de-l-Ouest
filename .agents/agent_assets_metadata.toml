@@ -1324,3 +1324,17 @@ mtime_ms = 1790550418948
 storage_uri = "gcs://replit-rams-assets-janeway/rams/assets/repl:7adaeed1-7d38-484c-8840-7d2a2b49a838/5af21df4-6078-4f3e-b6bb-b10a0e6ec8ce/4061a193-00d2-4c57-80e0-f93a5be96277"
 storage_version_token = "1790550434182725"
 content_type = "text/markdown"
+
+[[outputs]]
+id = "bGx_AF0qC7VerdrgazRqz"
+uri = "file://docs/guide-preparation-google-play-plantes-sacrees.docx"
+type = "word_document"
+title = "Guide Google Play — Plantes Sacrées"
+description = "Dossier Word en français : éléments vérifiés, blocages de conformité, données à déclarer, informations à compléter et étapes Play Console. Préparé le 29 septembre 2026; aucune publication effectuée."
+logical_id = "2c781c1f-d8d4-4feb-8809-b791ab3a1e39"
+content_hash = "sha256:6793aeed0f838411de87fbef450f9c12117074290ad5cd4d1952454841631c32"
+size = 12325
+mtime_ms = 1790681139561
+storage_uri = "gcs://replit-rams-assets-janeway/rams/assets/repl:46dafea5-f278-4767-b5cb-589ce6a23240/2c781c1f-d8d4-4feb-8809-b791ab3a1e39/779263e3-41f1-4e3a-86f5-3875f9679500"
+storage_version_token = "1790681902171986"
+content_type = "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
