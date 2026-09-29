@@ -101,11 +101,64 @@ test("authenticated account deletion rechecks the password and removes dependent
   });
 });
 
-test("public form accepts URL-encoded requests and returns generic errors for invalid credentials", async () => {
+test("authenticated account deletion rejects a wrong password without deleting records", async () => {
+  process.env.JWT_SECRET = JWT_SECRET;
   const database = createDatabase();
   const router = createAccountDeletionRouter({
     connect: database.connect,
     comparePassword: async () => false,
+    authenticate: (req, _res, next) => {
+      req.user = { id: 42, username: "tester" };
+      next();
+    },
+  });
+
+  await withApp(router, async (baseUrl) => {
+    const response = await fetch(`${baseUrl}/api/auth/account`, {
+      method: "DELETE",
+      headers: { "Content-Type": "application/json", Authorization: `Bearer ${TOKEN}` },
+      body: JSON.stringify({ password: "wrong-password" }),
+    });
+
+    assert.equal(response.status, 401);
+    assert.deepEqual(await response.json(), { error: "Mot de passe incorrect" });
+    const statements = database.calls.map((call) => call.sql);
+    assert.deepEqual(statements, ["BEGIN", "SELECT id, password_hash FROM users WHERE id = $1 FOR UPDATE", "ROLLBACK", "RELEASE"]);
+  });
+});
+
+test("a repeated authenticated deletion is idempotent once the account is absent", async () => {
+  process.env.JWT_SECRET = JWT_SECRET;
+  const database = createDatabase({ username: null });
+  const router = createAccountDeletionRouter({
+    connect: database.connect,
+    comparePassword: async () => {
+      throw new Error("Password comparison must not run for a missing account.");
+    },
+    authenticate: (req, _res, next) => {
+      req.user = { id: 42, username: "tester" };
+      next();
+    },
+  });
+
+  await withApp(router, async (baseUrl) => {
+    const response = await fetch(`${baseUrl}/api/auth/account`, {
+      method: "DELETE",
+      headers: { "Content-Type": "application/json", Authorization: `Bearer ${TOKEN}` },
+      body: JSON.stringify({ password: "correct-password" }),
+    });
+
+    assert.equal(response.status, 204);
+    const statements = database.calls.map((call) => call.sql);
+    assert.deepEqual(statements, ["BEGIN", "SELECT id, password_hash FROM users WHERE id = $1 FOR UPDATE", "ROLLBACK", "RELEASE"]);
+  });
+});
+
+test("public form accepts URL-encoded requests and returns generic errors for invalid credentials", async () => {
+  const database = createDatabase();
+  const router = createAccountDeletionRouter({
+    connect: database.connect,
+    comparePassword: async (password) => password === "correct-password",
   });
 
   await withApp(router, async (baseUrl) => {
@@ -128,6 +181,19 @@ test("public form accepts URL-encoded requests and returns generic errors for in
     assert.match(html, /Compte non supprimé/);
     assert.match(html, /nom d’utilisateur ou le mot de passe est incorrect/i);
     assert.doesNotMatch(html, /stored-hash|wrong-password/);
+
+    const successResponse = await fetch(`${baseUrl}/api/auth/account-deletion`, {
+      method: "POST",
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      body: new URLSearchParams({
+        username: "tester",
+        password: "correct-password",
+        confirm: "yes",
+      }),
+    });
+    assert.equal(successResponse.status, 200);
+    assert.match(await successResponse.text(), /Compte supprimé/);
+    assert.ok(database.calls.some((call) => call.sql === "DELETE FROM users WHERE id = $1"));
   }, { urlencoded: true });
 });
 
