@@ -11,7 +11,13 @@ const router = Router();
 type UserSelector = { userId: number } | { username: string };
 type DeletionResult = "deleted" | "invalid_credentials" | "missing";
 type PasswordComparer = (password: string, hash: string) => Promise<boolean>;
-type AccountDbClient = Awaited<ReturnType<typeof pool.connect>>;
+type AccountDbClient = {
+  query<Row = Record<string, unknown>>(
+    queryText: string,
+    values?: any[],
+  ): Promise<{ rows: Row[]; rowCount: number | null }>;
+  release(): void;
+};
 type ConnectClient = () => Promise<AccountDbClient>;
 
 const deleteLimit = rateLimit({

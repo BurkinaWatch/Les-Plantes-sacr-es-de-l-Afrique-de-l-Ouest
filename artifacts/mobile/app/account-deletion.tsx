@@ -76,7 +76,7 @@ export default function AccountDeletionScreen() {
           testID="account-deletion-sign-in"
           accessibilityRole="button"
           onPress={() => router.replace('/(auth)/login')}
-          style={styles.primaryButton}
+          style={[styles.primaryButton, { backgroundColor: colors.gold }]}
         >
           <Text style={[styles.primaryButtonText, { color: colors.deepBrown }]}>Se connecter</Text>
         </Pressable>

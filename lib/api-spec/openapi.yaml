@@ -109,6 +109,51 @@ paths:
           $ref: "#/components/responses/Unauthorized"
         "429":
           $ref: "#/components/responses/TooManyRequests"
+  /auth/account-deletion:
+    get:
+      operationId: getAccountDeletionPage
+      tags: [auth]
+      summary: Show the public account deletion form
+      description: Provides an unauthenticated web form for deleting an account when the user no longer has the app.
+      responses:
+        "200":
+          description: Account deletion page
+          content:
+            text/html:
+              schema:
+                type: string
+    post:
+      operationId: submitAccountDeletionRequest
+      tags: [auth]
+      summary: Submit the public account deletion form
+      description: Verifies the username and password, then deletes the account and linked records.
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: "#/components/schemas/AccountDeletionFormInput"
+      responses:
+        "200":
+          description: Success confirmation page
+          content:
+            text/html:
+              schema:
+                type: string
+        "400":
+          description: Form fields are invalid
+          content:
+            text/html:
+              schema:
+                type: string
+        "401":
+          description: Username or password did not match
+          content:
+            text/html:
+              schema:
+                type: string
+        "429":
+          $ref: "#/components/responses/TooManyRequests"
   /subscriptions/plans:
     get:
       operationId: getSubscriptionPlans
@@ -258,6 +303,22 @@ components:
           type: string
           minLength: 6
           maxLength: 128
+    AccountDeletionFormInput:
+      type: object
+      additionalProperties: false
+      required: [username, password, confirm]
+      properties:
+        username:
+          type: string
+          minLength: 3
+          maxLength: 30
+        password:
+          type: string
+          minLength: 6
+          maxLength: 128
+        confirm:
+          type: string
+          enum: [yes]
     AuthUser:
       type: object
       required: [id, username]
