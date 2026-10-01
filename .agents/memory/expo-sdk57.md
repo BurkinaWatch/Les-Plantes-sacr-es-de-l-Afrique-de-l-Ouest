@@ -20,3 +20,9 @@ For local Gradle builds, keep the Android SDK, Android user data, and Gradle cac
 **Why:** A workspace restart discarded Android tooling installed outside the mounted project, while ignored files inside the workspace persisted.
 
 **How to apply:** Point `ANDROID_SDK_ROOT`/`ANDROID_HOME`, `ANDROID_USER_HOME`, and `GRADLE_USER_HOME` to ignored directories under the mobile artifact, and keep generated toolchain files out of version control.
+
+The first local `assembleRelease` can exceed the foreground shell timeout while compiling React Native C++ libraries across ABIs. An existing APK at the output path may still be from an earlier build.
+
+**Why:** A timed-out shell does not prove Gradle completed or refreshed the APK; packaging can be reached only after lengthy native compilation.
+
+**How to apply:** Run long release builds in the background, wait for `BUILD SUCCESSFUL`, then verify the APK manifest version and signer before delivery.
