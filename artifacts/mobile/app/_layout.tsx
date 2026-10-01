@@ -1,8 +1,9 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { reloadAppAsync } from "expo";
 import * as Font from "expo-font";
 import * as SplashScreen from "expo-splash-screen";
-import { Stack, useRouter, useSegments } from "expo-router";
-import React, { useEffect, useRef, useState } from "react";
+import { Stack, useRootNavigationState, useRouter, useSegments } from "expo-router";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import {
   Animated,
   Dimensions,
@@ -20,6 +21,7 @@ import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { SacredIcon } from "@/components/SacredIcon";
 import { AppProvider } from "@/context/AppContext";
 import { AuthProvider, useAuth } from "@/context/AuthContext";
+import { StartupReadinessContext } from "@/context/StartupReadinessContext";
 import colors from "@/constants/colors";
 import { useColors } from "@/hooks/useColors";
 import { LanguageProvider } from "@/i18n";
@@ -58,25 +60,24 @@ if (isNative) {
 }
 
 /* ── Splash animé ──────────────────────────────────────────────── */
-function AnimatedSplash({ onFinish }: { onFinish: () => void }) {
+function AnimatedSplash({
+  canDismiss,
+  onFinish,
+}: {
+  canDismiss: boolean;
+  onFinish: () => void;
+}) {
   const logoScale   = useRef(new Animated.Value(0.94)).current;
   const titleOpacity    = useRef(new Animated.Value(0)).current;
   const screenOpacity   = useRef(new Animated.Value(1)).current;
   const onFinishRef = useRef(onFinish);
+  const nativeSplashHidden = useRef(false);
+  const [introComplete, setIntroComplete] = useState(false);
   onFinishRef.current = onFinish;
 
   useEffect(() => {
     const native = isNative;
-    let finished = false;
-    const finish = () => {
-      if (finished) return;
-      finished = true;
-      onFinishRef.current();
-    };
-
-    // Never let a native animation failure trap the app on the splash screen.
-    const fallbackTimer = setTimeout(finish, 2600);
-
+    const introFallback = setTimeout(() => setIntroComplete(true), 2600);
     const animation = Animated.sequence([
       Animated.parallel([
         Animated.spring(logoScale, {
@@ -92,24 +93,45 @@ function AnimatedSplash({ onFinish }: { onFinish: () => void }) {
         }),
       ]),
       Animated.delay(650),
-      Animated.timing(screenOpacity, {
-        toValue: 0,
-        duration: 280,
-        useNativeDriver: native,
-      }),
     ]);
     animation.start(({ finished: animationFinished }) => {
-      if (animationFinished) finish();
+      if (animationFinished) setIntroComplete(true);
     });
 
     return () => {
-      clearTimeout(fallbackTimer);
+      clearTimeout(introFallback);
       animation.stop();
     };
   }, []);
 
+  useEffect(() => {
+    if (!canDismiss || !introComplete) return;
+
+    const fadeOut = Animated.timing(screenOpacity, {
+      toValue: 0,
+      duration: 280,
+      useNativeDriver: isNative,
+    });
+    fadeOut.start(({ finished }) => {
+      if (finished) onFinishRef.current();
+    });
+
+    return () => fadeOut.stop();
+  }, [canDismiss, introComplete, screenOpacity]);
+
+  const handleLayout = () => {
+    if (!isNative || nativeSplashHidden.current) return;
+    nativeSplashHidden.current = true;
+    void SplashScreen.hideAsync().catch((error) => {
+      console.warn("Unable to hide the native splash screen:", error);
+    });
+  };
+
   return (
-    <Animated.View style={[styles.splashContainer, { opacity: screenOpacity }]}>
+    <Animated.View
+      onLayout={handleLayout}
+      style={[styles.splashContainer, { opacity: screenOpacity }]}
+    >
       {/* Logo principal */}
       <Animated.View
         style={[
@@ -303,9 +325,12 @@ function NotificationsSetup() {
 }
 
 /* ── Navigation ────────────────────────────────────────────────── */
-function RootLayoutNav() {
+function RootLayoutNav({ onLayoutReady }: { onLayoutReady: () => void }) {
   return (
-    <View style={{ flex: 1 }}>
+    <View
+      onLayout={onLayoutReady}
+      style={{ flex: 1, backgroundColor: colors.background }}
+    >
       <Stack screenOptions={{ headerShown: false }}>
         <Stack.Screen name="(tabs)"      options={{ headerShown: false }} />
         <Stack.Screen name="animal/[id]" options={{ headerShown: false, presentation: "card" }} />
@@ -325,14 +350,29 @@ function RootLayoutNav() {
 /* ── Root Layout ───────────────────────────────────────────────── */
 export default function RootLayout() {
   const [showLaunchSplash, setShowLaunchSplash] = useState(isNative);
+  const [navigatorHasLayout, setNavigatorHasLayout] = useState(false);
+  const [homeHasLayout, setHomeHasLayout] = useState(false);
+  const [startupFailed, setStartupFailed] = useState(false);
+  const rootNavigationState = useRootNavigationState();
+  const segments = useSegments();
+  const routeKey = segments.join("/");
+  const initialRouteIsHome = segments.length === 1 && segments[0] === "(tabs)";
+  const navigationReady = Boolean(
+    rootNavigationState?.key &&
+      rootNavigationState.routes.length > 0 &&
+      segments.length > 0 &&
+      navigatorHasLayout &&
+      (!initialRouteIsHome || homeHasLayout),
+  );
+
+  const markNavigatorLaidOut = useCallback(() => {
+    setNavigatorHasLayout(true);
+  }, []);
+  const markHomeLaidOut = useCallback(() => {
+    setHomeHasLayout(true);
+  }, []);
 
   useEffect(() => {
-    if (isNative) {
-      void SplashScreen.hideAsync().catch((error) => {
-        console.warn("Unable to hide the native splash screen:", error);
-      });
-    }
-
     const loadFonts = async () => {
       try {
         if (Platform.OS !== "web") {
@@ -352,9 +392,33 @@ export default function RootLayout() {
     loadFonts();
   }, []);
 
+  useEffect(() => {
+    if (!isNative || navigationReady) return;
+
+    const startupTimeout = setTimeout(() => {
+      console.error(
+        `[Startup] Initial route did not lay out within 12 seconds; route segments: ${routeKey || "(none)"}`,
+      );
+      setStartupFailed(true);
+      setShowLaunchSplash(false);
+    }, 12000);
+
+    return () => clearTimeout(startupTimeout);
+  }, [navigationReady, routeKey]);
+
+  useEffect(() => {
+    if (!navigationReady) return;
+    console.info("[Startup] Initial route layout is ready.");
+    setStartupFailed(false);
+  }, [navigationReady]);
+
   return (
     <SafeAreaProvider>
       <ErrorBoundary>
+        onError={(error, componentStack) => {
+          console.error("[Startup] React render error:", error.name);
+          console.error("[Startup] React component stack:", componentStack);
+        }}
         <QueryClientProvider client={queryClient}>
           <GestureHandlerRootView style={{ flex: 1 }}>
               <LanguageProvider>
@@ -362,10 +426,16 @@ export default function RootLayout() {
                   <AppProvider>
                     <NotificationsSetup />
                     <View style={{ flex: 1 }}>
-                      <RootLayoutNav />
-                      {showLaunchSplash ? (
-                        <AnimatedSplash onFinish={() => setShowLaunchSplash(false)} />
+                      <StartupReadinessContext.Provider value={markHomeLaidOut}>
+                        <RootLayoutNav onLayoutReady={markNavigatorLaidOut} />
+                      </StartupReadinessContext.Provider>
+                      {showLaunchSplash && !startupFailed ? (
+                        <AnimatedSplash
+                          canDismiss={navigationReady}
+                          onFinish={() => setShowLaunchSplash(false)}
+                        />
                       ) : null}
+                      {startupFailed ? <StartupRecoveryScreen /> : null}
                     </View>
                   </AppProvider>
                 </AuthProvider>
@@ -374,6 +444,41 @@ export default function RootLayout() {
         </QueryClientProvider>
       </ErrorBoundary>
     </SafeAreaProvider>
+  );
+}
+
+function StartupRecoveryScreen() {
+  const handleRetry = async () => {
+    try {
+      await reloadAppAsync();
+    } catch (error) {
+      console.error(
+        "[Startup] App reload failed:",
+        error instanceof Error ? error.name : "Unknown error",
+      );
+    }
+  };
+
+  return (
+    <View style={styles.startupRecovery}>
+      <Text style={styles.startupRecoveryTitle}>
+        L’application n’a pas pu s’ouvrir
+      </Text>
+      <Text style={styles.startupRecoveryMessage}>
+        L’écran d’accueil ne s’est pas chargé. Réessayez de démarrer
+        l’application.
+      </Text>
+      <Pressable
+        accessibilityRole="button"
+        onPress={handleRetry}
+        style={({ pressed }) => [
+          styles.startupRetryButton,
+          { opacity: pressed ? 0.82 : 1 },
+        ]}
+      >
+        <Text style={styles.startupRetryText}>Réessayer</Text>
+      </Pressable>
+    </View>
   );
 }
 
@@ -387,6 +492,43 @@ const styles = StyleSheet.create({
     paddingHorizontal: 32,
     zIndex: 1000,
     elevation: 1000,
+  },
+  startupRecovery: {
+    ...StyleSheet.absoluteFill,
+    zIndex: 1100,
+    elevation: 1100,
+    alignItems: "center",
+    justifyContent: "center",
+    paddingHorizontal: 28,
+    backgroundColor: colors.splashBackground,
+  },
+  startupRecoveryTitle: {
+    color: "#F0EAD6",
+    fontSize: 24,
+    lineHeight: 31,
+    fontWeight: "800",
+    textAlign: "center",
+    marginBottom: 14,
+  },
+  startupRecoveryMessage: {
+    color: "#D8CDB6",
+    fontSize: 16,
+    lineHeight: 24,
+    textAlign: "center",
+    marginBottom: 24,
+  },
+  startupRetryButton: {
+    minWidth: 180,
+    alignItems: "center",
+    borderRadius: 12,
+    backgroundColor: "#D4A017",
+    paddingVertical: 14,
+    paddingHorizontal: 24,
+  },
+  startupRetryText: {
+    color: "#120A05",
+    fontSize: 16,
+    fontWeight: "700",
   },
   logoWrap: {
     width: splashLogoSize,

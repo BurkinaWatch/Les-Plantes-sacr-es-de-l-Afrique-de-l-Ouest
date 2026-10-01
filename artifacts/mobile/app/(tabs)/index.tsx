@@ -19,6 +19,7 @@ import { QuoteCard } from '@/components/QuoteCard';
 import { SacredIcon } from '@/components/SacredIcon';
 import { SotyssiBranding } from '@/components/SotyssiBranding';
 import { useApp } from '@/context/AppContext';
+import { useStartupReadiness } from '@/context/StartupReadinessContext';
 import { PLANTS } from '@/data/animals';
 import { QUIZ_QUESTIONS } from '@/data/quiz';
 import { useColors } from '@/hooks/useColors';
@@ -56,6 +57,7 @@ export default function HomeScreen() {
   const insets = useSafeAreaInsets();
   const { dailyQuote } = useApp();
   const { t } = useTranslation();
+  const markStartupReady = useStartupReadiness();
 
   const { width, height } = useWindowDimensions();
   const heroHeight = Math.min(Math.max(Math.round(height * 0.58), 360), 560);
@@ -133,6 +135,7 @@ export default function HomeScreen() {
 
   return (
     <ScrollView
+      onLayout={markStartupReady}
       style={[styles.container, { backgroundColor: colors.background }]}
       contentContainerStyle={{ paddingBottom: 100 + insets.bottom }}
       showsVerticalScrollIndicator={false}
