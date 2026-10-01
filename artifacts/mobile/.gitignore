@@ -18,6 +18,7 @@ android/
 *.orig.*
 *.jks
 *.aab
+*.apk
 *.p8
 *.p12
 *.key
