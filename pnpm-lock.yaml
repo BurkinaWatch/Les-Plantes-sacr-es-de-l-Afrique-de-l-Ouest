@@ -254,6 +254,9 @@ importers:
 
   artifacts/mobile:
     dependencies:
+      expo:
+        specifier: ~57.0.26
+        version: 57.0.26(@babel/core@7.29.6)(@expo/metro-runtime@57.0.16)(expo-router@57.0.24)(react-dom@19.2.3(react@19.2.3))(react-native-web@0.21.2(react-dom@19.2.3(react@19.2.3))(react@19.2.3))(react-native-worklets@0.10.1(@babel/core@7.29.6)(@react-native/metro-config@0.86.3(@babel/core@7.29.6))(react-native@0.86.3(@babel/core@7.29.6)(@react-native/metro-config@0.86.3(@babel/core@7.29.6))(@types/react@19.2.14)(react@19.2.3))(react@19.2.3))(react-native@0.86.3(@babel/core@7.29.6)(@react-native/metro-config@0.86.3(@babel/core@7.29.6))(@types/react@19.2.14)(react@19.2.3))(react@19.2.3)(typescript@6.0.3)
       expo-asset:
         specifier: ~57.0.18
         version: 57.0.18(expo@57.0.26)(react-native@0.86.3(@babel/core@7.29.6)(@react-native/metro-config@0.86.3(@babel/core@7.29.6))(@types/react@19.2.14)(react@19.2.3))(react@19.2.3)(typescript@6.0.3)
@@ -315,9 +318,6 @@ importers:
       create-launch:
         specifier: 0.3.6
         version: 0.3.6
-      expo:
-        specifier: ~57.0.26
-        version: 57.0.26(@babel/core@7.29.6)(@expo/metro-runtime@57.0.16)(expo-router@57.0.24)(react-dom@19.2.3(react@19.2.3))(react-native-web@0.21.2(react-dom@19.2.3(react@19.2.3))(react@19.2.3))(react-native-worklets@0.10.1(@babel/core@7.29.6)(@react-native/metro-config@0.86.3(@babel/core@7.29.6))(react-native@0.86.3(@babel/core@7.29.6)(@react-native/metro-config@0.86.3(@babel/core@7.29.6))(@types/react@19.2.14)(react@19.2.3))(react@19.2.3))(react-native@0.86.3(@babel/core@7.29.6)(@react-native/metro-config@0.86.3(@babel/core@7.29.6))(@types/react@19.2.14)(react@19.2.3))(react@19.2.3)(typescript@6.0.3)
       expo-blur:
         specifier: ~57.0.3
         version: 57.0.3(expo@57.0.26)(react-native@0.86.3(@babel/core@7.29.6)(@react-native/metro-config@0.86.3(@babel/core@7.29.6))(@types/react@19.2.14)(react@19.2.3))(react@19.2.3)
@@ -7368,7 +7368,9 @@ snapshots:
       metro-runtime: 0.84.5
     transitivePeerDependencies:
       - '@babel/core'
+      - bufferutil
       - supports-color
+      - utf-8-validate
 
   '@react-native/normalize-colors@0.74.89': {}
 
