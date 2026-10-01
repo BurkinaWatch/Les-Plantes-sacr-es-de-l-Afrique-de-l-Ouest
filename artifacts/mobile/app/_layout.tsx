@@ -332,7 +332,7 @@ function RootLayoutNav({ onLayoutReady }: { onLayoutReady: () => void }) {
   return (
     <View
       onLayout={onLayoutReady}
-      style={{ flex: 1, backgroundColor: colors.background }}
+      style={{ flex: 1, backgroundColor: colors.light.background }}
     >
       <Stack screenOptions={{ headerShown: false }}>
         <Stack.Screen name="(tabs)"      options={{ headerShown: false }} />
