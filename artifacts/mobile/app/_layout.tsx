@@ -2,7 +2,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { reloadAppAsync } from "expo";
 import * as Font from "expo-font";
 import * as SplashScreen from "expo-splash-screen";
-import { Stack, useRootNavigationState, useRouter, useSegments } from "expo-router";
+import { Stack, useRouter, useSegments } from "expo-router";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import {
   Animated,
@@ -328,7 +328,20 @@ function NotificationsSetup() {
 }
 
 /* ── Navigation ────────────────────────────────────────────────── */
-function RootLayoutNav({ onLayoutReady }: { onLayoutReady: () => void }) {
+function RootLayoutNav({
+  onLayoutReady,
+  onRouteKeyChange,
+}: {
+  onLayoutReady: () => void;
+  onRouteKeyChange: (routeKey: string) => void;
+}) {
+  const segments = useSegments();
+  const routeKey = segments.join("/");
+
+  useEffect(() => {
+    onRouteKeyChange(routeKey);
+  }, [onRouteKeyChange, routeKey]);
+
   return (
     <View
       onLayout={onLayoutReady}
@@ -356,14 +369,10 @@ export default function RootLayout() {
   const [navigatorHasLayout, setNavigatorHasLayout] = useState(false);
   const [homeHasLayout, setHomeHasLayout] = useState(false);
   const [startupFailed, setStartupFailed] = useState(false);
-  const rootNavigationState = useRootNavigationState();
-  const segments = useSegments();
-  const routeKey = segments.join("/");
-  const initialRouteIsHome = segments.length === 1 && segments[0] === "(tabs)";
+  const [routeKey, setRouteKey] = useState("");
+  const initialRouteIsHome = routeKey === "(tabs)";
   const navigationReady = Boolean(
-    rootNavigationState?.key &&
-      rootNavigationState.routes.length > 0 &&
-      segments.length > 0 &&
+    routeKey.length > 0 &&
       navigatorHasLayout &&
       (!initialRouteIsHome || homeHasLayout),
   );
@@ -431,7 +440,10 @@ export default function RootLayout() {
                     <NotificationsSetup />
                     <View style={{ flex: 1 }}>
                       <StartupReadinessContext.Provider value={markHomeLaidOut}>
-                        <RootLayoutNav onLayoutReady={markNavigatorLaidOut} />
+                        <RootLayoutNav
+                          onLayoutReady={markNavigatorLaidOut}
+                          onRouteKeyChange={setRouteKey}
+                        />
                       </StartupReadinessContext.Provider>
                       {showLaunchSplash && !startupFailed ? (
                         <AnimatedSplash
