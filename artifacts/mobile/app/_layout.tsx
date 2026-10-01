@@ -95,7 +95,10 @@ function AnimatedSplash({
       Animated.delay(650),
     ]);
     animation.start(({ finished: animationFinished }) => {
-      if (animationFinished) setIntroComplete(true);
+      if (animationFinished) {
+        clearTimeout(introFallback);
+        setIntroComplete(true);
+      }
     });
 
     return () => {
@@ -414,11 +417,12 @@ export default function RootLayout() {
 
   return (
     <SafeAreaProvider>
-      <ErrorBoundary>
+      <ErrorBoundary
         onError={(error, componentStack) => {
           console.error("[Startup] React render error:", error.name);
           console.error("[Startup] React component stack:", componentStack);
         }}
+      >
         <QueryClientProvider client={queryClient}>
           <GestureHandlerRootView style={{ flex: 1 }}>
               <LanguageProvider>
