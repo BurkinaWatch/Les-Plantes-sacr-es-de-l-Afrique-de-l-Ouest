@@ -1,7 +1,8 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import * as Font from "expo-font";
+import * as SplashScreen from "expo-splash-screen";
 import { Stack, useRouter, useSegments } from "expo-router";
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
   Animated,
   Dimensions,
@@ -19,6 +20,7 @@ import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { SacredIcon } from "@/components/SacredIcon";
 import { AppProvider } from "@/context/AppContext";
 import { AuthProvider, useAuth } from "@/context/AuthContext";
+import colors from "@/constants/colors";
 import { useColors } from "@/hooks/useColors";
 import { LanguageProvider } from "@/i18n";
 import { useNotifications } from "@/hooks/useNotifications";
@@ -46,6 +48,7 @@ if (Platform.OS === "web" && typeof window !== "undefined") {
 
 const queryClient = new QueryClient();
 const { width } = Dimensions.get("window");
+const splashLogoSize = Math.min(width * 0.84, 360);
 const isNative = Platform.OS !== "web";
 
 /* ── Splash animé ──────────────────────────────────────────────── */
@@ -67,10 +70,10 @@ function AnimatedSplash({ onFinish }: { onFinish: () => void }) {
     };
 
     // Never let a native animation failure trap the app on the splash screen.
-    const fallbackTimer = setTimeout(finish, 4200);
+    const fallbackTimer = setTimeout(finish, 2600);
 
     const animation = Animated.sequence([
-      Animated.delay(150),
+      Animated.delay(100),
       Animated.parallel([
         Animated.spring(logoScale, {
           toValue: 1,
@@ -80,20 +83,19 @@ function AnimatedSplash({ onFinish }: { onFinish: () => void }) {
         }),
         Animated.timing(logoOpacity, {
           toValue: 1,
-          duration: 600,
+          duration: 420,
           useNativeDriver: native,
         }),
       ]),
-      Animated.delay(250),
       Animated.timing(titleOpacity, {
         toValue: 1,
-        duration: 500,
+        duration: 300,
         useNativeDriver: native,
       }),
-      Animated.delay(1200),
+      Animated.delay(650),
       Animated.timing(screenOpacity, {
         toValue: 0,
-        duration: 500,
+        duration: 280,
         useNativeDriver: native,
       }),
     ]);
@@ -324,7 +326,15 @@ function RootLayoutNav() {
 
 /* ── Root Layout ───────────────────────────────────────────────── */
 export default function RootLayout() {
+  const [showLaunchSplash, setShowLaunchSplash] = useState(isNative);
+
   useEffect(() => {
+    if (isNative) {
+      void SplashScreen.hideAsync().catch((error) => {
+        console.warn("Unable to hide the native splash screen:", error);
+      });
+    }
+
     const loadFonts = async () => {
       try {
         if (Platform.OS !== "web") {
@@ -353,7 +363,12 @@ export default function RootLayout() {
                 <AuthProvider>
                   <AppProvider>
                     <NotificationsSetup />
-                    <RootLayoutNav />
+                    <View style={{ flex: 1 }}>
+                      <RootLayoutNav />
+                      {showLaunchSplash ? (
+                        <AnimatedSplash onFinish={() => setShowLaunchSplash(false)} />
+                      ) : null}
+                    </View>
                   </AppProvider>
                 </AuthProvider>
               </LanguageProvider>
@@ -367,22 +382,24 @@ export default function RootLayout() {
 /* ── Styles ────────────────────────────────────────────────────── */
 const styles = StyleSheet.create({
   splashContainer: {
-    flex: 1,
-    backgroundColor: "#0A1F0A",
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: colors.light.background,
     alignItems: "center",
     justifyContent: "center",
     paddingHorizontal: 32,
+    zIndex: 1000,
+    elevation: 1000,
   },
   logoWrap: {
-    width: width * 0.76,
-    height: width * 0.76,
+    width: splashLogoSize,
+    height: splashLogoSize,
     alignItems: "center",
     justifyContent: "center",
     marginBottom: 20,
   },
   logo: {
-    width: width * 0.78,
-    height: width * 0.78,
+    width: splashLogoSize,
+    height: splashLogoSize,
     borderRadius: 28,
   },
   titleBlock: {
