@@ -51,10 +51,15 @@ const { width } = Dimensions.get("window");
 const splashLogoSize = Math.min(width * 0.84, 360);
 const isNative = Platform.OS !== "web";
 
+if (isNative) {
+  void SplashScreen.preventAutoHideAsync().catch((error) => {
+    console.warn("Unable to retain the native splash screen:", error);
+  });
+}
+
 /* ── Splash animé ──────────────────────────────────────────────── */
 function AnimatedSplash({ onFinish }: { onFinish: () => void }) {
-  const logoScale   = useRef(new Animated.Value(0.75)).current;
-  const logoOpacity = useRef(new Animated.Value(0)).current;
+  const logoScale   = useRef(new Animated.Value(0.94)).current;
   const titleOpacity    = useRef(new Animated.Value(0)).current;
   const screenOpacity   = useRef(new Animated.Value(1)).current;
   const onFinishRef = useRef(onFinish);
@@ -73,7 +78,6 @@ function AnimatedSplash({ onFinish }: { onFinish: () => void }) {
     const fallbackTimer = setTimeout(finish, 2600);
 
     const animation = Animated.sequence([
-      Animated.delay(100),
       Animated.parallel([
         Animated.spring(logoScale, {
           toValue: 1,
@@ -81,17 +85,12 @@ function AnimatedSplash({ onFinish }: { onFinish: () => void }) {
           friction: 8,
           useNativeDriver: native,
         }),
-        Animated.timing(logoOpacity, {
+        Animated.timing(titleOpacity, {
           toValue: 1,
-          duration: 420,
+          duration: 300,
           useNativeDriver: native,
         }),
       ]),
-      Animated.timing(titleOpacity, {
-        toValue: 1,
-        duration: 300,
-        useNativeDriver: native,
-      }),
       Animated.delay(650),
       Animated.timing(screenOpacity, {
         toValue: 0,
@@ -116,7 +115,6 @@ function AnimatedSplash({ onFinish }: { onFinish: () => void }) {
         style={[
           styles.logoWrap,
           {
-            opacity: logoOpacity,
             transform: [{ scale: logoScale }],
           },
         ]}
@@ -383,7 +381,7 @@ export default function RootLayout() {
 const styles = StyleSheet.create({
   splashContainer: {
     ...StyleSheet.absoluteFill,
-    backgroundColor: colors.light.background,
+    backgroundColor: colors.splashBackground,
     alignItems: "center",
     justifyContent: "center",
     paddingHorizontal: 32,

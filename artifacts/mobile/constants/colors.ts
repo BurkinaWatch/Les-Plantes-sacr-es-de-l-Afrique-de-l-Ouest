@@ -1,4 +1,6 @@
 const colors = {
+  splashBackground: "#120A05",
+
   light: {
     text: "#F0EAD6",
     tint: "#C8A020",

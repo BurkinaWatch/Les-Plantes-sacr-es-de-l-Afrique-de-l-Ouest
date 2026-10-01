@@ -25,7 +25,7 @@
     },
     "android": {
       "package": "com.sotyssi.plantessacrees",
-      "versionCode": 5,
+      "versionCode": 6,
       "backgroundColor": "#120A05",
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/logo-plantes-sacrees.png",
@@ -59,7 +59,7 @@
         "expo-splash-screen",
         {
           "image": "./assets/images/logo-plantes-sacrees.png",
-            "imageWidth": 240,
+          "imageWidth": 240,
           "resizeMode": "contain",
           "backgroundColor": "#120A05"
         }
