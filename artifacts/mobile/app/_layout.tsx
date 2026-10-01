@@ -382,7 +382,7 @@ export default function RootLayout() {
 /* ── Styles ────────────────────────────────────────────────────── */
 const styles = StyleSheet.create({
   splashContainer: {
-    ...StyleSheet.absoluteFillObject,
+    ...StyleSheet.absoluteFill,
     backgroundColor: colors.light.background,
     alignItems: "center",
     justifyContent: "center",
