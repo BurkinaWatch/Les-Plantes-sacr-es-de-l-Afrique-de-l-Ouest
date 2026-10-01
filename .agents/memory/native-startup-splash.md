@@ -8,3 +8,9 @@ The root screen must render immediately; font loading and decorative splash anim
 **Why:** On Android, a rejected or never-completing bootstrap promise or animation can leave the native launch logo visible indefinitely, with no useful in-app error surface.
 
 **How to apply:** Keep native splash control minimal, load optional fonts in the background, render the provider/navigation tree without waiting for them, and use a short fallback before revealing the first route.
+
+When changing Expo config-plugin settings or native launch images, regenerate the Android project with Expo prebuild before running Gradle; a direct Gradle build can package stale native resources even when `app.json` is current.
+
+**Why:** A release build compiled without prebuild kept the old, undersized Android splash drawable despite the larger configured image.
+
+**How to apply:** Run Android prebuild before each release build affected by native splash configuration, then inspect the generated splash resource before packaging.
