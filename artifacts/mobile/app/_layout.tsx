@@ -413,6 +413,16 @@ export default function RootLayout() {
       );
       setStartupFailed(true);
       setShowLaunchSplash(false);
+      void SplashScreen.hideAsync()
+        .then(() => {
+          console.info("[Startup] Native splash hidden to reveal recovery UI.");
+        })
+        .catch((error) => {
+          console.error(
+            "[Startup] Unable to hide native splash for recovery:",
+            error instanceof Error ? error.name : "Unknown error",
+          );
+        });
     }, 12000);
 
     return () => clearTimeout(startupTimeout);

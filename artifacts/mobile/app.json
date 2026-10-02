@@ -25,7 +25,7 @@
     },
     "android": {
       "package": "com.sotyssi.plantessacrees",
-      "versionCode": 7,
+      "versionCode": 8,
       "backgroundColor": "#120A05",
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/logo-plantes-sacrees.png",
