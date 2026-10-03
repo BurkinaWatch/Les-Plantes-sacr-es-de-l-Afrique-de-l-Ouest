@@ -1464,3 +1464,31 @@ mtime_ms = 1790720455010
 storage_uri = "gcs://replit-rams-assets-janeway/rams/assets/repl:46dafea5-f278-4767-b5cb-589ce6a23240/0af3c473-941d-4d4c-853a-8b8243e9b7df/40fde97e-b4c9-49e1-ac77-9c407040b2f3"
 storage_version_token = "1790721355342969"
 content_type = "image/png"
+
+[[outputs]]
+id = "6ftO7mFF2uPsYJuNfIUpb"
+uri = "file://deliverables/presentation-promotionnelle-plantes-sacrees.pdf"
+type = "pdf"
+title = "Présentation promotionnelle — Plantes Sacrées"
+description = "PDF A4 d’une page en français avec le logo officiel et une description promotionnelle des fonctions de l’application."
+logical_id = "a3016943-dc1d-4077-830c-2f7e9cd6133c"
+content_hash = "sha256:4d1243c0501e6fa3b588d05f4003a730ac4a7cd8f0256a6bfad858f92b6e9592"
+size = 3290198
+mtime_ms = 1791057298384
+storage_uri = "gcs://replit-rams-assets-janeway/rams/assets/repl:46dafea5-f278-4767-b5cb-589ce6a23240/a3016943-dc1d-4077-830c-2f7e9cd6133c/0da19ab6-4800-4e02-9d46-35f224165aec"
+storage_version_token = "1791057540025469"
+content_type = "application/pdf"
+
+[[outputs]]
+id = "uPJyR0rAL3xLW1mKE8mLJ"
+uri = "file://deliverables/logo-officiel-plantes-sacrees.png"
+type = "image"
+title = "Logo officiel — Plantes Sacrées"
+description = "PNG du logo officiel utilisé dans l’application mobile."
+logical_id = "95a6bb72-00c9-41f7-8cd4-b43bd692dc2d"
+content_hash = "sha256:f182fa4210851c2bf772d1398e1368316c2b1163d343306115a207def0a54c7b"
+size = 2549749
+mtime_ms = 1791057250544
+storage_uri = "gcs://replit-rams-assets-janeway/rams/assets/repl:46dafea5-f278-4767-b5cb-589ce6a23240/95a6bb72-00c9-41f7-8cd4-b43bd692dc2d/738d96c2-c60f-4076-b1fb-02a852874ac2"
+storage_version_token = "1791057541053979"
+content_type = "image/png"
