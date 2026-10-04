@@ -262,6 +262,7 @@ export default function RootLayout() {
   const initialRouteIsHome = routeKey === "(tabs)";
   const navigationReady = Boolean(
     routeKey.length > 0 &&
+      routeKey !== "index" &&
       navigatorHasLayout &&
       (!initialRouteIsHome || homeHasLayout),
   );
