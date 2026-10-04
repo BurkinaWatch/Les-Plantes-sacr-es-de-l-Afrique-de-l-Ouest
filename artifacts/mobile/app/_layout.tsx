@@ -6,8 +6,6 @@ import { Stack, useRouter, useSegments } from "expo-router";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import {
   Animated,
-  Dimensions,
-  Image,
   Platform,
   Pressable,
   StyleSheet,
@@ -49,121 +47,12 @@ if (Platform.OS === "web" && typeof window !== "undefined") {
 }
 
 const queryClient = new QueryClient();
-const { width } = Dimensions.get("window");
-const splashLogoSize = Math.min(width * 0.84, 360);
 const isNative = Platform.OS !== "web";
 
 if (isNative) {
   void SplashScreen.preventAutoHideAsync().catch((error) => {
     console.warn("Unable to retain the native splash screen:", error);
   });
-}
-
-/* ── Splash animé ──────────────────────────────────────────────── */
-function AnimatedSplash({
-  canDismiss,
-  onFinish,
-}: {
-  canDismiss: boolean;
-  onFinish: () => void;
-}) {
-  const logoScale   = useRef(new Animated.Value(0.94)).current;
-  const titleOpacity    = useRef(new Animated.Value(0)).current;
-  const screenOpacity   = useRef(new Animated.Value(1)).current;
-  const onFinishRef = useRef(onFinish);
-  const nativeSplashHidden = useRef(false);
-  const [introComplete, setIntroComplete] = useState(false);
-  onFinishRef.current = onFinish;
-
-  useEffect(() => {
-    const native = isNative;
-    const introFallback = setTimeout(() => setIntroComplete(true), 2600);
-    const animation = Animated.sequence([
-      Animated.parallel([
-        Animated.spring(logoScale, {
-          toValue: 1,
-          tension: 55,
-          friction: 8,
-          useNativeDriver: native,
-        }),
-        Animated.timing(titleOpacity, {
-          toValue: 1,
-          duration: 300,
-          useNativeDriver: native,
-        }),
-      ]),
-      Animated.delay(650),
-    ]);
-    animation.start(({ finished: animationFinished }) => {
-      if (animationFinished) {
-        clearTimeout(introFallback);
-        setIntroComplete(true);
-      }
-    });
-
-    return () => {
-      clearTimeout(introFallback);
-      animation.stop();
-    };
-  }, []);
-
-  useEffect(() => {
-    if (!canDismiss || !introComplete) return;
-
-    const fadeOut = Animated.timing(screenOpacity, {
-      toValue: 0,
-      duration: 280,
-      useNativeDriver: isNative,
-    });
-    fadeOut.start(({ finished }) => {
-      if (finished) onFinishRef.current();
-    });
-
-    return () => fadeOut.stop();
-  }, [canDismiss, introComplete, screenOpacity]);
-
-  const handleLayout = () => {
-    if (!isNative || nativeSplashHidden.current) return;
-    nativeSplashHidden.current = true;
-    void SplashScreen.hideAsync().catch((error) => {
-      console.warn("Unable to hide the native splash screen:", error);
-    });
-  };
-
-  return (
-    <Animated.View
-      onLayout={handleLayout}
-      style={[styles.splashContainer, { opacity: screenOpacity }]}
-    >
-      {/* Logo principal */}
-      <Animated.View
-        style={[
-          styles.logoWrap,
-          {
-            transform: [{ scale: logoScale }],
-          },
-        ]}
-      >
-        <Image
-          source={require("@/assets/images/logo-plantes-sacrees.png")}
-          style={styles.logo}
-          resizeMode="contain"
-          accessibilityLabel="Logo des Plantes Sacrées d'Afrique de l'Ouest"
-        />
-      </Animated.View>
-
-      {/* Titre */}
-      <Animated.View style={[styles.titleBlock, { opacity: titleOpacity }]}>
-        <Text
-          accessibilityLabel="Les Plantes Sacrées d'Afrique de l'Ouest"
-          style={styles.splashTitle}
-        >
-          Les Plantes Sacrées{"\n"}d'Afrique de l'Ouest
-        </Text>
-      </Animated.View>
-
-    </Animated.View>
-  );
 }
 
 /* ── FAB Scanner ────────────────────────────────────────────────── */
@@ -365,11 +254,11 @@ function RootLayoutNav({
 
 /* ── Root Layout ───────────────────────────────────────────────── */
 export default function RootLayout() {
-  const [showLaunchSplash, setShowLaunchSplash] = useState(isNative);
   const [navigatorHasLayout, setNavigatorHasLayout] = useState(false);
   const [homeHasLayout, setHomeHasLayout] = useState(false);
   const [startupFailed, setStartupFailed] = useState(false);
   const [routeKey, setRouteKey] = useState("");
+  const nativeSplashHidden = useRef(false);
   const initialRouteIsHome = routeKey === "(tabs)";
   const navigationReady = Boolean(
     routeKey.length > 0 &&
@@ -412,17 +301,6 @@ export default function RootLayout() {
         `[Startup] Initial route did not lay out within 12 seconds; route segments: ${routeKey || "(none)"}`,
       );
       setStartupFailed(true);
-      setShowLaunchSplash(false);
-      void SplashScreen.hideAsync()
-        .then(() => {
-          console.info("[Startup] Native splash hidden to reveal recovery UI.");
-        })
-        .catch((error) => {
-          console.error(
-            "[Startup] Unable to hide native splash for recovery:",
-            error instanceof Error ? error.name : "Unknown error",
-          );
-        });
     }, 12000);
 
     return () => clearTimeout(startupTimeout);
@@ -433,6 +311,22 @@ export default function RootLayout() {
     console.info("[Startup] Initial route layout is ready.");
     setStartupFailed(false);
   }, [navigationReady]);
+
+  useEffect(() => {
+    if (
+      !isNative ||
+      (!navigationReady && !startupFailed) ||
+      nativeSplashHidden.current
+    ) {
+      return;
+    }
+
+    nativeSplashHidden.current = true;
+    void SplashScreen.hideAsync().catch((error) => {
+      nativeSplashHidden.current = false;
+      console.warn("Unable to hide the native splash screen:", error);
+    });
+  }, [navigationReady, startupFailed]);
 
   return (
     <SafeAreaProvider>
@@ -455,12 +349,6 @@ export default function RootLayout() {
                           onRouteKeyChange={setRouteKey}
                         />
                       </StartupReadinessContext.Provider>
-                      {showLaunchSplash && !startupFailed ? (
-                        <AnimatedSplash
-                          canDismiss={navigationReady}
-                          onFinish={() => setShowLaunchSplash(false)}
-                        />
-                      ) : null}
                       {startupFailed ? <StartupRecoveryScreen /> : null}
                     </View>
                   </AppProvider>
@@ -510,15 +398,6 @@ function StartupRecoveryScreen() {
 
 /* ── Styles ────────────────────────────────────────────────────── */
 const styles = StyleSheet.create({
-  splashContainer: {
-    ...StyleSheet.absoluteFill,
-    backgroundColor: colors.splashBackground,
-    alignItems: "center",
-    justifyContent: "center",
-    paddingHorizontal: 32,
-    zIndex: 1000,
-    elevation: 1000,
-  },
   startupRecovery: {
     ...StyleSheet.absoluteFill,
     zIndex: 1100,
@@ -555,30 +434,5 @@ const styles = StyleSheet.create({
     color: "#120A05",
     fontSize: 16,
     fontWeight: "700",
-  },
-  logoWrap: {
-    width: splashLogoSize,
-    height: splashLogoSize,
-    alignItems: "center",
-    justifyContent: "center",
-    marginBottom: 20,
-  },
-  logo: {
-    width: splashLogoSize,
-    height: splashLogoSize,
-    borderRadius: 28,
-  },
-  titleBlock: {
-    alignItems: "center",
-    marginBottom: 0,
-    width: "100%",
-  },
-  splashTitle: {
-    fontSize: 24,
-    lineHeight: 31,
-    fontWeight: "800",
-    color: "#F0EAD6",
-    letterSpacing: 0.3,
-    textAlign: "center",
   },
 });
