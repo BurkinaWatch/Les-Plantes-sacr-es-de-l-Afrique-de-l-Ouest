@@ -25,7 +25,7 @@
     },
     "android": {
       "package": "com.sotyssi.plantessacrees",
-      "versionCode": 9,
+      "versionCode": 10,
       "backgroundColor": "#120A05",
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/logo-plantes-sacrees.png",
@@ -82,7 +82,8 @@
         }
       ],
       "expo-asset",
-      "./plugins/withPlayUploadSigning"
+      "./plugins/withPlayUploadSigning",
+      "./plugins/withCompactAndroidPackaging"
     ],
     "experiments": {
       "typedRoutes": true,

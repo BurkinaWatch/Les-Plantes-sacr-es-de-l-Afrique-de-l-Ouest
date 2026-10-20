@@ -26,3 +26,15 @@ The first local `assembleRelease` can exceed the foreground shell timeout while 
 **Why:** A timed-out shell or a lost background process does not prove Gradle completed or refreshed the APK; packaging can be reached only after lengthy native compilation, and workspace restarts discard active processes and their shell logs.
 
 **How to apply:** Run long release builds in the background, wait for `BUILD SUCCESSFUL`, then verify the APK manifest version and signer before delivery. After a workspace restart, treat the build as unverified and inspect output metadata before copying or presenting an APK.
+
+On an 8-GiB workspace, parallel native compilation alongside Metro can cause the operating system to kill the Gradle daemon. Gradle may only report its disappearance several minutes later.
+
+**Why:** Native compilers, the Gradle JVM, a separate Kotlin compiler daemon and Metro can jointly exceed the memory limit even when Gradle has only two workers.
+
+**How to apply:** Temporarily stop Metro for the release build, use one Gradle worker with parallel projects disabled, cap the JVM heap and run Kotlin compilation in-process. Reuse the surviving compilation outputs instead of cleaning them again. Restart Metro after the build. If output stalls, check the daemon and memory kill counters rather than assuming compilation is still progressing.
+
+Do not lower Metaspace aggressively when moving Kotlin compilation into Gradle's JVM: the compiler and Lint need room for their loaded classes. A 384-MiB cap caused Metaspace exhaustion and repeated full garbage collections after compilation; allow a larger class-metadata reserve while keeping the ordinary heap bounded.
+
+**Why:** The client log stopped at a failed Lint task while the actual `OutOfMemoryError: Metaspace` was only visible in the Gradle daemon log. This looked like a slow build rather than an actionable memory limit.
+
+**How to apply:** If the daemon is alive but output has stalled, inspect its log and JVM memory utilization before waiting longer or rerunning compilation. Preserve already-built outputs when restarting with corrected JVM limits.

@@ -34,7 +34,7 @@ function normalizeAssetId(value) {
 function registryEntries(source) {
   const entries = new Map();
   const entryPattern =
-    /^\s*(?:(['"])(.*?)\1|([A-Za-z_$][\w$]*))\s*:\s*require\(\s*['"][^'"\n]*\/([^/'"\n]+)\.(png|jpe?g)['"]\s*\)\s*,?/gim;
+    /^\s*(?:(['"])(.*?)\1|([A-Za-z_$][\w$]*))\s*:\s*require\(\s*['"][^'"\n]*\/([^/'"\n]+)\.(png|jpe?g|webp)['"]\s*\)\s*,?/gim;
 
   for (const match of source.matchAll(entryPattern)) {
     const key = match[2] ?? match[3];
@@ -49,7 +49,7 @@ function imageFiles() {
     .readdirSync(plantImagesDirectory, { withFileTypes: true })
     .filter(
       (entry) =>
-        entry.isFile() && /\.(png|jpe?g)$/i.test(path.extname(entry.name)),
+        entry.isFile() && /\.(png|jpe?g|webp)$/i.test(path.extname(entry.name)),
     )
     .map((entry) => path.basename(entry.name, path.extname(entry.name)));
 }

@@ -1492,3 +1492,17 @@ mtime_ms = 1791057250544
 storage_uri = "gcs://replit-rams-assets-janeway/rams/assets/repl:46dafea5-f278-4767-b5cb-589ce6a23240/95a6bb72-00c9-41f7-8cd4-b43bd692dc2d/738d96c2-c60f-4076-b1fb-02a852874ac2"
 storage_version_token = "1791057541053979"
 content_type = "image/png"
+
+[[outputs]]
+id = "XmkDGm1uP2IVoC6OLLsc7"
+uri = "file://artifacts/mobile/ANDROID_SIZE_REPORT.md"
+type = "text"
+title = "Rapport d’optimisation et de vérification Android"
+description = "APK réduit de 35,84 %, catalogue embarqué conservé, contrôles de signature et SHA-256, commandes de reproduction et limites des essais."
+logical_id = "202f7066-8273-4972-8594-f5ca75600a4d"
+content_hash = "sha256:2715e95522a21cd190e255182c77917cf0598ec39ed87d199d90740c8e095ca8"
+size = 7488
+mtime_ms = 1792507083751
+storage_uri = "gcs://replit-rams-assets-janeway/rams/assets/repl:46dafea5-f278-4767-b5cb-589ce6a23240/202f7066-8273-4972-8594-f5ca75600a4d/eb488599-6180-4dec-be8d-9278ccfc4d28"
+storage_version_token = "1792507097987111"
+content_type = "text/markdown"
