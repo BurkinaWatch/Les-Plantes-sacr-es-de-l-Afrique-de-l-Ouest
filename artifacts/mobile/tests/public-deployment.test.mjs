@@ -4,7 +4,9 @@ import { createRequire } from "node:module";
 import path from "node:path";
 import { spawn } from "node:child_process";
 import { EventEmitter } from "node:events";
+import { mkdtemp, rm } from "node:fs/promises";
 import http from "node:http";
+import { tmpdir } from "node:os";
 import test from "node:test";
 
 const require = createRequire(import.meta.url);
@@ -205,22 +207,26 @@ test("reports a failed smoke test while keeping the server running", async () =>
   );
 });
 
-test("keeps a real server child available after a controlled validation failure", async (t) => {
+test("keeps a real server child available after a controlled validation failure", { timeout: 15_000 }, async (t) => {
   const port = await getFreePort();
+  const staticRoot = await mkdtemp(path.join(tmpdir(), "mobile-launcher-test-"));
   const testDomain = "railway-integration.example.com";
   const signalSource = new EventEmitter();
   const logger = createTestLogger();
   let validationFailureReported;
-  const validationFailure = new Promise((resolve) => {
+  let validationCouldNotComplete;
+  const validationFailure = new Promise((resolve, reject) => {
     validationFailureReported = resolve;
+    validationCouldNotComplete = reject;
   });
-  const serverRoot = path.resolve(import.meta.dirname, "..");
   let server;
 
   logger.error = (message) => {
     logger.messages.push({ level: "error", message });
     if (message.startsWith("PUBLIC DEPLOYMENT VALIDATION FAILED")) {
       validationFailureReported();
+    } else if (message.startsWith("PUBLIC DEPLOYMENT VALIDATION COULD NOT COMPLETE")) {
+      validationCouldNotComplete(new Error(message));
     }
   };
 
@@ -228,7 +234,8 @@ test("keeps a real server child available after a controlled validation failure"
     env: {
       ...process.env,
       PORT: String(port),
-      STATIC_ROOT: path.join(serverRoot, "static-build"),
+      BASE_PATH: "/",
+      STATIC_ROOT: staticRoot,
       RAILWAY_PUBLIC_DOMAIN: testDomain,
     },
     processLike: signalSource,
@@ -253,6 +260,7 @@ test("keeps a real server child available after a controlled validation failure"
       server.kill("SIGKILL");
       await once(server, "exit").catch(() => {});
     }
+    await rm(staticRoot, { recursive: true, force: true });
   });
 
   await validationFailure;

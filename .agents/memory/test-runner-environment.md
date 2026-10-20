@@ -63,8 +63,18 @@ waiting for another `exit` event during cleanup.
 **Why:** Treating `exitCode === null` as “still running” can attempt to kill an already
 terminated child and leave the test waiting forever.
 
-**How to apply:** Consider a child settled when both `exitCode` and `signalCode` are
-non-null, and only await `exit` after confirming it is still running.
+**How to apply:** Consider a child settled when either `exitCode` or `signalCode` is
+non-null; only await a future `exit` when both are null.
+
+Launcher integration tests should use a minimal temporary static root, not local
+generated build output.
+
+**Why:** A local offline-content build can contain hundreds of megabytes. Loading
+it can exceed a short readiness deadline even when the server is correct, and a
+test waiting only for the later smoke-test report can then hang indefinitely.
+
+**How to apply:** Isolate launcher fixtures from generated assets, bound async
+waits, and surface readiness failures rather than waiting only for smoke results.
 
 With TypeScript 6, a command that names source files directly while a
 `tsconfig.json` is present fails with TS5112 unless it explicitly opts out of
