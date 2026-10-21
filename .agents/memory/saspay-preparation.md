@@ -42,6 +42,22 @@ also prevent valid webhooks from being accepted.
 credentials. Keep the explicit activation flag independent of credential
 presence; recognizing a key must never enable real payments automatically.
 
+## Estimations de frais avant le paiement
+
+Use SAS Pay's authenticated `pricing/my-rates` data only for a clearly labelled
+estimate. Live rates may include available networks with no tiers and negative
+numeric sentinels for optional amount bounds. Compute a range only from published
+tiers that cover the subscription amount; keep the account's configured fee mode
+and leave the final exact total to SAS Pay's hosted confirmation page.
+
+**Why:** The live rate data differs from the documentation examples, and fee
+handling can vary by network. Treating incomplete rate tiers as a complete range
+could mislead a customer.
+
+**How to apply:** Keep the estimate and exact hosted amount distinct in the UI.
+Skip networks with no matching tier, disclose the number of compatible published
+rates used, and never override `fee_charge_mode` just to make a quote.
+
 Webhook delivery is an at-least-once message flow: the unique event key must be recorded before business processing, and a duplicate must return successfully without re-running activation.
 
 **Why:** Providers retry deliveries, so a valid duplicate is normal operational behavior rather than an error condition.

@@ -44,15 +44,10 @@ export function estimateSasPayCustomerFees(
         : baseAmount >= minimum && (maximum === undefined || baseAmount <= maximum))
     );
   };
-  if (
-    availableRates.some(
-      (rate) => !rate.payin.tiers.some(tierCoversAmount),
-    )
-  ) {
-    return null;
-  }
-
-  const applicableTiers = availableRates
+  const applicableRates = availableRates.filter((rate) =>
+    rate.payin.tiers.some(tierCoversAmount),
+  );
+  const applicableTiers = applicableRates
     .flatMap((rate) =>
       rate.payin.tiers.filter(tierCoversAmount),
     );
@@ -95,7 +90,7 @@ export function estimateSasPayCustomerFees(
   const minimumFee = Math.min(...numericFees);
   const maximumFee = Math.max(...numericFees);
   const networkCount = new Set(
-    availableRates.map((rate) => `${rate.countryCode}:${rate.networkCode}`),
+    applicableRates.map((rate) => `${rate.countryCode}:${rate.networkCode}`),
   ).size;
 
   return {

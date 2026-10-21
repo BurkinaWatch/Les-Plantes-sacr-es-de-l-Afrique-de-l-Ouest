@@ -352,7 +352,7 @@ export default function AbonnementScreen() {
                   : selected.feeEstimate.feeChargeMode === "DEDUCTED"
                     ? "Les frais sont pris en charge par le marchand sur les réseaux concernés."
                     : "La prise en charge des frais dépend du réseau choisi."}
-                {` Estimation calculée sur ${selected.feeEstimate.networkCount} réseau${selected.feeEstimate.networkCount > 1 ? "x" : ""} disponible${selected.feeEstimate.networkCount > 1 ? "s" : ""}.`}
+                {` Estimation basée sur les tarifs publiés pour ${selected.feeEstimate.networkCount} réseau${selected.feeEstimate.networkCount > 1 ? "x" : ""} compatible${selected.feeEstimate.networkCount > 1 ? "s" : ""}. Le réseau choisi peut modifier ce montant.`}
               </Text>
             </>
           )}

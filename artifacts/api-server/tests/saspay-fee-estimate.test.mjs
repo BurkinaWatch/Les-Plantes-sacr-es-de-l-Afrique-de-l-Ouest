@@ -89,7 +89,7 @@ test("fee estimates respect amount tiers, fixed fees, floors, and caps", () => {
         tiers: [
           {
             minAmount: "0",
-            maxAmount: "19999",
+            maxAmount: "30000",
             currency: "XOF",
             percent: "3",
             fixed: "5",
@@ -103,10 +103,10 @@ test("fee estimates respect amount tiers, fixed fees, floors, and caps", () => {
   ]);
 
   assert.equal(estimate?.minimumFee, "400.00");
-  assert.equal(estimate?.maximumFee, "400.00");
+  assert.equal(estimate?.maximumFee, "605.00");
   assert.equal(estimate?.totalMinimum, "20400.00");
-  assert.equal(estimate?.totalMaximum, "20400.00");
-  assert.equal(estimate?.networkCount, 1);
+  assert.equal(estimate?.totalMaximum, "20605.00");
+  assert.equal(estimate?.networkCount, 2);
 });
 
 test("the estimate is unavailable instead of guessing when fee mode or eligible rates are missing", () => {
@@ -131,11 +131,14 @@ test("the estimate is unavailable instead of guessing when fee mode or eligible 
   );
   const missingNetworkTier = rate("BF", "orange_bf", "ADD_ON", "2.5");
   missingNetworkTier.payin.tiers = [];
+  const partialNetworkEstimate = estimateSasPayCustomerFees("2000.00", "XOF", [
+    rate("CI", "orange_ci", "ADD_ON", "2.5"),
+    missingNetworkTier,
+  ]);
+  assert.equal(partialNetworkEstimate?.minimumFee, "50.00");
+  assert.equal(partialNetworkEstimate?.networkCount, 1);
   assert.equal(
-    estimateSasPayCustomerFees("2000.00", "XOF", [
-      rate("CI", "orange_ci", "ADD_ON", "2.5"),
-      missingNetworkTier,
-    ]),
-    null,
+    partialNetworkEstimate?.totalMaximum,
+    "2050.00",
   );
 });
