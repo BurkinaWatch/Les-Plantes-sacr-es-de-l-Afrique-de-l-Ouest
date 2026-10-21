@@ -3,11 +3,11 @@ name: SAS Pay preparation
 description: Safety boundaries and rollout decisions for the SAS Pay integration.
 ---
 
-SAS Pay remains a server-only, opt-in integration. The application must keep plans inactive until pricing, currency, customer contact requirements, webhook configuration, and test credentials have been explicitly validated.
+SAS Pay credentials stay server-side. When the user explicitly authorizes direct-live rollout, do not require a sandbox account or test credentials; keep the activation flag explicit, preserve the approved prices, and reconcile each checkout against SAS Pay before activating it.
 
-**Why:** A hosted checkout can create a real payable session, and the available user model does not contain a verified customer email. Enabling by default or inventing contact data would risk real or misdirected payments.
+**Why:** The user explicitly authorized using the merchant's existing live SAS Pay credentials. Creating a checkout opens a payable session, but does not charge the customer unless they complete it.
 
-**How to apply:** Keep `SAS_PAY_ENABLED` false unless the rollout is intentional. Keep credentials in Replit Secrets, accept payment state only from a valid HMAC webhook or backend verification, and treat monthly/yearly renewals as separate payment intents until recurring billing is confirmed.
+**How to apply:** Keep merchant keys secret; enable live payment only in the intended runtime; accept payment state only after a valid signed webhook or backend verification; never simulate a payment or assume monthly/yearly recurring billing.
 
 ## Tarifs confirmés
 
@@ -21,16 +21,16 @@ This approval is not permission to charge a test payment.
 
 ## Cohérence des environnements
 
-Do not enable live payments in the preview merely to remove an availability
-error when the merchant's webhook points to production.
+Do not treat webhook delivery to production as confirmation that the preview
+database has been updated.
 
-**Why:** The web preview prefers the development API; a confirmation delivered
-to a different environment may not find or activate the customer's subscription.
+**Why:** The web preview prefers the development API, but the live merchant webhook
+may point to the production API and therefore a different database.
 
-**How to apply:** Validate that checkout creation, database records, webhook
-delivery and reconciliation belong to the same intended environment before
-opening real payments. A healthy production webhook alone does not validate a
-preview checkout.
+**How to apply:** Confirm a checkout in its owning database by querying SAS Pay
+with the stored checkout-session ID. When webhook and checkout databases differ,
+provide a user-triggered reconciliation path instead of trusting a cross-environment
+webhook or marking a subscription active from the redirect.
 
 The provisioned secrets use `SASPAY_*`, whereas the initial integration used
 `SAS_PAY_*`. Preserve compatibility with both naming conventions.

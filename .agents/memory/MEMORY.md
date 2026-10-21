@@ -23,7 +23,7 @@
 - [PostgreSQL readiness roles](postgresql-readiness-roles.md) — information_schema constraint metadata may require object ownership, not only SELECT grants
 - [PostgreSQL constraint probes](postgresql-constraint-probes.md) — expected constraint failures inside a write transaction need savepoints before later checks can continue
 - [GitHub connector sync limits](github-connector-sync-limits.md) — API write permission does not authenticate local Git pushes; Replit Git Providers auth is separate
-- [SAS Pay preparation](saspay-preparation.md) — payment remains server-only and opt-in until pricing, customer data, and webhook rollout are explicitly validated
+- [SAS Pay preparation](saspay-preparation.md) — keep keys server-only; support explicitly authorized live checkout with provider-verified reconciliation, not a mandatory sandbox.
 - [Expo preview warm-up](expo-preview-warmup.md) — wait for Metro's web bundle after a restart before diagnosing blank preview captures
 - [React Native Web image sizing](rn-web-image-sizing.md) — absolute positioning may leave local images at intrinsic dimensions; constrain layered images explicitly
 - [Offline APK optimization](offline-apk-optimization.md) — preserve embedded catalogue images and all ABIs; prefer lossless media and compressed native libraries for shared APKs.
