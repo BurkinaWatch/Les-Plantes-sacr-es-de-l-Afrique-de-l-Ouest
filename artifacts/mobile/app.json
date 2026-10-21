@@ -2,14 +2,14 @@
   "expo": {
     "name": "Les Plantes Sacrées d’Afrique de l’Ouest",
     "slug": "animaux-sacres-afrique",
-    "version": "1.0.3",
+    "version": "1.0.4",
     "orientation": "portrait",
     "icon": "./assets/images/logo-plantes-sacrees.png",
     "scheme": "plantessacrees",
     "userInterfaceStyle": "dark",
     "updates": {
       "url": "https://u.expo.dev/cb62d8b0-1962-4974-9bc9-987d7c68a92e",
-      "checkAutomatically": "ON_LOAD",
+      "checkAutomatically": "ON_ERROR_RECOVERY",
       "fallbackToCacheTimeout": 3000
     },
     "runtimeVersion": {
@@ -25,7 +25,7 @@
     },
     "android": {
       "package": "com.sotyssi.plantessacrees",
-      "versionCode": 12,
+      "versionCode": 13,
       "backgroundColor": "#120A05",
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/logo-plantes-sacrees.png",
