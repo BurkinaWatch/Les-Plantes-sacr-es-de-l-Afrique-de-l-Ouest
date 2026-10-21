@@ -48,6 +48,17 @@ def inventory(apk):
 
 
 def main():
+    if any(arg in ("--budget", "--help", "-h") or arg.startswith("--budget=") for arg in sys.argv[1:]):
+        import argparse
+        from android_release_gate import check_release
+        parser = argparse.ArgumentParser(description="Check a signed universal APK against the approved budget")
+        parser.add_argument("apk", type=pathlib.Path)
+        parser.add_argument("tools", type=pathlib.Path)
+        parser.add_argument("--budget", type=pathlib.Path, required=True)
+        parser.add_argument("--output", type=pathlib.Path, required=True)
+        args = parser.parse_args()
+        root = pathlib.Path(__file__).resolve().parents[1]
+        raise SystemExit(check_release(args.apk, args.tools, root, args.budget, args.output, inventory))
     if len(sys.argv) != 4:
         raise SystemExit("Usage: audit-android-release.py baseline.apk optimized.apk build-tools-directory")
     baseline, optimized, tools = map(pathlib.Path, sys.argv[1:])

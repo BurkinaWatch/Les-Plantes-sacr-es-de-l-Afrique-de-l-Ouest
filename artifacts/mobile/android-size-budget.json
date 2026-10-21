@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 1,
+  "reference": {
+    "report": "ANDROID_SIZE_REPORT.md",
+    "apkSha256": "bddfc15d3b180e54fe10e2561d908fc90d18091b78fbf5c15e4943c3c178cfaa",
+    "apkBytes": 203468501,
+    "catalogBytes": 132206673,
+    "catalogUniqueImages": 117,
+    "versionCode": 10
+  },
+  "nonCatalogHeadroomBytes": 5242880,
+  "maxCatalogGrowthBytes": 16777216,
+  "expectedArchitectures": ["arm64-v8a", "armeabi-v7a", "x86", "x86_64"],
+  "requiredLibrariesPerArchitecture": ["libreactnative.so", "libhermesvm.so"],
+  "signerSha256": "59b47e7dc4d1302a17bee085dea2534b7071eea74c0926c84bd2d64f0b4071a3",
+  "approval": "Référence optimisée documentée dans ANDROID_SIZE_REPORT.md ; marge hors catalogue de 5 Mio, croissance du catalogue plafonnée à 16 Mio."
+}

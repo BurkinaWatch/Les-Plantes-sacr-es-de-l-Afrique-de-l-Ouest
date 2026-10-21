@@ -1,0 +1,73 @@
+name: Android release size budget
+
+on:
+  pull_request:
+    paths:
+      - "artifacts/mobile/**"
+      - ".github/workflows/android-release-budget.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  policy-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verify blocking release policy
+        run: python3 -m unittest discover -s artifacts/mobile/tests -p 'android_release_test.py' -v
+
+  signed-release:
+    if: github.event_name == 'workflow_dispatch'
+    needs: policy-tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    environment: android-release
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.26.1
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+      - uses: android-actions/setup-android@v3
+      - name: Install Android build tools
+        run: sdkmanager "platforms;android-36" "build-tools;36.0.0"
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+      - name: Restore existing upload key securely
+        env:
+          PLAY_UPLOAD_KEY_BASE64: ${{ secrets.PLAY_UPLOAD_KEY_BASE64 }}
+        run: |
+          python3 - <<'PY'
+          import base64, os, pathlib
+          encoded = os.environ.get("PLAY_UPLOAD_KEY_BASE64")
+          if not encoded:
+              raise SystemExit("Configure the existing upload key in the android-release environment")
+          key = pathlib.Path("artifacts/mobile/.keys/play-upload-key.jks")
+          key.parent.mkdir(parents=True, exist_ok=True)
+          key.write_bytes(base64.b64decode(encoded, validate=True))
+          key.chmod(0o600)
+          PY
+      - name: Build signed APK and enforce budget
+        env:
+          PLAY_UPLOAD_KEY_PASSWORD: ${{ secrets.PLAY_UPLOAD_KEY_PASSWORD }}
+        run: pnpm --filter @workspace/mobile release:android
+      - name: Archive non-sensitive audit only, including rejected APKs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: android-release-evidence-${{ github.run_id }}-${{ github.run_attempt }}
+          path: generated-artifacts/android-release/release-audit.json
+          if-no-files-found: warn
+          retention-days: 90
+      - name: Remove signing material
+        if: always()
+        run: rm -f artifacts/mobile/.keys/play-upload-key.jks
