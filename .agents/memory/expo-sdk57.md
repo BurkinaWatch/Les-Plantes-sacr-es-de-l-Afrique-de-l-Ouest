@@ -38,3 +38,9 @@ Do not lower Metaspace aggressively when moving Kotlin compilation into Gradle's
 **Why:** The client log stopped at a failed Lint task while the actual `OutOfMemoryError: Metaspace` was only visible in the Gradle daemon log. This looked like a slow build rather than an actionable memory limit.
 
 **How to apply:** If the daemon is alive but output has stalled, inspect its log and JVM memory utilization before waiting longer or rerunning compilation. Preserve already-built outputs when restarting with corrected JVM limits.
+
+The interactive shell may select Node 20 while the mobile workflow uses Node 24; Expo Doctor requires Node 22.13 or newer.
+
+**Why:** A release built from an unsupported Node runtime is not equivalent to the supported mobile workflow, even when Gradle succeeds, and does not by itself prove the cause of a device startup crash.
+
+**How to apply:** Confirm `node -v` is at least 22.13 before Android prebuild/release. If an installed APK still crashes on-device, obtain native Android logcat; a successful bundle or web preview cannot identify the runtime exception.
