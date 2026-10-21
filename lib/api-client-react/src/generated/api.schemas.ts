@@ -12,11 +12,27 @@ export interface ApiError {
 
 export interface AuthCredentials {
   /**
+     * Email address; the username field name and legacy username values remain supported for older clients.
+     * @minLength 3
+     * @maxLength 254
+     */
+  username: string;
+  /**
+     * @minLength 6
+     * @maxLength 128
+     */
+  password: string;
+}
+
+export interface EmailLinkInput {
+  /**
      * @minLength 3
      * @maxLength 30
      * @pattern ^[A-Za-z0-9_]+$
      */
   username: string;
+  /** @maxLength 254 */
+  email: string;
   /**
      * @minLength 6
      * @maxLength 128
@@ -42,7 +58,7 @@ export const AccountDeletionFormInputConfirm = {
 export interface AccountDeletionFormInput {
   /**
      * @minLength 3
-     * @maxLength 30
+     * @maxLength 254
      */
   username: string;
   /**

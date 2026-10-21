@@ -32,6 +32,7 @@ import type {
   AuthSession,
   BadRequestResponse,
   CreateSubscriptionPaymentRequest,
+  EmailLinkInput,
   GetSubscriptionPlans200,
   GetSubscriptionStatus200,
   HealthStatus,
@@ -179,7 +180,7 @@ export const getRegisterAccountUrl = () => {
 }
 
 /**
- * @summary Create an account with a username and password
+ * @summary Create an account with an email address and password
  */
 export const registerAccount = async (authCredentials: AuthCredentials, options?: Parameters<typeof customFetch>[1]): Promise<AuthSession> => {
 
@@ -245,7 +246,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
     export type RegisterAccountMutationVariables = {data: BodyType<AuthCredentials>}
 
     /**
- * @summary Create an account with a username and password
+ * @summary Create an account with an email address and password
  */
 export const useRegisterAccount = <TError = ErrorType<BadRequestResponse | ApiError | TooManyRequestsResponse>,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof registerAccount>>, TError,RegisterAccountMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
@@ -267,7 +268,7 @@ export const getLoginAccountUrl = () => {
 }
 
 /**
- * @summary Sign in with a username and password
+ * @summary Sign in with an email address and password
  */
 export const loginAccount = async (authCredentials: AuthCredentials, options?: Parameters<typeof customFetch>[1]): Promise<AuthSession> => {
 
@@ -333,7 +334,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
     export type LoginAccountMutationVariables = {data: BodyType<AuthCredentials>}
 
     /**
- * @summary Sign in with a username and password
+ * @summary Sign in with an email address and password
  */
 export const useLoginAccount = <TError = ErrorType<BadRequestResponse | UnauthorizedResponse | TooManyRequestsResponse>,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof loginAccount>>, TError,LoginAccountMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
@@ -344,6 +345,95 @@ export const useLoginAccount = <TError = ErrorType<BadRequestResponse | Unauthor
         TContext
       > => {
       return useMutation(getLoginAccountMutationOptions(options), queryClient);
+    }
+
+export const getLinkAccountEmailUrl = () => {
+
+
+
+
+  return `/api/auth/link-email`
+}
+
+/**
+ * Keeps the account ID, password and subscriptions. The email becomes its login identifier; no account is created or merged.
+ * @summary Associate an email with an existing username account after password verification
+ */
+export const linkAccountEmail = async (emailLinkInput: EmailLinkInput, options?: Parameters<typeof customFetch>[1]): Promise<AuthSession> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return customFetch<AuthSession>(getLinkAccountEmailUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(emailLinkInput)
+  }
+);}
+
+
+
+
+
+export const getLinkAccountEmailMutationKey = () => ['linkAccountEmail'] as const;
+
+export const getLinkAccountEmailMutationOptions = <TError = ErrorType<BadRequestResponse | UnauthorizedResponse | ApiError | TooManyRequestsResponse>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof linkAccountEmail>>, TError,LinkAccountEmailMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof linkAccountEmail>>, TError,LinkAccountEmailMutationVariables, TContext> => {
+
+const mutationKey = getLinkAccountEmailMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof linkAccountEmail>>, LinkAccountEmailMutationVariables> = (props) => {
+          const {data} = props ?? {};
+
+          return  linkAccountEmail(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type LinkAccountEmailMutationResult = NonNullable<Awaited<ReturnType<typeof linkAccountEmail>>>
+    export type LinkAccountEmailMutationBody = BodyType<EmailLinkInput>
+    export type LinkAccountEmailMutationError = ErrorType<BadRequestResponse | UnauthorizedResponse | ApiError | TooManyRequestsResponse>
+    export type LinkAccountEmailMutationVariables = {data: BodyType<EmailLinkInput>}
+
+    /**
+ * @summary Associate an email with an existing username account after password verification
+ */
+export const useLinkAccountEmail = <TError = ErrorType<BadRequestResponse | UnauthorizedResponse | ApiError | TooManyRequestsResponse>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof linkAccountEmail>>, TError,LinkAccountEmailMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof linkAccountEmail>>,
+        TError,
+        LinkAccountEmailMutationVariables,
+        TContext
+      > => {
+      return useMutation(getLinkAccountEmailMutationOptions(options), queryClient);
     }
 
 export const getDeleteAccountUrl = () => {

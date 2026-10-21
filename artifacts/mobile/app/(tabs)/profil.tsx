@@ -24,6 +24,7 @@ import { TOTEM_RESULTS } from '@/data/quiz';
 import { useColors } from '@/hooks/useColors';
 import { useTranslation, LANG_CODES, LANG_NAMES, type LangCode } from '@/i18n';
 import { useGetSubscriptionPlans } from '@workspace/api-client-react';
+import { isValidEmail } from '@/lib/auth-validation';
 
 function formatPlanAmount(amount: string): string {
   const value = Number(amount);
@@ -238,9 +239,22 @@ export default function ProfilScreen() {
         <View style={[styles.infoSection, { backgroundColor: colors.card, borderColor: colors.border }]}>
           <Text style={[styles.infoLabel, { color: colors.gold }]}>{t.auth_account_label}</Text>
           <View style={[styles.infoRow, { borderTopColor: colors.border }]}>
-            <Text style={[styles.infoTitle, { color: colors.mutedForeground }]}>{t.auth_username}</Text>
+            <Text style={[styles.infoTitle, { color: colors.mutedForeground }]}>
+              {user && !isValidEmail(user.username) ? (lang === 'en' ? 'Previous username' : 'Ancien identifiant') : t.auth_username}
+            </Text>
             <Text style={[styles.infoValue, { color: colors.ivory }]}>{user?.username}</Text>
           </View>
+          {user && !isValidEmail(user.username) && (
+            <Pressable
+              accessibilityRole="button"
+              onPress={() => router.push({ pathname: '/(auth)/login', params: { username: user.username } })}
+              style={[styles.deleteAccountLink, { borderTopColor: colors.border }]}
+            >
+              <Text style={{ color: colors.gold }}>
+                {lang === 'en' ? 'Associate my email with this account' : 'Associer mon e-mail à ce compte'}
+              </Text>
+            </Pressable>
+          )}
           <Pressable
             testID="profile-delete-account"
             accessibilityRole="button"

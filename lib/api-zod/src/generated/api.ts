@@ -24,20 +24,18 @@ export const HealthCheckResponse = zod.object({
 
 
 /**
- * @summary Create an account with a username and password
+ * @summary Create an account with an email address and password
  */
 export const registerAccountBodyUsernameMin = 3;
-export const registerAccountBodyUsernameMax = 30;
+export const registerAccountBodyUsernameMax = 254;
 
-
-export const registerAccountBodyUsernameRegExp = new RegExp('^[A-Za-z0-9_]+$');
 export const registerAccountBodyPasswordMin = 6;
 export const registerAccountBodyPasswordMax = 128;
 
 
 
 export const RegisterAccountBody = zod.object({
-  "username": zod.string().min(registerAccountBodyUsernameMin).max(registerAccountBodyUsernameMax).regex(registerAccountBodyUsernameRegExp),
+  "username": zod.string().min(registerAccountBodyUsernameMin).max(registerAccountBodyUsernameMax).describe('Email address; the username field name and legacy username values remain supported for older clients.'),
   "password": zod.string().min(registerAccountBodyPasswordMin).max(registerAccountBodyPasswordMax)
 })
 
@@ -51,24 +49,53 @@ export const RegisterAccountResponse = zod.object({
 
 
 /**
- * @summary Sign in with a username and password
+ * @summary Sign in with an email address and password
  */
 export const loginAccountBodyUsernameMin = 3;
-export const loginAccountBodyUsernameMax = 30;
+export const loginAccountBodyUsernameMax = 254;
 
-
-export const loginAccountBodyUsernameRegExp = new RegExp('^[A-Za-z0-9_]+$');
 export const loginAccountBodyPasswordMin = 6;
 export const loginAccountBodyPasswordMax = 128;
 
 
 
 export const LoginAccountBody = zod.object({
-  "username": zod.string().min(loginAccountBodyUsernameMin).max(loginAccountBodyUsernameMax).regex(loginAccountBodyUsernameRegExp),
+  "username": zod.string().min(loginAccountBodyUsernameMin).max(loginAccountBodyUsernameMax).describe('Email address; the username field name and legacy username values remain supported for older clients.'),
   "password": zod.string().min(loginAccountBodyPasswordMin).max(loginAccountBodyPasswordMax)
 })
 
 export const LoginAccountResponse = zod.object({
+  "token": zod.string(),
+  "user": zod.object({
+  "id": zod.number().int(),
+  "username": zod.string()
+})
+})
+
+
+/**
+ * Keeps the account ID, password and subscriptions. The email becomes its login identifier; no account is created or merged.
+ * @summary Associate an email with an existing username account after password verification
+ */
+export const linkAccountEmailBodyUsernameMin = 3;
+export const linkAccountEmailBodyUsernameMax = 30;
+
+
+export const linkAccountEmailBodyUsernameRegExp = new RegExp('^[A-Za-z0-9_]+$');
+export const linkAccountEmailBodyEmailMax = 254;
+
+export const linkAccountEmailBodyPasswordMin = 6;
+export const linkAccountEmailBodyPasswordMax = 128;
+
+
+
+export const LinkAccountEmailBody = zod.object({
+  "username": zod.string().min(linkAccountEmailBodyUsernameMin).max(linkAccountEmailBodyUsernameMax).regex(linkAccountEmailBodyUsernameRegExp),
+  "email": zod.string().email().max(linkAccountEmailBodyEmailMax),
+  "password": zod.string().min(linkAccountEmailBodyPasswordMin).max(linkAccountEmailBodyPasswordMax)
+})
+
+export const LinkAccountEmailResponse = zod.object({
   "token": zod.string(),
   "user": zod.object({
   "id": zod.number().int(),
@@ -105,7 +132,7 @@ export const GetAccountDeletionPageResponse = zod.unknown()
  * @summary Submit the public account deletion form
  */
 export const submitAccountDeletionRequestBodyUsernameMin = 3;
-export const submitAccountDeletionRequestBodyUsernameMax = 30;
+export const submitAccountDeletionRequestBodyUsernameMax = 254;
 
 export const submitAccountDeletionRequestBodyPasswordMin = 6;
 export const submitAccountDeletionRequestBodyPasswordMax = 128;

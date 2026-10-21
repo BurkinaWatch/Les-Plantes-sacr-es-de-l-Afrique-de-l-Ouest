@@ -33,7 +33,7 @@ function attachVerifiedUser(req: Request, token: string): boolean {
       claims.id > 0 &&
       typeof claims.username === "string" &&
       claims.username.length > 0 &&
-      claims.username.length <= 30
+      claims.username.length <= 254
     ) {
       req.user = { id: claims.id, username: claims.username };
       return true;

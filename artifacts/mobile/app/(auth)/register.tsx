@@ -17,7 +17,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useAuth } from '@/context/AuthContext';
 import { useColors } from '@/hooks/useColors';
 import { useTranslation } from '@/i18n';
-import { isValidUsername } from '@/lib/auth-validation';
+import { isValidEmail } from '@/lib/auth-validation';
 
 export default function RegisterScreen() {
   const colors = useColors();
@@ -37,7 +37,7 @@ export default function RegisterScreen() {
       setError(t.auth_fields_required);
       return;
     }
-    if (!isValidUsername(username)) {
+    if (!isValidEmail(username)) {
       setError(t.auth_username_hint);
       return;
     }
@@ -81,8 +81,12 @@ export default function RegisterScreen() {
                 value={username}
                 onChangeText={setUsername}
                 placeholder={t.auth_username_placeholder}
+                accessibilityLabel={t.auth_username}
+                keyboardType="email-address"
+                autoComplete="email"
+                textContentType="emailAddress"
+                maxLength={254}
                 placeholderTextColor={colors.mutedForeground}
-                maxLength={30}
                 autoCapitalize="none"
                 autoCorrect={false}
               />

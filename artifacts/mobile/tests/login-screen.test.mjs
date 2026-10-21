@@ -19,7 +19,7 @@ function content(node) {
 }
 
 async function mount({ params = {}, result = {} } = {}) {
-  const calls = { credentials: [], routes: [] };
+  const calls = { credentials: [], links: [], routes: [] };
   const original = Module._load;
   Module._load = function (id, ...args) {
     if (id === "expo-router") return {
@@ -31,6 +31,7 @@ async function mount({ params = {}, result = {} } = {}) {
     };
     if (id === "@/context/AuthContext") return { useAuth: () => ({
       login: async (...credentials) => { calls.credentials.push(credentials); return result; },
+      linkEmail: async (...credentials) => { calls.links.push(credentials); return result; },
     }) };
     if (id === "@/hooks/useColors") return { useColors: () => ({}) };
     if (id === "@/i18n") return { useTranslation: () => ({ t: fr }) };
@@ -39,7 +40,7 @@ async function mount({ params = {}, result = {} } = {}) {
     if (id === "expo-linear-gradient") return { LinearGradient: "LinearGradient" };
     if (id === "react-native-safe-area-context") return { useSafeAreaInsets: () => ({ top: 0, bottom: 0 }) };
     if (id === "react-native") return {
-      ...Object.fromEntries(["ActivityIndicator", "Image", "KeyboardAvoidingView", "Pressable", "Text", "TextInput", "View"].map(x => [x, x])),
+      ...Object.fromEntries(["ActivityIndicator", "Image", "KeyboardAvoidingView", "Pressable", "ScrollView", "Text", "TextInput", "View"].map(x => [x, x])),
       StyleSheet: { create: x => x }, Platform: { OS: "web" },
     };
     return original.call(this, id, ...args);
@@ -62,7 +63,8 @@ async function mount({ params = {}, result = {} } = {}) {
       input(fr.auth_password).props.onChangeText(password);
     }),
     submit: async () => act(async () => {
-      const button = renderer.root.findAllByType("Pressable").find(x => content(x) === fr.auth_login_btn);
+      const button = renderer.root.findAllByType("Pressable").find(x =>
+        content(x) === fr.auth_login_btn || content(x) === "Associer mon e-mail et me connecter");
       await button.props.onPress();
     }),
     close: async () => {
@@ -72,47 +74,62 @@ async function mount({ params = {}, result = {} } = {}) {
   };
 }
 
-test("reconnection prefills the existing username and returns to subscription after login", async () => {
-  const f = await mount({ params: { username: "existing_user", returnTo: "/abonnement" } });
+test("reconnection prefills the saved email and returns to subscription after login", async () => {
+  const f = await mount({ params: { username: "client@example.com", returnTo: "/abonnement" } });
   try {
-    assert.equal(f.input(fr.auth_username).props.value, "existing_user");
+    assert.equal(f.input(fr.auth_username).props.value, "client@example.com");
     assert.equal(f.input(fr.auth_username).props.autoComplete, "username");
     assert.equal(f.input(fr.auth_password).props.autoComplete, "current-password");
     await act(async () => f.input(fr.auth_password).props.onChangeText("test-password"));
     await f.submit();
-    assert.deepEqual(f.calls.credentials, [["existing_user", "test-password"]]);
+    assert.deepEqual(f.calls.credentials, [["client@example.com", "test-password"]]);
     assert.deepEqual(f.calls.routes, [["dismissTo", "/abonnement"]]);
   } finally { await f.close(); }
 });
 
-test("email input explains which identifier to use without submitting unrelated credentials", async () => {
+test("invalid emails are rejected, while valid emails reach the login API", async () => {
   const f = await mount();
   try {
-    await f.fill("client@example.com", "test-password");
+    await f.fill("not-an-email", "test-password");
     await f.submit();
     assert.equal(f.calls.credentials.length, 0);
-    assert.ok(f.renderer.root.findAllByType("Text").some(x => content(x).includes("pas votre adresse e-mail")));
+    await f.fill("client@example.com", "test-password");
+    await f.submit();
+    assert.equal(f.calls.credentials.length, 1);
   } finally { await f.close(); }
 });
 
 test("wrong passwords remain rejected and the identifier is retained", async () => {
   const f = await mount({ result: { error: "Nom d'utilisateur ou mot de passe incorrect" } });
   try {
-    await f.fill("existing_user", "wrong-password");
+    await f.fill("client@example.com", "wrong-password");
     await f.submit();
     assert.equal(f.calls.credentials.length, 1);
     assert.equal(f.calls.routes.length, 0);
-    assert.equal(f.input(fr.auth_username).props.value, "existing_user");
+    assert.equal(f.input(fr.auth_username).props.value, "client@example.com");
     assert.ok(f.renderer.root.findAllByType("Text").some(x => content(x).includes("mot de passe incorrect")));
   } finally { await f.close(); }
 });
 
-test("ordinary username login still opens home and never follows arbitrary return URLs", async () => {
+test("email login opens home and never follows arbitrary return URLs", async () => {
   const f = await mount({ params: { returnTo: "https://untrusted.example" } });
   try {
-    await f.fill(" existing_user ", "test-password");
+    await f.fill(" client@example.com ", "test-password");
     await f.submit();
-    assert.deepEqual(f.calls.credentials, [["existing_user", "test-password"]]);
+    assert.deepEqual(f.calls.credentials, [["client@example.com", "test-password"]]);
     assert.deepEqual(f.calls.routes, [["replace", "/(tabs)"]]);
+  } finally { await f.close(); }
+});
+
+test("legacy association requires the old account credentials without silently creating a new account", async () => {
+  const f = await mount({ params: { username: "existing_user", returnTo: "/abonnement" } });
+  try {
+    assert.equal(f.input("Ancien identifiant").props.value, "existing_user");
+    assert.equal(f.input(fr.auth_username).props.value, "", "never invent an email for a legacy account");
+    await f.fill("client@example.com", "same-password");
+    await f.submit();
+    assert.equal(f.calls.credentials.length, 0);
+    assert.deepEqual(f.calls.links, [["existing_user", "client@example.com", "same-password"]]);
+    assert.deepEqual(f.calls.routes, [["dismissTo", "/abonnement"]]);
   } finally { await f.close(); }
 });

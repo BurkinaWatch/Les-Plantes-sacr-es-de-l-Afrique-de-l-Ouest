@@ -155,7 +155,8 @@ test("a repeated authenticated deletion is idempotent once the account is absent
 });
 
 test("public form accepts URL-encoded requests and returns generic errors for invalid credentials", async () => {
-  const database = createDatabase();
+  const email = `${"a".repeat(40)}@example.com`;
+  const database = createDatabase({ username: email });
   const router = createAccountDeletionRouter({
     connect: database.connect,
     comparePassword: async (password) => password === "correct-password",
@@ -179,14 +180,14 @@ test("public form accepts URL-encoded requests and returns generic errors for in
     const html = await response.text();
     assert.equal(response.status, 401);
     assert.match(html, /Compte non supprimé/);
-    assert.match(html, /nom d’utilisateur ou le mot de passe est incorrect/i);
+    assert.match(html, /ancien identifiant ou le mot de passe est incorrect/i);
     assert.doesNotMatch(html, /stored-hash|wrong-password/);
 
     const successResponse = await fetch(`${baseUrl}/api/auth/account-deletion`, {
       method: "POST",
       headers: { "Content-Type": "application/x-www-form-urlencoded" },
       body: new URLSearchParams({
-        username: "tester",
+        username: email,
         password: "correct-password",
         confirm: "yes",
       }),
@@ -194,6 +195,8 @@ test("public form accepts URL-encoded requests and returns generic errors for in
     assert.equal(successResponse.status, 200);
     assert.match(await successResponse.text(), /Compte supprimé/);
     assert.ok(database.calls.some((call) => call.sql === "DELETE FROM users WHERE id = $1"));
+    assert.ok(database.calls.some(call =>
+      call.sql.startsWith("SELECT id, password_hash FROM users WHERE username") && call.params[0] === email));
   }, { urlencoded: true });
 });
 

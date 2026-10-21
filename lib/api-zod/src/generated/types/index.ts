@@ -16,6 +16,7 @@ export * from './authUser';
 export * from './badRequestResponse';
 export * from './createSubscriptionPaymentRequest';
 export * from './createSubscriptionPaymentRequestPlanCode';
+export * from './emailLinkInput';
 export * from './getSubscriptionPlans200';
 export * from './getSubscriptionStatus200';
 export * from './healthStatus';

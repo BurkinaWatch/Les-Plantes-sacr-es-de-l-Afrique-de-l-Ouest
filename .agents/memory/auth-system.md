@@ -1,6 +1,6 @@
 ---
 name: Auth system
-description: Username/password auth for the mobile app — architecture, key decisions, and environment notes
+description: Email/password product requirement, preservation of existing accounts, and authentication constraints
 ---
 
 ## Architecture
@@ -14,8 +14,6 @@ description: Username/password auth for the mobile app — architecture, key dec
 
 **Why bcrypt + JWT (not a session)?**
 Mobile apps suit stateless JWT — no server-side session store needed.
-
-**bcrypt build approval**: Must be in `onlyBuiltDependencies` in `pnpm-workspace.yaml` or installs silently skip native build and fail at runtime.
 
 **zod must be an explicit dep of api-server**: It's in the catalog but not auto-available — must add `zod` to `dependencies` in `artifacts/api-server/package.json`.
 
@@ -33,6 +31,20 @@ les changements de modèle d’authentification sans demande explicite.
 **Why:** The user explicitly asked for account fixes without breaking working
 features after repeated confusion about sign-in.
 
-**How to apply:** Keep fixes targeted and verify ordinary username login plus
-subscription reconnection. Never infer an email-to-username link from an email's
-local part: without a verified association, it can identify the wrong account.
+**How to apply:** Keep fixes targeted and verify email login plus subscription
+reconnection. Never infer an email-to-username link from an email's local part:
+without an explicit association, it can identify the wrong account.
+
+## Connexion attendue
+
+« L’utilisateur se connecte avec son adresse mail et le mot de passe », pas avec
+un identifiant.
+
+**Why:** The user explicitly corrected the previous username-only fix. A
+technical field named username must not dictate the product's sign-in experience.
+
+**How to apply:** Use email/password on login and registration. Keep legacy client
+compatibility without forcing new users to choose a username. For accounts that
+never stored an email, require the old account's credentials for a one-time
+association; preserve the account ID, password and subscriptions rather than
+creating a replacement account or guessing an email mapping.

@@ -7,6 +7,7 @@ import {
   KeyboardAvoidingView,
   Platform,
   Pressable,
+  ScrollView,
   StyleSheet,
   Text,
   TextInput,
@@ -17,7 +18,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useAuth } from '@/context/AuthContext';
 import { useColors } from '@/hooks/useColors';
 import { useTranslation } from '@/i18n';
-import { isValidUsername } from '@/lib/auth-validation';
+import { isValidEmail, isValidUsername } from '@/lib/auth-validation';
 
 export default function LoginScreen() {
   const colors = useColors();
@@ -27,13 +28,20 @@ export default function LoginScreen() {
     returnTo?: string;
     username?: string;
   }>();
-  const { login } = useAuth();
+  const { login, linkEmail } = useAuth();
   const { t } = useTranslation();
 
   const [username, setUsername] = useState(() =>
-    typeof suggestedUsername === 'string' && isValidUsername(suggestedUsername)
+    typeof suggestedUsername === 'string' && isValidEmail(suggestedUsername)
       ? suggestedUsername.trim()
       : '',
+  );
+  const [legacyMode, setLegacyMode] = useState(() =>
+    typeof suggestedUsername === 'string' && isValidUsername(suggestedUsername),
+  );
+  const [legacyUsername, setLegacyUsername] = useState(() =>
+    typeof suggestedUsername === 'string' && isValidUsername(suggestedUsername)
+      ? suggestedUsername.trim() : '',
   );
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -44,13 +52,19 @@ export default function LoginScreen() {
       setError(t.auth_fields_required);
       return;
     }
-    if (!isValidUsername(username)) {
+    if (!isValidEmail(username)) {
       setError(t.auth_username_hint);
+      return;
+    }
+    if (legacyMode && !isValidUsername(legacyUsername)) {
+      setError("Saisissez l’ancien identifiant de ce compte (3-30 lettres, chiffres ou _).");
       return;
     }
     setError('');
     setLoading(true);
-    const result = await login(username.trim(), password);
+    const result = legacyMode
+      ? await linkEmail(legacyUsername, username.trim(), password)
+      : await login(username.trim(), password);
     setLoading(false);
     if (result.error) {
       setError(result.error);
@@ -70,7 +84,10 @@ export default function LoginScreen() {
         style={{ flex: 1 }}
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       >
-        <View style={[styles.container, { paddingTop: insets.top + 40, paddingBottom: insets.bottom + 20 }]}>
+        <ScrollView
+          keyboardShouldPersistTaps="handled"
+          contentContainerStyle={[styles.container, { paddingTop: insets.top + 40, paddingBottom: insets.bottom + 20 }]}
+        >
           <View style={styles.header}>
             <Image source={require('@/assets/images/icon.png')} style={styles.logo} />
             <Text style={[styles.title, { color: colors.ivory }]}>{t.auth_welcome_back}</Text>
@@ -91,6 +108,8 @@ export default function LoginScreen() {
                 accessibilityLabel={t.auth_username}
                 autoComplete="username"
                 textContentType="username"
+                keyboardType="email-address"
+                maxLength={254}
                 placeholderTextColor={colors.mutedForeground}
                 autoCapitalize="none"
                 autoCorrect={false}
@@ -99,6 +118,25 @@ export default function LoginScreen() {
                 {t.auth_username_hint}
               </Text>
             </View>
+
+            {legacyMode && (
+              <View style={styles.field}>
+                <Text style={[styles.label, { color: colors.mutedForeground }]}>ANCIEN IDENTIFIANT</Text>
+                <TextInput
+                  accessibilityLabel="Ancien identifiant"
+                  value={legacyUsername}
+                  onChangeText={setLegacyUsername}
+                  autoCapitalize="none"
+                  autoCorrect={false}
+                  placeholder="Identifiant de votre ancien compte"
+                  placeholderTextColor={colors.mutedForeground}
+                  style={[styles.input, { color: colors.ivory, borderColor: colors.border, backgroundColor: colors.warmBrown }]}
+                />
+                <Text style={[styles.identifierHint, { color: colors.mutedForeground }]}>
+                  Cette association unique conserve votre compte et vos abonnements. Ensuite, connectez-vous avec votre e-mail.
+                </Text>
+              </View>
+            )}
 
             <View style={styles.field}>
               <Text style={[styles.label, { color: colors.mutedForeground }]}>{t.auth_password}</Text>
@@ -130,11 +168,19 @@ export default function LoginScreen() {
                 {loading ? (
                   <ActivityIndicator color={colors.deepBrown} />
                 ) : (
-                  <Text style={[styles.btnText, { color: colors.deepBrown }]}>{t.auth_login_btn}</Text>
+                <Text style={[styles.btnText, { color: colors.deepBrown }]}>
+                  {legacyMode ? "Associer mon e-mail et me connecter" : t.auth_login_btn}
+                </Text>
                 )}
               </LinearGradient>
             </Pressable>
           </View>
+
+          <Pressable onPress={() => { setLegacyMode(value => !value); setError(''); }}>
+            <Text style={[styles.footerLink, { color: colors.gold, textAlign: 'center' }]}>
+              {legacyMode ? "J’ai déjà un compte avec mon e-mail" : "Ancien compte sans e-mail ? Associer mon adresse"}
+            </Text>
+          </Pressable>
 
           <View style={styles.footer}>
             <Text style={[styles.footerText, { color: 'rgba(255,255,255,0.5)' }]}>{t.auth_no_account}</Text>
@@ -142,14 +188,14 @@ export default function LoginScreen() {
               <Text style={[styles.footerLink, { color: colors.gold }]}>{t.auth_create_account}</Text>
             </Pressable>
           </View>
-        </View>
+        </ScrollView>
       </KeyboardAvoidingView>
     </LinearGradient>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, paddingHorizontal: 24, justifyContent: 'center', gap: 32 },
+  container: { flexGrow: 1, paddingHorizontal: 24, justifyContent: 'center', gap: 24 },
   header: { alignItems: 'center', gap: 10 },
   logo: { width: 80, height: 80, marginBottom: 4 },
   title: { fontSize: 28, fontWeight: '800', letterSpacing: 0.3 },

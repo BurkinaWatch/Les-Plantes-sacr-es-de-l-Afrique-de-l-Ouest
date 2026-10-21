@@ -8,9 +8,9 @@
 
 export interface AuthCredentials {
   /**
+     * Email address; the username field name and legacy username values remain supported for older clients.
      * @minLength 3
-     * @maxLength 30
-     * @pattern ^[A-Za-z0-9_]+$
+     * @maxLength 254
      */
   username: string;
   /**

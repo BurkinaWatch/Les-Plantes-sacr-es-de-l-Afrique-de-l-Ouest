@@ -2,9 +2,10 @@ import { Router } from "express";
 import bcrypt from "bcryptjs";
 import rateLimit from "express-rate-limit";
 import { db, usersTable } from "@workspace/db";
-import { eq } from "drizzle-orm";
-import { z } from "zod";
+import { and, eq } from "drizzle-orm";
 import { signUserToken } from "../lib/auth-middleware.js";
+import { credentialsSchema } from "../lib/auth-credentials.js";
+import { createEmailLinkHandler } from "../lib/email-link.js";
 
 const router = Router();
 
@@ -18,11 +19,6 @@ const authLimiter = rateLimit({
   message: { error: "Trop de tentatives. Réessaye dans 15 minutes." },
 });
 
-const credentialsSchema = z.object({
-  username: z.string().trim().toLowerCase().min(3).max(30).regex(/^[a-z0-9_]+$/, "Le nom d'utilisateur ne peut contenir que des lettres, chiffres et underscores"),
-  password: z.string().min(6).max(128),
-}).strict();
-
 router.post("/register", authLimiter, async (req, res) => {
   const parsed = credentialsSchema.safeParse(req.body);
   if (!parsed.success) {
@@ -33,11 +29,16 @@ router.post("/register", authLimiter, async (req, res) => {
 
   const existing = await db.select().from(usersTable).where(eq(usersTable.username, username)).limit(1);
   if (existing.length > 0) {
-    return res.status(409).json({ error: "Ce nom d'utilisateur est déjà pris" });
+    return res.status(409).json({ error: "Un compte existe déjà avec cette adresse e-mail ou cet identifiant." });
   }
 
   const passwordHash = await bcrypt.hash(password, SALT_ROUNDS);
-  const [user] = await db.insert(usersTable).values({ username, passwordHash }).returning({ id: usersTable.id, username: usersTable.username });
+  const [user] = await db.insert(usersTable).values({ username, passwordHash })
+    .onConflictDoNothing({ target: usersTable.username })
+    .returning({ id: usersTable.id, username: usersTable.username });
+  if (!user) {
+    return res.status(409).json({ error: "Un compte existe déjà avec cette adresse e-mail ou cet identifiant." });
+  }
 
   const token = signUserToken({ id: user!.id, username: user!.username });
 
@@ -54,17 +55,30 @@ router.post("/login", authLimiter, async (req, res) => {
 
   const [user] = await db.select().from(usersTable).where(eq(usersTable.username, username)).limit(1);
   if (!user) {
-    return res.status(401).json({ error: "Nom d'utilisateur ou mot de passe incorrect" });
+    return res.status(401).json({ error: "Adresse e-mail ou mot de passe incorrect" });
   }
 
   const valid = await bcrypt.compare(password, user.passwordHash);
   if (!valid) {
-    return res.status(401).json({ error: "Nom d'utilisateur ou mot de passe incorrect" });
+    return res.status(401).json({ error: "Adresse e-mail ou mot de passe incorrect" });
   }
 
   const token = signUserToken({ id: user.id, username: user.username });
 
   return res.status(200).json({ token, user: { id: user.id, username: user.username } });
 });
+
+router.post("/link-email", authLimiter, createEmailLinkHandler({
+  findAccount: async (username) => {
+    const [account] = await db.select().from(usersTable).where(eq(usersTable.username, username)).limit(1);
+    return account;
+  },
+  renameAccount: async (account, email) => {
+    const [user] = await db.update(usersTable).set({ username: email })
+      .where(and(eq(usersTable.id, account.id), eq(usersTable.username, account.username)))
+      .returning({ id: usersTable.id, username: usersTable.username });
+    return user;
+  },
+}));
 
 export default router;

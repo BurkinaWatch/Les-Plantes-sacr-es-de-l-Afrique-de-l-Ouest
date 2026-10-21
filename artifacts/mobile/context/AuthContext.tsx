@@ -4,6 +4,7 @@ import { getApiBase } from '@/lib/api-config';
 import {
   deleteAccount as deleteAccountRequest,
   loginAccount,
+  linkAccountEmail,
   registerAccount,
 } from '@workspace/api-client-react';
 
@@ -30,8 +31,9 @@ interface AuthContextType {
   /** Server-issued JWT. Include as `Authorization: Bearer <token>` on AI requests. */
   token: string | null;
   isLoading: boolean;
-  register: (username: string, password: string) => Promise<{ error?: string }>;
-  login: (username: string, password: string) => Promise<{ error?: string }>;
+  register: (email: string, password: string) => Promise<{ error?: string }>;
+  login: (email: string, password: string) => Promise<{ error?: string }>;
+  linkEmail: (username: string, email: string, password: string) => Promise<{ error?: string }>;
   deleteAccount: (password: string) => Promise<{ error?: string }>;
   logout: () => Promise<void>;
 }
@@ -133,6 +135,21 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     await AsyncStorage.removeItem(AUTH_KEY);
   }, []);
 
+  const linkEmail = useCallback(async (username: string, email: string, password: string) => {
+    if (!getApiBase()) return { error: 'Serveur non disponible. Vérifie ta connexion.' };
+    try {
+      const data = await linkAccountEmail({
+        username: username.trim().toLowerCase(),
+        email: email.trim().toLowerCase(),
+        password,
+      });
+      await persist(data.user, data.token);
+      return {};
+    } catch (error) {
+      return { error: getAuthApiError(error) ?? 'Impossible d’associer cette adresse e-mail pour le moment.' };
+    }
+  }, [persist]);
+
   const deleteAccount = useCallback(async (password: string) => {
     try {
       await deleteAccountRequest({ password });
@@ -153,7 +170,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   return (
-    <AuthContext.Provider value={{ user, token, isLoading, register, login, deleteAccount, logout }}>
+    <AuthContext.Provider value={{ user, token, isLoading, register, login, linkEmail, deleteAccount, logout }}>
       {children}
     </AuthContext.Provider>
   );

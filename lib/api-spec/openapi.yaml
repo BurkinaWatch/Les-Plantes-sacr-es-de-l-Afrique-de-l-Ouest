@@ -38,7 +38,7 @@ paths:
     post:
       operationId: registerAccount
       tags: [auth]
-      summary: Create an account with a username and password
+      summary: Create an account with an email address and password
       requestBody:
         required: true
         content:
@@ -66,7 +66,7 @@ paths:
     post:
       operationId: loginAccount
       tags: [auth]
-      summary: Sign in with a username and password
+      summary: Sign in with an email address and password
       requestBody:
         required: true
         content:
@@ -84,6 +84,37 @@ paths:
           $ref: "#/components/responses/BadRequest"
         "401":
           $ref: "#/components/responses/Unauthorized"
+        "429":
+          $ref: "#/components/responses/TooManyRequests"
+  /auth/link-email:
+    post:
+      operationId: linkAccountEmail
+      tags: [auth]
+      summary: Associate an email with an existing username account after password verification
+      description: Keeps the account ID, password and subscriptions. The email becomes its login identifier; no account is created or merged.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/EmailLinkInput"
+      responses:
+        "200":
+          description: Existing account and a renewed bearer token
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthSession"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "409":
+          description: Email is already used or the account was concurrently modified
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
         "429":
           $ref: "#/components/responses/TooManyRequests"
   /auth/account:
@@ -288,8 +319,26 @@ components:
         username:
           type: string
           minLength: 3
+          maxLength: 254
+          description: Email address; the username field name and legacy username values remain supported for older clients.
+        password:
+          type: string
+          minLength: 6
+          maxLength: 128
+    EmailLinkInput:
+      type: object
+      additionalProperties: false
+      required: [username, email, password]
+      properties:
+        username:
+          type: string
+          minLength: 3
           maxLength: 30
           pattern: "^[A-Za-z0-9_]+$"
+        email:
+          type: string
+          format: email
+          maxLength: 254
         password:
           type: string
           minLength: 6
@@ -311,7 +360,7 @@ components:
         username:
           type: string
           minLength: 3
-          maxLength: 30
+          maxLength: 254
         password:
           type: string
           minLength: 6

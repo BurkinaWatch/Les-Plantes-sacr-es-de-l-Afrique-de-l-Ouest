@@ -4,6 +4,7 @@ import rateLimit from "express-rate-limit";
 import { z } from "zod";
 
 import { requireJwt } from "../lib/auth-middleware.js";
+import { credentialsSchema } from "../lib/auth-credentials.js";
 
 const router = Router();
 
@@ -32,8 +33,7 @@ const accountDeletionSchema = z.object({
 }).strict();
 
 const webDeletionSchema = z.object({
-  username: z.string().trim().toLowerCase().min(3).max(30)
-    .regex(/^[a-z0-9_]+$/),
+  username: credentialsSchema.shape.username,
   password: z.string().min(6).max(128),
   confirm: z.literal("yes"),
 }).strict();
@@ -73,7 +73,7 @@ function deletionPage(notice?: { title: string; message: string; success?: boole
 <body>
 <main>
   <h1>Demander la suppression de votre compte</h1>
-<p>Cette page permet de supprimer votre compte « Les Plantes Sacrées » même si vous n’avez plus accès à l’application. La vérification se fait avec votre nom d’utilisateur et votre mot de passe; aucun e-mail n’est demandé par ce formulaire.</p>
+<p>Cette page permet de supprimer votre compte « Les Plantes Sacrées » même si vous n’avez plus accès à l’application. La vérification se fait avec votre adresse e-mail (ou votre ancien identifiant) et votre mot de passe.</p>
   ${noticeHtml}
   <h2>Conséquences de la suppression</h2>
   <ul>
@@ -83,8 +83,8 @@ function deletionPage(notice?: { title: string; message: string; success?: boole
     <li>La suppression ne déclenche ni remboursement ni annulation auprès d’un prestataire de paiement. Les favoris et résultats du quiz stockés uniquement sur votre appareil ne peuvent être effacés que depuis l’application ou en supprimant ses données sur cet appareil.</li>
   </ul>
   <form method="post" action="./account-deletion" autocomplete="on">
-    <label for="username">Nom d’utilisateur</label>
-    <input id="username" name="username" type="text" autocomplete="username" minlength="3" maxlength="30" required>
+    <label for="username">Adresse e-mail ou ancien identifiant</label>
+    <input id="username" name="username" type="text" autocomplete="username" minlength="3" maxlength="254" required>
     <label for="password">Mot de passe actuel</label>
     <input id="password" name="password" type="password" autocomplete="current-password" minlength="6" maxlength="128" required>
     <label class="confirm"><input type="checkbox" name="confirm" value="yes" required><span>Je comprends que cette suppression est définitive et que l’accès et les données de compte seront supprimés.</span></label>
@@ -235,7 +235,7 @@ export function createAccountDeletionRouter(options: {
     if (!parsed.success) {
       return sendPage(res.status(400), {
         title: "Vérifiez les informations",
-        message: "Saisissez un nom d’utilisateur et un mot de passe valides, puis confirmez la suppression.",
+        message: "Saisissez votre adresse e-mail ou ancien identifiant et un mot de passe valides, puis confirmez la suppression.",
       });
     }
 
@@ -249,7 +249,7 @@ export function createAccountDeletionRouter(options: {
       if (result !== "deleted") {
         return sendPage(res.status(401), {
           title: "Compte non supprimé",
-          message: "Le nom d’utilisateur ou le mot de passe est incorrect. Vérifiez les informations et réessayez.",
+          message: "L’adresse e-mail, l’ancien identifiant ou le mot de passe est incorrect. Vérifiez les informations et réessayez.",
         });
       }
       return sendPage(res, {

@@ -10,7 +10,7 @@ import type { AccountDeletionFormInputConfirm } from './accountDeletionFormInput
 export interface AccountDeletionFormInput {
   /**
      * @minLength 3
-     * @maxLength 30
+     * @maxLength 254
      */
   username: string;
   /**
