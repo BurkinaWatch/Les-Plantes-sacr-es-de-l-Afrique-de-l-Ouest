@@ -98,7 +98,34 @@ function parsePayinFeeTier(value: unknown, rateCurrency: string): SasPayPayinFee
     !currency ||
     (feeMode !== "ADD_ON" && feeMode !== "DEDUCTED")
   ) {
-    throw new SasPayProviderError("SAS Pay a retourné des tarifs incomplets.", 502);
+    const fieldShape = (keys: string[]) => {
+      const key = keys.find((candidate) => candidate in value);
+      if (!key) return `${keys[0]}:missing`;
+      const fieldValue = value[key];
+      if (typeof fieldValue === "string") {
+        if (!fieldValue.trim()) return `${key}:empty`;
+        return Number.isFinite(Number(fieldValue)) ? `${key}:numeric-string` : `${key}:other-string`;
+      }
+      if (typeof fieldValue === "number") {
+        return Number.isFinite(fieldValue) && fieldValue >= 0
+          ? `${key}:number`
+          : `${key}:negative-or-invalid-number`;
+      }
+      return `${key}:${fieldValue === null ? "null" : Array.isArray(fieldValue) ? "array" : typeof fieldValue}`;
+    };
+    const invalidFields = [
+      ...(minAmount === undefined ? [fieldShape(["min_amount", "minAmount"])] : []),
+      ...(percent === undefined ? [fieldShape(["percent"])] : []),
+      ...(fixed === undefined ? [fieldShape(["fixed"])] : []),
+      ...(!currency ? [fieldShape(["currency"])] : []),
+      ...(feeMode !== "ADD_ON" && feeMode !== "DEDUCTED"
+        ? [fieldShape(["fee_charge_mode", "feeChargeMode"])]
+        : []),
+    ];
+    throw new SasPayProviderError(
+      `SAS Pay a retourné des tarifs incomplets (${invalidFields.join(", ")}).`,
+      502,
+    );
   }
 
   return {
