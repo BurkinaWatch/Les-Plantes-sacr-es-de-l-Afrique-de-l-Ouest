@@ -23,11 +23,18 @@ export default function LoginScreen() {
   const colors = useColors();
   const insets = useSafeAreaInsets();
   const router = useRouter();
-  const { returnTo } = useLocalSearchParams<{ returnTo?: string }>();
+  const { returnTo, username: suggestedUsername } = useLocalSearchParams<{
+    returnTo?: string;
+    username?: string;
+  }>();
   const { login } = useAuth();
   const { t } = useTranslation();
 
-  const [username, setUsername] = useState('');
+  const [username, setUsername] = useState(() =>
+    typeof suggestedUsername === 'string' && isValidUsername(suggestedUsername)
+      ? suggestedUsername.trim()
+      : '',
+  );
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
@@ -81,10 +88,16 @@ export default function LoginScreen() {
                   if (error) setError('');
                 }}
                 placeholder={t.auth_username_placeholder}
+                accessibilityLabel={t.auth_username}
+                autoComplete="username"
+                textContentType="username"
                 placeholderTextColor={colors.mutedForeground}
                 autoCapitalize="none"
                 autoCorrect={false}
               />
+              <Text style={[styles.identifierHint, { color: colors.mutedForeground }]}>
+                {t.auth_username_hint}
+              </Text>
             </View>
 
             <View style={styles.field}>
@@ -94,6 +107,9 @@ export default function LoginScreen() {
                 value={password}
                 onChangeText={setPassword}
                 placeholder={t.auth_password_placeholder}
+                accessibilityLabel={t.auth_password}
+                autoComplete="current-password"
+                textContentType="password"
                 placeholderTextColor={colors.mutedForeground}
                 secureTextEntry
               />
@@ -142,6 +158,7 @@ const styles = StyleSheet.create({
   field: { gap: 6 },
   label: { fontSize: 12, fontWeight: '600', letterSpacing: 1 },
   input: { borderWidth: 1, borderRadius: 12, paddingHorizontal: 16, paddingVertical: 14, fontSize: 15 },
+  identifierHint: { fontSize: 12, lineHeight: 18 },
   errorBox: { borderWidth: 1, borderRadius: 10, padding: 12 },
   errorText: { fontSize: 13, lineHeight: 18 },
   btn: { borderRadius: 14, paddingVertical: 16, alignItems: 'center' },

@@ -90,7 +90,10 @@ test("a rejected status session offers reconnection without creating a checkout"
     assert.equal(f.button("Continuer vers le paiement"), undefined);
     await act(async () => f.button("Se reconnecter").props.onPress());
     assert.equal(f.calls.logout, 1);
-    assert.deepEqual(f.calls.routes[0], { pathname: "/(auth)/login", params: { returnTo: "/abonnement" } });
+    assert.deepEqual(f.calls.routes[0], {
+      pathname: "/(auth)/login",
+      params: { returnTo: "/abonnement", username: "test" },
+    });
   } finally { await f.close(); }
 });
 

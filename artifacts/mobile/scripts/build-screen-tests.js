@@ -7,11 +7,13 @@ const outputRoot = path.join(root, ".screen-test-dist");
 
 const sources = [
   ["app/abonnement.tsx", "app/abonnement.js"],
+  ["app/(auth)/login.tsx", "app/(auth)/login.js"],
   ["app/chat-totem.tsx", "app/chat-totem.js"],
   ["app/(tabs)/scanner.tsx", "app/(tabs)/scanner.js"],
   ["app/animal/[id].tsx", "app/animal/[id].js"],
   ["constants/plantImages.ts", "constants/plantImages.js"],
   ["lib/ai-api.ts", "lib/ai-api.js"],
+  ["lib/auth-validation.ts", "lib/auth-validation.js"],
 ];
 
 fs.rmSync(outputRoot, { recursive: true, force: true });

@@ -9,7 +9,6 @@ description: Username/password auth for the mobile app — architecture, key dec
 - **DB**: `lib/db/src/schema/users.ts` — `usersTable` with `id`, `username` (unique), `password_hash`, `created_at`
 - **Mobile context**: `artifacts/mobile/context/AuthContext.tsx` — `AuthProvider` + `useAuth()` hook
 - **Screens**: `artifacts/mobile/app/(auth)/login.tsx` and `register.tsx` with `(auth)/_layout.tsx`
-- **Guard**: `_layout.tsx` uses `useAuth()` to show `(auth)` group when logged out, `(tabs)` group when logged in
 
 ## Key decisions
 
@@ -26,3 +25,14 @@ older locally saved sessions; recover rejected sessions through sign-in.
 **How to apply:**
 - Any new protected API route should verify the JWT via middleware reading `Authorization: Bearer <token>`
 - Check the current bearer-token wiring before changing authentication; the earlier placeholder-only description was stale.
+
+Pour les corrections de comptes : « garde tout ce qui fonctionne déjà sans les
+changer ». Préserver les comptes, mots de passe et parcours existants ; éviter
+les changements de modèle d’authentification sans demande explicite.
+
+**Why:** The user explicitly asked for account fixes without breaking working
+features after repeated confusion about sign-in.
+
+**How to apply:** Keep fixes targeted and verify ordinary username login plus
+subscription reconnection. Never infer an email-to-username link from an email's
+local part: without a verified association, it can identify the wrong account.

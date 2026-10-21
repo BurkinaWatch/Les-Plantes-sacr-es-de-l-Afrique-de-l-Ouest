@@ -309,7 +309,13 @@ export default function AbonnementScreen() {
                   // In-memory logout has already cleared the rejected session.
                 }
               }
-              router.push({ pathname: "/(auth)/login", params: { returnTo: "/abonnement" } });
+              router.push({
+                pathname: "/(auth)/login",
+                params: {
+                  returnTo: "/abonnement",
+                  ...(user?.username ? { username: user.username } : {}),
+                },
+              });
             }}
             style={[styles.button, { backgroundColor: colors.gold }]}
           >
