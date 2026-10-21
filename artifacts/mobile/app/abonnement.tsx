@@ -1,7 +1,9 @@
 import { useLocalSearchParams, useRouter } from "expo-router";
 import React, { useEffect, useMemo, useState } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 import {
   ActivityIndicator,
+  AppState,
   Linking,
   Pressable,
   ScrollView,
@@ -26,6 +28,7 @@ export default function AbonnementScreen() {
   const colors = useColors();
   const insets = useSafeAreaInsets();
   const router = useRouter();
+  const queryClient = useQueryClient();
   const { reason } = useLocalSearchParams<{ reason?: string }>();
   const { user, token, isLoading: authLoading, logout } = useAuth();
   const [rejectedToken, setRejectedToken] = useState<string | null>(null);
@@ -105,6 +108,9 @@ export default function AbonnementScreen() {
     reconcileMutation.mutate(undefined, {
       onSuccess: () => {
         statusQuery.refetch();
+        void queryClient.invalidateQueries({
+          queryKey: ["trial-access", user?.id],
+        });
       },
       onError: (error) => {
         if (isUnauthorized(error)) handleRequestError(error, "");
@@ -177,8 +183,11 @@ export default function AbonnementScreen() {
     if (!authenticated) return;
     reconcileMutation.mutate(undefined, {
       onSuccess: async (result) => {
-        await statusQuery.refetch();
-        if (result.activated > 0) {
+        const refreshedStatus = await statusQuery.refetch();
+        await queryClient.invalidateQueries({
+          queryKey: ["trial-access", user?.id],
+        });
+        if (result.activated > 0 || refreshedStatus.data?.access.subscriptionActive) {
           setCheckoutUrl(null);
           setMessage("Paiement confirmé. Votre abonnement est actif.");
         } else if (result.checked > 0) {
@@ -192,6 +201,16 @@ export default function AbonnementScreen() {
       },
     });
   }
+
+  useEffect(() => {
+    if (!authenticated) return;
+    const subscription = AppState.addEventListener("change", (nextState) => {
+      if (nextState === "active") {
+        reconcilePayment();
+      }
+    });
+    return () => subscription.remove();
+  }, [authenticated, token]);
 
   return (
     <ScrollView

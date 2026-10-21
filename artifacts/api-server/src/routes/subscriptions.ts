@@ -17,6 +17,11 @@ import { getSasPayWebhookSecret } from "../lib/saspay-config.js";
 import { estimateSasPayCustomerFees } from "../lib/saspay-fee-estimate.js";
 import { getTrialAccess } from "../lib/subscription-access.js";
 import {
+  settlePaymentAttempt,
+  type PaymentSettlementOperations,
+  type PaymentSettlementStore,
+} from "../lib/payment-settlement.js";
+import {
   createSasPayInterventionNotifier,
   normalizeSasPayAdminEmail,
 } from "../lib/saspay-notifications.js";
@@ -68,16 +73,6 @@ const createPaymentSchema = z
   })
   .strict();
 
-function addPeriod(date: Date, period: string): Date {
-  const result = new Date(date);
-  if (period === "YEARLY") {
-    result.setUTCFullYear(result.getUTCFullYear() + 1);
-  } else {
-    result.setUTCMonth(result.getUTCMonth() + 1);
-  }
-  return result;
-}
-
 function asRecord(value: unknown): Record<string, unknown> {
   return typeof value === "object" && value !== null
     ? (value as Record<string, unknown>)
@@ -88,79 +83,50 @@ function firstString(...values: unknown[]): string | undefined {
   return values.find((value): value is string => typeof value === "string" && value.length > 0);
 }
 
-function isSuccessfulPayment(status: string): boolean {
-  return ["SUCCESS", "SUCCEEDED", "PAID", "COMPLETED"].includes(status.toUpperCase());
-}
+function createPaymentSettlementStore(database: typeof db): PaymentSettlementStore {
+  const operations = (
+    transaction: Pick<typeof db, "update" | "select">,
+  ): PaymentSettlementOperations => ({
+    claimPendingAttempt: async (attemptId, update) => {
+      const [claimed] = await transaction
+        .update(paymentAttemptsTable)
+        .set(update)
+        .where(
+          and(
+            eq(paymentAttemptsTable.id, attemptId),
+            eq(paymentAttemptsTable.status, "PENDING"),
+          ),
+        )
+        .returning({ id: paymentAttemptsTable.id });
+      return Boolean(claimed);
+    },
+    getSubscriptionPeriod: async (subscriptionId) => {
+      const [subscription] = await transaction
+        .select({ period: subscriptionsTable.period })
+        .from(subscriptionsTable)
+        .where(eq(subscriptionsTable.id, subscriptionId))
+        .limit(1);
+      return subscription?.period;
+    },
+    activateSubscription: async (subscriptionId, update) => {
+      await transaction
+        .update(subscriptionsTable)
+        .set(update)
+        .where(eq(subscriptionsTable.id, subscriptionId));
+    },
+    failSubscription: async (subscriptionId, updatedAt) => {
+      await transaction
+        .update(subscriptionsTable)
+        .set({ status: "FAILED", updatedAt })
+        .where(eq(subscriptionsTable.id, subscriptionId));
+    },
+  });
 
-function isFailedPayment(status: string): boolean {
-  return ["FAILED", "CANCELLED", "CANCELED", "EXPIRED", "DECLINED"].includes(
-    status.toUpperCase(),
-  );
-}
-
-type PaymentAttemptRow = typeof paymentAttemptsTable.$inferSelect;
-type PaymentTransition = "SUCCEEDED" | "FAILED" | "PENDING" | "UNCHANGED";
-
-async function settlePaymentAttempt(
-  database: typeof db,
-  attempt: PaymentAttemptRow,
-  status: string,
-  transactionId?: string,
-  reference?: string,
-): Promise<PaymentTransition> {
-  const nextStatus = isSuccessfulPayment(status)
-    ? "SUCCEEDED"
-    : isFailedPayment(status)
-      ? "FAILED"
-      : "PENDING";
-  const [claimedAttempt] = await database
-    .update(paymentAttemptsTable)
-    .set({
-      status: nextStatus,
-      providerTransactionId: transactionId ?? attempt.providerTransactionId,
-      providerReference: reference ?? attempt.providerReference,
-      updatedAt: new Date(),
-    })
-    .where(
-      and(
-        eq(paymentAttemptsTable.id, attempt.id),
-        eq(paymentAttemptsTable.status, "PENDING"),
-      ),
-    )
-    .returning({ id: paymentAttemptsTable.id });
-
-  // A webhook and a reconciliation request can arrive together. Only the
-  // request that changes PENDING may apply the subscription transition.
-  if (!claimedAttempt) return "UNCHANGED";
-
-  if (nextStatus === "SUCCEEDED") {
-    const [subscription] = await database
-      .select({
-        period: subscriptionsTable.period,
-      })
-      .from(subscriptionsTable)
-      .where(eq(subscriptionsTable.id, attempt.subscriptionId))
-      .limit(1);
-    const startsAt = new Date();
-    await database
-      .update(subscriptionsTable)
-      .set({
-        status: "ACTIVE",
-        startsAt,
-        expiresAt: addPeriod(startsAt, subscription?.period ?? "MONTHLY"),
-        providerTransactionId: transactionId ?? attempt.providerTransactionId,
-        providerReference: reference ?? attempt.providerReference,
-        updatedAt: startsAt,
-      })
-      .where(eq(subscriptionsTable.id, attempt.subscriptionId));
-  } else if (nextStatus === "FAILED") {
-    await database
-      .update(subscriptionsTable)
-      .set({ status: "FAILED", updatedAt: new Date() })
-      .where(eq(subscriptionsTable.id, attempt.subscriptionId));
-  }
-
-  return nextStatus;
+  return {
+    ...operations(database),
+    transaction: (operation) =>
+      database.transaction((transaction) => operation(operations(transaction))),
+  };
 }
 
 export function createSubscriptionsRouter(
@@ -283,9 +249,9 @@ export function createSubscriptionsRouter(
     try {
       const checkout = await paymentProvider.getCheckoutSession(attempt.providerCheckoutId);
       const checkoutStatus = checkout.status.toUpperCase();
-      if (checkoutStatus === "PAID" && checkout.transactionId) {
+      if (checkoutStatus === "PAID") {
         const transition = await settlePaymentAttempt(
-          database,
+          createPaymentSettlementStore(database),
           attempt,
           "SUCCESS",
           checkout.transactionId,
@@ -293,7 +259,11 @@ export function createSubscriptionsRouter(
         );
         if (transition === "SUCCEEDED") activated += 1;
       } else if (["EXPIRED", "CANCELLED"].includes(checkoutStatus)) {
-        const transition = await settlePaymentAttempt(database, attempt, "EXPIRED");
+        const transition = await settlePaymentAttempt(
+          createPaymentSettlementStore(database),
+          attempt,
+          "EXPIRED",
+        );
         if (transition === "FAILED") failed += 1;
       }
     } catch (error) {
@@ -583,7 +553,13 @@ router.post("/webhook", createSasPayTestWebhookHandler(() => getSasPayWebhookSec
     }
 
     if (attempt) {
-      await settlePaymentAttempt(database, attempt, status, transactionId, reference);
+      await settlePaymentAttempt(
+        createPaymentSettlementStore(database),
+        attempt,
+        status,
+        transactionId,
+        reference,
+      );
     } else if (verificationNeedsAttention) {
       void notifySasPayIntervention({
         providerTransactionId: transactionId,
