@@ -37,6 +37,7 @@ export async function sendExpoPushNotification(
         Accept: "application/json",
         "Accept-Encoding": "gzip, deflate",
       },
+      signal: AbortSignal.timeout(8_000),
       body: JSON.stringify(messages),
     });
   } catch (err) {

@@ -6,6 +6,7 @@ import {
   db,
   paymentAttemptsTable,
   paymentEventsTable,
+  pool,
   subscriptionPlansTable,
   subscriptionsTable,
 } from "@workspace/db";
@@ -13,14 +14,48 @@ import { requireActiveUserJwt } from "../lib/auth-middleware.js";
 import { logger } from "../lib/logger.js";
 import { SasPayProvider, SasPayProviderError } from "../lib/saspay-provider.js";
 import { getSasPayWebhookSecret } from "../lib/saspay-config.js";
+import {
+  createSasPayInterventionNotifier,
+  normalizeSasPayAdminEmail,
+} from "../lib/saspay-notifications.js";
 import { toPublicPaymentProviderStatus, type PaymentProvider } from "../lib/payment-provider.js";
 import {
   createSasPayTestWebhookHandler,
   recordIdempotentWebhookEvent,
   verifySasPayWebhook,
 } from "../lib/saspay-webhook.js";
+import { sendExpoPushNotification } from "./push-tokens.js";
 
 const provider = new SasPayProvider();
+const notifySasPayIntervention = createSasPayInterventionNotifier({
+  getAdminEmail: () => normalizeSasPayAdminEmail(process.env.SAS_PAY_ADMIN_EMAIL),
+  findCustomerTokens: async (userId) => {
+    const result = await pool.query<{ token: string }>(
+      "SELECT token FROM push_tokens WHERE user_id = $1",
+      [userId],
+    );
+    return result.rows.map(({ token }) => token);
+  },
+  findAdminRecipients: async (email) => {
+    const result = await pool.query<{ userId: number; token: string | null }>(
+      `SELECT users.id AS "userId", push_tokens.token
+       FROM users
+       LEFT JOIN push_tokens ON push_tokens.user_id = users.id
+       WHERE LOWER(BTRIM(users.username)) = $1`,
+      [email],
+    );
+    return {
+      accountFound: result.rows.length > 0,
+      tokens: result.rows.flatMap(({ token }) => (token ? [token] : [])),
+    };
+  },
+  send: sendExpoPushNotification,
+  warn: (reason, input) =>
+    logger.warn(
+      { customerUserId: input.customerUserId, subscriptionId: input.subscriptionId, reason },
+      "SAS Pay intervention notification",
+    ),
+});
 
 const createPaymentSchema = z
   .object({
@@ -174,6 +209,10 @@ export function createSubscriptionsRouter(
 
   router.post("/reconcile", requireActiveUserJwt, async (req, res) => {
   if (!paymentProvider.isConfigured() || !paymentProvider.getCheckoutSession) {
+    void notifySasPayIntervention({
+      customerUserId: req.user!.id,
+      reason: "configuration",
+    });
     return res.status(503).json({
       code: "PAYMENTS_NOT_CONFIGURED",
       error: "La vérification des paiements n'est pas encore disponible.",
@@ -194,6 +233,7 @@ export function createSubscriptionsRouter(
 
   let activated = 0;
   let failed = 0;
+  let interventionSubscriptionId: number | undefined;
   for (const attempt of pendingAttempts) {
     if (!attempt.providerCheckoutId) continue;
 
@@ -218,7 +258,16 @@ export function createSubscriptionsRouter(
         { err: error, checkoutId: attempt.providerCheckoutId, userId: req.user!.id },
         "Unable to reconcile a SAS Pay checkout session",
       );
+      interventionSubscriptionId ??= attempt.subscriptionId;
     }
+  }
+
+  if (interventionSubscriptionId) {
+    void notifySasPayIntervention({
+      customerUserId: req.user!.id,
+      subscriptionId: interventionSubscriptionId,
+      reason: "verification",
+    });
   }
 
   return res.json({
@@ -235,6 +284,10 @@ export function createSubscriptionsRouter(
   }
 
   if (!paymentProvider.isConfigured()) {
+    void notifySasPayIntervention({
+      customerUserId: req.user!.id,
+      reason: "configuration",
+    });
     return res.status(503).json({
       code: "PAYMENTS_NOT_CONFIGURED",
       error: "Les paiements ne sont pas encore disponibles.",
@@ -253,6 +306,10 @@ export function createSubscriptionsRouter(
     .limit(1);
 
   if (!plan?.amount || !plan.currency) {
+    void notifySasPayIntervention({
+      customerUserId: req.user!.id,
+      reason: "configuration",
+    });
     return res.status(503).json({
       code: "PLAN_NOT_CONFIGURED",
       error: "Le prix de cet abonnement n'est pas encore configuré.",
@@ -315,6 +372,11 @@ export function createSubscriptionsRouter(
       .where(eq(subscriptionsTable.id, subscription.id));
 
     if (error instanceof SasPayProviderError) {
+      void notifySasPayIntervention({
+        customerUserId: req.user!.id,
+        subscriptionId: subscription.id,
+        reason: "configuration",
+      });
       return res.status(toPublicPaymentProviderStatus(error.status)).json({
         code: "PAYMENT_PROVIDER_ERROR",
         error: error.message,
@@ -322,6 +384,11 @@ export function createSubscriptionsRouter(
     }
 
     logger.error({ err: error, userId: req.user!.id }, "Failed to create payment checkout");
+    void notifySasPayIntervention({
+      customerUserId: req.user!.id,
+      subscriptionId: subscription.id,
+      reason: "configuration",
+    });
     return res.status(502).json({
       code: "PAYMENT_PROVIDER_ERROR",
       error: "Le service de paiement est temporairement indisponible.",
@@ -423,6 +490,7 @@ router.post("/webhook", createSasPayTestWebhookHandler(() => getSasPayWebhookSec
     // SAS Pay's documented transaction.success payload does not carry the
     // checkout metadata or checkout id. Resolve the transaction through the
     // checkout sessions created by this application before changing state.
+    let verificationNeedsAttention = false;
     if (!attempt && paymentProvider.getCheckoutSession) {
       const pendingAttempts = await database
         .select()
@@ -449,6 +517,7 @@ router.post("/webhook", createSasPayTestWebhookHandler(() => getSasPayWebhookSec
                 (reference !== undefined && checkout.transactionReference === reference);
               return checkoutStatus === "PAID" && transactionMatches ? candidate : undefined;
             } catch (error) {
+              verificationNeedsAttention = true;
               logger.warn(
                 {
                   err: error,
@@ -472,6 +541,11 @@ router.post("/webhook", createSasPayTestWebhookHandler(() => getSasPayWebhookSec
 
     if (attempt) {
       await settlePaymentAttempt(database, attempt, status, transactionId, reference);
+    } else if (verificationNeedsAttention) {
+      void notifySasPayIntervention({
+        providerTransactionId: transactionId,
+        reason: "verification",
+      });
     }
 
     await database
