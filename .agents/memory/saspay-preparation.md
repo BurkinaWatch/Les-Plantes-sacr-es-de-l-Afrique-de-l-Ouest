@@ -60,6 +60,22 @@ Payment settlement must claim a pending attempt before activating its subscripti
 
 **How to apply:** Make the payment-attempt transition conditional on `PENDING`; only the request that successfully changes that state may set the subscription active.
 
+## Notifications de paiements nécessitant une intervention
+
+L’utilisateur veut avertir à la fois le client concerné et le compte
+administrateur, par notification ciblée et jamais par diffusion générale.
+Garder l’adresse admin uniquement dans la configuration protégée, jamais dans
+le code, le dépôt, les notifications ou les journaux.
+
+**Why:** L’utilisateur a choisi les deux destinataires; les jetons Expo sont
+rattachés aux comptes, mais le projet ne dispose pas d’un rôle administrateur
+ni d’une boîte de réception dédiée.
+
+**How to apply:** Cibler le client par son compte de paiement, cibler
+l’administrateur uniquement par son compte explicitement configuré, et
+signaler quand ce compte ou son jeton push n’est pas inscrit. Ne jamais
+diffuser les détails d’un paiement aux autres utilisateurs.
+
 A rejected session must recover through explicit sign-in, never by relaxing JWT
 verification or automatically replaying checkout creation after login.
 
