@@ -26,19 +26,51 @@ export default function AbonnementScreen() {
   const colors = useColors();
   const insets = useSafeAreaInsets();
   const router = useRouter();
-  const { user } = useAuth();
+  const { user, token, isLoading: authLoading, logout } = useAuth();
+  const [rejectedToken, setRejectedToken] = useState<string | null>(null);
   const [selectedPlan, setSelectedPlan] = useState<"MONTHLY" | "YEARLY">("MONTHLY");
   const [email, setEmail] = useState("");
   const [customerName, setCustomerName] = useState("");
   const [message, setMessage] = useState<string | null>(null);
   const [checkoutUrl, setCheckoutUrl] = useState<string | null>(null);
+  const sessionExpired = Boolean(token && rejectedToken === token);
+  const authenticated = Boolean(user && token) && !sessionExpired && !authLoading;
+  // A new login must not inherit a cached 401 from the previous session.
+  // Use an opaque local key rather than placing the bearer token in the cache.
+  const sessionScope = useMemo(() => Math.random().toString(36).slice(2), [token]);
 
   const plansQuery = useGetSubscriptionPlans();
   const statusQuery = useGetSubscriptionStatus({
-    query: { enabled: Boolean(user), queryKey: ["subscription-status"] },
+    query: {
+      enabled: authenticated,
+      queryKey: ["subscription-status", user?.id, sessionScope],
+      retry: (count, error) => !isUnauthorized(error) && count < 2,
+    },
   });
   const paymentMutation = useCreateSubscriptionPayment();
   const reconcileMutation = useReconcileSubscriptionPayment();
+
+  function handleRequestError(error: unknown, fallback: string) {
+    if (isUnauthorized(error)) {
+      setRejectedToken(token);
+      setCheckoutUrl(null);
+      setMessage("Votre session a expiré ou n’est plus valide. Reconnectez-vous pour continuer votre abonnement.");
+      return;
+    }
+    // Do not display transport details or a provider's raw response.
+    setMessage(fallback);
+  }
+
+  useEffect(() => {
+    setCheckoutUrl(null);
+    setMessage(null);
+  }, [user?.id, token]);
+
+  useEffect(() => {
+    if (authenticated && isUnauthorized(statusQuery.error)) {
+      handleRequestError(statusQuery.error, "");
+    }
+  }, [authenticated, statusQuery.error]);
 
   useEffect(() => {
     const error = plansQuery.error;
@@ -59,13 +91,16 @@ export default function AbonnementScreen() {
     const hasConfiguredPlan = plansQuery.data?.plans.some(
       (plan) => plan.active && Boolean(plan.amount && plan.currency),
     );
-    if (!user || !hasConfiguredPlan) return;
+    if (!authenticated || !hasConfiguredPlan) return;
     reconcileMutation.mutate(undefined, {
       onSuccess: () => {
         statusQuery.refetch();
       },
+      onError: (error) => {
+        if (isUnauthorized(error)) handleRequestError(error, "");
+      },
     });
-  }, [user, plansQuery.data?.plans]);
+  }, [authenticated, token, plansQuery.data?.plans]);
 
   const selected = useMemo(
     () => plansQuery.data?.plans.find((plan) => plan.code === selectedPlan),
@@ -78,7 +113,7 @@ export default function AbonnementScreen() {
 
   async function startPayment() {
     if (
-      !user ||
+      !authenticated ||
       !isConfigured ||
       !validEmail ||
       customerName.trim().length < 2 ||
@@ -111,20 +146,21 @@ export default function AbonnementScreen() {
           statusQuery.refetch();
         },
         onError: (error) => {
-          setMessage(error instanceof Error ? error.message : "Paiement indisponible.");
+          handleRequestError(error, "Le paiement est indisponible pour le moment. Réessayez dans quelques instants.");
         },
       },
     );
   }
 
   function openCheckout() {
-    if (!checkoutUrl) return;
+    if (!authenticated || !checkoutUrl) return;
     Linking.openURL(checkoutUrl).catch(() => {
       setMessage("Impossible d’ouvrir la page SAS Pay. Vérifiez votre connexion et réessayez.");
     });
   }
 
   function reconcilePayment() {
+    if (!authenticated) return;
     reconcileMutation.mutate(undefined, {
       onSuccess: async (result) => {
         await statusQuery.refetch();
@@ -137,8 +173,8 @@ export default function AbonnementScreen() {
           setMessage("Aucun paiement en attente à vérifier.");
         }
       },
-      onError: () => {
-        setMessage("La vérification a échoué. Vérifiez votre connexion et réessayez.");
+      onError: (error) => {
+        handleRequestError(error, "La vérification a échoué. Vérifiez votre connexion et réessayez.");
       },
     });
   }
@@ -166,7 +202,7 @@ export default function AbonnementScreen() {
         </Text>
       </View>
 
-      {statusQuery.data?.subscription && (
+      {authenticated && statusQuery.data?.subscription && (
         <View style={[styles.statusCard, { backgroundColor: colors.card, borderColor: colors.gold }]}>
           <Text style={[styles.statusTitle, { color: colors.ivory }]}>Votre abonnement</Text>
           <Text style={[styles.body, { color: colors.mutedForeground }]}>
@@ -256,17 +292,30 @@ export default function AbonnementScreen() {
         </View>
       )}
 
-      {!user ? (
+      {!authenticated ? (
         <View style={styles.loginPrompt}>
           <Text style={[styles.body, { color: colors.mutedForeground }]}>
-            Connectez-vous pour souscrire à une formule et suivre votre paiement.
+            {sessionExpired
+              ? "Votre session n’est plus valide. Reconnectez-vous pour poursuivre."
+              : "Connectez-vous pour souscrire à une formule et suivre votre paiement."}
           </Text>
           <Pressable
             accessibilityRole="button"
-            onPress={() => router.push("/(auth)/login" as any)}
+            onPress={async () => {
+              if (user) {
+                try {
+                  await logout();
+                } catch {
+                  // In-memory logout has already cleared the rejected session.
+                }
+              }
+              router.push({ pathname: "/(auth)/login", params: { returnTo: "/abonnement" } });
+            }}
             style={[styles.button, { backgroundColor: colors.gold }]}
           >
-            <Text style={[styles.buttonText, { color: colors.deepBrown }]}>Se connecter</Text>
+            <Text style={[styles.buttonText, { color: colors.deepBrown }]}>
+              {sessionExpired ? "Se reconnecter" : "Se connecter"}
+            </Text>
           </Pressable>
         </View>
       ) : (
@@ -355,6 +404,11 @@ export default function AbonnementScreen() {
       {message && <Text style={[styles.message, { color: colors.mutedForeground }]}>{message}</Text>}
     </ScrollView>
   );
+}
+
+function isUnauthorized(error: unknown): boolean {
+  return typeof error === "object" && error !== null &&
+    "status" in error && error.status === 401;
 }
 
 const styles = StyleSheet.create({

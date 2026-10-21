@@ -26,3 +26,13 @@ Payment settlement must claim a pending attempt before activating its subscripti
 **Why:** A webhook and a user-triggered checkout reconciliation can legitimately observe the same paid session at the same time.
 
 **How to apply:** Make the payment-attempt transition conditional on `PENDING`; only the request that successfully changes that state may set the subscription active.
+
+A rejected session must recover through explicit sign-in, never by relaxing JWT
+verification or automatically replaying checkout creation after login.
+
+**Why:** A locally restored user can outlive its server-issued token, and replaying
+a payment intent without another user action risks duplicate payable sessions.
+
+**How to apply:** Offer a return to the subscription after sign-in, isolate its
+cached status by session without using bearer tokens as cache keys, and require
+an explicit action before starting another checkout.

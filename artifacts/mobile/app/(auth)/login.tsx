@@ -1,5 +1,5 @@
 import { LinearGradient } from 'expo-linear-gradient';
-import { useRouter } from 'expo-router';
+import { useLocalSearchParams, useRouter } from 'expo-router';
 import React, { useState } from 'react';
 import {
   ActivityIndicator,
@@ -23,6 +23,7 @@ export default function LoginScreen() {
   const colors = useColors();
   const insets = useSafeAreaInsets();
   const router = useRouter();
+  const { returnTo } = useLocalSearchParams<{ returnTo?: string }>();
   const { login } = useAuth();
   const { t } = useTranslation();
 
@@ -47,7 +48,12 @@ export default function LoginScreen() {
     if (result.error) {
       setError(result.error);
     } else {
-      router.replace('/(tabs)');
+      // Only allow the known in-app return route, never an arbitrary URL.
+      if (returnTo === '/abonnement') {
+        router.dismissTo('/abonnement');
+      } else {
+        router.replace('/(tabs)');
+      }
     }
   }
 

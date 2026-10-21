@@ -14,14 +14,15 @@ description: Username/password auth for the mobile app — architecture, key dec
 ## Key decisions
 
 **Why bcrypt + JWT (not a session)?**
-Mobile apps suit stateless JWT — no server-side session store needed. 30-day expiry.
+Mobile apps suit stateless JWT — no server-side session store needed.
 
 **bcrypt build approval**: Must be in `onlyBuiltDependencies` in `pnpm-workspace.yaml` or installs silently skip native build and fail at runtime.
 
 **zod must be an explicit dep of api-server**: It's in the catalog but not auto-available — must add `zod` to `dependencies` in `artifacts/api-server/package.json`.
 
-**JWT_SECRET**: Defaults to a hardcoded fallback string in dev. For production, set `JWT_SECRET` env var.
+Do not introduce a development fallback signing secret or weaken validation for
+older locally saved sessions; recover rejected sessions through sign-in.
 
 **How to apply:**
 - Any new protected API route should verify the JWT via middleware reading `Authorization: Bearer <token>`
-- The `custom-fetch.ts` in `api-client-react` has a placeholder for injecting the Bearer token — wire it up when API routes need auth
+- Check the current bearer-token wiring before changing authentication; the earlier placeholder-only description was stale.

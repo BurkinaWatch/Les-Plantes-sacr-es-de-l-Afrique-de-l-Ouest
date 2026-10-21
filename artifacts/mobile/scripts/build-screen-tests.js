@@ -6,6 +6,7 @@ const root = path.resolve(__dirname, "..");
 const outputRoot = path.join(root, ".screen-test-dist");
 
 const sources = [
+  ["app/abonnement.tsx", "app/abonnement.js"],
   ["app/chat-totem.tsx", "app/chat-totem.js"],
   ["app/(tabs)/scanner.tsx", "app/(tabs)/scanner.js"],
   ["app/animal/[id].tsx", "app/animal/[id].js"],
