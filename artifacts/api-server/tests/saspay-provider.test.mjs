@@ -176,6 +176,12 @@ test("SAS Pay reads current merchant pay-in fee tiers without creating a checkou
             ],
           },
         },
+        {
+          country_code: "CM",
+          currency: "XAF",
+          network_code: "mtn_cm",
+          payin: { available: true, tiers: [] },
+        },
       ]),
       { status: 200, headers: { "content-type": "application/json" } },
     );
@@ -192,9 +198,10 @@ test("SAS Pay reads current merchant pay-in fee tiers without creating a checkou
     ]);
 
     assert.deepEqual(rates, concurrentRates);
-    assert.equal(rates.length, 1);
+    assert.equal(rates.length, 2);
     assert.equal(rates[0].payin.tiers[0].feeChargeMode, "ADD_ON");
     assert.equal(rates[0].payin.tiers[0].floorAmount, null);
+    assert.equal(rates[1].payin.tiers.length, 0);
     assert.equal(requests.length, 1);
     assert.equal(
       requests[0].input,

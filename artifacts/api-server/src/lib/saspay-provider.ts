@@ -165,8 +165,7 @@ function parseMyPayinRates(payload: unknown): SasPayPayinRate[] {
       !countryCode ||
       !currency ||
       !networkCode ||
-      !Array.isArray(value.payin.tiers) ||
-      value.payin.tiers.length === 0
+      !Array.isArray(value.payin.tiers)
     ) {
       throw new SasPayProviderError("SAS Pay a retourné des tarifs incomplets.", 502);
     }

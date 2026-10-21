@@ -129,4 +129,13 @@ test("the estimate is unavailable instead of guessing when fee mode or eligible 
     estimateSasPayCustomerFees("2000.00", "XOF", [differentCurrency]),
     null,
   );
+  const missingNetworkTier = rate("BF", "orange_bf", "ADD_ON", "2.5");
+  missingNetworkTier.payin.tiers = [];
+  assert.equal(
+    estimateSasPayCustomerFees("2000.00", "XOF", [
+      rate("CI", "orange_ci", "ADD_ON", "2.5"),
+      missingNetworkTier,
+    ]),
+    null,
+  );
 });

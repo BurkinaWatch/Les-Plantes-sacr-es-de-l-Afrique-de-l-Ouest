@@ -27,28 +27,42 @@ export function estimateSasPayCustomerFees(
   const baseAmount = decimal(amount ?? undefined);
   if (baseAmount === undefined || !currency || !rates?.length) return null;
 
-  const applicableTiers = rates
-    .filter(
-      (rate) =>
-        rate.currency.toUpperCase() === currency.toUpperCase() && rate.payin.available,
+  const availableRates = rates.filter(
+    (rate) =>
+      rate.currency.toUpperCase() === currency.toUpperCase() && rate.payin.available,
+  );
+  if (!availableRates.length) return null;
+
+  const tierCoversAmount = (tier: SasPayPayinRate["payin"]["tiers"][number]) => {
+    const minimum = decimal(tier.minAmount);
+    const maximum = tier.maxAmount === null ? undefined : decimal(tier.maxAmount);
+    return (
+      tier.currency.toUpperCase() === currency.toUpperCase() &&
+      minimum !== undefined &&
+      (maximum === undefined && tier.maxAmount !== null
+        ? false
+        : baseAmount >= minimum && (maximum === undefined || baseAmount <= maximum))
+    );
+  };
+  if (
+    availableRates.some(
+      (rate) => !rate.payin.tiers.some(tierCoversAmount),
     )
+  ) {
+    return null;
+  }
+
+  const applicableTiers = availableRates
     .flatMap((rate) =>
-      rate.payin.tiers
-        .filter((tier) => tier.currency.toUpperCase() === currency.toUpperCase())
-        .filter((tier) => {
-          const minimum = decimal(tier.minAmount);
-          const maximum =
-            tier.maxAmount === null ? undefined : decimal(tier.maxAmount);
-          return (
-            minimum !== undefined &&
-            (maximum === undefined && tier.maxAmount !== null
-              ? false
-              : baseAmount >= minimum && (maximum === undefined || baseAmount <= maximum))
-          );
-        }),
+      rate.payin.tiers.filter(tierCoversAmount),
     );
   if (!applicableTiers.length) return null;
 
+  /*
+   * Do not report a partial fee range when any available network has no
+   * published tier for this plan amount. SAS Pay still shows its exact total
+   * on the hosted payment page in that case.
+   */
   const modes = new Set<"ADD_ON" | "DEDUCTED">();
   for (const tier of applicableTiers) {
     if (tier.feeChargeMode !== "ADD_ON" && tier.feeChargeMode !== "DEDUCTED") {
@@ -81,13 +95,7 @@ export function estimateSasPayCustomerFees(
   const minimumFee = Math.min(...numericFees);
   const maximumFee = Math.max(...numericFees);
   const networkCount = new Set(
-    rates.flatMap((rate) =>
-      rate.currency.toUpperCase() === currency.toUpperCase() &&
-      rate.payin.available &&
-      rate.payin.tiers.some((tier) => applicableTiers.includes(tier))
-        ? [`${rate.countryCode}:${rate.networkCode}`]
-        : [],
-    ),
+    availableRates.map((rate) => `${rate.countryCode}:${rate.networkCode}`),
   ).size;
 
   return {
