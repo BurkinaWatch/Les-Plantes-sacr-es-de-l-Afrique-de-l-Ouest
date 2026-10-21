@@ -4,6 +4,7 @@ import type {
   CreateCheckoutInput,
   PaymentProvider,
 } from "./payment-provider.js";
+import { getSasPayApiKey } from "./saspay-config.js";
 
 const DEFAULT_API_URL = "https://api.saspay.me/api/v1";
 
@@ -125,7 +126,7 @@ export class SasPayProviderError extends Error {
 }
 
 export function isSasPayEnabled(env: NodeJS.ProcessEnv = process.env): boolean {
-  return env.SAS_PAY_ENABLED === "true" && Boolean(env.SAS_PAY_API_KEY?.trim());
+  return env.SAS_PAY_ENABLED === "true" && Boolean(getSasPayApiKey(env));
 }
 
 export class SasPayProvider implements PaymentProvider {
@@ -134,7 +135,7 @@ export class SasPayProvider implements PaymentProvider {
   private readonly apiUrl: string;
 
   constructor(private readonly env: NodeJS.ProcessEnv = process.env) {
-    this.apiKey = env.SAS_PAY_API_KEY?.trim() || undefined;
+    this.apiKey = getSasPayApiKey(env);
     this.apiUrl = (env.SAS_PAY_API_URL || DEFAULT_API_URL).replace(/\/+$/, "");
   }
 

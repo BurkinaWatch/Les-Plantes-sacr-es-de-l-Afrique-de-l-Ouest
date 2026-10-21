@@ -1,7 +1,20 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 
-import { SasPayProvider } from "../.test-dist/src/lib/saspay-provider.js";
+import { SasPayProvider, isSasPayEnabled } from "../.test-dist/src/lib/saspay-provider.js";
+import { getSasPayApiKey, getSasPayWebhookSecret } from "../.test-dist/src/lib/saspay-config.js";
+
+test("both existing secret naming conventions work without enabling payments implicitly", () => {
+  const aliases = { SASPAY_API_KEY: "alias-test-key", SASPAY_WEBHOOK_SECRET: " alias-test-secret " };
+  assert.equal(getSasPayApiKey(aliases), "alias-test-key");
+  assert.equal(getSasPayWebhookSecret(aliases), " alias-test-secret ");
+  assert.equal(isSasPayEnabled(aliases), false);
+  assert.equal(isSasPayEnabled({ ...aliases, SAS_PAY_ENABLED: "false" }), false);
+  assert.equal(isSasPayEnabled({ ...aliases, SAS_PAY_ENABLED: "true" }), true);
+  assert.equal(isSasPayEnabled({ SAS_PAY_ENABLED: "true" }), false);
+  assert.equal(getSasPayApiKey({ ...aliases, SAS_PAY_API_KEY: "canonical-test-key" }), "canonical-test-key");
+  assert.equal(getSasPayWebhookSecret({ ...aliases, SAS_PAY_WEBHOOK_SECRET: "canonical-test-secret" }), "canonical-test-secret");
+});
 
 test("SAS Pay creates a hosted checkout with the documented request shape", async () => {
   const originalFetch = globalThis.fetch;
@@ -21,7 +34,7 @@ test("SAS Pay creates a hosted checkout with the documented request shape", asyn
   try {
     const provider = new SasPayProvider({
       SAS_PAY_ENABLED: "true",
-      SAS_PAY_API_KEY: "sk_test_provider",
+      SASPAY_API_KEY: "sk_test_provider",
     });
     const checkout = await provider.createCheckout({
       amount: "2000.00",

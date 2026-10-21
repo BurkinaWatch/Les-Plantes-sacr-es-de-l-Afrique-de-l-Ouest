@@ -126,6 +126,22 @@ test("temporary payment failures do not invalidate a valid session", async () =>
   } finally { await f.close(); }
 });
 
+test("unconfigured payments explain the administrator action instead of suggesting a temporary outage", async () => {
+  const f = await fixture({
+    paymentError: { status: 503, data: { code: "PAYMENTS_NOT_CONFIGURED" } },
+  });
+  try {
+    await f.fill();
+    await act(async () => f.button("Continuer vers le paiement").props.onPress());
+    const message = f.renderer.root.findAllByType("Text").map(text).join(" ");
+    assert.match(message, /paiements ne sont pas encore activés par l’administrateur/);
+    assert.doesNotMatch(message, /quelques instants/);
+    assert.equal(f.calls.logout, 0);
+    assert.equal(f.button("Se reconnecter"), undefined);
+    assert.equal(f.calls.checkout, 1, "never automatically repeat a checkout request");
+  } finally { await f.close(); }
+});
+
 test("a reconciliation 401 uses the same recovery without starting another payment", async () => {
   const f = await fixture({ reconcileError: { status: 401 } });
   try {

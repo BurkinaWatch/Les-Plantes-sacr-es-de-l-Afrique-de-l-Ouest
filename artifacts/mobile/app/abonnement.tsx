@@ -57,6 +57,11 @@ export default function AbonnementScreen() {
       setMessage("Votre session a expiré ou n’est plus valide. Reconnectez-vous pour continuer votre abonnement.");
       return;
     }
+    const data = typeof error === "object" && error !== null && "data" in error ? error.data : null;
+    if (typeof data === "object" && data !== null && "code" in data && data.code === "PAYMENTS_NOT_CONFIGURED") {
+      setMessage("Les paiements ne sont pas encore activés par l’administrateur. Aucun paiement n’a été lancé. Réessayer plus tard ne suffit pas : la configuration doit être finalisée.");
+      return;
+    }
     // Do not display transport details or a provider's raw response.
     setMessage(fallback);
   }

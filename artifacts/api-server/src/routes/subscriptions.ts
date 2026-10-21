@@ -12,6 +12,7 @@ import {
 import { requireActiveUserJwt } from "../lib/auth-middleware.js";
 import { logger } from "../lib/logger.js";
 import { SasPayProvider, SasPayProviderError } from "../lib/saspay-provider.js";
+import { getSasPayWebhookSecret } from "../lib/saspay-config.js";
 import type { PaymentProvider } from "../lib/payment-provider.js";
 import {
   recordIdempotentWebhookEvent,
@@ -333,7 +334,7 @@ router.post("/webhook", async (req, res) => {
     rawBody ?? Buffer.from(""),
     req.header("X-Webhook-Signature"),
     req.header("X-Webhook-Timestamp"),
-    process.env.SAS_PAY_WEBHOOK_SECRET,
+    getSasPayWebhookSecret(process.env),
   );
   if (!valid || !rawBody) {
     return res.status(401).json({ error: "Signature webhook invalide." });

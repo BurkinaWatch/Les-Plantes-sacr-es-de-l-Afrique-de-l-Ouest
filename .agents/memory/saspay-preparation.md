@@ -9,6 +9,16 @@ SAS Pay remains a server-only, opt-in integration. The application must keep pla
 
 **How to apply:** Keep `SAS_PAY_ENABLED` false unless the rollout is intentional. Keep credentials in Replit Secrets, accept payment state only from a valid HMAC webhook or backend verification, and treat monthly/yearly renewals as separate payment intents until recurring billing is confirmed.
 
+The provisioned secrets use `SASPAY_*`, whereas the initial integration used
+`SAS_PAY_*`. Preserve compatibility with both naming conventions.
+
+**Why:** A naming mismatch can make existing credentials appear missing and can
+also prevent valid webhooks from being accepted.
+
+**How to apply:** Check secret existence for both forms before requesting new
+credentials. Keep the explicit activation flag independent of credential
+presence; recognizing a key must never enable real payments automatically.
+
 Webhook delivery is an at-least-once message flow: the unique event key must be recorded before business processing, and a duplicate must return successfully without re-running activation.
 
 **Why:** Providers retry deliveries, so a valid duplicate is normal operational behavior rather than an error condition.
