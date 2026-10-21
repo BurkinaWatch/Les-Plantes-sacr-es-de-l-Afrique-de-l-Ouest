@@ -297,6 +297,72 @@ export default function AbonnementScreen() {
         </View>
       )}
 
+      {selected?.active && selected.amount && selected.currency && (
+        <View
+          style={[
+            styles.priceSummary,
+            { backgroundColor: colors.card, borderColor: colors.border },
+          ]}
+          accessibilityLabel="Récapitulatif estimatif du paiement"
+        >
+          <Text style={[styles.eyebrow, { color: colors.gold }]}>
+            RÉCAPITULATIF
+          </Text>
+          <View style={styles.amountRow}>
+            <Text style={[styles.amountLabel, { color: colors.ivory }]}>
+              {selected.period === "MONTHLY"
+                ? "Abonnement mensuel"
+                : "Abonnement annuel"}
+            </Text>
+            <Text style={[styles.amountValue, { color: colors.ivory }]}>
+              {formatCurrency(selected.amount, selected.currency)}
+            </Text>
+          </View>
+          <View style={styles.amountRow}>
+            <Text style={[styles.amountLabel, { color: colors.mutedForeground }]}>
+              Frais SAS Pay estimés
+            </Text>
+            <Text style={[styles.amountValue, { color: colors.ivory }]}>
+              {selected.feeEstimate
+                ? formatAmountRange(
+                    selected.feeEstimate.minimumFee,
+                    selected.feeEstimate.maximumFee,
+                    selected.currency,
+                  )
+                : "Selon le réseau"}
+            </Text>
+          </View>
+          {selected.feeEstimate && (
+            <>
+              <View style={styles.amountRow}>
+                <Text style={[styles.amountLabel, styles.totalLabel, { color: colors.ivory }]}>
+                  Total estimé
+                </Text>
+                <Text style={[styles.amountValue, styles.totalValue, { color: colors.gold }]}>
+                  {formatAmountRange(
+                    selected.feeEstimate.totalMinimum,
+                    selected.feeEstimate.totalMaximum,
+                    selected.currency,
+                  )}
+                </Text>
+              </View>
+              <Text style={[styles.feeNote, { color: colors.mutedForeground }]}>
+                {selected.feeEstimate.feeChargeMode === "ADD_ON"
+                  ? "Les frais estimés sont ajoutés au paiement."
+                  : selected.feeEstimate.feeChargeMode === "DEDUCTED"
+                    ? "Les frais sont pris en charge par le marchand sur les réseaux concernés."
+                    : "La prise en charge des frais dépend du réseau choisi."}
+                {` Estimation calculée sur ${selected.feeEstimate.networkCount} réseau${selected.feeEstimate.networkCount > 1 ? "x" : ""} disponible${selected.feeEstimate.networkCount > 1 ? "s" : ""}.`}
+              </Text>
+            </>
+          )}
+          <Text style={[styles.feeNote, { color: colors.mutedForeground }]}>
+            Le montant exact sera affiché par SAS Pay après le choix du réseau,
+            avant la confirmation du paiement.
+          </Text>
+        </View>
+      )}
+
       {!authenticated ? (
         <View style={styles.loginPrompt}>
           <Text style={[styles.body, { color: colors.mutedForeground }]}>
@@ -422,6 +488,20 @@ function isUnauthorized(error: unknown): boolean {
     "status" in error && error.status === 401;
 }
 
+function formatCurrency(value: string, currency: string): string {
+  const amount = Number(value);
+  return Number.isFinite(amount)
+    ? `${new Intl.NumberFormat("fr-FR", { maximumFractionDigits: 2 }).format(amount)} ${currency}`
+    : `${value} ${currency}`;
+}
+
+function formatAmountRange(minimum: string, maximum: string, currency: string): string {
+  const minimumText = formatCurrency(minimum, currency);
+  return minimum === maximum
+    ? minimumText
+    : `${minimumText} – ${formatCurrency(maximum, currency)}`;
+}
+
 const styles = StyleSheet.create({
   container: { flex: 1, paddingHorizontal: 20 },
   topRow: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", marginBottom: 22 },
@@ -437,6 +517,13 @@ const styles = StyleSheet.create({
   planHeader: { flexDirection: "row", justifyContent: "space-between", alignItems: "center" },
   planName: { flex: 1, flexShrink: 1, marginRight: 12, fontSize: 17, fontWeight: "700" as const },
   planDescription: { fontSize: 14 },
+  priceSummary: { borderRadius: 16, borderWidth: 1, padding: 16, marginTop: 18, gap: 12 },
+  amountRow: { flexDirection: "row", alignItems: "flex-start", justifyContent: "space-between", gap: 12 },
+  amountLabel: { flex: 1, flexShrink: 1, fontSize: 14, lineHeight: 20 },
+  amountValue: { flexShrink: 0, fontSize: 14, lineHeight: 20, fontWeight: "700" as const, textAlign: "right" },
+  totalLabel: { fontWeight: "800" as const },
+  totalValue: { fontSize: 16, fontWeight: "800" as const },
+  feeNote: { fontSize: 12, lineHeight: 18 },
   unavailable: { fontSize: 12, fontWeight: "700" as const },
   radio: { width: 22, height: 22, borderRadius: 11, borderWidth: 2, alignItems: "center", justifyContent: "center" },
   radioDot: { width: 10, height: 10, borderRadius: 5 },

@@ -23,11 +23,33 @@ export type CheckoutSessionStatus = {
   transactionReference?: string;
 };
 
+export type SasPayPayinFeeTier = {
+  minAmount: string;
+  maxAmount: string | null;
+  currency: string;
+  percent: string;
+  fixed: string;
+  floorAmount: string | null;
+  capAmount: string | null;
+  feeChargeMode?: "ADD_ON" | "DEDUCTED";
+};
+
+export type SasPayPayinRate = {
+  countryCode: string;
+  currency: string;
+  networkCode: string;
+  payin: {
+    available: boolean;
+    tiers: SasPayPayinFeeTier[];
+  };
+};
+
 export interface PaymentProvider {
   readonly name: PaymentProviderName;
   isConfigured(): boolean;
   createCheckout(input: CreateCheckoutInput): Promise<CheckoutSession>;
   getCheckoutSession?(checkoutId: string): Promise<CheckoutSessionStatus>;
+  getMyPayinRates?(): Promise<SasPayPayinRate[]>;
 }
 
 // A credential or scope error from the merchant provider is not evidence that

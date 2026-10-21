@@ -3,6 +3,8 @@ import type {
   CheckoutSessionStatus,
   CreateCheckoutInput,
   PaymentProvider,
+  SasPayPayinFeeTier,
+  SasPayPayinRate,
 } from "./payment-provider.js";
 import { getSasPayApiKey } from "./saspay-config.js";
 
@@ -12,6 +14,150 @@ type JsonRecord = Record<string, unknown>;
 
 function isRecord(value: unknown): value is JsonRecord {
   return typeof value === "object" && value !== null && !Array.isArray(value);
+}
+
+function readNumericString(
+  record: JsonRecord,
+  keys: readonly string[],
+): string | undefined {
+  for (const key of keys) {
+    const value = record[key];
+    if (
+      typeof value === "string" &&
+      value.trim() &&
+      Number.isFinite(Number(value)) &&
+      Number(value) >= 0
+    ) {
+      return value;
+    }
+    if (typeof value === "number" && Number.isFinite(value) && value >= 0) {
+      return String(value);
+    }
+  }
+  return undefined;
+}
+
+function readOptionalNumericString(
+  record: JsonRecord,
+  keys: readonly string[],
+): string | null {
+  const key = keys.find((candidate) => candidate in record);
+  if (!key || record[key] === null || record[key] === "") return null;
+  const rawValue = record[key];
+  if (
+    (typeof rawValue === "number" && Number.isFinite(rawValue) && rawValue < 0) ||
+    (typeof rawValue === "string" &&
+      rawValue.trim() !== "" &&
+      Number.isFinite(Number(rawValue)) &&
+      Number(rawValue) < 0)
+  ) {
+    return null;
+  }
+  const value = readNumericString(record, keys);
+  if (value === undefined) {
+    if (typeof rawValue === "string") {
+      const trimmed = rawValue.trim();
+      if (/^(?:null|none|n\/a|not applicable|unavailable|-)$/i.test(trimmed)) {
+        return null;
+      }
+      const amountWithCurrency = trimmed.match(
+        /^(\d+(?:[.,]\d+)?)(?:\s*(?:XOF|XAF|FCFA|CFA|F\s*CFA))$/i,
+      );
+      if (amountWithCurrency) return amountWithCurrency[1].replace(",", ".");
+    }
+    const valueType = Array.isArray(rawValue)
+      ? "array"
+      : rawValue === null
+        ? "null"
+        : typeof rawValue;
+    throw new SasPayProviderError(
+      `Le champ ${key} des tarifs SAS Pay n’est pas numérique (type ${valueType}).`,
+      502,
+    );
+  }
+  return value;
+}
+
+function parsePayinFeeTier(value: unknown, rateCurrency: string): SasPayPayinFeeTier {
+  if (!isRecord(value)) {
+    throw new SasPayProviderError("SAS Pay a retourné des tarifs inexploitables.", 502);
+  }
+  const minAmount = readNumericString(value, ["min_amount", "minAmount"]);
+  const percent = readNumericString(value, ["percent"]);
+  const fixed = readNumericString(value, ["fixed"]);
+  const maxAmount = readOptionalNumericString(value, ["max_amount", "maxAmount"]);
+  const floorAmount = readOptionalNumericString(value, ["floor_amount", "floorAmount"]);
+  const capAmount = readOptionalNumericString(value, ["cap_amount", "capAmount"]);
+  const feeMode = firstString(value, ["fee_charge_mode", "feeChargeMode"]);
+  const currency = firstString(value, ["currency"]) ?? rateCurrency;
+
+  if (
+    minAmount === undefined ||
+    percent === undefined ||
+    fixed === undefined ||
+    !currency ||
+    (feeMode !== "ADD_ON" && feeMode !== "DEDUCTED")
+  ) {
+    throw new SasPayProviderError("SAS Pay a retourné des tarifs incomplets.", 502);
+  }
+
+  return {
+    minAmount,
+    maxAmount,
+    currency,
+    percent,
+    fixed,
+    floorAmount,
+    capAmount,
+    feeChargeMode: feeMode,
+  };
+}
+
+function parseMyPayinRates(payload: unknown): SasPayPayinRate[] {
+  const rateEntries = Array.isArray(payload)
+    ? payload
+    : isRecord(payload) && Array.isArray(payload.results)
+      ? payload.results
+      : isRecord(payload) && Array.isArray(payload.data)
+        ? payload.data
+        : undefined;
+  if (!rateEntries) {
+    throw new SasPayProviderError("SAS Pay a retourné un format de tarifs inattendu.", 502);
+  }
+
+  return rateEntries.flatMap((value) => {
+    if (!isRecord(value) || !isRecord(value.payin)) {
+      throw new SasPayProviderError("Les tarifs SAS Pay ne contiennent pas les informations de paiement attendues.", 502);
+    }
+    if (value.payin.available !== true) return [];
+
+    const countryCode = firstString(value, ["country_code", "countryCode"]);
+    const currency = firstString(value, ["currency"]);
+    const networkCode = firstString(value, ["network_code", "networkCode"]);
+    if (
+      !countryCode ||
+      !currency ||
+      !networkCode ||
+      !Array.isArray(value.payin.tiers) ||
+      value.payin.tiers.length === 0
+    ) {
+      throw new SasPayProviderError("SAS Pay a retourné des tarifs incomplets.", 502);
+    }
+
+    return [
+      {
+        countryCode,
+        currency,
+        networkCode,
+        payin: {
+          available: true,
+          tiers: value.payin.tiers.map((tier) =>
+            parsePayinFeeTier(tier, currency),
+          ),
+        },
+      },
+    ];
+  });
 }
 
 function firstString(record: JsonRecord, keys: readonly string[]): string | undefined {
@@ -133,6 +279,11 @@ export class SasPayProvider implements PaymentProvider {
   readonly name = "SAS_PAY" as const;
   private readonly apiKey: string | undefined;
   private readonly apiUrl: string;
+  private payinRatesCache: {
+    rates: SasPayPayinRate[];
+    expiresAt: number;
+  } | null = null;
+  private payinRatesRequest: Promise<SasPayPayinRate[]> | null = null;
 
   constructor(private readonly env: NodeJS.ProcessEnv = process.env) {
     this.apiKey = getSasPayApiKey(env);
@@ -257,5 +408,56 @@ export class SasPayProvider implements PaymentProvider {
           ? transaction.reference
           : undefined,
     };
+  }
+
+  async getMyPayinRates(): Promise<SasPayPayinRate[]> {
+    if (!this.isConfigured() || !this.apiKey) {
+      throw new SasPayProviderError("Le paiement SAS Pay est indisponible.", 503);
+    }
+
+    if (this.payinRatesCache && this.payinRatesCache.expiresAt > Date.now()) {
+      return this.payinRatesCache.rates;
+    }
+    if (this.payinRatesRequest) return this.payinRatesRequest;
+
+    this.payinRatesRequest = this.fetchMyPayinRates()
+      .then((rates) => {
+        this.payinRatesCache = { rates, expiresAt: Date.now() + 60_000 };
+        return rates;
+      })
+      .finally(() => {
+        this.payinRatesRequest = null;
+      });
+    return this.payinRatesRequest;
+  }
+
+  private async fetchMyPayinRates(): Promise<SasPayPayinRate[]> {
+    const response = await fetch(`${this.apiUrl}/pricing/my-rates/`, {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${this.apiKey}`,
+        Accept: "application/json",
+      },
+      signal: AbortSignal.timeout(8_000),
+    });
+
+    let payload: unknown;
+    try {
+      payload = await response.json();
+    } catch {
+      throw new SasPayProviderError(
+        "SAS Pay n’a pas renvoyé les tarifs de paiement.",
+        response.status || 502,
+      );
+    }
+
+    if (!response.ok) {
+      throw new SasPayProviderError(
+        `SAS Pay n’a pas pu fournir les tarifs (${response.status}).`,
+        response.status,
+      );
+    }
+
+    return parseMyPayinRates(payload);
   }
 }

@@ -386,7 +386,7 @@ components:
           $ref: "#/components/schemas/AuthUser"
     SubscriptionPlan:
       type: object
-      required: [code, name, period, active]
+      required: [code, name, period, active, feeEstimate]
       properties:
         code:
           type: string
@@ -407,6 +407,26 @@ components:
           enum: [MONTHLY, YEARLY]
         active:
           type: boolean
+        feeEstimate:
+          description: Estimated customer-paid fee range across available SAS Pay XOF networks. The hosted checkout shows the exact amount before final confirmation.
+          oneOf:
+            - type: object
+              required: [minimumFee, maximumFee, totalMinimum, totalMaximum, feeChargeMode, networkCount]
+              properties:
+                minimumFee:
+                  type: string
+                maximumFee:
+                  type: string
+                totalMinimum:
+                  type: string
+                totalMaximum:
+                  type: string
+                feeChargeMode:
+                  type: string
+                  enum: [ADD_ON, DEDUCTED, MIXED]
+                networkCount:
+                  type: integer
+            - type: "null"
     SubscriptionStatus:
       type: object
       required: [id, planCode, planName, period, status]

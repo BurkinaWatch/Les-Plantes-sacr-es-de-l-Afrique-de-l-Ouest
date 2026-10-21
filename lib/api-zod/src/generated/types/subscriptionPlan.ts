@@ -6,6 +6,7 @@
  * OpenAPI spec version: 0.1.0
  */
 import type { SubscriptionPlanCode } from './subscriptionPlanCode';
+import type { SubscriptionPlanFeeEstimate } from './subscriptionPlanFeeEstimate';
 import type { SubscriptionPlanPeriod } from './subscriptionPlanPeriod';
 
 export interface SubscriptionPlan {
@@ -19,4 +20,6 @@ export interface SubscriptionPlan {
   currency?: string | null;
   period: SubscriptionPlanPeriod;
   active: boolean;
+  /** Estimated customer-paid fee range across available SAS Pay XOF networks. The hosted checkout shows the exact amount before final confirmation. */
+  feeEstimate: SubscriptionPlanFeeEstimate;
 }

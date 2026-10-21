@@ -159,7 +159,15 @@ export const GetSubscriptionPlansResponse = zod.object({
   "amount": zod.string().nullish(),
   "currency": zod.string().nullish(),
   "period": zod.enum(['MONTHLY', 'YEARLY']),
-  "active": zod.boolean()
+  "active": zod.boolean(),
+  "feeEstimate": zod.union([zod.object({
+  "minimumFee": zod.string(),
+  "maximumFee": zod.string(),
+  "totalMinimum": zod.string(),
+  "totalMaximum": zod.string(),
+  "feeChargeMode": zod.enum(['ADD_ON', 'DEDUCTED', 'MIXED']),
+  "networkCount": zod.number().int()
+}),zod.null()]).describe('Estimated customer-paid fee range across available SAS Pay XOF networks. The hosted checkout shows the exact amount before final confirmation.')
 }))
 })
 

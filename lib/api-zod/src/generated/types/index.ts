@@ -27,6 +27,8 @@ export * from './healthStatusStatus';
 export * from './subscriptionPayment';
 export * from './subscriptionPlan';
 export * from './subscriptionPlanCode';
+export * from './subscriptionPlanFeeEstimate';
+export * from './subscriptionPlanFeeEstimateFeeChargeMode';
 export * from './subscriptionPlanPeriod';
 export * from './subscriptionReconciliation';
 export * from './subscriptionStatus';

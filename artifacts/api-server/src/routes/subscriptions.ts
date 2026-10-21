@@ -14,6 +14,7 @@ import { requireActiveUserJwt } from "../lib/auth-middleware.js";
 import { logger } from "../lib/logger.js";
 import { SasPayProvider, SasPayProviderError } from "../lib/saspay-provider.js";
 import { getSasPayWebhookSecret } from "../lib/saspay-config.js";
+import { estimateSasPayCustomerFees } from "../lib/saspay-fee-estimate.js";
 import {
   createSasPayInterventionNotifier,
   normalizeSasPayAdminEmail,
@@ -168,21 +169,45 @@ export function createSubscriptionsRouter(
   const router = Router();
 
   router.get("/plans", async (_req, res) => {
-  const plans = await database
-    .select({
-      code: subscriptionPlansTable.code,
-      name: subscriptionPlansTable.name,
-      description: subscriptionPlansTable.description,
-      amount: subscriptionPlansTable.amount,
-      currency: subscriptionPlansTable.currency,
-      period: subscriptionPlansTable.period,
-      active: subscriptionPlansTable.active,
-    })
-    .from(subscriptionPlansTable)
-    .orderBy(subscriptionPlansTable.id);
+    const ratesRequest =
+      paymentProvider.isConfigured() && paymentProvider.getMyPayinRates
+        ? paymentProvider.getMyPayinRates().catch((error: unknown) => {
+            logger.warn(
+              {
+                status: error instanceof SasPayProviderError ? error.status : undefined,
+                reason:
+                  error instanceof SasPayProviderError
+                    ? error.message
+                    : "SAS Pay fee-rate request failed",
+              },
+              "SAS Pay fee estimates are unavailable",
+            );
+            return null;
+          })
+        : Promise.resolve(null);
+    const plans = await database
+      .select({
+        code: subscriptionPlansTable.code,
+        name: subscriptionPlansTable.name,
+        description: subscriptionPlansTable.description,
+        amount: subscriptionPlansTable.amount,
+        currency: subscriptionPlansTable.currency,
+        period: subscriptionPlansTable.period,
+        active: subscriptionPlansTable.active,
+      })
+      .from(subscriptionPlansTable)
+      .orderBy(subscriptionPlansTable.id);
+    const rates = await ratesRequest;
 
-  return res.json({ plans });
-});
+    return res.json({
+      plans: plans.map((plan) => ({
+        ...plan,
+        feeEstimate: rates
+          ? estimateSasPayCustomerFees(plan.amount, plan.currency, rates)
+          : null,
+      })),
+    });
+  });
 
   router.get("/status", requireActiveUserJwt, async (req, res) => {
   const [subscription] = await database

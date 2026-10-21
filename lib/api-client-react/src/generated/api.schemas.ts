@@ -95,6 +95,27 @@ export const SubscriptionPlanPeriod = {
   YEARLY: 'YEARLY',
 } as const;
 
+export type SubscriptionPlanFeeEstimateFeeChargeMode = typeof SubscriptionPlanFeeEstimateFeeChargeMode[keyof typeof SubscriptionPlanFeeEstimateFeeChargeMode];
+
+
+export const SubscriptionPlanFeeEstimateFeeChargeMode = {
+  ADD_ON: 'ADD_ON',
+  DEDUCTED: 'DEDUCTED',
+  MIXED: 'MIXED',
+} as const;
+
+/**
+ * Estimated customer-paid fee range across available SAS Pay XOF networks. The hosted checkout shows the exact amount before final confirmation.
+ */
+export type SubscriptionPlanFeeEstimate = {
+  minimumFee: string;
+  maximumFee: string;
+  totalMinimum: string;
+  totalMaximum: string;
+  feeChargeMode: SubscriptionPlanFeeEstimateFeeChargeMode;
+  networkCount: number;
+} | null;
+
 export interface SubscriptionPlan {
   code: SubscriptionPlanCode;
   name: string;
@@ -106,6 +127,8 @@ export interface SubscriptionPlan {
   currency?: string | null;
   period: SubscriptionPlanPeriod;
   active: boolean;
+  /** Estimated customer-paid fee range across available SAS Pay XOF networks. The hosted checkout shows the exact amount before final confirmation. */
+  feeEstimate: SubscriptionPlanFeeEstimate;
 }
 
 export type SubscriptionStatusStatus = typeof SubscriptionStatusStatus[keyof typeof SubscriptionStatusStatus];

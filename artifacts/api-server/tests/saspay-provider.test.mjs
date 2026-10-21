@@ -148,3 +148,61 @@ test("SAS Pay resolves the transaction attached to a paid checkout session", asy
     globalThis.fetch = originalFetch;
   }
 });
+
+test("SAS Pay reads current merchant pay-in fee tiers without creating a checkout", async () => {
+  const originalFetch = globalThis.fetch;
+  const requests = [];
+  globalThis.fetch = async (input, init) => {
+    requests.push({ input: String(input), init });
+    return new Response(
+      JSON.stringify([
+        {
+          country_code: "CI",
+          currency: "XOF",
+          network_code: "orange_ci",
+          payin: {
+            available: true,
+            tiers: [
+              {
+                min_amount: "0.00",
+                max_amount: "500000.00",
+                currency: "XOF",
+                percent: "2.500",
+                fixed: "0.00",
+                floor_amount: -1,
+                cap_amount: null,
+                fee_charge_mode: "ADD_ON",
+              },
+            ],
+          },
+        },
+      ]),
+      { status: 200, headers: { "content-type": "application/json" } },
+    );
+  };
+
+  try {
+    const provider = new SasPayProvider({
+      SAS_PAY_ENABLED: "true",
+      SAS_PAY_API_KEY: "sk_test_provider",
+    });
+    const [rates, concurrentRates] = await Promise.all([
+      provider.getMyPayinRates(),
+      provider.getMyPayinRates(),
+    ]);
+
+    assert.deepEqual(rates, concurrentRates);
+    assert.equal(rates.length, 1);
+    assert.equal(rates[0].payin.tiers[0].feeChargeMode, "ADD_ON");
+    assert.equal(rates[0].payin.tiers[0].floorAmount, null);
+    assert.equal(requests.length, 1);
+    assert.equal(
+      requests[0].input,
+      "https://api.saspay.me/api/v1/pricing/my-rates/",
+    );
+    assert.equal(requests[0].init.method, "GET");
+    assert.equal(requests[0].init.headers.Authorization, "Bearer sk_test_provider");
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
+});
