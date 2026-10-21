@@ -87,6 +87,7 @@ packages = ["eas-cli", "jdk17", "android-tools", "sdkmanager", "glib", "nspr", "
 [userenv]
 
 [userenv.shared]
+SAS_PAY_ENABLED = "true"
 
 [userenv.development]
 EXPO_PUBLIC_API_BASE_URL = "https://les-plantes-sacr-es-de-l-afrique-de-l-ouest-production.up.railway.app/api"
