@@ -5,6 +5,7 @@ import * as SplashScreen from "expo-splash-screen";
 import { Stack, useRouter, useSegments } from "expo-router";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import {
+  ActivityIndicator,
   Animated,
   Platform,
   Pressable,
@@ -25,7 +26,11 @@ import { useColors } from "@/hooks/useColors";
 import { LanguageProvider } from "@/i18n";
 import { useNotifications } from "@/hooks/useNotifications";
 import { getApiBase } from "@/lib/api-config";
-import { setAuthTokenGetter, setBaseUrl } from "@workspace/api-client-react";
+import {
+  setAuthTokenGetter,
+  setBaseUrl,
+  useGetSubscriptionStatus,
+} from "@workspace/api-client-react";
 
 setBaseUrl(getApiBase());
 
@@ -225,11 +230,109 @@ function RootLayoutNav({
   onRouteKeyChange: (routeKey: string) => void;
 }) {
   const segments = useSegments();
+  const router = useRouter();
+  const theme = useColors();
+  const { user, isLoading: authLoading, logout } = useAuth();
   const routeKey = segments.join("/");
+  const routeGroup = segments[0] ?? "";
+  const onAuthRoute = routeGroup === "(auth)";
+  const onSubscriptionRoute = routeGroup === "abonnement";
+  const onAccountDeletionRoute = routeGroup === "account-deletion";
+  const onFallbackRoute = routeGroup === "error-fallback";
+  const accessQuery = useGetSubscriptionStatus({
+    query: {
+      enabled: Boolean(user) && !authLoading,
+      queryKey: ["trial-access", user?.id],
+      refetchInterval: 30_000,
+      refetchOnReconnect: true,
+      refetchOnWindowFocus: true,
+      retry: 1,
+    },
+  });
+  const access = accessQuery.data?.access;
+  const trialStartedAt = accessQuery.data?.trial.startedAt
+    ? Date.parse(accessQuery.data.trial.startedAt)
+    : Number.NaN;
+  const trialEndsAt = accessQuery.data?.trial.endsAt
+    ? Date.parse(accessQuery.data.trial.endsAt)
+    : Number.NaN;
+  const subscriptionEndsAt = accessQuery.data?.subscription?.expiresAt
+    ? Date.parse(accessQuery.data.subscription.expiresAt)
+    : Number.NaN;
+  const locallyActiveTrial =
+    access?.trialActive === true &&
+    Number.isFinite(trialStartedAt) &&
+    Number.isFinite(trialEndsAt) &&
+    Date.now() >= trialStartedAt &&
+    Date.now() < trialEndsAt;
+  const locallyActiveSubscription =
+    access?.subscriptionActive === true &&
+    (!Number.isFinite(subscriptionEndsAt) || Date.now() < subscriptionEndsAt);
+  const hasCurrentAccess =
+    access?.hasAccess === true &&
+    (locallyActiveTrial || locallyActiveSubscription);
+  const needsAccessCheck =
+    !onAuthRoute &&
+    !onSubscriptionRoute &&
+    !onAccountDeletionRoute &&
+    !onFallbackRoute;
 
   useEffect(() => {
     onRouteKeyChange(routeKey);
   }, [onRouteKeyChange, routeKey]);
+
+  useEffect(() => {
+    if (authLoading) return;
+
+    if (
+      user &&
+      accessQuery.isError &&
+      isUnauthorizedApiError(accessQuery.error)
+    ) {
+      void logout();
+      if (!onAuthRoute) router.replace("/(auth)/login");
+      return;
+    }
+
+    if (!user) {
+      if (!onAuthRoute && !onSubscriptionRoute && !onFallbackRoute) {
+        router.replace("/(auth)/login");
+      }
+      return;
+    }
+
+    if (
+      needsAccessCheck &&
+      accessQuery.data &&
+      !hasCurrentAccess
+    ) {
+      router.replace({
+        pathname: "/abonnement",
+        params: { reason: "trial-expired" },
+      });
+    }
+  }, [
+    accessQuery.data,
+    accessQuery.error,
+    accessQuery.isError,
+    authLoading,
+    hasCurrentAccess,
+    needsAccessCheck,
+    onAuthRoute,
+    onFallbackRoute,
+    onSubscriptionRoute,
+    logout,
+    router,
+    user,
+  ]);
+
+  const shouldBlockPrivateContent =
+    needsAccessCheck &&
+    (authLoading ||
+      !user ||
+      !accessQuery.data ||
+      !hasCurrentAccess ||
+      (accessQuery.isError && !accessQuery.data));
 
   return (
     <View
@@ -248,8 +351,70 @@ function RootLayoutNav({
         <Stack.Screen name="account-deletion" options={{ headerShown: false, presentation: "card" }} />
       </Stack>
       <ScannerFab />
+      {shouldBlockPrivateContent && (
+        <View
+          accessibilityViewIsModal
+          style={[
+            StyleSheet.absoluteFill,
+            {
+              alignItems: "center",
+              backgroundColor: theme.background,
+              justifyContent: "center",
+              padding: 28,
+              zIndex: 1000,
+              elevation: 1000,
+            },
+          ]}
+        >
+          {accessQuery.isError && !accessQuery.data ? (
+            <>
+              <Text style={{ color: theme.ivory, fontSize: 16, textAlign: "center" }}>
+                Impossible de vérifier votre accès. Vérifiez votre connexion puis réessayez.
+              </Text>
+              <Pressable
+                accessibilityRole="button"
+                onPress={() => void accessQuery.refetch()}
+                style={{
+                  backgroundColor: theme.gold,
+                  borderRadius: 14,
+                  marginTop: 20,
+                  paddingHorizontal: 22,
+                  paddingVertical: 13,
+                }}
+              >
+                <Text style={{ color: theme.deepBrown, fontWeight: "700" }}>
+                  Réessayer
+                </Text>
+              </Pressable>
+            </>
+          ) : (
+            <>
+              <ActivityIndicator color={theme.gold} />
+              <Text
+                style={{
+                  color: theme.mutedForeground,
+                  fontSize: 14,
+                  marginTop: 14,
+                  textAlign: "center",
+                }}
+              >
+                {user
+                  ? "Vérification de votre accès…"
+                  : "Ouverture de la connexion…"}
+              </Text>
+            </>
+          )}
+        </View>
+      )}
     </View>
   );
+}
+
+function isUnauthorizedApiError(error: unknown): boolean {
+  return typeof error === "object" &&
+    error !== null &&
+    "status" in error &&
+    error.status === 401;
 }
 
 /* ── Root Layout ───────────────────────────────────────────────── */

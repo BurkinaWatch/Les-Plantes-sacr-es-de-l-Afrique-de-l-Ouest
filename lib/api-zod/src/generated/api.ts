@@ -184,7 +184,17 @@ export const GetSubscriptionStatusResponse = zod.object({
   "status": zod.enum(['PENDING', 'ACTIVE', 'FAILED', 'CANCELLED', 'EXPIRED']),
   "startsAt": zod.coerce.date().nullish(),
   "expiresAt": zod.coerce.date().nullish()
-}),zod.null()])
+}),zod.null()]),
+  "trial": zod.object({
+  "startedAt": zod.coerce.date(),
+  "endsAt": zod.coerce.date(),
+  "active": zod.boolean()
+}),
+  "access": zod.object({
+  "hasAccess": zod.boolean(),
+  "trialActive": zod.boolean(),
+  "subscriptionActive": zod.boolean()
+})
 })
 
 

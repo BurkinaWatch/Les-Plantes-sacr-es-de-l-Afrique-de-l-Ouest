@@ -1,7 +1,7 @@
 import { Router, type RequestHandler } from "express";
 import Groq from "groq-sdk";
 import { z } from "zod";
-import { requireActiveUserJwt } from "../lib/auth-middleware.js";
+import { requireTrialOrActiveSubscription } from "../lib/auth-middleware.js";
 import {
   createUserRateLimiter,
   monthlyQuotaMiddleware,
@@ -123,7 +123,7 @@ Retourne UNIQUEMENT du JSON valide. Pas de markdown, pas d'explication, pas de b
 
 export function createPlantRecognitionRouter(
   getClient: () => ChatClient = getGroq,
-  authenticate: RequestHandler = requireActiveUserJwt,
+  authenticate: RequestHandler = requireTrialOrActiveSubscription,
 ): Router {
   const router = Router();
 

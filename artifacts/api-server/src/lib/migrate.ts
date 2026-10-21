@@ -8,7 +8,7 @@ export const REQUIRED_SCHEMA_TABLES = [
   "payment_attempts",
   "payment_events",
 ] as const;
-export const CURRENT_SCHEMA_VERSION = 3;
+export const CURRENT_SCHEMA_VERSION = 4;
 
 type RequiredSchemaColumn = {
   tableName: string;
@@ -49,6 +49,13 @@ const REQUIRED_SCHEMA_COLUMNS: readonly RequiredSchemaColumn[] = [
     dataType: "timestamp without time zone",
     udtName: "timestamp",
     defaultRequirement: "now",
+  },
+  {
+    tableName: "users",
+    columnName: "trial_started_at",
+    isNullable: "YES",
+    dataType: "timestamp without time zone",
+    udtName: "timestamp",
   },
   {
     tableName: "push_tokens",
@@ -622,7 +629,8 @@ async function ensureSchemaObjects(client: SchemaClient): Promise<void> {
       id SERIAL PRIMARY KEY,
       username TEXT NOT NULL UNIQUE,
       password_hash TEXT NOT NULL,
-      created_at TIMESTAMP DEFAULT NOW() NOT NULL
+      created_at TIMESTAMP DEFAULT NOW() NOT NULL,
+      trial_started_at TIMESTAMP
     )
   `);
 
@@ -761,6 +769,12 @@ async function activateSubscriptionPlans(client: SchemaClient): Promise<void> {
   `);
 }
 
+async function addTrialStartedAtColumn(client: SchemaClient): Promise<void> {
+  await client.query(
+    "ALTER TABLE users ADD COLUMN IF NOT EXISTS trial_started_at TIMESTAMP",
+  );
+}
+
 const SCHEMA_MIGRATIONS: readonly SchemaMigration[] = [
   {
     version: 1,
@@ -808,6 +822,16 @@ const SCHEMA_MIGRATIONS: readonly SchemaMigration[] = [
           WHERE code IN ('MONTHLY', 'YEARLY')
         `);
       },
+    },
+  },
+  {
+    version: 4,
+    up: addTrialStartedAtColumn,
+    rollback: {
+      strategy: "restore-backup",
+      reviewed: true,
+      notes:
+        "Trial start timestamps determine whether an account may use paid features; dropping them could restart trials for existing accounts.",
     },
   },
 ];

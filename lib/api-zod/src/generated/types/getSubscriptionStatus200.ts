@@ -5,8 +5,12 @@
  * API specification
  * OpenAPI spec version: 0.1.0
  */
+import type { GetSubscriptionStatus200Access } from './getSubscriptionStatus200Access';
+import type { GetSubscriptionStatus200Trial } from './getSubscriptionStatus200Trial';
 import type { SubscriptionStatus } from './subscriptionStatus';
 
 export type GetSubscriptionStatus200 = {
   subscription: SubscriptionStatus | null;
+  trial: GetSubscriptionStatus200Trial;
+  access: GetSubscriptionStatus200Access;
 };

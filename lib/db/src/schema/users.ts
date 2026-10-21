@@ -7,6 +7,7 @@ export const usersTable = pgTable("users", {
   username: text("username").notNull().unique(),
   passwordHash: text("password_hash").notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
+  trialStartedAt: timestamp("trial_started_at"),
 });
 
 export const insertUserSchema = createInsertSchema(usersTable).omit({

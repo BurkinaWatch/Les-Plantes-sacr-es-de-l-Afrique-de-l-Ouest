@@ -15,6 +15,7 @@ import { logger } from "../lib/logger.js";
 import { SasPayProvider, SasPayProviderError } from "../lib/saspay-provider.js";
 import { getSasPayWebhookSecret } from "../lib/saspay-config.js";
 import { estimateSasPayCustomerFees } from "../lib/saspay-fee-estimate.js";
+import { getTrialAccess } from "../lib/subscription-access.js";
 import {
   createSasPayInterventionNotifier,
   normalizeSasPayAdminEmail,
@@ -210,6 +211,11 @@ export function createSubscriptionsRouter(
   });
 
   router.get("/status", requireActiveUserJwt, async (req, res) => {
+  const access = await getTrialAccess(req.user!.id);
+  if (!access) {
+    return res.status(401).json({ error: "Ce compte n’existe plus" });
+  }
+
   const [subscription] = await database
     .select({
       id: subscriptionsTable.id,
@@ -229,7 +235,19 @@ export function createSubscriptionsRouter(
     .orderBy(desc(subscriptionsTable.createdAt))
     .limit(1);
 
-  return res.json({ subscription: subscription ?? null });
+  return res.json({
+    subscription: subscription ?? null,
+    trial: {
+      startedAt: access.trialStartedAt.toISOString(),
+      endsAt: access.trialEndsAt.toISOString(),
+      active: access.trialActive,
+    },
+    access: {
+      hasAccess: access.hasAccess,
+      trialActive: access.trialActive,
+      subscriptionActive: access.subscriptionActive,
+    },
+  });
 });
 
   router.post("/reconcile", requireActiveUserJwt, async (req, res) => {

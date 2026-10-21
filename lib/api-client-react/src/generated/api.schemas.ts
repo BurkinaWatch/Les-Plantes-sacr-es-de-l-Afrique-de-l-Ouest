@@ -242,7 +242,21 @@ export type GetSubscriptionPlans200 = {
   plans: SubscriptionPlan[];
 };
 
+export type GetSubscriptionStatus200Trial = {
+  startedAt: string;
+  endsAt: string;
+  active: boolean;
+};
+
+export type GetSubscriptionStatus200Access = {
+  hasAccess: boolean;
+  trialActive: boolean;
+  subscriptionActive: boolean;
+};
+
 export type GetSubscriptionStatus200 = {
   subscription: SubscriptionStatus | null;
+  trial: GetSubscriptionStatus200Trial;
+  access: GetSubscriptionStatus200Access;
 };
 

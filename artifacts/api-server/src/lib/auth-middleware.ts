@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction, type RequestHandler } from "express";
 import jwt from "jsonwebtoken";
+import { getTrialAccess, type TrialAccess } from "./subscription-access.js";
 
 // Extend Express Request to carry a server-verified user identity
 declare global {
@@ -91,6 +92,48 @@ export const requireActiveUserJwt = createRequireJwt(async (userId) => {
   const result = await pool.query("SELECT 1 FROM users WHERE id = $1 LIMIT 1", [userId]);
   return (result.rowCount ?? 0) > 0;
 });
+
+export function createRequireTrialOrActiveSubscription(
+  loadAccess: (userId: number) => Promise<TrialAccess | null> = getTrialAccess,
+  authenticate: RequestHandler = requireActiveUserJwt,
+): RequestHandler {
+  return (req, res, next) => {
+    authenticate(req, res, (authError?: unknown) => {
+      if (authError) {
+        next(authError);
+        return;
+      }
+      if (res.headersSent) return;
+
+      const userId = req.user?.id;
+      if (!userId) {
+        res.status(401).json({ error: "Authentification requise" });
+        return;
+      }
+
+      void loadAccess(userId)
+        .then((access) => {
+          if (!access) {
+            res.status(401).json({ error: "Ce compte n’existe plus" });
+            return;
+          }
+          if (!access.hasAccess) {
+            res.status(402).json({
+              code: "SUBSCRIPTION_REQUIRED",
+              error: "Votre essai gratuit de 3 jours est terminé. Abonnez-vous pour continuer.",
+              trialEndsAt: access.trialEndsAt.toISOString(),
+            });
+            return;
+          }
+          next();
+        })
+        .catch(next);
+    });
+  };
+}
+
+export const requireTrialOrActiveSubscription =
+  createRequireTrialOrActiveSubscription();
 
 export function signUserToken(user: { id: number; username: string }): string {
   const jwtSecret = process.env["JWT_SECRET"];

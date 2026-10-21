@@ -71,6 +71,17 @@ export default function RegisterScreen() {
             <Image source={require('@/assets/images/icon.png')} style={styles.logo} />
             <Text style={[styles.title, { color: colors.ivory }]}>{t.auth_create_title}</Text>
             <Text style={[styles.subtitle, { color: 'rgba(255,255,255,0.55)' }]}>{t.auth_register_subtitle}</Text>
+            <Text
+              style={{
+                color: colors.gold,
+                fontSize: 12,
+                lineHeight: 18,
+                marginTop: 10,
+                textAlign: 'center',
+              }}
+            >
+              Accès complet gratuit pendant 3 jours après l’inscription. Un abonnement sera nécessaire ensuite.
+            </Text>
           </View>
 
           <View style={[styles.card, { backgroundColor: colors.card, borderColor: colors.border }]}>

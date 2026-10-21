@@ -24,6 +24,7 @@
 - [PostgreSQL constraint probes](postgresql-constraint-probes.md) — expected constraint failures inside a write transaction need savepoints before later checks can continue
 - [GitHub connector sync limits](github-connector-sync-limits.md) — API write permission does not authenticate local Git pushes; Replit Git Providers auth is separate
 - [SAS Pay preparation](saspay-preparation.md) — keep keys and admin contact protected; send payment-intervention alerts only to the payer and configured admin.
+- [Essai gratuit et accès](trial-access.md) — essai de 72 h; nouveaux comptes à l’inscription, comptes existants à leur prochaine connexion, abonnement actif préservé.
 - [Expo preview warm-up](expo-preview-warmup.md) — wait for Metro's web bundle after a restart before diagnosing blank preview captures
 - [React Native Web image sizing](rn-web-image-sizing.md) — absolute positioning may leave local images at intrinsic dimensions; constrain layered images explicitly
 - [Offline APK optimization](offline-apk-optimization.md) — preserve embedded catalogue images and all ABIs; prefer lossless media and compressed native libraries for shared APKs.

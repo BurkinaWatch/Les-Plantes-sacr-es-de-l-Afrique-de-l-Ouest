@@ -217,12 +217,34 @@ paths:
             application/json:
               schema:
                 type: object
-                required: [subscription]
+                required: [subscription, trial, access]
                 properties:
                   subscription:
                     oneOf:
                       - $ref: "#/components/schemas/SubscriptionStatus"
                       - type: "null"
+                  trial:
+                    type: object
+                    required: [startedAt, endsAt, active]
+                    properties:
+                      startedAt:
+                        type: string
+                        format: date-time
+                      endsAt:
+                        type: string
+                        format: date-time
+                      active:
+                        type: boolean
+                  access:
+                    type: object
+                    required: [hasAccess, trialActive, subscriptionActive]
+                    properties:
+                      hasAccess:
+                        type: boolean
+                      trialActive:
+                        type: boolean
+                      subscriptionActive:
+                        type: boolean
         "401":
           $ref: "#/components/responses/Unauthorized"
   /subscriptions/reconcile:

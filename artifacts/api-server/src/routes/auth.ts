@@ -33,7 +33,11 @@ router.post("/register", authLimiter, async (req, res) => {
   }
 
   const passwordHash = await bcrypt.hash(password, SALT_ROUNDS);
-  const [user] = await db.insert(usersTable).values({ username, passwordHash })
+  const [user] = await db.insert(usersTable).values({
+    username,
+    passwordHash,
+    trialStartedAt: new Date(),
+  })
     .onConflictDoNothing({ target: usersTable.username })
     .returning({ id: usersTable.id, username: usersTable.username });
   if (!user) {
