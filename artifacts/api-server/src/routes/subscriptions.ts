@@ -13,7 +13,7 @@ import { requireActiveUserJwt } from "../lib/auth-middleware.js";
 import { logger } from "../lib/logger.js";
 import { SasPayProvider, SasPayProviderError } from "../lib/saspay-provider.js";
 import { getSasPayWebhookSecret } from "../lib/saspay-config.js";
-import type { PaymentProvider } from "../lib/payment-provider.js";
+import { toPublicPaymentProviderStatus, type PaymentProvider } from "../lib/payment-provider.js";
 import {
   createSasPayTestWebhookHandler,
   recordIdempotentWebhookEvent,
@@ -315,7 +315,7 @@ export function createSubscriptionsRouter(
       .where(eq(subscriptionsTable.id, subscription.id));
 
     if (error instanceof SasPayProviderError) {
-      return res.status(error.status >= 500 ? 502 : error.status).json({
+      return res.status(toPublicPaymentProviderStatus(error.status)).json({
         code: "PAYMENT_PROVIDER_ERROR",
         error: error.message,
       });

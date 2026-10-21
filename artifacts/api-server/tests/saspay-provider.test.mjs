@@ -3,6 +3,7 @@ import test from "node:test";
 
 import { SasPayProvider, isSasPayEnabled } from "../.test-dist/src/lib/saspay-provider.js";
 import { getSasPayApiKey, getSasPayWebhookSecret } from "../.test-dist/src/lib/saspay-config.js";
+import { toPublicPaymentProviderStatus } from "../.test-dist/src/lib/payment-provider.js";
 
 test("both existing secret naming conventions work without enabling payments implicitly", () => {
   const aliases = { SASPAY_API_KEY: "alias-test-key", SASPAY_WEBHOOK_SECRET: " alias-test-secret " };
@@ -14,6 +15,13 @@ test("both existing secret naming conventions work without enabling payments imp
   assert.equal(isSasPayEnabled({ SAS_PAY_ENABLED: "true" }), false);
   assert.equal(getSasPayApiKey({ ...aliases, SAS_PAY_API_KEY: "canonical-test-key" }), "canonical-test-key");
   assert.equal(getSasPayWebhookSecret({ ...aliases, SAS_PAY_WEBHOOK_SECRET: "canonical-test-secret" }), "canonical-test-secret");
+});
+
+test("upstream merchant credential failures do not masquerade as customer sign-in failures", () => {
+  assert.equal(toPublicPaymentProviderStatus(401), 502);
+  assert.equal(toPublicPaymentProviderStatus(403), 502);
+  assert.equal(toPublicPaymentProviderStatus(503), 502);
+  assert.equal(toPublicPaymentProviderStatus(409), 409);
 });
 
 test("SAS Pay creates a hosted checkout with the documented request shape", async () => {

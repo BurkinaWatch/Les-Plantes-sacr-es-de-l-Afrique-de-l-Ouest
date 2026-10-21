@@ -155,6 +155,7 @@ export class SasPayProvider implements PaymentProvider {
         "Content-Type": "application/json",
         Accept: "application/json",
       },
+      signal: AbortSignal.timeout(15_000),
       body: JSON.stringify({
         amount: input.amount,
         currency: input.currency,

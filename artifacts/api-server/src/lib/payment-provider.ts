@@ -29,3 +29,9 @@ export interface PaymentProvider {
   createCheckout(input: CreateCheckoutInput): Promise<CheckoutSession>;
   getCheckoutSession?(checkoutId: string): Promise<CheckoutSessionStatus>;
 }
+
+// A credential or scope error from the merchant provider is not evidence that
+// the user's app session expired. Never let an upstream 401 log the user out.
+export function toPublicPaymentProviderStatus(status: number): number {
+  return status === 401 || status === 403 || status >= 500 ? 502 : status;
+}
