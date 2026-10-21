@@ -1,4 +1,5 @@
 import { createHmac, timingSafeEqual } from "node:crypto";
+import type { RequestHandler } from "express";
 
 export function verifySasPayWebhook(
   rawBody: Buffer,
@@ -23,6 +24,36 @@ export function verifySasPayWebhook(
     expectedBuffer.length === receivedBuffer.length &&
     timingSafeEqual(expectedBuffer, receivedBuffer)
   );
+}
+
+/**
+ * A signed dashboard connectivity test is not a transaction. Acknowledge it
+ * without invoking settlement, recording payment events or creating accounts.
+ * All financial events continue through the existing authenticated handler.
+ */
+export function createSasPayTestWebhookHandler(
+  getSecret: () => string | undefined,
+): RequestHandler {
+  return (req, res, next) => {
+    if (req.body?.event !== "webhook.test") {
+      next();
+      return;
+    }
+    const rawBody = req.rawBody;
+    if (
+      !rawBody ||
+      !verifySasPayWebhook(
+        rawBody,
+        req.header("X-Webhook-Signature"),
+        req.header("X-Webhook-Timestamp"),
+        getSecret(),
+      )
+    ) {
+      res.status(401).json({ error: "Signature webhook invalide." });
+      return;
+    }
+    res.json({ received: true, test: true });
+  };
 }
 
 /**

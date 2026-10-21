@@ -9,6 +9,29 @@ SAS Pay remains a server-only, opt-in integration. The application must keep pla
 
 **How to apply:** Keep `SAS_PAY_ENABLED` false unless the rollout is intentional. Keep credentials in Replit Secrets, accept payment state only from a valid HMAC webhook or backend verification, and treat monthly/yearly renewals as separate payment intents until recurring billing is confirmed.
 
+## Tarifs confirmés
+
+L’utilisateur confirme conserver les tarifs : **2 000 XOF par mois** et
+**20 000 XOF par an**.
+
+**Why:** The user explicitly approved these prices for preparing real payments.
+
+**How to apply:** Preserve these amounts unless the user asks to change them.
+This approval is not permission to charge a test payment.
+
+## Cohérence des environnements
+
+Do not enable live payments in the preview merely to remove an availability
+error when the merchant's webhook points to production.
+
+**Why:** The web preview prefers the development API; a confirmation delivered
+to a different environment may not find or activate the customer's subscription.
+
+**How to apply:** Validate that checkout creation, database records, webhook
+delivery and reconciliation belong to the same intended environment before
+opening real payments. A healthy production webhook alone does not validate a
+preview checkout.
+
 The provisioned secrets use `SASPAY_*`, whereas the initial integration used
 `SAS_PAY_*`. Preserve compatibility with both naming conventions.
 

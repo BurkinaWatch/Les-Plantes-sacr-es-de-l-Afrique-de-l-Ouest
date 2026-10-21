@@ -15,6 +15,7 @@ import { SasPayProvider, SasPayProviderError } from "../lib/saspay-provider.js";
 import { getSasPayWebhookSecret } from "../lib/saspay-config.js";
 import type { PaymentProvider } from "../lib/payment-provider.js";
 import {
+  createSasPayTestWebhookHandler,
   recordIdempotentWebhookEvent,
   verifySasPayWebhook,
 } from "../lib/saspay-webhook.js";
@@ -328,7 +329,7 @@ export function createSubscriptionsRouter(
   }
 });
 
-router.post("/webhook", async (req, res) => {
+router.post("/webhook", createSasPayTestWebhookHandler(() => getSasPayWebhookSecret(process.env)), async (req, res) => {
   const rawBody = req.rawBody;
   const valid = verifySasPayWebhook(
     rawBody ?? Buffer.from(""),
