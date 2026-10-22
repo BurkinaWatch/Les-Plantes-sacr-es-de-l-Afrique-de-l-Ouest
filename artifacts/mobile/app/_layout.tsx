@@ -281,6 +281,7 @@ function RootLayoutNav({
     !onFallbackRoute;
 
   useEffect(() => {
+    console.info(`[Startup] Active route: ${routeKey || "(none)"}`);
     onRouteKeyChange(routeKey);
   }, [onRouteKeyChange, routeKey]);
 
@@ -470,9 +471,9 @@ export default function RootLayout() {
 
   useEffect(() => {
     if (!navigationReady) return;
-    console.info("[Startup] Initial route layout is ready.");
+    console.info(`[Startup] Initial route layout is ready: ${routeKey}`);
     setStartupFailed(false);
-  }, [navigationReady]);
+  }, [navigationReady, routeKey]);
 
   useEffect(() => {
     if (
