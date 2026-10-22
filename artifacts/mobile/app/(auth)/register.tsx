@@ -15,6 +15,7 @@ import {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { useAuth } from '@/context/AuthContext';
+import { useStartupReadiness } from '@/context/StartupReadinessContext';
 import { useColors } from '@/hooks/useColors';
 import { useTranslation } from '@/i18n';
 import { isValidEmail } from '@/lib/auth-validation';
@@ -25,6 +26,7 @@ export default function RegisterScreen() {
   const router = useRouter();
   const { register } = useAuth();
   const { t } = useTranslation();
+  const markStartupReady = useStartupReadiness();
 
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
@@ -61,7 +63,11 @@ export default function RegisterScreen() {
   }
 
   return (
-    <LinearGradient colors={[colors.warmBrown, colors.deepBrown]} style={{ flex: 1 }}>
+    <LinearGradient
+      colors={[colors.warmBrown, colors.deepBrown]}
+      onLayout={markStartupReady}
+      style={{ flex: 1 }}
+    >
       <KeyboardAvoidingView
         style={{ flex: 1 }}
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}

@@ -16,6 +16,7 @@ import {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { useAuth } from '@/context/AuthContext';
+import { useStartupReadiness } from '@/context/StartupReadinessContext';
 import { useColors } from '@/hooks/useColors';
 import { useTranslation } from '@/i18n';
 import { isValidEmail, isValidUsername } from '@/lib/auth-validation';
@@ -30,6 +31,7 @@ export default function LoginScreen() {
   }>();
   const { login, linkEmail } = useAuth();
   const { t } = useTranslation();
+  const markStartupReady = useStartupReadiness();
 
   const [username, setUsername] = useState(() =>
     typeof suggestedUsername === 'string' && isValidEmail(suggestedUsername)
@@ -79,7 +81,11 @@ export default function LoginScreen() {
   }
 
   return (
-    <LinearGradient colors={[colors.warmBrown, colors.deepBrown]} style={{ flex: 1 }}>
+    <LinearGradient
+      colors={[colors.warmBrown, colors.deepBrown]}
+      onLayout={markStartupReady}
+      style={{ flex: 1 }}
+    >
       <KeyboardAvoidingView
         style={{ flex: 1 }}
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}

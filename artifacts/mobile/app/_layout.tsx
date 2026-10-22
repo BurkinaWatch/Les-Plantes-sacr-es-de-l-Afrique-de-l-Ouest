@@ -223,10 +223,10 @@ function NotificationsSetup() {
 
 /* ── Navigation ────────────────────────────────────────────────── */
 function RootLayoutNav({
-  onLayoutReady,
+  onRouteLayoutReady,
   onRouteKeyChange,
 }: {
-  onLayoutReady: () => void;
+  onRouteLayoutReady: (routeKey: string) => void;
   onRouteKeyChange: (routeKey: string) => void;
 }) {
   const segments = useSegments();
@@ -234,6 +234,9 @@ function RootLayoutNav({
   const theme = useColors();
   const { user, isLoading: authLoading, logout } = useAuth();
   const routeKey = segments.join("/");
+  const markCurrentRouteLaidOut = useCallback(() => {
+    onRouteLayoutReady(routeKey);
+  }, [onRouteLayoutReady, routeKey]);
   const routeGroup = segments[0] ?? "";
   const onAuthRoute = routeGroup === "(auth)";
   const onSubscriptionRoute = routeGroup === "abonnement";
@@ -335,78 +338,77 @@ function RootLayoutNav({
       (accessQuery.isError && !accessQuery.data));
 
   return (
-    <View
-      onLayout={onLayoutReady}
-      style={{ flex: 1, backgroundColor: colors.light.background }}
-    >
-      <Stack screenOptions={{ headerShown: false }}>
-        <Stack.Screen name="(tabs)"      options={{ headerShown: false }} />
-        <Stack.Screen name="animal/[id]" options={{ headerShown: false, presentation: "card" }} />
-        <Stack.Screen name="plant/[id]"  options={{ headerShown: false, presentation: "card" }} />
-        <Stack.Screen name="(auth)"      options={{ headerShown: false }} />
-        <Stack.Screen name="chat-totem"  options={{ headerShown: false, presentation: "card" }} />
-        <Stack.Screen name="progression-spirituelle" options={{ headerShown: false, presentation: "card" }} />
-        <Stack.Screen name="error-fallback" options={{ headerShown: false, presentation: "card" }} />
-        <Stack.Screen name="abonnement" options={{ headerShown: false, presentation: "card" }} />
-        <Stack.Screen name="account-deletion" options={{ headerShown: false, presentation: "card" }} />
-      </Stack>
-      <ScannerFab />
-      {shouldBlockPrivateContent && (
-        <View
-          accessibilityViewIsModal
-          style={[
-            StyleSheet.absoluteFill,
-            {
-              alignItems: "center",
-              backgroundColor: theme.background,
-              justifyContent: "center",
-              padding: 28,
-              zIndex: 1000,
-              elevation: 1000,
-            },
-          ]}
-        >
-          {accessQuery.isError && !accessQuery.data ? (
-            <>
-              <Text style={{ color: theme.ivory, fontSize: 16, textAlign: "center" }}>
-                Impossible de vérifier votre accès. Vérifiez votre connexion puis réessayez.
-              </Text>
-              <Pressable
-                accessibilityRole="button"
-                onPress={() => void accessQuery.refetch()}
-                style={{
-                  backgroundColor: theme.gold,
-                  borderRadius: 14,
-                  marginTop: 20,
-                  paddingHorizontal: 22,
-                  paddingVertical: 13,
-                }}
-              >
-                <Text style={{ color: theme.deepBrown, fontWeight: "700" }}>
-                  Réessayer
+    <StartupReadinessContext.Provider value={markCurrentRouteLaidOut}>
+      <View style={{ flex: 1, backgroundColor: colors.light.background }}>
+        <Stack screenOptions={{ headerShown: false }}>
+          <Stack.Screen name="(tabs)"      options={{ headerShown: false }} />
+          <Stack.Screen name="animal/[id]" options={{ headerShown: false, presentation: "card" }} />
+          <Stack.Screen name="plant/[id]"  options={{ headerShown: false, presentation: "card" }} />
+          <Stack.Screen name="(auth)"      options={{ headerShown: false }} />
+          <Stack.Screen name="chat-totem"  options={{ headerShown: false, presentation: "card" }} />
+          <Stack.Screen name="progression-spirituelle" options={{ headerShown: false, presentation: "card" }} />
+          <Stack.Screen name="error-fallback" options={{ headerShown: false, presentation: "card" }} />
+          <Stack.Screen name="abonnement" options={{ headerShown: false, presentation: "card" }} />
+          <Stack.Screen name="account-deletion" options={{ headerShown: false, presentation: "card" }} />
+        </Stack>
+        <ScannerFab />
+        {shouldBlockPrivateContent && (
+          <View
+            accessibilityViewIsModal
+            style={[
+              StyleSheet.absoluteFill,
+              {
+                alignItems: "center",
+                backgroundColor: theme.background,
+                justifyContent: "center",
+                padding: 28,
+                zIndex: 1000,
+                elevation: 1000,
+              },
+            ]}
+          >
+            {accessQuery.isError && !accessQuery.data ? (
+              <>
+                <Text style={{ color: theme.ivory, fontSize: 16, textAlign: "center" }}>
+                  Impossible de vérifier votre accès. Vérifiez votre connexion puis réessayez.
                 </Text>
-              </Pressable>
-            </>
-          ) : (
-            <>
-              <ActivityIndicator color={theme.gold} />
-              <Text
-                style={{
-                  color: theme.mutedForeground,
-                  fontSize: 14,
-                  marginTop: 14,
-                  textAlign: "center",
-                }}
-              >
-                {user
-                  ? "Vérification de votre accès…"
-                  : "Ouverture de la connexion…"}
-              </Text>
-            </>
-          )}
-        </View>
-      )}
-    </View>
+                <Pressable
+                  accessibilityRole="button"
+                  onPress={() => void accessQuery.refetch()}
+                  style={{
+                    backgroundColor: theme.gold,
+                    borderRadius: 14,
+                    marginTop: 20,
+                    paddingHorizontal: 22,
+                    paddingVertical: 13,
+                  }}
+                >
+                  <Text style={{ color: theme.deepBrown, fontWeight: "700" }}>
+                    Réessayer
+                  </Text>
+                </Pressable>
+              </>
+            ) : (
+              <>
+                <ActivityIndicator color={theme.gold} />
+                <Text
+                  style={{
+                    color: theme.mutedForeground,
+                    fontSize: 14,
+                    marginTop: 14,
+                    textAlign: "center",
+                  }}
+                >
+                  {user
+                    ? "Vérification de votre accès…"
+                    : "Ouverture de la connexion…"}
+                </Text>
+              </>
+            )}
+          </View>
+        )}
+      </View>
+    </StartupReadinessContext.Provider>
   );
 }
 
@@ -419,24 +421,18 @@ function isUnauthorizedApiError(error: unknown): boolean {
 
 /* ── Root Layout ───────────────────────────────────────────────── */
 export default function RootLayout() {
-  const [navigatorHasLayout, setNavigatorHasLayout] = useState(false);
-  const [homeHasLayout, setHomeHasLayout] = useState(false);
+  const [laidOutRouteKey, setLaidOutRouteKey] = useState("");
   const [startupFailed, setStartupFailed] = useState(false);
   const [routeKey, setRouteKey] = useState("");
   const nativeSplashHidden = useRef(false);
-  const initialRouteIsHome = routeKey === "(tabs)";
   const navigationReady = Boolean(
     routeKey.length > 0 &&
       routeKey !== "index" &&
-      navigatorHasLayout &&
-      (!initialRouteIsHome || homeHasLayout),
+      laidOutRouteKey === routeKey,
   );
 
-  const markNavigatorLaidOut = useCallback(() => {
-    setNavigatorHasLayout(true);
-  }, []);
-  const markHomeLaidOut = useCallback(() => {
-    setHomeHasLayout(true);
+  const markRouteLaidOut = useCallback((laidOutKey: string) => {
+    setLaidOutRouteKey(laidOutKey);
   }, []);
 
   useEffect(() => {
@@ -464,13 +460,13 @@ export default function RootLayout() {
 
     const startupTimeout = setTimeout(() => {
       console.error(
-        `[Startup] Initial route did not lay out within 12 seconds; route segments: ${routeKey || "(none)"}`,
+        `[Startup] Initial route did not lay out within 12 seconds; active route: ${routeKey || "(none)"}, last laid-out route: ${laidOutRouteKey || "(none)"}`,
       );
       setStartupFailed(true);
     }, 12000);
 
     return () => clearTimeout(startupTimeout);
-  }, [navigationReady, routeKey]);
+  }, [laidOutRouteKey, navigationReady, routeKey]);
 
   useEffect(() => {
     if (!navigationReady) return;
@@ -509,12 +505,10 @@ export default function RootLayout() {
                   <AppProvider>
                     <NotificationsSetup />
                     <View style={{ flex: 1 }}>
-                      <StartupReadinessContext.Provider value={markHomeLaidOut}>
-                        <RootLayoutNav
-                          onLayoutReady={markNavigatorLaidOut}
-                          onRouteKeyChange={setRouteKey}
-                        />
-                      </StartupReadinessContext.Provider>
+                      <RootLayoutNav
+                        onRouteLayoutReady={markRouteLaidOut}
+                        onRouteKeyChange={setRouteKey}
+                      />
                       {startupFailed ? <StartupRecoveryScreen /> : null}
                     </View>
                   </AppProvider>
