@@ -19,7 +19,7 @@ function content(node) {
 }
 
 async function mount({ params = {}, result = {} } = {}) {
-  const calls = { credentials: [], links: [], routes: [] };
+  const calls = { credentials: [], links: [], routes: [], startupReady: 0 };
   const original = Module._load;
   Module._load = function (id, ...args) {
     if (id === "expo-router") return {
@@ -33,6 +33,9 @@ async function mount({ params = {}, result = {} } = {}) {
       login: async (...credentials) => { calls.credentials.push(credentials); return result; },
       linkEmail: async (...credentials) => { calls.links.push(credentials); return result; },
     }) };
+    if (id === "@/context/StartupReadinessContext") return {
+      useStartupReadiness: () => () => { calls.startupReady++; },
+    };
     if (id === "@/hooks/useColors") return { useColors: () => ({}) };
     if (id === "@/i18n") return { useTranslation: () => ({ t: fr }) };
     if (id === "@/lib/auth-validation") return require("../.screen-test-dist/lib/auth-validation.js");
@@ -77,6 +80,10 @@ async function mount({ params = {}, result = {} } = {}) {
 test("reconnection prefills the saved email and returns to subscription after login", async () => {
   const f = await mount({ params: { username: "client@example.com", returnTo: "/abonnement" } });
   try {
+    const root = f.renderer.root.findByType("LinearGradient");
+    assert.equal(typeof root.props.onLayout, "function");
+    await act(async () => root.props.onLayout());
+    assert.equal(f.calls.startupReady, 1);
     assert.equal(f.input(fr.auth_username).props.value, "client@example.com");
     assert.equal(f.input(fr.auth_username).props.autoComplete, "username");
     assert.equal(f.input(fr.auth_password).props.autoComplete, "current-password");

@@ -7,6 +7,7 @@ globalThis.IS_REACT_ACT_ENVIRONMENT = true;
 const require = createRequire(import.meta.url);
 const React = require("react");
 const Renderer = require("react-test-renderer");
+const { QueryClient, QueryClientProvider } = require("@tanstack/react-query");
 const { act } = Renderer;
 const Module = require("node:module");
 
@@ -26,8 +27,12 @@ async function fixture({ statusError = null, paymentError = null, reconcileError
   const plans = { plans: [{ code: "MONTHLY", name: "Mensuel", active: true, amount: "1000", currency: "XOF", period: "MONTHLY" }] };
   let currentStatusError = statusError;
   const originalLoad = Module._load;
+  const queryClient = new QueryClient();
   Module._load = function (id, ...args) {
-    if (id === "expo-router") return { useRouter: () => ({ back() {}, push: route => calls.routes.push(route) }) };
+    if (id === "expo-router") return {
+      useLocalSearchParams: () => ({}),
+      useRouter: () => ({ back() {}, push: route => calls.routes.push(route) }),
+    };
     if (id === "@/context/AuthContext") return { useAuth: () => auth };
     if (id === "@/hooks/useColors") return { useColors: () => ({}) };
     if (id === "@/components/SacredIcon") return { SacredIcon: () => null };
@@ -60,9 +65,14 @@ async function fixture({ statusError = null, paymentError = null, reconcileError
   const screenPath = require.resolve("../.screen-test-dist/app/abonnement.js");
   delete require.cache[screenPath];
   const Screen = require(screenPath).default;
+  const screen = () => React.createElement(
+    QueryClientProvider,
+    { client: queryClient },
+    React.createElement(Screen),
+  );
   let renderer;
   try {
-    await act(async () => { renderer = Renderer.create(React.createElement(Screen)); });
+    await act(async () => { renderer = Renderer.create(screen()); });
   } finally {
     Module._load = originalLoad;
   }
@@ -75,7 +85,7 @@ async function fixture({ statusError = null, paymentError = null, reconcileError
     }),
     refresh: async () => {
       currentStatusError = null;
-      await act(async () => renderer.update(React.createElement(Screen)));
+      await act(async () => renderer.update(screen()));
     },
     close: async () => act(async () => renderer.unmount()),
   };
