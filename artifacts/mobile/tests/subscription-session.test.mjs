@@ -39,7 +39,9 @@ async function fixture({ statusError = null, paymentError = null, reconcileError
     if (id === "react-native-safe-area-context") return { useSafeAreaInsets: () => ({ top: 0 }) };
     if (id === "react-native") return {
       ...Object.fromEntries(["ActivityIndicator", "Pressable", "ScrollView", "Text", "TextInput", "View"].map(x => [x, x])),
-      StyleSheet: { create: x => x }, Linking: { openURL: async () => {} },
+      StyleSheet: { create: x => x },
+      AppState: { addEventListener: () => ({ remove() {} }) },
+      Linking: { openURL: async () => {} },
     };
     if (id === "@workspace/api-client-react") return {
       useGetSubscriptionPlans: () => ({ data: plans }),
