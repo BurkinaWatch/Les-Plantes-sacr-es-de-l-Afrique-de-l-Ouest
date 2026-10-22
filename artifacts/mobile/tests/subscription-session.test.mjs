@@ -49,7 +49,14 @@ async function fixture({ statusError = null, paymentError = null, reconcileError
         calls.enabled = query.enabled;
         calls.queryKeys.push(query.queryKey);
         assert.equal(query.retry(0, { status: 401 }), false);
-        return { error: currentStatusError, refetch: async () => {} };
+        return {
+          error: currentStatusError,
+          data: currentStatusError
+            ? undefined
+            : { access: { subscriptionActive: false }, subscription: null },
+          isSuccess: !currentStatusError,
+          refetch: async () => ({}),
+        };
       },
       useCreateSubscriptionPayment: () => ({
         isPending: false,
