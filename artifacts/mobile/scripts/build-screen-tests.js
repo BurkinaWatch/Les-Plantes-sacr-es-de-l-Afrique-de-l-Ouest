@@ -11,6 +11,7 @@ const sources = [
   ["app/chat-totem.tsx", "app/chat-totem.js"],
   ["app/(tabs)/scanner.tsx", "app/(tabs)/scanner.js"],
   ["app/animal/[id].tsx", "app/animal/[id].js"],
+  ["components/StartupDiagnosticButton.tsx", "components/StartupDiagnosticButton.js"],
   ["constants/plantImages.ts", "constants/plantImages.js"],
   ["lib/ai-api.ts", "lib/ai-api.js"],
   ["lib/auth-validation.ts", "lib/auth-validation.js"],

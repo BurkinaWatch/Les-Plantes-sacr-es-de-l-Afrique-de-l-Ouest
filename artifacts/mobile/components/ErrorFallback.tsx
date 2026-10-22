@@ -13,6 +13,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { useColors } from "@/hooks/useColors";
 import { SacredIcon } from "@/components/SacredIcon";
+import { StartupDiagnosticButton } from "@/components/StartupDiagnosticButton";
 
 export type ErrorFallbackProps = {
   error: Error;
@@ -106,6 +107,16 @@ export function ErrorFallback({
             Try Again
           </Text>
         </Pressable>
+        <StartupDiagnosticButton
+          reason="react-render-error"
+          route=""
+          style={styles.diagnosticButton}
+          textStyle={{ color: colors.foreground }}
+        />
+        <Text style={[styles.privacyNote, { color: colors.mutedForeground }]}>
+          Le rapport exclut les données du compte, les jetons et le texte de
+          l’erreur. Rien n’est partagé sans votre accord.
+        </Text>
       </View>
 
       {__DEV__ ? (
@@ -238,6 +249,15 @@ const styles = StyleSheet.create({
     fontWeight: "600",
     textAlign: "center",
     fontSize: 16,
+  },
+  diagnosticButton: {
+    marginTop: 12,
+  },
+  privacyNote: {
+    fontSize: 12,
+    lineHeight: 18,
+    maxWidth: 340,
+    textAlign: "center",
   },
   modalOverlay: {
     flex: 1,

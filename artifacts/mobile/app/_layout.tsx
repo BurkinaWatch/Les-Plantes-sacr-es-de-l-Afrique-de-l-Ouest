@@ -18,6 +18,7 @@ import { SafeAreaProvider, useSafeAreaInsets } from "react-native-safe-area-cont
 
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { SacredIcon } from "@/components/SacredIcon";
+import { StartupDiagnosticButton } from "@/components/StartupDiagnosticButton";
 import { AppProvider } from "@/context/AppContext";
 import { AuthProvider, useAuth } from "@/context/AuthContext";
 import { StartupReadinessContext } from "@/context/StartupReadinessContext";
@@ -510,7 +511,9 @@ export default function RootLayout() {
                         onRouteLayoutReady={markRouteLaidOut}
                         onRouteKeyChange={setRouteKey}
                       />
-                      {startupFailed ? <StartupRecoveryScreen /> : null}
+                      {startupFailed ? (
+                        <StartupRecoveryScreen route={routeKey} />
+                      ) : null}
                     </View>
                   </AppProvider>
                 </AuthProvider>
@@ -522,7 +525,7 @@ export default function RootLayout() {
   );
 }
 
-function StartupRecoveryScreen() {
+function StartupRecoveryScreen({ route }: { route: string }) {
   const handleRetry = async () => {
     try {
       await reloadAppAsync();
@@ -543,6 +546,10 @@ function StartupRecoveryScreen() {
         L’écran d’accueil ne s’est pas chargé. Réessayez de démarrer
         l’application.
       </Text>
+      <Text style={styles.startupDiagnosticPrivacy}>
+        Le rapport ne contient ni identifiant, ni e-mail, ni jeton. Rien n’est
+        transmis avant que vous choisissiez de le partager.
+      </Text>
       <Pressable
         accessibilityRole="button"
         onPress={handleRetry}
@@ -553,6 +560,11 @@ function StartupRecoveryScreen() {
       >
         <Text style={styles.startupRetryText}>Réessayer</Text>
       </Pressable>
+      <StartupDiagnosticButton
+        reason="route-timeout"
+        route={route}
+        style={styles.startupDiagnosticButton}
+      />
     </View>
   );
 }
@@ -583,6 +595,13 @@ const styles = StyleSheet.create({
     textAlign: "center",
     marginBottom: 24,
   },
+  startupDiagnosticPrivacy: {
+    color: "#D8CDB6",
+    fontSize: 13,
+    lineHeight: 19,
+    textAlign: "center",
+    marginBottom: 18,
+  },
   startupRetryButton: {
     minWidth: 180,
     alignItems: "center",
@@ -595,5 +614,8 @@ const styles = StyleSheet.create({
     color: "#120A05",
     fontSize: 16,
     fontWeight: "700",
+  },
+  startupDiagnosticButton: {
+    marginTop: 12,
   },
 });
