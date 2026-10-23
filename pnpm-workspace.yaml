@@ -43,21 +43,7 @@ onlyBuiltDependencies:
   - unrs-resolver
 
 overrides:
-  image-size: 'workspace:@workspace/metro-image-size@*'
-  tar: 7.5.22
   '@babel/core': 7.29.6
-  body-parser: 2.3.0
-  'brace-expansion@1.1.15': 1.1.18
-  'brace-expansion@2.1.1': 2.1.4
-  'brace-expansion@5.0.6': 5.0.9
-  'ip-address': 10.5.0
-  'js-yaml@3.14.2': 3.15.1
-  'js-yaml@4.1.1': 4.3.1
-  nanoid: 3.3.18
-  postcss: 8.5.26
-  qs: 6.15.3
-  shell-quote: 1.10.0
-  undici: 6.28.0
   '@esbuild-kit/esm-loader': npm:tsx@^4.21.0
   '@expo/ngrok-bin>@expo/ngrok-bin-darwin-arm64': '-'
   '@expo/ngrok-bin>@expo/ngrok-bin-darwin-x64': '-'
@@ -79,6 +65,24 @@ overrides:
   '@tailwindcss/oxide>@tailwindcss/oxide-linux-x64-musl': '-'
   '@tailwindcss/oxide>@tailwindcss/oxide-win32-arm64-msvc': '-'
   '@tailwindcss/oxide>@tailwindcss/oxide-win32-x64-msvc': '-'
+  '@xmldom/xmldom@>=0.7.0 <=0.8.13': '>=0.8.14'
+  '@xmldom/xmldom@>=0.7.0 <=0.8.14': '>=0.8.15'
+  '@xmldom/xmldom@>=0.9.0 <=0.9.10': '>=0.9.11'
+  '@xmldom/xmldom@>=0.9.0 <=0.9.11': '>=0.9.12'
+  '@xmldom/xmldom@>=0.9.0-beta.1 <=0.9.11': '>=0.9.12'
+  '@xmldom/xmldom@>=0.9.0-beta.9 <=0.9.10': '>=0.9.11'
+  '@xmldom/xmldom@>=0.9.10 <=0.9.11': '>=0.9.12'
+  baseline-browser-mapping@>=2.0.0 <2.11.0: '>=2.11.0'
+  body-parser: 2.3.0
+  brace-expansion@1.1.15: 1.1.18
+  brace-expansion@2.1.1: 2.1.4
+  brace-expansion@5.0.6: 5.0.12
+  brace-expansion@>=4.0.0 <5.0.10: '>=5.0.10'
+  brace-expansion@>=4.0.0 <5.0.11: '>=5.0.11'
+  brace-expansion@>=4.0.0 <5.0.12: '>=5.0.12'
+  browserslist@<=4.28.6: '>=4.28.7'
+  compression@<1.8.2: '>=1.8.2'
+  decode-uri-component@<=0.4.2: '>=0.5.0'
   esbuild: 0.27.3
   esbuild>@esbuild/aix-ppc64: '-'
   esbuild>@esbuild/android-arm: '-'
@@ -105,6 +109,24 @@ overrides:
   esbuild>@esbuild/win32-arm64: '-'
   esbuild>@esbuild/win32-ia32: '-'
   esbuild>@esbuild/win32-x64: '-'
+  esbuild@>=0.27.3 <0.28.1: '>=0.28.1'
+  fast-copy@>=4.0.0 <4.1.0: '>=4.1.0'
+  fast-uri@>=3.0.0 <3.1.3: '>=3.1.3'
+  fast-uri@>=3.0.0 <3.1.5: '>=3.1.5'
+  fast-uri@>=3.0.0 <3.1.6: '>=3.1.6'
+  fast-uri@>=3.0.0 <3.1.7: '>=3.1.7'
+  fast-uri@>=3.0.0 <3.1.8: '>=3.1.8'
+  fast-uri@>=3.0.0 <=3.1.3: '>=3.1.4'
+  fast-uri@>=3.1.2 <3.1.6: '>=3.1.6'
+  image-size: workspace:@workspace/metro-image-size@*
+  ip-address: 10.7.4
+  ip-address@<=10.5.0: '>=10.5.1'
+  ip-address@<=10.7.0: '>=10.7.1'
+  ip-address@<=10.7.3: '>=10.7.4'
+  ip-address@>=10.2.0 <=10.5.0: '>=10.5.1'
+  js-yaml@3.14.2: 3.15.1
+  js-yaml@4.1.1: 4.3.1
+  js-yaml@>=4.0.0 <4.3.2: '>=4.3.2'
   lightningcss>lightningcss-android-arm64: '-'
   lightningcss>lightningcss-darwin-arm64: '-'
   lightningcss>lightningcss-darwin-x64: '-'
@@ -115,6 +137,12 @@ overrides:
   lightningcss>lightningcss-linux-x64-musl: '-'
   lightningcss>lightningcss-win32-arm64-msvc: '-'
   lightningcss>lightningcss-win32-x64-msvc: '-'
+  nanoid: 3.3.18
+  postcss: 8.5.26
+  proxy-addr@>=1.1.0 <2.0.8: '>=2.0.8'
+  qs: 6.16.1
+  qs@>=2.2.5 <6.16.0: '>=6.16.0'
+  qs@>=6.14.2 <=6.15.3: '>=6.16.0'
   rollup>@rollup/rollup-android-arm-eabi: '-'
   rollup>@rollup/rollup-android-arm64: '-'
   rollup>@rollup/rollup-darwin-arm64: '-'
@@ -139,3 +167,14 @@ overrides:
   rollup>@rollup/rollup-win32-ia32-msvc: '-'
   rollup>@rollup/rollup-win32-x64-gnu: '-'
   rollup>@rollup/rollup-win32-x64-msvc: '-'
+  shell-quote: 1.12.0
+  shell-quote@>=1.8.4 <1.11.0: '>=1.11.0'
+  source-map-js@>=1.0.0 <1.2.2: '>=1.2.2'
+  tar: 7.5.22
+  undici: 6.28.1
+  undici@<6.28.1: '>=6.28.1'
+  undici@>=6.25.0 <6.28.1: '>=6.28.1'
+  undici@>=6.7.0 <6.28.1: '>=6.28.1'
+  uuid@<11.1.1: '>=11.1.1'
+  vite@>=7.0.0 <=7.3.4: '>=7.3.5'
+  vite@>=7.0.0 <=7.3.6: '>=7.3.7'
