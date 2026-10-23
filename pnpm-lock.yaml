@@ -293,6 +293,9 @@ importers:
 
   artifacts/mobile:
     dependencies:
+      expo:
+        specifier: ~57.0.31
+        version: 57.0.31(@babel/core@7.29.6)(@expo/metro-runtime@57.0.17)(expo-router@57.0.29)(react-dom@19.2.3(react@19.2.3))(react-native-web@0.21.2(react-dom@19.2.3(react@19.2.3))(react@19.2.3))(react-native-worklets@0.10.1(@babel/core@7.29.6)(@react-native/metro-config@0.86.3(@babel/core@7.29.6))(react-native@0.86.3(@babel/core@7.29.6)(@react-native/metro-config@0.86.3(@babel/core@7.29.6))(@types/react@19.2.14)(react@19.2.3))(react@19.2.3))(react-native@0.86.3(@babel/core@7.29.6)(@react-native/metro-config@0.86.3(@babel/core@7.29.6))(@types/react@19.2.14)(react@19.2.3))(react@19.2.3)(typescript@6.0.3)
       expo-asset:
         specifier: ~57.0.20
         version: 57.0.20(expo@57.0.31)(react-native@0.86.3(@babel/core@7.29.6)(@react-native/metro-config@0.86.3(@babel/core@7.29.6))(@types/react@19.2.14)(react@19.2.3))(react@19.2.3)(typescript@6.0.3)
@@ -354,9 +357,6 @@ importers:
       create-launch:
         specifier: 0.3.6
         version: 0.3.6
-      expo:
-        specifier: ~57.0.31
-        version: 57.0.31(@babel/core@7.29.6)(@expo/metro-runtime@57.0.17)(expo-router@57.0.29)(react-dom@19.2.3(react@19.2.3))(react-native-web@0.21.2(react-dom@19.2.3(react@19.2.3))(react@19.2.3))(react-native-worklets@0.10.1(@babel/core@7.29.6)(@react-native/metro-config@0.86.3(@babel/core@7.29.6))(react-native@0.86.3(@babel/core@7.29.6)(@react-native/metro-config@0.86.3(@babel/core@7.29.6))(@types/react@19.2.14)(react@19.2.3))(react@19.2.3))(react-native@0.86.3(@babel/core@7.29.6)(@react-native/metro-config@0.86.3(@babel/core@7.29.6))(@types/react@19.2.14)(react@19.2.3))(react@19.2.3)(typescript@6.0.3)
       expo-blur:
         specifier: ~57.0.3
         version: 57.0.3(expo@57.0.31)(react-native@0.86.3(@babel/core@7.29.6)(@react-native/metro-config@0.86.3(@babel/core@7.29.6))(@types/react@19.2.14)(react@19.2.3))(react@19.2.3)
