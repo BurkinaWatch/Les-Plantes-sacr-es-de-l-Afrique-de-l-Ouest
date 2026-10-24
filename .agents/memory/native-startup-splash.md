@@ -9,6 +9,12 @@ The root screen must render immediately; font loading and decorative splash anim
 
 **How to apply:** Keep native splash control minimal, load optional fonts in the background, render the provider/navigation tree without waiting for them, signal readiness from the actual route layout, and provide a bounded recovery path when readiness never arrives.
 
+The fatal startup boundary must wrap the provider tree, including `SafeAreaProvider`; its fallback must not depend on contexts or hooks from providers that may have failed.
+
+**Why:** A boundary nested inside the provider tree cannot catch errors thrown by the root layout or an outer provider, which can leave only the native background visible.
+
+**How to apply:** Keep a minimal, context-free fallback at the component root for fatal startup errors, while retaining richer inner boundaries for ordinary screen errors.
+
 When changing Expo config-plugin settings or native launch images, regenerate the Android project with Expo prebuild before running Gradle; a direct Gradle build can package stale native resources even when `app.json` is current.
 
 **Why:** A release build compiled without prebuild kept the old, undersized Android splash drawable despite the larger configured image.
