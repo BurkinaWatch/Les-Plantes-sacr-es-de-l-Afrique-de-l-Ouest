@@ -17,6 +17,7 @@ import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { SafeAreaProvider, useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { ErrorBoundary } from "@/components/ErrorBoundary";
+import type { ErrorFallbackProps } from "@/components/ErrorFallback";
 import { SacredIcon } from "@/components/SacredIcon";
 import { StartupDiagnosticButton } from "@/components/StartupDiagnosticButton";
 import { AppProvider } from "@/context/AppContext";
@@ -423,6 +424,68 @@ function isUnauthorizedApiError(error: unknown): boolean {
 
 /* ── Root Layout ───────────────────────────────────────────────── */
 export default function RootLayout() {
+  return (
+    <ErrorBoundary
+      FallbackComponent={StartupFatalFallback}
+      onError={(error, componentStack) => {
+        console.error("[Startup] Root render error:", error.name);
+        console.error("[Startup] Root component stack:", componentStack);
+      }}
+    >
+      <RootLayoutContent />
+    </ErrorBoundary>
+  );
+}
+
+function StartupFatalFallback({ resetError }: ErrorFallbackProps) {
+  useEffect(() => {
+    console.error("[Startup] Displaying root error recovery screen");
+    void SplashScreen.hideAsync().catch((error) => {
+      console.warn("Unable to hide the native splash from root recovery:", error);
+    });
+  }, []);
+
+  const retry = async () => {
+    try {
+      await reloadAppAsync();
+    } catch (error) {
+      console.warn(
+        "[Startup] Root recovery reload failed:",
+        error instanceof Error ? error.name : "Unknown error",
+      );
+      resetError();
+    }
+  };
+
+  return (
+    <View style={styles.startupRecovery}>
+      <Text style={styles.startupRecoveryTitle}>
+        L’application n’a pas pu démarrer
+      </Text>
+      <Text style={styles.startupRecoveryMessage}>
+        Une erreur a interrompu l’ouverture. Réessayez ou partagez un diagnostic
+        sûr pour nous aider à identifier le problème.
+      </Text>
+      <Pressable
+        accessibilityRole="button"
+        onPress={() => void retry()}
+        style={({ pressed }) => [
+          styles.startupRetryButton,
+          { opacity: pressed ? 0.82 : 1 },
+        ]}
+      >
+        <Text style={styles.startupRetryText}>Réessayer</Text>
+      </Pressable>
+      <StartupDiagnosticButton
+        reason="react-render-error"
+        route=""
+        style={styles.startupDiagnosticButton}
+      />
+    </View>
+  );
+}
+
+function RootLayoutContent() {
   const [laidOutRouteKey, setLaidOutRouteKey] = useState("");
   const [startupFailed, setStartupFailed] = useState(false);
   const [routeKey, setRouteKey] = useState("");
@@ -441,20 +504,33 @@ export default function RootLayout() {
     const loadFonts = async () => {
       try {
         if (Platform.OS !== "web") {
-          await Promise.race([
+          console.info("[Startup] Optional icon font load started");
+          const fontsLoaded = await Promise.race([
             Font.loadAsync({
               Feather: require("@expo/vector-icons/build/vendor/react-native-vector-icons/Fonts/Feather.ttf"),
               MaterialCommunityIcons: require("@expo/vector-icons/build/vendor/react-native-vector-icons/Fonts/MaterialCommunityIcons.ttf"),
-            }),
-            new Promise<void>((resolve) => setTimeout(resolve, 3000)),
+            }).then(() => true),
+            new Promise<boolean>((resolve) =>
+              setTimeout(() => resolve(false), 3000),
+            ),
           ]);
+          console.info(
+            `[Startup] Optional icon fonts ${fontsLoaded ? "loaded" : "timed out"}; continuing`,
+          );
         }
-      } catch {
-        // Les icônes se dégradent gracieusement si les polices échouent
+      } catch (error) {
+        console.warn(
+          "[Startup] Optional icon font load failed; continuing:",
+          error instanceof Error ? error.name : "Unknown error",
+        );
       }
     };
 
     loadFonts();
+  }, []);
+
+  useEffect(() => {
+    console.info("[Startup] Root layout content mounted");
   }, []);
 
   useEffect(() => {
