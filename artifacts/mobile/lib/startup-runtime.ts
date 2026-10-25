@@ -53,6 +53,7 @@ export function createStartupFatalCapture() {
 
     subscribe(listener: (diagnostic: StartupFatalDiagnostic) => void) {
       listeners.add(listener);
+      if (fatalDiagnostic) listener(fatalDiagnostic);
       return () => listeners.delete(listener);
     },
 
@@ -67,6 +68,9 @@ export function createStartupFatalCapture() {
             errorType: safeErrorType(error),
             stage,
           };
+          console.error(
+            `[Startup] Fatal JavaScript error before first route (${fatalDiagnostic.errorType}) at ${fatalDiagnostic.stage}`,
+          );
           for (const listener of listeners) listener(fatalDiagnostic);
           return;
         }
