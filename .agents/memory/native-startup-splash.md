@@ -20,3 +20,9 @@ When changing Expo config-plugin settings or native launch images, regenerate th
 **Why:** A release build compiled without prebuild kept the old, undersized Android splash drawable despite the larger configured image.
 
 **How to apply:** Run Android prebuild before each release build affected by native splash configuration, then inspect the generated splash resource before packaging.
+
+Treat web preview, Metro export, and APK audit as build checks only—not proof that Android reached its first React Native frame. JavaScript handlers can report fatal errors only after their module is loaded; they cannot explain native crashes or failures that happen before the app root evaluates.
+
+**Why:** A device can install a correctly signed APK and still show only the launch background or terminate before React Native mounts, while all web and static checks pass.
+
+**How to apply:** For a device-only blank launch, capture Android Logcat or add an explicit startup-stage diagnostic build. State clearly which check was performed and do not claim a root cause until runtime evidence identifies it.
