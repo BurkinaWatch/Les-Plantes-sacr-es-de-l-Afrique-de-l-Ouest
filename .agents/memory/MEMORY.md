@@ -20,6 +20,7 @@
 - [Expo/API routing](expo-api-routing.md) — prefer explicit API origins; native Expo Go avoids browser CORS, while Replit web preview needs an exact allowlist
 - [PostgreSQL schema smoke metadata](schema-smoke-postgres.md) — cast catalog identifier aggregates to text[] before comparing them in Node
 - [Railway PostgreSQL TLS checks](postgres-railway-ssl.md) — pg 8.20 treats sslmode=require as verified TLS; disposable checks need a trusted CA
+- [Railway private database access](railway-private-db-access.md) — Railway’s internal PostgreSQL hostname cannot resolve from the Replit workspace; use service readiness or run checks inside Railway
 - [PostgreSQL readiness roles](postgresql-readiness-roles.md) — information_schema constraint metadata may require object ownership, not only SELECT grants
 - [PostgreSQL constraint probes](postgresql-constraint-probes.md) — expected constraint failures inside a write transaction need savepoints before later checks can continue
 - [GitHub connector sync limits](github-connector-sync-limits.md) — API write permission does not authenticate local Git pushes; Replit Git Providers auth is separate
