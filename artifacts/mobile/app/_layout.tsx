@@ -243,7 +243,7 @@ function RootLayoutNav({
   const segments = useSegments();
   const router = useRouter();
   const theme = useColors();
-  const { user, isLoading: authLoading, logout } = useAuth();
+  const { user, token, isLoading: authLoading, logout } = useAuth();
   const routeKey = segments.join("/");
   const markCurrentRouteLaidOut = useCallback(() => {
     onRouteLayoutReady(routeKey);
@@ -255,13 +255,16 @@ function RootLayoutNav({
   const onFallbackRoute = routeGroup === "error-fallback";
   const accessQuery = useGetSubscriptionStatus({
     query: {
-      enabled: Boolean(user) && !authLoading,
+      enabled: Boolean(user) && Boolean(token) && !authLoading,
       queryKey: ["trial-access", user?.id],
       refetchInterval: 30_000,
       refetchOnReconnect: true,
       refetchOnWindowFocus: true,
       retry: 1,
     },
+    request: token
+      ? { headers: { Authorization: `Bearer ${token}` } }
+      : undefined,
   });
   const access = accessQuery.data?.access;
   const trialStartedAt = accessQuery.data?.trial.startedAt
@@ -299,6 +302,12 @@ function RootLayoutNav({
 
   useEffect(() => {
     if (authLoading) return;
+
+    if (user && !token) {
+      void logout();
+      if (!onAuthRoute) router.replace("/(auth)/login");
+      return;
+    }
 
     if (
       user &&
@@ -339,6 +348,7 @@ function RootLayoutNav({
     onSubscriptionRoute,
     logout,
     router,
+    token,
     user,
   ]);
 
@@ -383,7 +393,7 @@ function RootLayoutNav({
             {accessQuery.isError && !accessQuery.data ? (
               <>
                 <Text style={{ color: theme.ivory, fontSize: 16, textAlign: "center" }}>
-                  Impossible de vérifier votre accès. Vérifiez votre connexion puis réessayez.
+                  {getAccessCheckErrorMessage(accessQuery.error)}
                 </Text>
                 <Pressable
                   accessibilityRole="button"
@@ -423,6 +433,24 @@ function RootLayoutNav({
       </View>
     </StartupReadinessContext.Provider>
   );
+}
+
+function getAccessCheckErrorMessage(error: unknown): string {
+  const status =
+    typeof error === "object" &&
+    error !== null &&
+    "status" in error &&
+    typeof error.status === "number"
+      ? error.status
+      : null;
+
+  if (status === 401) {
+    return "Votre session doit être renouvelée. Reconnectez-vous pour vérifier votre accès.";
+  }
+  if (status !== null) {
+    return `Le serveur n’a pas pu vérifier votre accès (HTTP ${status}). Réessayez dans quelques instants.`;
+  }
+  return "Impossible de joindre le serveur de vérification. Vérifiez votre connexion puis réessayez.";
 }
 
 function isUnauthorizedApiError(error: unknown): boolean {
