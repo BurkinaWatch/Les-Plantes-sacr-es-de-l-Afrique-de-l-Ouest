@@ -15,6 +15,7 @@ const sources = [
   ["constants/plantImages.ts", "constants/plantImages.js"],
   ["lib/ai-api.ts", "lib/ai-api.js"],
   ["lib/auth-validation.ts", "lib/auth-validation.js"],
+  ["lib/startup-runtime.ts", "lib/startup-runtime.js"],
 ];
 
 fs.rmSync(outputRoot, { recursive: true, force: true });

@@ -1,4 +1,9 @@
-export type StartupDiagnosticReason = "route-timeout" | "react-render-error";
+import type { StartupStage } from "./startup-runtime";
+
+export type StartupDiagnosticReason =
+  | "route-timeout"
+  | "react-render-error"
+  | "runtime-js-error";
 
 const ROUTE_LABELS: Record<string, string> = {
   "(auth)": "authentification",
@@ -15,6 +20,16 @@ const ROUTE_LABELS: Record<string, string> = {
 const REASON_LABELS: Record<StartupDiagnosticReason, string> = {
   "route-timeout": "l’écran initial n’a pas terminé son affichage dans le délai prévu",
   "react-render-error": "une erreur React a interrompu l’affichage",
+  "runtime-js-error": "une erreur JavaScript fatale est survenue avant le premier écran",
+};
+
+const STAGE_LABELS: Record<StartupStage, string> = {
+  "javascript-entry": "initialisation JavaScript",
+  "root-layout": "initialisation de la structure de l’application",
+  providers: "initialisation des services de l’application",
+  router: "démarrage de la navigation",
+  navigation: "chargement de l’écran initial",
+  "route-laid-out": "premier écran affiché",
 };
 
 function safeVersion(value: unknown): string {
@@ -45,6 +60,8 @@ export function buildStartupDiagnostic(input: {
   osVersion: unknown;
   appVersion: unknown;
   buildNumber: unknown;
+  stage?: StartupStage;
+  runtimeErrorType?: unknown;
   occurredAt?: Date;
 }): string {
   const occurredAt = input.occurredAt ?? new Date();
@@ -59,9 +76,19 @@ export function buildStartupDiagnostic(input: {
     `Version du système : ${safeVersion(input.osVersion)}`,
     `Version de l’application : ${safeVersion(input.appVersion)}`,
     `Numéro de build : ${safeBuildNumber(input.buildNumber)}`,
-    `Étape : ${REASON_LABELS[input.reason]}`,
+    `Étape : ${input.stage ? STAGE_LABELS[input.stage] : REASON_LABELS[input.reason]}`,
     `Écran concerné : ${safeRoute(input.route)}`,
+    ...(input.runtimeErrorType
+      ? [
+          `Type d’erreur JavaScript : ${
+            typeof input.runtimeErrorType === "string" &&
+            /^[A-Za-z][A-Za-z0-9_]{0,39}$/.test(input.runtimeErrorType)
+              ? input.runtimeErrorType
+              : "inconnu"
+          }`,
+        ]
+      : []),
     "",
-    "Rapport technique sans données de compte : aucun identifiant, e-mail, jeton, paramètre de navigation ou message d’erreur brut n’est inclus.",
+    "Rapport technique sans données de compte : aucun identifiant, e-mail, jeton, paramètre de navigation, message ou trace d’erreur brute n’est inclus.",
   ].join("\n");
 }

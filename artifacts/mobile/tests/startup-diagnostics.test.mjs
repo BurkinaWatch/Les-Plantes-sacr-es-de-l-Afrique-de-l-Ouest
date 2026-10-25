@@ -54,6 +54,24 @@ test("startup report rejects injected metadata and classifies unknown routes", (
   assert.doesNotMatch(report, /client@example\.com|secret|private-user-id/);
 });
 
+test("fatal startup report shares only the sanitized error type and startup stage", () => {
+  const report = buildStartupDiagnostic({
+    reason: "runtime-js-error",
+    route: "(tabs)/index?email=private@example.com",
+    platform: "android",
+    osVersion: 35,
+    appVersion: "1.0.8",
+    buildNumber: 17,
+    stage: "navigation",
+    runtimeErrorType: "TypeError\naccount@example.com",
+    occurredAt: new Date("2026-10-25T22:00:00.000Z"),
+  });
+
+  assert.match(report, /Étape : chargement de l’écran initial/);
+  assert.match(report, /Type d’erreur JavaScript : inconnu/);
+  assert.doesNotMatch(report, /private@example\.com|account@example\.com|TypeError\\n/);
+});
+
 test("diagnostic is only shared after the user presses the recovery button", async () => {
   const projectRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
   const shareCalls = [];

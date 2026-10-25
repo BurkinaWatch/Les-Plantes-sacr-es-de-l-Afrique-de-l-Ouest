@@ -15,10 +15,13 @@ import {
   buildStartupDiagnostic,
   StartupDiagnosticReason,
 } from "@/lib/startup-diagnostics";
+import type { StartupStage } from "@/lib/startup-runtime";
 
 type StartupDiagnosticButtonProps = {
   reason: StartupDiagnosticReason;
   route: string;
+  stage?: StartupStage;
+  runtimeErrorType?: string;
   style?: StyleProp<ViewStyle>;
   textStyle?: StyleProp<TextStyle>;
 };
@@ -26,6 +29,8 @@ type StartupDiagnosticButtonProps = {
 export function StartupDiagnosticButton({
   reason,
   route,
+  stage,
+  runtimeErrorType,
   style,
   textStyle,
 }: StartupDiagnosticButtonProps) {
@@ -46,6 +51,8 @@ export function StartupDiagnosticButton({
         buildNumber:
           Constants.expoConfig?.android?.versionCode ??
           Constants.expoConfig?.ios?.buildNumber,
+        stage,
+        runtimeErrorType,
       });
       await Share.share({
         title: "Diagnostic de démarrage",

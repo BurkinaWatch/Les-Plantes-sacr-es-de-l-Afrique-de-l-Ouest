@@ -33,8 +33,17 @@ import {
   setBaseUrl,
   useGetSubscriptionStatus,
 } from "@workspace/api-client-react";
+import {
+  getStartupFatalDiagnostic,
+  installStartupFatalCapture,
+  setStartupStage,
+  subscribeToStartupFatal,
+  type StartupFatalDiagnostic,
+} from "@/lib/startup-runtime";
 
 setBaseUrl(getApiBase());
+setStartupStage("root-layout");
+installStartupFatalCapture();
 
 // Suppress fontfaceobserver timeout errors on web (known Expo Web / vector-icons issue)
 if (Platform.OS === "web" && typeof window !== "undefined") {
@@ -284,6 +293,7 @@ function RootLayoutNav({
 
   useEffect(() => {
     console.info(`[Startup] Active route: ${routeKey || "(none)"}`);
+    setStartupStage(routeKey ? "navigation" : "router");
     onRouteKeyChange(routeKey);
   }, [onRouteKeyChange, routeKey]);
 
@@ -488,6 +498,8 @@ function StartupFatalFallback({ resetError }: ErrorFallbackProps) {
 function RootLayoutContent() {
   const [laidOutRouteKey, setLaidOutRouteKey] = useState("");
   const [startupFailed, setStartupFailed] = useState(false);
+  const [runtimeFatal, setRuntimeFatal] =
+    useState<StartupFatalDiagnostic | null>(getStartupFatalDiagnostic);
   const [routeKey, setRouteKey] = useState("");
   const nativeSplashHidden = useRef(false);
   const navigationReady = Boolean(
@@ -497,7 +509,13 @@ function RootLayoutContent() {
   );
 
   const markRouteLaidOut = useCallback((laidOutKey: string) => {
+    setStartupStage("route-laid-out");
     setLaidOutRouteKey(laidOutKey);
+  }, []);
+
+  useEffect(() => {
+    setStartupStage("providers");
+    return subscribeToStartupFatal(setRuntimeFatal);
   }, []);
 
   useEffect(() => {
@@ -555,7 +573,7 @@ function RootLayoutContent() {
   useEffect(() => {
     if (
       !isNative ||
-      (!navigationReady && !startupFailed) ||
+      (!navigationReady && !startupFailed && !runtimeFatal) ||
       nativeSplashHidden.current
     ) {
       return;
@@ -566,7 +584,7 @@ function RootLayoutContent() {
       nativeSplashHidden.current = false;
       console.warn("Unable to hide the native splash screen:", error);
     });
-  }, [navigationReady, startupFailed]);
+  }, [navigationReady, runtimeFatal, startupFailed]);
 
   return (
     <SafeAreaProvider>
@@ -587,8 +605,14 @@ function RootLayoutContent() {
                         onRouteLayoutReady={markRouteLaidOut}
                         onRouteKeyChange={setRouteKey}
                       />
-                      {startupFailed ? (
-                        <StartupRecoveryScreen route={routeKey} />
+                      {startupFailed || runtimeFatal ? (
+                        <StartupRecoveryScreen
+                          route={routeKey}
+                          reason={
+                            runtimeFatal ? "runtime-js-error" : "route-timeout"
+                          }
+                          runtimeFatal={runtimeFatal}
+                        />
                       ) : null}
                     </View>
                   </AppProvider>
@@ -601,7 +625,15 @@ function RootLayoutContent() {
   );
 }
 
-function StartupRecoveryScreen({ route }: { route: string }) {
+function StartupRecoveryScreen({
+  route,
+  reason,
+  runtimeFatal,
+}: {
+  route: string;
+  reason: "route-timeout" | "runtime-js-error";
+  runtimeFatal: StartupFatalDiagnostic | null;
+}) {
   const handleRetry = async () => {
     try {
       await reloadAppAsync();
@@ -619,8 +651,9 @@ function StartupRecoveryScreen({ route }: { route: string }) {
         L’application n’a pas pu s’ouvrir
       </Text>
       <Text style={styles.startupRecoveryMessage}>
-        L’écran d’accueil ne s’est pas chargé. Réessayez de démarrer
-        l’application.
+        {runtimeFatal
+          ? `Une erreur ${runtimeFatal.errorType} a interrompu le démarrage avant le premier écran. Réessayez ou partagez le diagnostic sûr.`
+          : "L’écran d’accueil ne s’est pas chargé. Réessayez de démarrer l’application."}
       </Text>
       <Text style={styles.startupDiagnosticPrivacy}>
         Le rapport ne contient ni identifiant, ni e-mail, ni jeton. Rien n’est
@@ -637,8 +670,10 @@ function StartupRecoveryScreen({ route }: { route: string }) {
         <Text style={styles.startupRetryText}>Réessayer</Text>
       </Pressable>
       <StartupDiagnosticButton
-        reason="route-timeout"
+        reason={reason}
         route={route}
+        stage={runtimeFatal?.stage}
+        runtimeErrorType={runtimeFatal?.errorType}
         style={styles.startupDiagnosticButton}
       />
     </View>
