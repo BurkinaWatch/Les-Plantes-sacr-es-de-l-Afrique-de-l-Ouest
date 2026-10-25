@@ -255,6 +255,8 @@ raise SystemExit({audit_status})
     def test_release_build_is_followed_by_blocking_audit_and_allowlisted_archive(self):
         source = (MOBILE / "scripts/release-android.sh").read_text()
         self.assertIn("set -euo pipefail", source)
+        self.assertLess(source.index("pnpm run optimize:catalog-images"), source.index("pnpm run verify:plant-images"))
+        self.assertLess(source.index("pnpm run verify:plant-images"), source.index("expo prebuild"))
         self.assertLess(source.index("./gradlew :app:assembleRelease"), source.index("python3 scripts/audit-android-release.py"))
         self.assertIn('--budget android-size-budget.json', source)
         self.assertIn('trap archive_evidence EXIT', source)

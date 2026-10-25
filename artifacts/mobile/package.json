@@ -12,6 +12,7 @@
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "capture:native": "node scripts/capture-native-svg.js",
     "verify:native-svg": "node scripts/capture-native-svg.js --verify",
+    "optimize:catalog-images": "node scripts/optimize-catalog-images.js",
     "verify:plant-images": "node scripts/verify-plant-images.js",
     "release:android": "bash scripts/release-android.sh",
     "test:android-release": "python3 -m unittest discover -s tests -p 'android_release_test.py' -v",

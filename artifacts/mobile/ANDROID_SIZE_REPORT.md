@@ -1,6 +1,32 @@
 # Réduction du téléchargement Android
 
-## Résultat livré
+## Release actuelle — v20 (1.0.11)
+
+| Élément | v19 | v20 |
+|---|---:|---:|
+| APK universel signé | 203 511 713 octets (194,08 Mio) | **117 083 513 octets (111,66 Mio)** |
+| Catalogue WebP | 127 714 474 octets | **41 286 256 octets** |
+
+**Gain sur le téléchargement : 86 428 200 octets (82,42 Mio), soit 42,47 %.**
+Le catalogue conserve ses **117 images locales uniques** : ses 94 WebP ont diminué de 67,67 %; les 23 JPEG restent présents.
+
+- Fichier : `artifacts/mobile/public/plantessacrees-v20.apk`.
+- Package : `com.sotyssi.plantessacrees`; version `1.0.11`, code Android `20`.
+- SHA-256 : `5197037fe12ee9df16c070f8190e24916fe8af638a9aee6589ca87a7464e3ae8`.
+- Signature vérifiée par `apksigner`, même certificat autorisé : `59b47e7dc4d1302a17bee085dea2534b7071eea74c0926c84bd2d64f0b4071a3`.
+- Alignement ZIP de 16 Kio vérifié; **104 bibliothèques natives compressées**, architectures `arm64-v8a`, `armeabi-v7a`, `x86` et `x86_64` conservées.
+- Les **117 images du registre** ont été retrouvées dans l’APK avec un SHA-256 identique à la source.
+- Le seuil de release était de 122 283 163 octets; réserve restante : 5 199 650 octets.
+- Les 94 WebP sont réencodés en qualité 95 depuis les PNG maîtres conservés. Dimensions et transparence sont identiques; PSNR moyen mesuré : 42,44 dB, minimum : 38,31 dB.
+- Vérifications réussies : 87 tests mobiles, 19 tests du contrôle de release, TypeScript, vérification des 116 fiches et compilation Android Release avec Lint vital.
+- Preuve non sensible : `generated-artifacts/android-release/release-evidence.tar.gz`.
+- Aucun appareil Android ou émulateur n’étant connecté, l’installation réelle sur appareil n’a pas été testée.
+
+## Historique détaillé — release v10 (1.0.1)
+
+Les sections suivantes décrivent l’ancienne release v10. Ses tailles et sa conversion sans perte sont historiques; elles ne décrivent pas la compression qualité 95 de la v20.
+
+### Résultat livré v10
 
 | Élément | Avant | Après |
 |---|---:|---:|
@@ -24,7 +50,7 @@ Une copie de téléchargement est disponible dans `artifacts/mobile/public/plant
 - **104 bibliothèques natives conservées**, 26 pour chacune des quatre architectures, désormais compressées.
 - Compilation Release et contrôle Lint vital réussis (`BUILD SUCCESSFUL`).
 
-## Choix retenu
+### Choix retenu v10
 
 - APK universel : conservation de `armeabi-v7a`, `arm64-v8a`, `x86` et `x86_64`.
 - Compression ZIP des bibliothèques natives, persistée par le plugin Expo `withCompactAndroidPackaging`.
@@ -36,7 +62,7 @@ Les PNG maîtres sont conservés comme sources de conversion, mais ne sont plus 
 
 La compression native réduit le téléchargement, pas nécessairement l'espace occupé après installation : Android extrait les bibliothèques à l'installation. Aucune architecture n'est supprimée et le démarrage n'est pas modifié. La réduction du bytecode par R8 n'est pas activée dans ce changement, pour éviter de modifier simultanément le comportement des modules natifs.
 
-## Audit des ressources
+### Audit des ressources v10
 
 APK initial : **317 134 727 octets** (302,44 Mio).
 
@@ -64,7 +90,7 @@ Les anciennes variantes `corossolier.png`, `kalanchoe.png`, `palmier-huile.png` 
 
 **Conversion des 94 images : 189 044 618 → 127 714 474 octets**, soit **61 330 144 octets économisés (32,44 %)**. Les pixels décodés sont identiques pour chaque image.
 
-## Contrôles et preuves
+### Contrôles et preuves v10
 
 - Vérification du registre sur les **116 fiches** du catalogue effectif.
 - Tests du packaging : option persistante, idempotente et sans modification des architectures.
@@ -79,7 +105,7 @@ Les preuves volumineuses sont dans `generated-artifacts/android-size/`, exclu de
 - `apk-audit.json` : comparaison des ZIP, identité, signature, alignement et présence des 117 fichiers uniques du registre par SHA-256.
 - `gradle-release.log` et `mobile-tests.log`.
 
-## Reproduire
+### Reproduire la v10 historique
 
 Depuis `artifacts/mobile`, avec les dépendances installées :
 

@@ -28,4 +28,4 @@
 - [Essai gratuit et accès](trial-access.md) — essai de 72 h; nouveaux comptes à l’inscription, comptes existants à leur prochaine connexion, abonnement actif préservé.
 - [Expo preview warm-up](expo-preview-warmup.md) — wait for Metro's web bundle after a restart before diagnosing blank preview captures
 - [React Native Web image sizing](rn-web-image-sizing.md) — absolute positioning may leave local images at intrinsic dimensions; constrain layered images explicitly
-- [Offline APK optimization](offline-apk-optimization.md) — preserve embedded catalogue images and all ABIs; prefer lossless media and compressed native libraries for shared APKs.
+- [Offline APK optimization](offline-apk-optimization.md) — preserve embedded images and all ABIs; allow measured lossy WebP only with masters and quality gates.
