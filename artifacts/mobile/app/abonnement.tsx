@@ -16,6 +16,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { SacredIcon } from "@/components/SacredIcon";
 import { useAuth } from "@/context/AuthContext";
+import { useStartupReadiness } from "@/context/StartupReadinessContext";
 import { useColors } from "@/hooks/useColors";
 import {
   useCreateSubscriptionPayment,
@@ -30,6 +31,7 @@ export default function AbonnementScreen() {
   const router = useRouter();
   const queryClient = useQueryClient();
   const { reason } = useLocalSearchParams<{ reason?: string }>();
+  const markStartupReady = useStartupReadiness();
   const { user, token, isLoading: authLoading, logout } = useAuth();
   const [rejectedToken, setRejectedToken] = useState<string | null>(null);
   const [selectedPlan, setSelectedPlan] = useState<"MONTHLY" | "YEARLY">("MONTHLY");
@@ -240,6 +242,7 @@ export default function AbonnementScreen() {
     <ScrollView
       style={[styles.container, { backgroundColor: colors.background }]}
       contentContainerStyle={{ paddingTop: insets.top + 18, paddingBottom: 40 }}
+      onLayout={markStartupReady}
     >
       <View style={styles.topRow}>
         <Pressable
