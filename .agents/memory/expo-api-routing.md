@@ -20,3 +20,9 @@ API clients must preserve the `/api/` route prefix even when the configured API 
 **Why:** The development proxy sends `/api/*` to the API artifact, while an unprefixed route can be handled by the mobile app instead of the API.
 
 **How to apply:** Build API endpoint URLs with exactly one `/api/` prefix, and test both a host-only base URL and a base URL already ending in `/api`.
+
+The shared Expo development command must not globally default `EXPO_PUBLIC_API_BASE_URL` to the Replit app host. An explicit URL outranks the release API URL even on native platforms, so that default can silently route Expo Go or native bundles away from the API.
+
+**Why:** The mobile preview returned a network error because its dev command supplied the Replit development host as an explicit API URL. The API itself was healthy, and the platform-aware resolver already correctly selected the local proxy for web and the configured API for native.
+
+**How to apply:** Leave `EXPO_PUBLIC_API_BASE_URL` unset by default in shared dev commands. Keep `EXPO_PUBLIC_DOMAIN` available and let the resolver select the local proxy only for web development; use an explicit API override only when a developer intentionally supplies one.
