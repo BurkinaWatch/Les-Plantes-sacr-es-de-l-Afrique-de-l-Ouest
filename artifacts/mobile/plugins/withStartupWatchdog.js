@@ -1,6 +1,6 @@
 const fs = require("node:fs/promises");
 const path = require("node:path");
-const { withDangerousMod, withMainActivity } = require("@expo/config-plugins");
+const { withDangerousMod, withMainActivity } = require("expo/config-plugins");
 
 const WATCHDOG_SOURCE = "plugins/android/StartupWatchdog.kt";
 const ACTIVITY_CLASS = "class MainActivity : ReactActivity() {";
