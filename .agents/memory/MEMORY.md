@@ -1,7 +1,7 @@
 - [i18n system](i18n-system.md) — lightweight custom i18n without external packages; LanguageProvider wraps AppProvider in app/_layout.tsx
 - [Play upload-key handling](play-upload-key.md) — preserve the upload key; keep its password in Replit Secrets and out of command arguments and logs.
 - [Auth system](auth-system.md) — connexion e-mail/mot de passe exigée ; préserver les anciens comptes et prouver leur possession avant d’associer un e-mail.
-- [Expo Replit config](expo-replit-config.md) — REACT_NATIVE_PACKAGER_HOSTNAME must be $REPLIT_EXPO_DEV_DOMAIN; Google Fonts timeout fix; metro.config.js CORS setup
+- [Expo Replit config](expo-replit-config.md) — Replit Metro settings, Expo plugin imports under pnpm, and native/web runtime quirks
 - [Expo SDK 57 setup](expo-sdk57.md) — native splash uses the plugin; manage Expo Go sign-in and keep local Android tools and caches in ignored workspace paths
 - [Plant dataset](plant-dataset.md) — adding plants to animals.ts; image key MUST equal id; field misspelled `symboliqueSpirirtuelle`; pre-existing tsc errors unrelated
 - [Savoir source attribution](savoir-source-attribution.md) — use exact registry titles for app citations and keep source notes aligned to the evidence they support

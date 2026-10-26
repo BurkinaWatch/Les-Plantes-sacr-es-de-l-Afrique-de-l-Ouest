@@ -63,3 +63,11 @@ React Native DevTools is a downloaded dotslash-managed Linux binary and needs a 
 **Why:** Metro can start even when its debugger binary cannot load, so an incomplete library set leaves the preview running but silently removes native debugging controls.
 
 **How to apply:** When Metro reports that React Native DevTools cannot load a shared library, inspect the underlying cached binary's complete `ldd` output and provide every missing runtime library before verifying the Expo workflow again.
+
+## Expo config plugin imports with pnpm
+
+For custom Expo config plugins in this workspace, import plugin helpers from `expo/config-plugins` unless `@expo/config-plugins` is declared directly by the mobile package.
+
+**Why:** pnpm does not expose undeclared transitive dependencies from the mobile package's plugin directory. Gradle evaluates Expo config plugins through `expo-constants:createExpoConfig`, so an unresolved import can fail a release build before native compilation starts.
+
+**How to apply:** Prefer Expo's `expo/config-plugins` re-export for config plugins that already depend on Expo; add a direct package dependency only if the project requires APIs not re-exported there.
