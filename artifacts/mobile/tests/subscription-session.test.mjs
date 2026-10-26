@@ -54,6 +54,9 @@ async function fixture({
       }),
     };
     if (id === "@/context/AuthContext") return { useAuth: () => auth };
+    if (id === "@/context/StartupReadinessContext") {
+      return { useStartupReadiness: () => () => {} };
+    }
     if (id === "@/hooks/useColors") return { useColors: () => ({}) };
     if (id === "@/components/SacredIcon") return { SacredIcon: () => null };
     if (id === "react-native-safe-area-context") return { useSafeAreaInsets: () => ({ top: 0 }) };
