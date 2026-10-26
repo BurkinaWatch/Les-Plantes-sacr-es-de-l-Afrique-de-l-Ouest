@@ -49,14 +49,34 @@ export default function AbonnementScreen() {
       enabled: authenticated,
       queryKey: ["subscription-status", user?.id, sessionScope],
       retry: (count, error) => !isUnauthorized(error) && count < 2,
+      refetchInterval: 30_000,
+      refetchOnReconnect: true,
+      refetchOnWindowFocus: true,
     },
   });
   const paymentMutation = useCreateSubscriptionPayment();
   const reconcileMutation = useReconcileSubscriptionPayment();
-  const trialExpired = reason === "trial-expired";
+  const trialStartedAt = statusQuery.data?.trial.startedAt
+    ? Date.parse(statusQuery.data.trial.startedAt)
+    : Number.NaN;
+  const trialEndsAt = statusQuery.data?.trial.endsAt
+    ? Date.parse(statusQuery.data.trial.endsAt)
+    : Number.NaN;
+  const hasActiveTrial =
+    statusQuery.data?.access.trialActive === true &&
+    Number.isFinite(trialStartedAt) &&
+    Number.isFinite(trialEndsAt) &&
+    Date.now() >= trialStartedAt &&
+    Date.now() < trialEndsAt;
   const activeSubscriptionExpiry = statusQuery.data?.subscription?.expiresAt
     ? Date.parse(statusQuery.data.subscription.expiresAt)
     : Number.NaN;
+  const hasActiveSubscription =
+    statusQuery.data?.access.subscriptionActive === true &&
+    (!Number.isFinite(activeSubscriptionExpiry) ||
+      Date.now() < activeSubscriptionExpiry);
+  const hasAppAccess = hasActiveTrial || hasActiveSubscription;
+  const trialExpired = reason === "trial-expired" && !hasAppAccess;
 
   function handleRequestError(error: unknown, fallback: string) {
     if (isUnauthorized(error)) {
@@ -124,11 +144,15 @@ export default function AbonnementScreen() {
   );
   const isConfigured = Boolean(selected?.active && selected.amount && selected.currency);
   const validEmail = /^\S+@\S+\.\S+$/.test(email.trim());
-  const hasActiveSubscription =
-    statusQuery.data?.access.subscriptionActive === true &&
-    (!Number.isFinite(activeSubscriptionExpiry) ||
-      Date.now() < activeSubscriptionExpiry);
   const hasPendingSubscription = statusQuery.data?.subscription?.status === "PENDING";
+
+  async function continueToApp() {
+    if (!user?.id || !hasAppAccess) return;
+    await queryClient.invalidateQueries({
+      queryKey: ["trial-access", user.id],
+    });
+    router.replace("/(tabs)");
+  }
 
   async function startPayment() {
     if (
@@ -218,7 +242,19 @@ export default function AbonnementScreen() {
       contentContainerStyle={{ paddingTop: insets.top + 18, paddingBottom: 40 }}
     >
       <View style={styles.topRow}>
-        <Pressable onPress={() => router.back()} accessibilityRole="button" accessibilityLabel="Retour">
+        <Pressable
+          onPress={() => {
+            if (router.canGoBack()) {
+              router.back();
+            } else if (hasAppAccess) {
+              void continueToApp();
+            } else {
+              router.replace("/(auth)/login");
+            }
+          }}
+          accessibilityRole="button"
+          accessibilityLabel="Retour"
+        >
           <SacredIcon name="arrow-left" size={24} color={colors.ivory} />
         </Pressable>
         <Text style={[styles.title, { color: colors.ivory }]}>Abonnement</Text>
@@ -253,6 +289,32 @@ export default function AbonnementScreen() {
         </View>
       )}
 
+      {hasActiveTrial && (
+        <View
+          style={[
+            styles.statusCard,
+            {
+              backgroundColor: colors.card,
+              borderColor: colors.gold,
+              marginTop: 14,
+            },
+          ]}
+        >
+          <Text style={[styles.body, { color: colors.ivory }]}>
+            Votre essai gratuit est actif. Vous pouvez continuer à utiliser l’application.
+          </Text>
+          <Pressable
+            accessibilityRole="button"
+            onPress={() => void continueToApp()}
+            style={[styles.secondaryButton, { borderColor: colors.gold }]}
+          >
+            <Text style={[styles.buttonText, { color: colors.gold }]}>
+              Continuer vers l’application
+            </Text>
+          </Pressable>
+        </View>
+      )}
+
       {authenticated && statusQuery.data?.subscription && (
         <View style={[styles.statusCard, { backgroundColor: colors.card, borderColor: colors.gold }]}>
           <Text style={[styles.statusTitle, { color: colors.ivory }]}>Votre abonnement</Text>
@@ -265,7 +327,7 @@ export default function AbonnementScreen() {
                   : statusQuery.data.subscription.status === "FAILED"
                     ? "Échec du paiement"
                     : statusQuery.data.subscription.status === "CANCELLED"
-                      ? "Résilié"
+                    ? "Annulé"
                       : "Expiré"
             }
           </Text>
@@ -517,7 +579,7 @@ export default function AbonnementScreen() {
               </Text>
               <Pressable
                 accessibilityRole="button"
-                onPress={() => router.replace("/(tabs)")}
+                onPress={() => void continueToApp()}
                 style={[styles.secondaryButton, { borderColor: colors.gold }]}
               >
                 <Text style={[styles.buttonText, { color: colors.gold }]}>

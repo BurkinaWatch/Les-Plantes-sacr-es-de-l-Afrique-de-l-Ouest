@@ -18,20 +18,40 @@ function text(node) {
   return text(node.props?.children);
 }
 
-async function fixture({ statusError = null, paymentError = null, reconcileError = null } = {}) {
+async function fixture({
+  statusError = null,
+  paymentError = null,
+  reconcileError = null,
+  trialActive = false,
+} = {}) {
   const calls = { checkout: 0, routes: [], logout: 0, queryKeys: [], enabled: true };
   const auth = {
     user: { id: 1, username: "test" }, token: "old-session", isLoading: false,
     logout: async () => { calls.logout++; auth.user = null; auth.token = null; },
   };
   const plans = { plans: [{ code: "MONTHLY", name: "Mensuel", active: true, amount: "1000", currency: "XOF", period: "MONTHLY" }] };
+  const now = Date.now();
+  const trial = trialActive
+    ? {
+        startedAt: new Date(now - 60_000).toISOString(),
+        endsAt: new Date(now + 3 * 24 * 60 * 60 * 1000 - 60_000).toISOString(),
+      }
+    : {
+        startedAt: new Date(now - 4 * 24 * 60 * 60 * 1000).toISOString(),
+        endsAt: new Date(now - 24 * 60 * 60 * 1000).toISOString(),
+      };
   let currentStatusError = statusError;
   const originalLoad = Module._load;
   const queryClient = new QueryClient();
   Module._load = function (id, ...args) {
     if (id === "expo-router") return {
       useLocalSearchParams: () => ({}),
-      useRouter: () => ({ back() {}, push: route => calls.routes.push(route) }),
+      useRouter: () => ({
+        back: () => calls.routes.push(["back"]),
+        canGoBack: () => false,
+        replace: route => calls.routes.push(["replace", route]),
+        push: route => calls.routes.push(route),
+      }),
     };
     if (id === "@/context/AuthContext") return { useAuth: () => auth };
     if (id === "@/hooks/useColors") return { useColors: () => ({}) };
@@ -53,7 +73,11 @@ async function fixture({ statusError = null, paymentError = null, reconcileError
           error: currentStatusError,
           data: currentStatusError
             ? undefined
-            : { access: { subscriptionActive: false }, subscription: null },
+            : {
+                access: { hasAccess: trialActive, trialActive, subscriptionActive: false },
+                trial,
+                subscription: null,
+              },
           isSuccess: !currentStatusError,
           refetch: async () => ({}),
         };
@@ -113,6 +137,21 @@ test("a rejected status session offers reconnection without creating a checkout"
       pathname: "/(auth)/login",
       params: { returnTo: "/abonnement", username: "test" },
     });
+  } finally { await f.close(); }
+});
+
+test("a restored trial can return from a direct subscription link to the app", async () => {
+  const f = await fixture({ trialActive: true });
+  try {
+    const screenText = f.renderer.root.findAllByType("Text").map(text).join(" ");
+    assert.match(screenText, /Votre essai gratuit est actif/);
+    await act(async () => f.button("Continuer vers l’application").props.onPress());
+    assert.deepEqual(f.calls.routes, [["replace", "/(tabs)"]]);
+
+    await act(async () => {
+      f.renderer.root.findByProps({ accessibilityLabel: "Retour" }).props.onPress();
+    });
+    assert.deepEqual(f.calls.routes.at(-1), ["replace", "/(tabs)"]);
   } finally { await f.close(); }
 });
 
