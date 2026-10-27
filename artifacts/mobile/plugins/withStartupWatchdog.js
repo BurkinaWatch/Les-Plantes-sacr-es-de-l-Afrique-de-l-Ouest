@@ -5,6 +5,7 @@ const { withDangerousMod, withMainActivity } = require("expo/config-plugins");
 const WATCHDOG_SOURCE = "plugins/android/StartupWatchdog.kt";
 const ACTIVITY_CLASS = "class MainActivity : ReactActivity() {";
 const SUPER_ON_CREATE = "    super.onCreate(null)";
+const OBSERVE_REACT_HOST = "    StartupWatchdog.observeReactHost(this)";
 const BACK_PRESSED_OVERRIDE = "  override fun invokeDefaultOnBackPressed() {";
 
 function withStartupWatchdog(config) {
@@ -56,7 +57,7 @@ function withStartupWatchdog(config) {
 
     source = source.replace(
       SUPER_ON_CREATE,
-      `    StartupWatchdog.attach(this)\n${SUPER_ON_CREATE}`,
+      `    StartupWatchdog.attach(this)\n${SUPER_ON_CREATE}\n${OBSERVE_REACT_HOST}`,
     );
     source = source.replace(
       BACK_PRESSED_OVERRIDE,
