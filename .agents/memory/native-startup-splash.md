@@ -26,3 +26,9 @@ Treat web preview, Metro export, and APK audit as build checks only—not proof 
 **Why:** A device can install a correctly signed APK and still show only the launch background or terminate before React Native mounts, while all web and static checks pass.
 
 **How to apply:** For a device-only blank launch, capture Android Logcat or add an explicit startup-stage diagnostic build. State clearly which check was performed and do not claim a root cause until runtime evidence identifies it.
+
+Do not swallow a fatal JavaScript startup error before a mounted recovery listener can handle it. Capture only safe metadata, then delegate to React Native's existing global error handler when no recovery listener was notified or a listener fails.
+
+**Why:** Replacing the global handler and returning before the recovery UI subscribes can suppress the only visible exception and leave the native splash over an empty app.
+
+**How to apply:** When wrapping `ErrorUtils`, test both the mounted-recovery path and the pre-mount path; the latter must preserve React Native's original fatal-error handling.
