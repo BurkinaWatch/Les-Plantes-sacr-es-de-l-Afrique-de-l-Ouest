@@ -14,9 +14,15 @@ import { useColors } from "@/hooks/useColors";
 import { useTranslation } from "@/i18n";
 
 let SymbolView: any = null;
-try {
-  SymbolView = require("expo-symbols").SymbolView;
-} catch {}
+// SF Symbols are only rendered on iOS. Do not evaluate expo-symbols on
+// Android: its module initializes Android symbol/font support at import time,
+// which is unnecessary for the Android launcher and can fail before the
+// router gets a chance to render its first screen.
+if (Platform.OS === "ios") {
+  try {
+    SymbolView = require("expo-symbols").SymbolView;
+  } catch {}
+}
 
 let Feather: any = null;
 let MaterialCommunityIcons: any = null;
