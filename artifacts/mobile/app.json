@@ -2,7 +2,7 @@
   "expo": {
     "name": "Les Plantes Sacrées d’Afrique de l’Ouest",
     "slug": "animaux-sacres-afrique",
-    "version": "1.0.12",
+  "version": "1.0.13",
     "orientation": "portrait",
     "icon": "./assets/images/logo-plantes-sacrees.png",
     "scheme": "plantessacrees",
@@ -25,7 +25,7 @@
     },
     "android": {
       "package": "com.sotyssi.plantessacrees",
-      "versionCode": 21,
+      "versionCode": 22,
       "backgroundColor": "#120A05",
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/logo-plantes-sacrees.png",

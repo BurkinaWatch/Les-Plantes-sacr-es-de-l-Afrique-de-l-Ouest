@@ -71,8 +71,21 @@ export function createStartupFatalCapture() {
           console.error(
             `[Startup] Fatal JavaScript error before first route (${fatalDiagnostic.errorType}) at ${fatalDiagnostic.stage}`,
           );
-          for (const listener of listeners) listener(fatalDiagnostic);
-          return;
+          let recoveryNotified = false;
+          for (const listener of listeners) {
+            try {
+              listener(fatalDiagnostic);
+              recoveryNotified = true;
+            } catch (listenerError) {
+              console.error(
+                `[Startup] Recovery listener failed (${safeErrorType(listenerError)})`,
+              );
+            }
+          }
+          // Suppress the default fatal handler only when a mounted recovery
+          // screen has actually been notified. Before that screen subscribes,
+          // delegate so an early exception is not silently swallowed.
+          if (recoveryNotified) return;
         }
 
         previousHandler?.(error, isFatal);

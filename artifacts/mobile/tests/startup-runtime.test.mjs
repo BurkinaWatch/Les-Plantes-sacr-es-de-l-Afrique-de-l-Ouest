@@ -25,7 +25,7 @@ function makeErrorUtils() {
   };
 }
 
-test("fatal startup errors are captured without exposing message or stack", () => {
+test("fatal startup errors reach the mounted recovery listener without exposing message or stack", () => {
   const capture = createStartupFatalCapture();
   const runtime = makeErrorUtils();
   runtime.setOriginalHandler(() => runtime.countPreviousCall());
@@ -45,6 +45,21 @@ test("fatal startup errors are captured without exposing message or stack", () =
   });
   assert.deepEqual(events, [{ errorType: "TypeError", stage: "navigation" }]);
   assert.equal(runtime.previousCalls, 0);
+});
+
+test("fatal startup errors before a recovery listener preserve React Native handling", () => {
+  const capture = createStartupFatalCapture();
+  const runtime = makeErrorUtils();
+  runtime.setOriginalHandler(() => runtime.countPreviousCall());
+  capture.install(runtime.utils);
+  capture.setStage("root-layout");
+  runtime.invoke(new TypeError("startup failed"), true);
+
+  assert.deepEqual(capture.getDiagnostic(), {
+    errorType: "TypeError",
+    stage: "root-layout",
+  });
+  assert.equal(runtime.previousCalls, 1);
 });
 
 test("fatal errors after the first route keep the original crash handling", () => {
