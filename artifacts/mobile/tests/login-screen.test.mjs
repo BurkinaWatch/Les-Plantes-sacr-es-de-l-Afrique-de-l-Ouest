@@ -18,8 +18,8 @@ function content(node) {
   return content(node.props?.children);
 }
 
-async function mount({ params = {}, result = {} } = {}) {
-  const calls = { credentials: [], links: [], routes: [], startupReady: 0 };
+async function mount({ params = {}, result = {}, platform = "web" } = {}) {
+  const calls = { credentials: [], links: [], routes: [], startupReady: 0, preventedSubmissions: 0 };
   const original = Module._load;
   Module._load = function (id, ...args) {
     if (id === "expo-router") return {
@@ -44,7 +44,7 @@ async function mount({ params = {}, result = {} } = {}) {
     if (id === "react-native-safe-area-context") return { useSafeAreaInsets: () => ({ top: 0, bottom: 0 }) };
     if (id === "react-native") return {
       ...Object.fromEntries(["ActivityIndicator", "Image", "KeyboardAvoidingView", "Pressable", "ScrollView", "Text", "TextInput", "View"].map(x => [x, x])),
-      StyleSheet: { create: x => x }, Platform: { OS: "web" },
+       StyleSheet: { create: x => x }, Platform: { OS: platform },
     };
     return original.call(this, id, ...args);
   };
@@ -66,6 +66,14 @@ async function mount({ params = {}, result = {} } = {}) {
       input(fr.auth_password).props.onChangeText(password);
     }),
     submit: async () => act(async () => {
+      if (platform === "web") {
+        const form = renderer.root.findByType("form");
+        form.props.onSubmit({
+          preventDefault: () => { calls.preventedSubmissions++; },
+        });
+        await Promise.resolve();
+        return;
+      }
       const button = renderer.root.findAllByType("Pressable").find(x =>
         content(x) === fr.auth_login_btn || content(x) === "Associer mon e-mail et me connecter");
       await button.props.onPress();
@@ -91,6 +99,36 @@ test("reconnection prefills the saved email and returns to subscription after lo
     await f.submit();
     assert.deepEqual(f.calls.credentials, [["client@example.com", "test-password"]]);
     assert.deepEqual(f.calls.routes, [["dismissTo", "/abonnement"]]);
+  } finally { await f.close(); }
+});
+
+test("web login uses a semantic form and prevents duplicate submissions", async () => {
+  const f = await mount();
+  try {
+    const form = f.renderer.root.findByType("form");
+    assert.equal(typeof form.props.onSubmit, "function");
+    assert.equal(f.renderer.root.findByType("button").props.type, "submit");
+    await f.fill("client@example.com", "test-password");
+
+    await act(async () => {
+      const event = { preventDefault: () => { f.calls.preventedSubmissions++; } };
+      form.props.onSubmit(event);
+      form.props.onSubmit(event);
+      await Promise.resolve();
+    });
+
+    assert.equal(f.calls.preventedSubmissions, 2);
+    assert.deepEqual(f.calls.credentials, [["client@example.com", "test-password"]]);
+  } finally { await f.close(); }
+});
+
+test("native login keeps its pressable action without rendering a web form", async () => {
+  const f = await mount({ platform: "android" });
+  try {
+    assert.equal(f.renderer.root.findAllByType("form").length, 0);
+    await f.fill("client@example.com", "test-password");
+    await f.submit();
+    assert.deepEqual(f.calls.credentials, [["client@example.com", "test-password"]]);
   } finally { await f.close(); }
 });
 

@@ -1,6 +1,6 @@
 import { LinearGradient } from 'expo-linear-gradient';
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import {
   ActivityIndicator,
   Image,
@@ -48,8 +48,11 @@ export default function LoginScreen() {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const isSubmittingRef = useRef(false);
 
   async function handleLogin() {
+    if (isSubmittingRef.current) return;
+
     if (!username.trim() || !password) {
       setError(t.auth_fields_required);
       return;
@@ -62,23 +65,137 @@ export default function LoginScreen() {
       setError("Saisissez l’ancien identifiant de ce compte (3-30 lettres, chiffres ou _).");
       return;
     }
+    isSubmittingRef.current = true;
     setError('');
     setLoading(true);
-    const result = legacyMode
-      ? await linkEmail(legacyUsername, username.trim(), password)
-      : await login(username.trim(), password);
-    setLoading(false);
-    if (result.error) {
-      setError(result.error);
-    } else {
-      // Only allow the known in-app return route, never an arbitrary URL.
-      if (returnTo === '/abonnement') {
-        router.dismissTo('/abonnement');
+    try {
+      const result = legacyMode
+        ? await linkEmail(legacyUsername, username.trim(), password)
+        : await login(username.trim(), password);
+      if (result.error) {
+        setError(result.error);
       } else {
-        router.replace('/(tabs)');
+        // Only allow the known in-app return route, never an arbitrary URL.
+        if (returnTo === '/abonnement') {
+          router.dismissTo('/abonnement');
+        } else {
+          router.replace('/(tabs)');
+        }
       }
+    } finally {
+      isSubmittingRef.current = false;
+      setLoading(false);
     }
   }
+
+  const submitLabel = legacyMode
+    ? 'Associer mon e-mail et me connecter'
+    : t.auth_login_btn;
+  const loginCard = (
+    <View style={[styles.card, { backgroundColor: colors.card, borderColor: colors.border }]}>
+      <View style={styles.field}>
+        <Text style={[styles.label, { color: colors.mutedForeground }]}>{t.auth_username}</Text>
+        <TextInput
+          style={[styles.input, { color: colors.ivory, borderColor: colors.border, backgroundColor: colors.warmBrown }]}
+          value={username}
+          onChangeText={(value) => {
+            setUsername(value);
+            if (error) setError('');
+          }}
+          placeholder={t.auth_username_placeholder}
+          accessibilityLabel={t.auth_username}
+          autoComplete="username"
+          textContentType="username"
+          keyboardType="email-address"
+          maxLength={254}
+          placeholderTextColor={colors.mutedForeground}
+          autoCapitalize="none"
+          autoCorrect={false}
+        />
+        <Text style={[styles.identifierHint, { color: colors.mutedForeground }]}>
+          {t.auth_username_hint}
+        </Text>
+      </View>
+
+      {legacyMode && (
+        <View style={styles.field}>
+          <Text style={[styles.label, { color: colors.mutedForeground }]}>ANCIEN IDENTIFIANT</Text>
+          <TextInput
+            accessibilityLabel="Ancien identifiant"
+            value={legacyUsername}
+            onChangeText={setLegacyUsername}
+            autoCapitalize="none"
+            autoCorrect={false}
+            placeholder="Identifiant de votre ancien compte"
+            placeholderTextColor={colors.mutedForeground}
+            style={[styles.input, { color: colors.ivory, borderColor: colors.border, backgroundColor: colors.warmBrown }]}
+          />
+          <Text style={[styles.identifierHint, { color: colors.mutedForeground }]}>
+            Cette association unique conserve votre compte et vos abonnements. Ensuite, connectez-vous avec votre e-mail.
+          </Text>
+        </View>
+      )}
+
+      <View style={styles.field}>
+        <Text style={[styles.label, { color: colors.mutedForeground }]}>{t.auth_password}</Text>
+        <TextInput
+          style={[styles.input, { color: colors.ivory, borderColor: colors.border, backgroundColor: colors.warmBrown }]}
+          value={password}
+          onChangeText={setPassword}
+          placeholder={t.auth_password_placeholder}
+          accessibilityLabel={t.auth_password}
+          autoComplete="current-password"
+          textContentType="password"
+          placeholderTextColor={colors.mutedForeground}
+          secureTextEntry
+        />
+      </View>
+
+      {error ? (
+        <View style={[styles.errorBox, { backgroundColor: '#7f1d1d22', borderColor: '#ef4444' }]}>
+          <Text style={[styles.errorText, { color: '#f87171' }]}>{error}</Text>
+        </View>
+      ) : null}
+
+      {Platform.OS === 'web' ? (
+        <button
+          type="submit"
+          disabled={loading}
+          style={{
+            marginTop: 8,
+            width: '100%',
+            border: 0,
+            borderRadius: 14,
+            padding: '16px 12px',
+            background: `linear-gradient(90deg, ${colors.gold}, ${colors.ochre})`,
+            color: colors.deepBrown,
+            fontFamily: 'inherit',
+            fontSize: 15,
+            fontWeight: 700,
+            cursor: loading ? 'wait' : 'pointer',
+            opacity: loading ? 0.8 : 1,
+          }}
+        >
+          {loading ? 'Connexion…' : submitLabel}
+        </button>
+      ) : (
+        <Pressable
+          onPress={handleLogin}
+          disabled={loading}
+          accessibilityRole="button"
+          style={({ pressed }) => [{ opacity: pressed || loading ? 0.8 : 1, marginTop: 8 }]}
+        >
+          <LinearGradient colors={[colors.gold, colors.ochre]} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }} style={styles.btn}>
+            {loading ? (
+              <ActivityIndicator color={colors.deepBrown} />
+            ) : (
+              <Text style={[styles.btnText, { color: colors.deepBrown }]}>{submitLabel}</Text>
+            )}
+          </LinearGradient>
+        </Pressable>
+      )}
+    </View>
+  );
 
   return (
     <LinearGradient
@@ -100,87 +217,17 @@ export default function LoginScreen() {
             <Text style={[styles.subtitle, { color: 'rgba(255,255,255,0.55)' }]}>{t.auth_login_subtitle}</Text>
           </View>
 
-          <View style={[styles.card, { backgroundColor: colors.card, borderColor: colors.border }]}>
-            <View style={styles.field}>
-              <Text style={[styles.label, { color: colors.mutedForeground }]}>{t.auth_username}</Text>
-              <TextInput
-                style={[styles.input, { color: colors.ivory, borderColor: colors.border, backgroundColor: colors.warmBrown }]}
-                value={username}
-                onChangeText={(value) => {
-                  setUsername(value);
-                  if (error) setError('');
-                }}
-                placeholder={t.auth_username_placeholder}
-                accessibilityLabel={t.auth_username}
-                autoComplete="username"
-                textContentType="username"
-                keyboardType="email-address"
-                maxLength={254}
-                placeholderTextColor={colors.mutedForeground}
-                autoCapitalize="none"
-                autoCorrect={false}
-              />
-              <Text style={[styles.identifierHint, { color: colors.mutedForeground }]}>
-                {t.auth_username_hint}
-              </Text>
-            </View>
-
-            {legacyMode && (
-              <View style={styles.field}>
-                <Text style={[styles.label, { color: colors.mutedForeground }]}>ANCIEN IDENTIFIANT</Text>
-                <TextInput
-                  accessibilityLabel="Ancien identifiant"
-                  value={legacyUsername}
-                  onChangeText={setLegacyUsername}
-                  autoCapitalize="none"
-                  autoCorrect={false}
-                  placeholder="Identifiant de votre ancien compte"
-                  placeholderTextColor={colors.mutedForeground}
-                  style={[styles.input, { color: colors.ivory, borderColor: colors.border, backgroundColor: colors.warmBrown }]}
-                />
-                <Text style={[styles.identifierHint, { color: colors.mutedForeground }]}>
-                  Cette association unique conserve votre compte et vos abonnements. Ensuite, connectez-vous avec votre e-mail.
-                </Text>
-              </View>
-            )}
-
-            <View style={styles.field}>
-              <Text style={[styles.label, { color: colors.mutedForeground }]}>{t.auth_password}</Text>
-              <TextInput
-                style={[styles.input, { color: colors.ivory, borderColor: colors.border, backgroundColor: colors.warmBrown }]}
-                value={password}
-                onChangeText={setPassword}
-                placeholder={t.auth_password_placeholder}
-                accessibilityLabel={t.auth_password}
-                autoComplete="current-password"
-                textContentType="password"
-                placeholderTextColor={colors.mutedForeground}
-                secureTextEntry
-              />
-            </View>
-
-            {error ? (
-              <View style={[styles.errorBox, { backgroundColor: '#7f1d1d22', borderColor: '#ef4444' }]}>
-                <Text style={[styles.errorText, { color: '#f87171' }]}>{error}</Text>
-              </View>
-            ) : null}
-
-            <Pressable
-              onPress={handleLogin}
-              disabled={loading}
-              style={({ pressed }) => [{ opacity: pressed || loading ? 0.8 : 1, marginTop: 8 }]}
+          {Platform.OS === 'web' ? (
+            <form
+              style={{ width: '100%' }}
+              onSubmit={(event) => {
+                event.preventDefault();
+                void handleLogin();
+              }}
             >
-              <LinearGradient colors={[colors.gold, colors.ochre]} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }} style={styles.btn}>
-                {loading ? (
-                  <ActivityIndicator color={colors.deepBrown} />
-                ) : (
-                <Text style={[styles.btnText, { color: colors.deepBrown }]}>
-                  {legacyMode ? "Associer mon e-mail et me connecter" : t.auth_login_btn}
-                </Text>
-                )}
-              </LinearGradient>
-            </Pressable>
-          </View>
+              {loginCard}
+            </form>
+          ) : loginCard}
 
           <Pressable onPress={() => { setLegacyMode(value => !value); setError(''); }}>
             <Text style={[styles.footerLink, { color: colors.gold, textAlign: 'center' }]}>
