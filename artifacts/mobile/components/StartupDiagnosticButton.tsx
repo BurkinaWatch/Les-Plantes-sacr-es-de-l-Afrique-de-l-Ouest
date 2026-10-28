@@ -1,7 +1,9 @@
 import Constants from "expo-constants";
+import * as Updates from "expo-updates";
 import React, { useState } from "react";
 import {
   Alert,
+  NativeModules,
   Platform,
   Pressable,
   Share,
@@ -16,12 +18,16 @@ import {
   StartupDiagnosticReason,
 } from "@/lib/startup-diagnostics";
 import type { StartupStage } from "@/lib/startup-runtime";
+import type { StartupErrorKind } from "@/lib/startup-runtime";
 
 type StartupDiagnosticButtonProps = {
   reason: StartupDiagnosticReason;
   route: string;
   stage?: StartupStage;
   runtimeErrorType?: string;
+  errorMessage?: string;
+  errorStack?: string;
+  errorKind?: StartupErrorKind;
   style?: StyleProp<ViewStyle>;
   textStyle?: StyleProp<TextStyle>;
 };
@@ -31,6 +37,9 @@ export function StartupDiagnosticButton({
   route,
   stage,
   runtimeErrorType,
+  errorMessage,
+  errorStack,
+  errorKind,
   style,
   textStyle,
 }: StartupDiagnosticButtonProps) {
@@ -42,6 +51,20 @@ export function StartupDiagnosticButton({
     if (sharing) return;
     setSharing(true);
     try {
+      let runtimeInfo:
+        | {
+            abi?: string;
+            newArchitecture?: boolean;
+            jsEngine?: string;
+          }
+        | undefined;
+      try {
+        runtimeInfo =
+          NativeModules.StartupDiagnostic?.getRuntimeInfo?.() ?? undefined;
+      } catch {
+        runtimeInfo = undefined;
+      }
+
       const diagnostic = buildStartupDiagnostic({
         reason,
         route,
@@ -51,8 +74,18 @@ export function StartupDiagnosticButton({
         buildNumber:
           Constants.expoConfig?.android?.versionCode ??
           Constants.expoConfig?.ios?.buildNumber,
+        runtimeVersion: Updates.runtimeVersion ?? Constants.expoConfig?.runtimeVersion,
+        easChannel: Updates.channel,
+        updateId: Updates.updateId,
+        isEmbeddedLaunch: Updates.isEmbeddedLaunch,
+        abi: runtimeInfo?.abi,
+        newArchitecture: runtimeInfo?.newArchitecture,
+        jsEngine: runtimeInfo?.jsEngine,
         stage,
         runtimeErrorType,
+        errorMessage,
+        errorStack,
+        errorKind,
       });
       await Share.share({
         title: "Diagnostic de démarrage",
