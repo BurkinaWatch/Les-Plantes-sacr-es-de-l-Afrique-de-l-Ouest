@@ -41,6 +41,32 @@ export function createStartupFatalCapture() {
     (diagnostic: StartupFatalDiagnostic) => void
   >();
 
+  const recordFatalError = (error: unknown): boolean => {
+    if (ready || fatalDiagnostic) return false;
+
+    fatalDiagnostic = {
+      errorType: safeErrorType(error),
+      stage,
+    };
+    console.error(
+      `[Startup] Fatal JavaScript error before first route (${fatalDiagnostic.errorType}) at ${fatalDiagnostic.stage}`,
+    );
+
+    let recoveryNotified = false;
+    for (const listener of listeners) {
+      try {
+        listener(fatalDiagnostic);
+        recoveryNotified = true;
+      } catch (listenerError) {
+        console.error(
+          `[Startup] Recovery listener failed (${safeErrorType(listenerError)})`,
+        );
+      }
+    }
+
+    return recoveryNotified;
+  };
+
   return {
     setStage(nextStage: StartupStage) {
       stage = nextStage;
@@ -57,6 +83,8 @@ export function createStartupFatalCapture() {
       return () => listeners.delete(listener);
     },
 
+    recordFatalError,
+
     install(errorUtils: ErrorUtilsLike | undefined) {
       if (installed || !errorUtils) return;
       installed = true;
@@ -64,28 +92,10 @@ export function createStartupFatalCapture() {
 
       errorUtils.setGlobalHandler((error, isFatal) => {
         if (isFatal && !ready) {
-          fatalDiagnostic = {
-            errorType: safeErrorType(error),
-            stage,
-          };
-          console.error(
-            `[Startup] Fatal JavaScript error before first route (${fatalDiagnostic.errorType}) at ${fatalDiagnostic.stage}`,
-          );
-          let recoveryNotified = false;
-          for (const listener of listeners) {
-            try {
-              listener(fatalDiagnostic);
-              recoveryNotified = true;
-            } catch (listenerError) {
-              console.error(
-                `[Startup] Recovery listener failed (${safeErrorType(listenerError)})`,
-              );
-            }
-          }
           // Suppress the default fatal handler only when a mounted recovery
           // screen has actually been notified. Before that screen subscribes,
           // delegate so an early exception is not silently swallowed.
-          if (recoveryNotified) return;
+          if (recordFatalError(error)) return;
         }
 
         previousHandler?.(error, isFatal);
@@ -102,6 +112,10 @@ export function setStartupStage(stage: StartupStage): void {
 
 export function getStartupFatalDiagnostic(): StartupFatalDiagnostic | null {
   return startupFatalCapture.getDiagnostic();
+}
+
+export function recordStartupFatalError(error: unknown): boolean {
+  return startupFatalCapture.recordFatalError(error);
 }
 
 export function subscribeToStartupFatal(

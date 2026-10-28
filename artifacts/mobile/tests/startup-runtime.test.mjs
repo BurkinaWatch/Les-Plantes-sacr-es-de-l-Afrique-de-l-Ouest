@@ -62,6 +62,25 @@ test("fatal startup errors before a recovery listener preserve React Native hand
   assert.equal(runtime.previousCalls, 1);
 });
 
+test("fatal entry errors are labeled and preserve React Native handling before recovery mounts", () => {
+  const capture = createStartupFatalCapture();
+  const runtime = makeErrorUtils();
+  runtime.setOriginalHandler(() => runtime.countPreviousCall());
+  capture.install(runtime.utils);
+  capture.setStage("javascript-entry");
+
+  const error = new TypeError("private account and token must never be copied");
+  capture.recordFatalError(error);
+
+  assert.deepEqual(capture.getDiagnostic(), {
+    errorType: "TypeError",
+    stage: "javascript-entry",
+  });
+  assert.equal(runtime.previousCalls, 0);
+  runtime.invoke(error, true);
+  assert.equal(runtime.previousCalls, 1);
+});
+
 test("fatal errors after the first route keep the original crash handling", () => {
   const capture = createStartupFatalCapture();
   const runtime = makeErrorUtils();

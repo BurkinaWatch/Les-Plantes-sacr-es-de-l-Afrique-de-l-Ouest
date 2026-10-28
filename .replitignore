@@ -4,14 +4,4 @@
 # No need to store the pnpm store twice.
 .local
 /generated-artifacts/
-/artifacts/mobile/public/plantessacrees-v10.apk
-/artifacts/mobile/public/plantessacrees-v11.apk
-/artifacts/mobile/public/plantessacrees-v12.apk
-/artifacts/mobile/public/plantessacrees-v13.apk
-/artifacts/mobile/public/plantessacrees-v14.apk
-/artifacts/mobile/public/plantessacrees-v15.apk
-/artifacts/mobile/public/plantessacrees-v16.apk
-/artifacts/mobile/public/plantessacrees-v17.apk
-/artifacts/mobile/public/plantessacrees-v20.apk
-/artifacts/mobile/public/plantessacrees-v21.apk
-/artifacts/mobile/public/plantessacrees-v24.apk
+/artifacts/mobile/public/plantessacrees-v25.apk

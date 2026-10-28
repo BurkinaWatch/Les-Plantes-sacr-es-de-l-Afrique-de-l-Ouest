@@ -41,8 +41,8 @@ import {
   type StartupFatalDiagnostic,
 } from "@/lib/startup-runtime";
 
-setBaseUrl(getApiBase());
 setStartupStage("root-layout");
+setBaseUrl(getApiBase());
 installStartupFatalCapture();
 
 // Suppress fontfaceobserver timeout errors on web (known Expo Web / vector-icons issue)
