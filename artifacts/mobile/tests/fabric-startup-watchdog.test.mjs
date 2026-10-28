@@ -17,12 +17,61 @@ const generatedSource = await readFile(
   ),
   "utf8",
 );
+const diagnosticModuleTemplate = await readFile(
+  resolve(projectRoot, "plugins/android/StartupDiagnosticModule.kt"),
+  "utf8",
+);
+const generatedDiagnosticModule = await readFile(
+  resolve(
+    projectRoot,
+    "android/app/src/main/java/com/sotyssi/plantessacrees/StartupDiagnosticModule.kt",
+  ),
+  "utf8",
+);
+const generatedApplication = await readFile(
+  resolve(
+    projectRoot,
+    "android/app/src/main/java/com/sotyssi/plantessacrees/MainApplication.kt",
+  ),
+  "utf8",
+);
 
 test("generated Android watchdog matches its Expo plugin template", () => {
   assert.equal(
     generatedSource,
     sourceTemplate.replace("__PACKAGE_NAME__", "com.sotyssi.plantessacrees"),
   );
+});
+
+test("generated startup diagnostic module matches its Expo plugin template", () => {
+  assert.equal(
+    generatedDiagnosticModule,
+    diagnosticModuleTemplate.replace(
+      "__PACKAGE_NAME__",
+      "com.sotyssi.plantessacrees",
+    ),
+  );
+  assert.match(generatedApplication, /add\(StartupDiagnosticPackage\(\)\)/);
+});
+
+test("native startup diagnostic module persists a sanitized JavaScript error synchronously", () => {
+  assert.match(
+    diagnosticModuleTemplate,
+    /@ReactMethod\(isBlockingSynchronousMethod = true\)\s+fun recordStartupError/,
+  );
+  assert.match(
+    diagnosticModuleTemplate,
+    /StartupWatchdog\.recordJavaScriptError/,
+  );
+  assert.match(sourceTemplate, /private fun sanitizeErrorMessage/);
+  assert.match(sourceTemplate, /\.commit\(\)/);
+});
+
+test("Android startup report includes the captured JavaScript error", () => {
+  assert.match(sourceTemplate, /Erreur JavaScript/);
+  assert.match(sourceTemplate, /error\.message/);
+  assert.match(sourceTemplate, /applicationContext\?\.let\(::clearJavaScriptError\)/);
+  assert.match(sourceTemplate, /applicationContext = activity\.applicationContext/);
 });
 
 test("Fabric listener records only Fabric-specific events with their event timestamp", () => {

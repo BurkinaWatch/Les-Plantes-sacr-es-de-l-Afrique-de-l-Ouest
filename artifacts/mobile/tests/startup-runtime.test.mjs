@@ -90,6 +90,7 @@ test("fatal startup errors before a recovery listener preserve React Native hand
   assert.deepEqual(capture.getDiagnostic(), {
     errorType: "TypeError",
     stage: "root-layout",
+    errorMessage: "startup failed",
   });
   assert.equal(runtime.previousCalls, 1);
 });
@@ -107,6 +108,7 @@ test("fatal entry errors are labeled and preserve React Native handling before r
   assert.deepEqual(capture.getDiagnostic(), {
     errorType: "TypeError",
     stage: "javascript-entry",
+    errorMessage: "private account and token must never be copied",
   });
   assert.equal(runtime.previousCalls, 0);
   runtime.invoke(error, true);
