@@ -36,6 +36,17 @@ test("generic marker listener skips Fabric-only names to avoid duplicate records
   assert.match(sourceTemplate, /if \(marker !in fabricOnlyMarkers\) \{\s*recordMarker\(marker\.name, SystemClock\.uptimeMillis\(\)\)/);
 });
 
+test("React context markers provide timestamps from the shared uptime clock", () => {
+  assert.match(
+    sourceTemplate,
+    /recordMarker\("REACT_CONTEXT_INITIALIZED", SystemClock\.uptimeMillis\(\)\)/,
+  );
+  assert.match(
+    sourceTemplate,
+    /recordMarker\("REACT_CONTEXT_ALREADY_INITIALIZED", SystemClock\.uptimeMillis\(\)\)/,
+  );
+});
+
 test("startup marker report uses a shared uptime clock and chronological order", () => {
   assert.match(sourceTemplate, /startedAtUptimeMs = SystemClock\.uptimeMillis\(\)/);
   assert.match(sourceTemplate, /val elapsedTenths = \(timestampUptimeMs - startUptimeMs\) \/ 100L/);
