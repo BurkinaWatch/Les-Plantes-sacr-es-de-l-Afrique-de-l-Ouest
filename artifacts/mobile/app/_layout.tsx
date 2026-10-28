@@ -706,8 +706,8 @@ function RootLayoutContent() {
 }
 
 function StartupProvidersMarker() {
+  setStartupStage("providers");
   useEffect(() => {
-    setStartupStage("providers");
     recordStartupMarker("STARTUP_03_PROVIDERS_MOUNTED");
   }, []);
   return null;
