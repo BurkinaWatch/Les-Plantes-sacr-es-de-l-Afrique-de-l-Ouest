@@ -70,8 +70,44 @@ test("native startup diagnostic module persists a sanitized JavaScript error syn
 test("Android startup report includes the captured JavaScript error", () => {
   assert.match(sourceTemplate, /Erreur JavaScript/);
   assert.match(sourceTemplate, /error\.message/);
+  assert.match(sourceTemplate, /Début de pile/);
+  assert.match(sourceTemplate, /error\.stack/);
   assert.match(sourceTemplate, /applicationContext\?\.let\(::clearJavaScriptError\)/);
   assert.match(sourceTemplate, /applicationContext = activity\.applicationContext/);
+});
+
+test("native startup report includes numbered milestones and build/runtime configuration", () => {
+  for (const label of [
+    "01 index.js chargé",
+    "02 _layout monté",
+    "03 providers montés",
+    "04 Stack monté",
+    "05 premier onLayout reçu",
+    "06 hideAsync appelé",
+    "07 CONTENT_APPEARED reçu côté natif",
+  ]) {
+    assert.ok(sourceTemplate.includes(label), `missing startup marker ${label}`);
+  }
+  assert.match(sourceTemplate, /BuildConfig\.IS_NEW_ARCHITECTURE_ENABLED/);
+  assert.match(sourceTemplate, /BuildConfig\.IS_HERMES_ENABLED/);
+  assert.match(sourceTemplate, /Build\.SUPPORTED_ABIS/);
+  assert.match(sourceTemplate, /Runtime version/);
+  assert.match(sourceTemplate, /Canal EAS Update/);
+  assert.match(sourceTemplate, /Mise à jour chargée/);
+});
+
+test("native startup diagnostic bridge exposes markers and update/runtime metadata", () => {
+  assert.match(
+    diagnosticModuleTemplate,
+    /fun recordStartupMarker\(marker: String\)/,
+  );
+  assert.match(
+    diagnosticModuleTemplate,
+    /fun recordStartupMetadata\(/,
+  );
+  assert.match(diagnosticModuleTemplate, /fun getRuntimeInfo\(\): WritableMap/);
+  assert.match(diagnosticModuleTemplate, /stack: String/);
+  assert.match(diagnosticModuleTemplate, /kind: String/);
 });
 
 test("Fabric listener records only Fabric-specific events with their event timestamp", () => {
