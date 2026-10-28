@@ -1,7 +1,20 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 
-import { resolveApiBaseUrl } from "../.test-dist/api-config-core.js";
+import { getWebHostname, resolveApiBaseUrl } from "../.test-dist/api-config-core.js";
+
+test("does not assume a native window global has browser location", () => {
+  assert.equal(getWebHostname("android", {}), undefined);
+  assert.equal(getWebHostname("android", { location: undefined }), undefined);
+});
+
+test("safely ignores a missing browser location and reads a real web hostname", () => {
+  assert.equal(getWebHostname("web", {}), undefined);
+  assert.equal(
+    getWebHostname("web", { location: { hostname: "preview.replit.dev" } }),
+    "preview.replit.dev",
+  );
+});
 
 test("prefers an explicit API URL over release and development hosts", () => {
   assert.equal(

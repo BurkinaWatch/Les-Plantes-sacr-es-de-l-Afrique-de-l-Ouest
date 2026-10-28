@@ -7,6 +7,22 @@ export interface ApiBaseUrlInputs {
   preferDevelopmentDomain?: boolean;
 }
 
+/**
+ * React Native may expose a global `window` without a browser `location`.
+ * Only read a hostname when both the platform and the window shape support it.
+ */
+export function getWebHostname(platform: string, windowLike: unknown): string | undefined {
+  if (platform !== "web" || typeof windowLike !== "object" || windowLike === null) {
+    return undefined;
+  }
+
+  const location = (windowLike as { location?: unknown }).location;
+  if (typeof location !== "object" || location === null) return undefined;
+
+  const hostname = (location as { hostname?: unknown }).hostname;
+  return typeof hostname === "string" ? hostname : undefined;
+}
+
 export function normalizeApiBaseUrl(value: unknown): string | null {
   if (typeof value !== 'string' || value.trim() === '') return null;
   return value.trim().replace(/\/+$/, '').replace(/\/api$/i, '');

@@ -26,3 +26,9 @@ The shared Expo development command must not globally default `EXPO_PUBLIC_API_B
 **Why:** The mobile preview returned a network error because its dev command supplied the Replit development host as an explicit API URL. The API itself was healthy, and the platform-aware resolver already correctly selected the local proxy for web and the configured API for native.
 
 **How to apply:** Leave `EXPO_PUBLIC_API_BASE_URL` unset by default in shared dev commands. Keep `EXPO_PUBLIC_DOMAIN` available and let the resolver select the local proxy only for web development; use an explicit API override only when a developer intentionally supplies one.
+
+React Native can define a global `window` without providing the browser-only `window.location`. Never read `window.location.hostname` just because `window` exists; gate hostname access on the web platform and validate the location object.
+
+**Why:** On Android, accessing `window.location.hostname` during root-module initialization raised a fatal JavaScript exception before Expo Router could render the first route.
+
+**How to apply:** Keep platform and window-shape checks in a small tested helper. Include a native-like `window` object with no `location` in API-config regression tests.

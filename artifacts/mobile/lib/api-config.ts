@@ -1,6 +1,6 @@
 import Constants from 'expo-constants';
 import { Platform } from 'react-native';
-import { resolveApiBaseUrl } from './api-config-core';
+import { getWebHostname, resolveApiBaseUrl } from './api-config-core';
 
 const configuredApiBaseUrl = Constants.expoConfig?.extra?.apiBaseUrl;
 
@@ -20,7 +20,9 @@ export function getApiBase(): string | null {
     developmentDomain: process.env.EXPO_PUBLIC_DOMAIN,
     platform: Platform.OS,
     preferDevelopmentDomain: Platform.OS === 'web' && __DEV__,
-    webHostname:
-      typeof window !== 'undefined' ? window.location.hostname : undefined,
+    webHostname: getWebHostname(
+      Platform.OS,
+      typeof window !== 'undefined' ? window : undefined,
+    ),
   });
 }
