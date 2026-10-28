@@ -2,7 +2,6 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
 import {
-  Alert,
   Image,
   Modal,
   Platform,
@@ -22,7 +21,7 @@ import { useAuth } from '@/context/AuthContext';
 import { PLANTS } from '@/data/animals';
 import { TOTEM_RESULTS } from '@/data/quiz';
 import { useColors } from '@/hooks/useColors';
-import { useTranslation, LANG_CODES, LANG_NAMES, type LangCode } from '@/i18n';
+import { useTranslation, LANG_CODES, LANG_NAMES } from '@/i18n';
 import { useGetSubscriptionPlans } from '@workspace/api-client-react';
 import { isValidEmail } from '@/lib/auth-validation';
 

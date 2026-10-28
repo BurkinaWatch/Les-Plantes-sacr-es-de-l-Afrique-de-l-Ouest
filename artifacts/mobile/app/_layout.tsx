@@ -120,8 +120,8 @@ function ScannerFab() {
     // Gentle breathing pulse on the button
     const breath = Animated.loop(
       Animated.sequence([
-        Animated.timing(pulseScale, { toValue: 1.08, duration: 1100, useNativeDriver: true }),
-        Animated.timing(pulseScale, { toValue: 1.0,  duration: 1100, useNativeDriver: true }),
+        Animated.timing(pulseScale, { toValue: 1.08, duration: 1100, useNativeDriver: isNative }),
+        Animated.timing(pulseScale, { toValue: 1.0,  duration: 1100, useNativeDriver: isNative }),
       ])
     );
 
@@ -129,12 +129,12 @@ function ScannerFab() {
     const ring = Animated.loop(
       Animated.sequence([
         Animated.parallel([
-          Animated.timing(ringScale,   { toValue: 1.7,  duration: 1400, useNativeDriver: true }),
-          Animated.timing(ringOpacity, { toValue: 0,    duration: 1400, useNativeDriver: true }),
+          Animated.timing(ringScale,   { toValue: 1.7,  duration: 1400, useNativeDriver: isNative }),
+          Animated.timing(ringOpacity, { toValue: 0,    duration: 1400, useNativeDriver: isNative }),
         ]),
         Animated.parallel([
-          Animated.timing(ringScale,   { toValue: 1.0,  duration: 0,    useNativeDriver: true }),
-          Animated.timing(ringOpacity, { toValue: 0.55, duration: 0,    useNativeDriver: true }),
+          Animated.timing(ringScale,   { toValue: 1.0,  duration: 0,    useNativeDriver: isNative }),
+          Animated.timing(ringOpacity, { toValue: 0.55, duration: 0,    useNativeDriver: isNative }),
         ]),
         Animated.delay(400),
       ])
@@ -161,10 +161,10 @@ function ScannerFab() {
           {
             borderColor: colors.gold,
             opacity: ringOpacity,
+            pointerEvents: "none",
             transform: [{ scale: ringScale }],
           },
         ]}
-        pointerEvents="none"
       />
 
       {/* Button with breathing scale */}

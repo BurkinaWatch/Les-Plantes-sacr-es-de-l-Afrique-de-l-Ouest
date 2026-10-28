@@ -73,8 +73,8 @@ export default function QuizScreen() {
       setSelectedValue(null);
       if (currentQ < QUIZ_QUESTIONS.length - 1) {
         Animated.sequence([
-          Animated.timing(fadeAnim, { toValue: 0, duration: 160, useNativeDriver: true }),
-          Animated.timing(fadeAnim, { toValue: 1, duration: 240, useNativeDriver: true }),
+          Animated.timing(fadeAnim, { toValue: 0, duration: 160, useNativeDriver: Platform.OS !== 'web' }),
+          Animated.timing(fadeAnim, { toValue: 1, duration: 240, useNativeDriver: Platform.OS !== 'web' }),
         ]).start();
         setTimeout(() => setCurrentQ((q) => q + 1), 160);
       } else {
@@ -409,7 +409,6 @@ export default function QuizScreen() {
         <View style={styles.likertRow}>
           {LIKERT_VALUES.map((val) => {
             const isSelected = selectedValue === val;
-            const isNear = selectedValue !== null && Math.abs(val - (selectedValue ?? 0)) <= 0;
             return (
               <Pressable
                 key={val}

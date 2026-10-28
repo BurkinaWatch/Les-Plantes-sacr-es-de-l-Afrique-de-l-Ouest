@@ -12,7 +12,6 @@ import {
   ScrollView,
   StyleSheet,
   Text,
-  type GestureResponderEvent,
   useWindowDimensions,
   View,
 } from 'react-native';

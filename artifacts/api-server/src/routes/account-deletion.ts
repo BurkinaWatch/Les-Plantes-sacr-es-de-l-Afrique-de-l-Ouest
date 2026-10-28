@@ -6,8 +6,6 @@ import { z } from "zod";
 import { requireJwt } from "../lib/auth-middleware.js";
 import { credentialsSchema } from "../lib/auth-credentials.js";
 
-const router = Router();
-
 type UserSelector = { userId: number } | { username: string };
 type DeletionResult = "deleted" | "invalid_credentials" | "missing";
 type PasswordComparer = (password: string, hash: string) => Promise<boolean>;

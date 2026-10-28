@@ -111,15 +111,15 @@ export default function HomeScreen() {
 
   useEffect(() => {
     Animated.parallel([
-      Animated.timing(fadeAnim, { toValue: 1, duration: 900, useNativeDriver: true }),
-      Animated.timing(slideAnim, { toValue: 0, duration: 800, useNativeDriver: true }),
-      Animated.spring(scaleAnim, { toValue: 1, tension: 60, friction: 8, useNativeDriver: true }),
+      Animated.timing(fadeAnim, { toValue: 1, duration: 900, useNativeDriver: Platform.OS !== 'web' }),
+      Animated.timing(slideAnim, { toValue: 0, duration: 800, useNativeDriver: Platform.OS !== 'web' }),
+      Animated.spring(scaleAnim, { toValue: 1, tension: 60, friction: 8, useNativeDriver: Platform.OS !== 'web' }),
     ]).start();
 
     Animated.loop(
       Animated.sequence([
-        Animated.timing(glowAnim, { toValue: 1, duration: 2200, useNativeDriver: true }),
-        Animated.timing(glowAnim, { toValue: 0.4, duration: 2200, useNativeDriver: true }),
+        Animated.timing(glowAnim, { toValue: 1, duration: 2200, useNativeDriver: Platform.OS !== 'web' }),
+        Animated.timing(glowAnim, { toValue: 0.4, duration: 2200, useNativeDriver: Platform.OS !== 'web' }),
       ])
     ).start();
   }, []);

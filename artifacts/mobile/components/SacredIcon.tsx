@@ -3,7 +3,6 @@ import { Platform } from 'react-native';
 import Svg, {
   Circle,
   Ellipse,
-  G,
   Line,
   Path,
   Polygon,

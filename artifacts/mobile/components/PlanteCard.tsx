@@ -3,7 +3,6 @@ import { useRouter } from 'expo-router';
 import React, { memo } from 'react';
 import { ImageBackground, Platform, Pressable, StyleSheet, Text, View } from 'react-native';
 
-import { useColors } from '@/hooks/useColors';
 import PLANT_IMAGES from '@/constants/plantImages';
 import type { Plante } from '@/data/animals';
 
@@ -23,7 +22,6 @@ const CATEGORY_LABELS: Record<string, string> = {
 };
 
 export const PlanteCard = memo(function PlanteCard({ plante, compact = false, numColumns = 2 }: Props) {
-  const colors = useColors();
   const router = useRouter();
 
   const cardHeight = compact ? 90 : numColumns >= 4 ? 100 : numColumns === 3 ? 110 : 115;
