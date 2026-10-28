@@ -18,7 +18,7 @@
 - [Expo asset paths](expo-asset-paths.md) — Metro asset sources may resolve through workspace dependencies; validate resolved sources, but publish only sanitized output paths
 - [Expo Go manifest protocol](expo-go-static-manifest.md) — self-hosted Expo Go manifests must use protocol version 0 and a form-data multipart manifest part
 - [Railway public domains](railway-public-domains.md) — service domains cannot be inferred reliably; authenticated Railway project access is required before embedding one in a client
-- [Expo/API routing](expo-api-routing.md) — prefer explicit API origins; native Expo Go avoids browser CORS, while Replit web preview needs an exact allowlist
+- [Expo/API routing](expo-api-routing.md) — use explicit API origins, exact web-preview CORS, and never assume native `window` has browser `location`
 - [PostgreSQL schema smoke metadata](schema-smoke-postgres.md) — cast catalog identifier aggregates to text[] before comparing them in Node
 - [Railway PostgreSQL TLS checks](postgres-railway-ssl.md) — pg 8.20 treats sslmode=require as verified TLS; disposable checks need a trusted CA
 - [Railway private database access](railway-private-db-access.md) — Railway’s internal PostgreSQL hostname cannot resolve from the Replit workspace; use service readiness or run checks inside Railway
