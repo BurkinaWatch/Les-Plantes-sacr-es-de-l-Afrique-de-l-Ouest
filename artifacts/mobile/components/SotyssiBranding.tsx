@@ -4,6 +4,7 @@ import { Image, StyleSheet, Text, useWindowDimensions, View } from "react-native
 import { useColors } from "@/hooks/useColors";
 
 const LOGO_SURFACE_PADDING = 8;
+const LOGO_SCALE = 0.75;
 
 type SotyssiBrandingProps = {
   variant?: "footer" | "compact";
@@ -29,7 +30,7 @@ export function SotyssiBranding({
   }
 
   const isWide = width >= 720;
-  const logoWidth = Math.max(0, Math.min(248, width - 80));
+  const logoWidth = Math.max(0, Math.min(248, width - 80)) * LOGO_SCALE;
   const year = new Date().getFullYear();
 
   return (
