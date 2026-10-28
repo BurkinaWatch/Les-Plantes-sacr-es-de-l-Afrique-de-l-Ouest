@@ -27,7 +27,13 @@ test("custom entry captures fatal errors before evaluating Expo Router", () => {
           installStartupFatalCapture() {
             calls.push("capture-installed");
           },
+          setNativeStartupDiagnosticBridge(bridge) {
+            calls.push(`native-bridge:${bridge === "native-diagnostic"}`);
+          },
         };
+      }
+      if (moduleName === "react-native") {
+        return { NativeModules: { StartupDiagnostic: "native-diagnostic" } };
       }
       if (moduleName === "expo-router/entry") {
         calls.push("router-evaluated");
@@ -41,6 +47,8 @@ test("custom entry captures fatal errors before evaluating Expo Router", () => {
     "require:./lib/startup-runtime",
     "stage:javascript-entry",
     "capture-installed",
+    "require:react-native",
+    "native-bridge:true",
     "require:expo-router/entry",
     "router-evaluated",
   ]);
@@ -67,8 +75,14 @@ test("synchronous Expo Router startup errors are recorded then rethrown", () => 
               recordStartupFatalError(error) {
                 calls.push(`recorded:${error === startupError}`);
               },
+            setNativeStartupDiagnosticBridge(bridge) {
+              calls.push(`native-bridge:${bridge === "native-diagnostic"}`);
+            },
             };
           }
+        if (moduleName === "react-native") {
+          return { NativeModules: { StartupDiagnostic: "native-diagnostic" } };
+        }
           if (moduleName === "expo-router/entry") throw startupError;
           throw new Error(`Unexpected entry dependency: ${moduleName}`);
         },
@@ -80,6 +94,8 @@ test("synchronous Expo Router startup errors are recorded then rethrown", () => 
     "require:./lib/startup-runtime",
     "stage:javascript-entry",
     "capture-installed",
+    "require:react-native",
+    "native-bridge:true",
     "require:expo-router/entry",
     "recorded:true",
   ]);

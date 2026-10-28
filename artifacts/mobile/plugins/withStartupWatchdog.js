@@ -1,12 +1,19 @@
 const fs = require("node:fs/promises");
 const path = require("node:path");
-const { withDangerousMod, withMainActivity } = require("expo/config-plugins");
+const {
+  withDangerousMod,
+  withMainActivity,
+  withMainApplication,
+} = require("expo/config-plugins");
 
 const WATCHDOG_SOURCE = "plugins/android/StartupWatchdog.kt";
+const DIAGNOSTIC_MODULE_SOURCE = "plugins/android/StartupDiagnosticModule.kt";
 const ACTIVITY_CLASS = "class MainActivity : ReactActivity() {";
 const SUPER_ON_CREATE = "    super.onCreate(null)";
 const OBSERVE_REACT_HOST = "    StartupWatchdog.observeReactHost(this)";
 const BACK_PRESSED_OVERRIDE = "  override fun invokeDefaultOnBackPressed() {";
+const APPLICATION_CLASS = "class MainApplication : Application(), ReactApplication {";
+const PACKAGES_APPLY = "PackageList(this).packages.apply {";
 
 function withStartupWatchdog(config) {
   config = withDangerousMod(config, [
@@ -36,9 +43,34 @@ function withStartupWatchdog(config) {
 
       await fs.mkdir(path.dirname(targetPath), { recursive: true });
       await fs.writeFile(targetPath, source);
+
+      const moduleSource = (await fs.readFile(
+        path.join(projectRoot, DIAGNOSTIC_MODULE_SOURCE),
+        "utf8",
+      )).replace("__PACKAGE_NAME__", packageName);
+      await fs.writeFile(
+        path.join(path.dirname(targetPath), "StartupDiagnosticModule.kt"),
+        moduleSource,
+      );
       return modConfig;
     },
   ]);
+
+  config = withMainApplication(config, (modConfig) => {
+    let source = modConfig.modResults.contents;
+    if (source.includes("add(StartupDiagnosticPackage())")) return modConfig;
+    if (!source.includes(APPLICATION_CLASS) || !source.includes(PACKAGES_APPLY)) {
+      throw new Error(
+        "Startup diagnostic could not safely patch the generated MainApplication.",
+      );
+    }
+    source = source.replace(
+      PACKAGES_APPLY,
+      `${PACKAGES_APPLY}\n          add(StartupDiagnosticPackage())`,
+    );
+    modConfig.modResults.contents = source;
+    return modConfig;
+  });
 
   return withMainActivity(config, (modConfig) => {
     let source = modConfig.modResults.contents;

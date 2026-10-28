@@ -9,14 +9,32 @@ export type StartupStage =
 export type StartupFatalDiagnostic = {
   errorType: string;
   stage: StartupStage;
+  errorMessage: string;
 };
 
 type GlobalErrorHandler = (error: unknown, isFatal?: boolean) => void;
+
+export type NativeStartupDiagnosticBridge = {
+  recordStartupError: (
+    errorType: string,
+    message: string,
+    stage: string,
+  ) => boolean;
+};
 
 type ErrorUtilsLike = {
   getGlobalHandler?: () => GlobalErrorHandler | undefined;
   setGlobalHandler: (handler: GlobalErrorHandler) => void;
 };
+
+const SAFE_STAGES = new Set<StartupStage>([
+  "javascript-entry",
+  "root-layout",
+  "providers",
+  "router",
+  "navigation",
+  "route-laid-out",
+]);
 
 function safeErrorType(error: unknown): string {
   const name =
@@ -32,11 +50,40 @@ function safeErrorType(error: unknown): string {
   return /^[A-Za-z][A-Za-z0-9_]{0,39}$/.test(name) ? name : "Error";
 }
 
+function safeErrorMessage(error: unknown): string {
+  const rawMessage =
+    error instanceof Error
+      ? error.message
+      : typeof error === "object" &&
+          error !== null &&
+          "message" in error &&
+          typeof error.message === "string"
+        ? error.message
+        : "";
+
+  if (!rawMessage) return "Message indisponible";
+
+  return rawMessage
+    .replace(/[\u0000-\u001f\u007f]/g, " ")
+    .replace(/\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}\b/gi, "[e-mail]")
+    .replace(/\bBearer\s+\S+/gi, "Bearer [masqué]")
+    .replace(/\beyJ[A-Za-z0-9_-]{10,}\.[A-Za-z0-9_-]{10,}(?:\.[A-Za-z0-9_-]{10,})?\b/g, "[jeton masqué]")
+    .replace(/\bhttps?:\/\/\S+/gi, "[URL masquée]")
+    .replace(
+      /\b(authorization|token|access[_-]?token|refresh[_-]?token|password|passwd|secret|cookie|session|credential|email|e-mail|api[_-]?key)\b\s*[:=]\s*[^\s,;]+/gi,
+      "$1=[masqué]",
+    )
+    .replace(/\s+/g, " ")
+    .trim()
+    .slice(0, 180) || "Message indisponible";
+}
+
 export function createStartupFatalCapture() {
   let stage: StartupStage = "javascript-entry";
   let ready = false;
   let fatalDiagnostic: StartupFatalDiagnostic | null = null;
   let installed = false;
+  let nativeBridge: NativeStartupDiagnosticBridge | undefined;
   const listeners = new Set<
     (diagnostic: StartupFatalDiagnostic) => void
   >();
@@ -47,7 +94,22 @@ export function createStartupFatalCapture() {
     fatalDiagnostic = {
       errorType: safeErrorType(error),
       stage,
+      errorMessage: safeErrorMessage(error),
     };
+    try {
+      const saved = nativeBridge?.recordStartupError(
+        fatalDiagnostic.errorType,
+        fatalDiagnostic.errorMessage,
+        fatalDiagnostic.stage,
+      );
+      if (saved === false) {
+        console.warn("[Startup] Native startup diagnostic was not saved");
+      }
+    } catch (bridgeError) {
+      console.warn(
+        `[Startup] Native diagnostic bridge unavailable (${safeErrorType(bridgeError)})`,
+      );
+    }
     console.error(
       `[Startup] Fatal JavaScript error before first route (${fatalDiagnostic.errorType}) at ${fatalDiagnostic.stage}`,
     );
@@ -71,6 +133,10 @@ export function createStartupFatalCapture() {
     setStage(nextStage: StartupStage) {
       stage = nextStage;
       if (nextStage === "route-laid-out") ready = true;
+    },
+
+    setNativeBridge(bridge: NativeStartupDiagnosticBridge | undefined) {
+      nativeBridge = bridge;
     },
 
     getDiagnostic() {
@@ -107,7 +173,13 @@ export function createStartupFatalCapture() {
 const startupFatalCapture = createStartupFatalCapture();
 
 export function setStartupStage(stage: StartupStage): void {
-  startupFatalCapture.setStage(stage);
+  startupFatalCapture.setStage(SAFE_STAGES.has(stage) ? stage : "javascript-entry");
+}
+
+export function setNativeStartupDiagnosticBridge(
+  bridge: NativeStartupDiagnosticBridge | undefined,
+): void {
+  startupFatalCapture.setNativeBridge(bridge);
 }
 
 export function getStartupFatalDiagnostic(): StartupFatalDiagnostic | null {

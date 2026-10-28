@@ -30,7 +30,14 @@ test("fatal startup errors reach the mounted recovery listener without exposing 
   const runtime = makeErrorUtils();
   runtime.setOriginalHandler(() => runtime.countPreviousCall());
   const events = [];
+  const nativeErrors = [];
 
+  capture.setNativeBridge({
+    recordStartupError: (...args) => {
+      nativeErrors.push(args);
+      return true;
+    },
+  });
   capture.setStage("navigation");
   capture.subscribe(event => events.push(event));
   capture.install(runtime.utils);
@@ -42,9 +49,34 @@ test("fatal startup errors reach the mounted recovery listener without exposing 
   assert.deepEqual(capture.getDiagnostic(), {
     errorType: "TypeError",
     stage: "navigation",
+    errorMessage: "[e-mail] token=[masqué]",
   });
-  assert.deepEqual(events, [{ errorType: "TypeError", stage: "navigation" }]);
+  assert.deepEqual(events, [{
+    errorType: "TypeError",
+    stage: "navigation",
+    errorMessage: "[e-mail] token=[masqué]",
+  }]);
+  assert.deepEqual(nativeErrors, [[
+    "TypeError",
+    "[e-mail] token=[masqué]",
+    "navigation",
+  ]]);
   assert.equal(runtime.previousCalls, 0);
+});
+
+test("native diagnostic bridge failures do not replace React Native error handling", () => {
+  const capture = createStartupFatalCapture();
+  const runtime = makeErrorUtils();
+  runtime.setOriginalHandler(() => runtime.countPreviousCall());
+  capture.setNativeBridge({
+    recordStartupError() {
+      throw new Error("native bridge failed");
+    },
+  });
+  capture.install(runtime.utils);
+
+  assert.doesNotThrow(() => runtime.invoke(new Error("startup failed"), true));
+  assert.equal(runtime.previousCalls, 1);
 });
 
 test("fatal startup errors before a recovery listener preserve React Native handling", () => {

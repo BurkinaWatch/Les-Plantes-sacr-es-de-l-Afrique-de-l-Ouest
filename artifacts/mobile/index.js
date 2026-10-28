@@ -7,6 +7,10 @@ startupRuntime.setStartupStage("javascript-entry");
 startupRuntime.installStartupFatalCapture();
 
 try {
+  const { NativeModules } = require("react-native");
+  startupRuntime.setNativeStartupDiagnosticBridge(
+    NativeModules?.StartupDiagnostic,
+  );
   require("expo-router/entry");
 } catch (error) {
   // Some synchronous module-evaluation failures do not pass through
