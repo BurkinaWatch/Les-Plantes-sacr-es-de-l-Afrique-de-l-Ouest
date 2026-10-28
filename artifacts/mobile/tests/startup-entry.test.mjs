@@ -27,13 +27,27 @@ test("custom entry captures fatal errors before evaluating Expo Router", () => {
           installStartupFatalCapture() {
             calls.push("capture-installed");
           },
+          recordStartupMarker(marker) {
+            calls.push(`marker:${marker}`);
+          },
           setNativeStartupDiagnosticBridge(bridge) {
             calls.push(`native-bridge:${bridge === "native-diagnostic"}`);
+          },
+          setStartupUpdateMetadata(metadata) {
+            calls.push(`updates:${metadata.runtimeVersion}:${metadata.channel}`);
           },
         };
       }
       if (moduleName === "react-native") {
         return { NativeModules: { StartupDiagnostic: "native-diagnostic" } };
+      }
+      if (moduleName === "expo-updates") {
+        return {
+          runtimeVersion: "1.0.17",
+          channel: "preview",
+          updateId: null,
+          isEmbeddedLaunch: true,
+        };
       }
       if (moduleName === "expo-router/entry") {
         calls.push("router-evaluated");
@@ -49,6 +63,9 @@ test("custom entry captures fatal errors before evaluating Expo Router", () => {
     "capture-installed",
     "require:react-native",
     "native-bridge:true",
+    "marker:STARTUP_01_INDEX_JS_LOADED",
+    "require:expo-updates",
+    "updates:1.0.17:preview",
     "require:expo-router/entry",
     "router-evaluated",
   ]);
@@ -75,14 +92,31 @@ test("synchronous Expo Router startup errors are recorded then rethrown", () => 
               recordStartupFatalError(error) {
                 calls.push(`recorded:${error === startupError}`);
               },
-            setNativeStartupDiagnosticBridge(bridge) {
-              calls.push(`native-bridge:${bridge === "native-diagnostic"}`);
-            },
+              recordStartupMarker(marker) {
+                calls.push(`marker:${marker}`);
+              },
+              setNativeStartupDiagnosticBridge(bridge) {
+                calls.push(`native-bridge:${bridge === "native-diagnostic"}`);
+              },
+              setStartupUpdateMetadata(metadata) {
+                calls.push(`updates:${metadata.runtimeVersion}:${metadata.channel}`);
+              },
             };
           }
-        if (moduleName === "react-native") {
-          return { NativeModules: { StartupDiagnostic: "native-diagnostic" } };
-        }
+          if (moduleName === "react-native") {
+            return { NativeModules: { StartupDiagnostic: "native-diagnostic" } };
+          }
+          if (moduleName === "expo-updates") {
+            return {
+              runtimeVersion: "1.0.17",
+              channel: "preview",
+              updateId: null,
+              isEmbeddedLaunch: true,
+            };
+          }
+          if (moduleName === "expo-splash-screen") {
+            return { hideAsync: () => Promise.resolve() };
+          }
           if (moduleName === "expo-router/entry") throw startupError;
           throw new Error(`Unexpected entry dependency: ${moduleName}`);
         },
@@ -96,7 +130,12 @@ test("synchronous Expo Router startup errors are recorded then rethrown", () => 
     "capture-installed",
     "require:react-native",
     "native-bridge:true",
+    "marker:STARTUP_01_INDEX_JS_LOADED",
+    "require:expo-updates",
+    "updates:1.0.17:preview",
     "require:expo-router/entry",
     "recorded:true",
+    "marker:STARTUP_06_SPLASH_HIDE_ASYNC_CALLED",
+    "require:expo-splash-screen",
   ]);
 });

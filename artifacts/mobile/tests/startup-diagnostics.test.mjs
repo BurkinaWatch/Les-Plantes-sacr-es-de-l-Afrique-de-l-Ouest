@@ -72,11 +72,53 @@ test("fatal startup report shares only the sanitized error type and startup stag
   assert.doesNotMatch(report, /private@example\.com|account@example\.com|TypeError\\n/);
 });
 
+test("startup report includes sanitized error details and exact native runtime metadata", () => {
+  const report = buildStartupDiagnostic({
+    reason: "promise-rejection",
+    route: "(auth)/login",
+    platform: "android",
+    osVersion: 28,
+    appVersion: "1.0.17",
+    buildNumber: 26,
+    runtimeVersion: "1.0.17",
+    easChannel: "preview",
+    updateId: "b8a3d042-52bd-4cb5-90d5-801268d3a9ad",
+    isEmbeddedLaunch: false,
+    abi: "arm64-v8a, armeabi-v7a",
+    newArchitecture: true,
+    jsEngine: "Hermes",
+    runtimeErrorType: "TypeError",
+    errorMessage: "token=private-token failed for customer@example.com",
+    errorStack: "TypeError: token=private-token\nat RootLayout\nhttps://private.invalid",
+    errorKind: "promise-rejection",
+  });
+
+  assert.match(report, /Runtime version : 1\.0\.17/);
+  assert.match(report, /Canal EAS Update : preview/);
+  assert.match(report, /Mise à jour chargée : b8a3d042-52bd-4cb5-90d5-801268d3a9ad/);
+  assert.match(report, /ABI : arm64-v8a, armeabi-v7a/);
+  assert.match(report, /Nouvelle architecture : oui/);
+  assert.match(report, /Moteur JavaScript : Hermes/);
+  assert.match(report, /Catégorie : promise-rejection/);
+  assert.match(report, /Message court : token=\[masqué\] failed for \[e-mail\]/);
+  assert.match(report, /at RootLayout/);
+  assert.doesNotMatch(report, /private-token|customer@example\.com|private\.invalid/);
+});
+
 test("diagnostic is only shared after the user presses the recovery button", async () => {
   const projectRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
   const shareCalls = [];
   const native = {
     Alert: { alert() {} },
+    NativeModules: {
+      StartupDiagnostic: {
+        getRuntimeInfo: () => ({
+          abi: "arm64-v8a",
+          newArchitecture: true,
+          jsEngine: "Hermes",
+        }),
+      },
+    },
     Platform: { OS: "android", Version: 35 },
     Pressable: "Pressable",
     Share: { share: async payload => { shareCalls.push(payload); } },
@@ -86,6 +128,14 @@ test("diagnostic is only shared after the user presses the recovery button", asy
   Module._load = function (id, ...args) {
     if (id === "expo-constants") {
       return { expoConfig: { version: "1.0.5", android: { versionCode: 14 } } };
+    }
+    if (id === "expo-updates") {
+      return {
+        runtimeVersion: "1.0.5",
+        channel: "preview",
+        updateId: null,
+        isEmbeddedLaunch: true,
+      };
     }
     if (id === "react-native") return native;
     if (id === "@/lib/startup-diagnostics") {
@@ -113,6 +163,8 @@ test("diagnostic is only shared after the user presses the recovery button", asy
     assert.equal(shareCalls.length, 1);
     assert.match(shareCalls[0].message, /Version du système : 35/);
     assert.match(shareCalls[0].message, /Numéro de build : 14/);
+    assert.match(shareCalls[0].message, /Canal EAS Update : preview/);
+    assert.match(shareCalls[0].message, /ABI : arm64-v8a/);
     assert.doesNotMatch(shareCalls[0].message, /private@example\.com/);
   } finally {
     if (renderer) await act(async () => renderer.unmount());
