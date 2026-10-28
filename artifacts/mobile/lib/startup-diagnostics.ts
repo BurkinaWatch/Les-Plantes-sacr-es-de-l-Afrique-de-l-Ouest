@@ -1,7 +1,4 @@
-import {
-  getSafeStartupErrorDetails,
-  type StartupStage,
-} from "./startup-runtime";
+import type { StartupStage } from "./startup-runtime";
 
 export type StartupDiagnosticReason =
   | "route-timeout"
@@ -71,6 +68,49 @@ function safeAbi(value: unknown): string {
   return values.length ? values.join(", ") : "indisponible";
 }
 
+function safeErrorDetails(
+  errorType: unknown,
+  errorMessage: unknown,
+  errorStack: unknown,
+): { errorType: string; errorMessage: string; errorStack: string } {
+  const safeType =
+    typeof errorType === "string" &&
+    /^[A-Za-z][A-Za-z0-9_]{0,39}$/.test(errorType)
+      ? errorType
+      : "Error";
+  const sanitizeText = (value: string): string =>
+    value
+      .replace(/[\u0000-\u001f\u007f]/g, " ")
+      .replace(/\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}\b/gi, "[e-mail]")
+      .replace(/\bBearer\s+\S+/gi, "Bearer [masqué]")
+      .replace(/\beyJ[A-Za-z0-9_-]{10,}\.[A-Za-z0-9_-]{10,}(?:\.[A-Za-z0-9_-]{10,})?\b/g, "[jeton masqué]")
+      .replace(/\bhttps?:\/\/\S+/gi, "[URL masquée]")
+      .replace(
+        /\b(authorization|token|access[_-]?token|refresh[_-]?token|password|passwd|secret|cookie|session|credential|email|e-mail|api[_-]?key)\b\s*[:=]\s*[^\s,;]+/gi,
+        "$1=[masqué]",
+      )
+      .replace(/\s+/g, " ")
+      .trim()
+      .slice(0, 180) || "Message indisponible";
+  const safeMessage =
+    typeof errorMessage === "string"
+      ? sanitizeText(errorMessage)
+      : "Message indisponible";
+  const stackLines =
+    typeof errorStack === "string"
+      ? errorStack
+          .split(/\r?\n/)
+          .slice(0, 4)
+          .map(sanitizeText)
+          .filter((line) => line !== "Message indisponible")
+      : [];
+  return {
+    errorType: safeType,
+    errorMessage: safeMessage,
+    errorStack: stackLines.join("\n").slice(0, 500) || "Pile indisponible",
+  };
+}
+
 function safeRoute(route: string): string {
   const firstSegment = route.split("/")[0] ?? "";
   return ROUTE_LABELS[firstSegment] ?? "autre";
@@ -133,12 +173,10 @@ export function buildStartupDiagnostic(input: {
     `Écran concerné : ${safeRoute(input.route)}`,
     ...(input.errorMessage !== undefined
       ? (() => {
-          const details = getSafeStartupErrorDetails(
-            {
-              name: input.runtimeErrorType,
-              message: String(input.errorMessage),
-            },
-            typeof input.errorStack === "string" ? input.errorStack : undefined,
+          const details = safeErrorDetails(
+            input.runtimeErrorType,
+            input.errorMessage,
+            input.errorStack,
           );
           return [
             `Type d’erreur JavaScript : ${details.errorType}`,

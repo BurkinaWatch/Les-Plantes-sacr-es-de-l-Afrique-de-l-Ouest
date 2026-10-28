@@ -155,7 +155,7 @@ test("unhandled promise failures are captured with a sanitized stack before read
     true,
   );
   assert.equal(events[0].errorKind, "promise-rejection");
-  assert.match(events[0].errorMessage, /\[e-mail\].*token=\[masqué\]/);
+  assert.match(events[0].errorMessage, /email=\[masqué\].*token=\[masqué\]/);
   assert.equal(nativeErrors[0][4], "promise-rejection");
   assert.doesNotMatch(events[0].errorStack, /customer@example\.com|private-token/);
 });
