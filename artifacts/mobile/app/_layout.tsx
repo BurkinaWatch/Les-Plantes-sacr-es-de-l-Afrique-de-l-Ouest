@@ -35,7 +35,10 @@ import {
 } from "@workspace/api-client-react";
 import {
   getStartupFatalDiagnostic,
+  getSafeStartupErrorDetails,
   installStartupFatalCapture,
+  recordStartupMarker,
+  recordStartupRenderError,
   setStartupStage,
   subscribeToStartupFatal,
   type StartupFatalDiagnostic,
@@ -64,10 +67,36 @@ if (Platform.OS === "web" && typeof window !== "undefined") {
 
 const queryClient = new QueryClient();
 const isNative = Platform.OS !== "web";
+let nativeSplashHidden = false;
+let nativeSplashHideTask: Promise<void> | null = null;
+
+async function hideNativeSplashOnce(): Promise<void> {
+  if (!isNative || nativeSplashHidden) return;
+  if (nativeSplashHideTask) return nativeSplashHideTask;
+
+  recordStartupMarker("STARTUP_06_SPLASH_HIDE_ASYNC_CALLED");
+  let hidden = false;
+  nativeSplashHideTask = (async () => {
+    try {
+      await SplashScreen.hideAsync();
+      hidden = true;
+      nativeSplashHidden = true;
+    } catch (error) {
+      console.warn(
+        "[Startup] Unable to hide the native splash screen:",
+        error instanceof Error ? error.name : "Unknown error",
+      );
+    } finally {
+      if (!hidden) nativeSplashHideTask = null;
+    }
+  })();
+  return nativeSplashHideTask;
+}
 
 if (isNative) {
   void SplashScreen.preventAutoHideAsync().catch((error) => {
     console.warn("Unable to retain the native splash screen:", error);
+    void hideNativeSplashOnce();
   });
 }
 
@@ -246,6 +275,7 @@ function RootLayoutNav({
   const { user, token, isLoading: authLoading, logout } = useAuth();
   const routeKey = segments.join("/");
   const markCurrentRouteLaidOut = useCallback(() => {
+    recordStartupMarker("STARTUP_05_FIRST_ON_LAYOUT");
     onRouteLayoutReady(routeKey);
   }, [onRouteLayoutReady, routeKey]);
   const routeGroup = segments[0] ?? "";
@@ -293,6 +323,10 @@ function RootLayoutNav({
     !onSubscriptionRoute &&
     !onAccountDeletionRoute &&
     !onFallbackRoute;
+
+  useEffect(() => {
+    recordStartupMarker("STARTUP_04_STACK_MOUNTED");
+  }, []);
 
   useEffect(() => {
     console.info(`[Startup] Active route: ${routeKey || "(none)"}`);
@@ -462,12 +496,21 @@ function isUnauthorizedApiError(error: unknown): boolean {
 
 /* ── Root Layout ───────────────────────────────────────────────── */
 export default function RootLayout() {
+  useEffect(() => {
+    recordStartupMarker("STARTUP_02_ROOT_LAYOUT_MOUNTED");
+  }, []);
+
   return (
     <ErrorBoundary
       FallbackComponent={StartupFatalFallback}
       onError={(error, componentStack) => {
         console.error("[Startup] Root render error:", error.name);
         console.error("[Startup] Root component stack:", componentStack);
+        recordStartupRenderError(
+          error,
+          [error.stack, componentStack].filter(Boolean).join("\n"),
+        );
+        void hideNativeSplashOnce();
       }}
     >
       <RootLayoutContent />
@@ -475,13 +518,12 @@ export default function RootLayout() {
   );
 }
 
-function StartupFatalFallback({ resetError }: ErrorFallbackProps) {
+function StartupFatalFallback({ error, resetError }: ErrorFallbackProps) {
   useEffect(() => {
     console.error("[Startup] Displaying root error recovery screen");
-    void SplashScreen.hideAsync().catch((error) => {
-      console.warn("Unable to hide the native splash from root recovery:", error);
-    });
+    void hideNativeSplashOnce();
   }, []);
+  const safeError = getSafeStartupErrorDetails(error);
 
   const retry = async () => {
     try {
@@ -501,8 +543,10 @@ function StartupFatalFallback({ resetError }: ErrorFallbackProps) {
         L’application n’a pas pu démarrer
       </Text>
       <Text style={styles.startupRecoveryMessage}>
-        Une erreur a interrompu l’ouverture. Réessayez ou partagez un diagnostic
-        sûr pour nous aider à identifier le problème.
+        {safeError.errorMessage}
+      </Text>
+      <Text selectable style={styles.startupRecoveryStack}>
+        {safeError.errorStack}
       </Text>
       <Pressable
         accessibilityRole="button"
@@ -517,6 +561,10 @@ function StartupFatalFallback({ resetError }: ErrorFallbackProps) {
       <StartupDiagnosticButton
         reason="react-render-error"
         route=""
+        runtimeErrorType={safeError.errorType}
+        errorMessage={safeError.errorMessage}
+        errorStack={safeError.errorStack}
+        errorKind="react-render-error"
         style={styles.startupDiagnosticButton}
       />
     </View>
@@ -529,7 +577,6 @@ function RootLayoutContent() {
   const [runtimeFatal, setRuntimeFatal] =
     useState<StartupFatalDiagnostic | null>(getStartupFatalDiagnostic);
   const [routeKey, setRouteKey] = useState("");
-  const nativeSplashHidden = useRef(false);
   const navigationReady = Boolean(
     routeKey.length > 0 &&
       routeKey !== "index" &&
@@ -542,7 +589,6 @@ function RootLayoutContent() {
   }, []);
 
   useEffect(() => {
-    setStartupStage("providers");
     return subscribeToStartupFatal(setRuntimeFatal);
   }, []);
 
@@ -602,16 +648,12 @@ function RootLayoutContent() {
     if (
       !isNative ||
       (!navigationReady && !startupFailed && !runtimeFatal) ||
-      nativeSplashHidden.current
+    nativeSplashHidden
     ) {
       return;
     }
 
-    nativeSplashHidden.current = true;
-    void SplashScreen.hideAsync().catch((error) => {
-      nativeSplashHidden.current = false;
-      console.warn("Unable to hide the native splash screen:", error);
-    });
+    void hideNativeSplashOnce();
   }, [navigationReady, runtimeFatal, startupFailed]);
 
   return (
@@ -620,6 +662,11 @@ function RootLayoutContent() {
         onError={(error, componentStack) => {
           console.error("[Startup] React render error:", error.name);
           console.error("[Startup] React component stack:", componentStack);
+            recordStartupRenderError(
+              error,
+              [error.stack, componentStack].filter(Boolean).join("\n"),
+            );
+            void hideNativeSplashOnce();
         }}
       >
         <QueryClientProvider client={queryClient}>
@@ -627,6 +674,7 @@ function RootLayoutContent() {
               <LanguageProvider>
                 <AuthProvider>
                   <AppProvider>
+                    <StartupProvidersMarker />
                     <NotificationsSetup />
                     <View style={{ flex: 1 }}>
                       <RootLayoutNav
@@ -637,7 +685,11 @@ function RootLayoutContent() {
                         <StartupRecoveryScreen
                           route={routeKey}
                           reason={
-                            runtimeFatal ? "runtime-js-error" : "route-timeout"
+                            runtimeFatal?.errorKind === "promise-rejection"
+                              ? "promise-rejection"
+                              : runtimeFatal
+                                ? "runtime-js-error"
+                                : "route-timeout"
                           }
                           runtimeFatal={runtimeFatal}
                         />
@@ -653,13 +705,24 @@ function RootLayoutContent() {
   );
 }
 
+function StartupProvidersMarker() {
+  useEffect(() => {
+    setStartupStage("providers");
+    recordStartupMarker("STARTUP_03_PROVIDERS_MOUNTED");
+  }, []);
+  return null;
+}
+
 function StartupRecoveryScreen({
   route,
   reason,
   runtimeFatal,
 }: {
   route: string;
-  reason: "route-timeout" | "runtime-js-error";
+  reason:
+    | "route-timeout"
+    | "runtime-js-error"
+    | "promise-rejection";
   runtimeFatal: StartupFatalDiagnostic | null;
 }) {
   const handleRetry = async () => {
@@ -680,9 +743,14 @@ function StartupRecoveryScreen({
       </Text>
       <Text style={styles.startupRecoveryMessage}>
         {runtimeFatal
-          ? `Une erreur ${runtimeFatal.errorType} a interrompu le démarrage avant le premier écran. Réessayez ou partagez le diagnostic sûr.`
+          ? runtimeFatal.errorMessage
           : "L’écran d’accueil ne s’est pas chargé. Réessayez de démarrer l’application."}
       </Text>
+      {runtimeFatal ? (
+        <Text selectable style={styles.startupRecoveryStack}>
+          {runtimeFatal.errorStack}
+        </Text>
+      ) : null}
       <Text style={styles.startupDiagnosticPrivacy}>
         Le rapport ne contient ni identifiant, ni e-mail, ni jeton. Rien n’est
         transmis avant que vous choisissiez de le partager.
@@ -702,6 +770,9 @@ function StartupRecoveryScreen({
         route={route}
         stage={runtimeFatal?.stage}
         runtimeErrorType={runtimeFatal?.errorType}
+        errorMessage={runtimeFatal?.errorMessage}
+        errorStack={runtimeFatal?.errorStack}
+        errorKind={runtimeFatal?.errorKind}
         style={styles.startupDiagnosticButton}
       />
     </View>
@@ -733,6 +804,19 @@ const styles = StyleSheet.create({
     lineHeight: 24,
     textAlign: "center",
     marginBottom: 24,
+  },
+  startupRecoveryStack: {
+    color: "#D8CDB6",
+    fontFamily: Platform.select({
+      android: "monospace",
+      ios: "Menlo",
+      default: "monospace",
+    }),
+    fontSize: 11,
+    lineHeight: 16,
+    marginBottom: 18,
+    maxWidth: 340,
+    textAlign: "left",
   },
   startupDiagnosticPrivacy: {
     color: "#D8CDB6",

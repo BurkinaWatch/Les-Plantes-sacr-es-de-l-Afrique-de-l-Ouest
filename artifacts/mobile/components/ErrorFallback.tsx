@@ -14,6 +14,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useColors } from "@/hooks/useColors";
 import { SacredIcon } from "@/components/SacredIcon";
 import { StartupDiagnosticButton } from "@/components/StartupDiagnosticButton";
+import { getSafeStartupErrorDetails } from "@/lib/startup-runtime";
 
 export type ErrorFallbackProps = {
   error: Error;
@@ -30,6 +31,7 @@ export function ErrorFallback({
   const insets = useSafeAreaInsets();
 
   const [isModalVisible, setIsModalVisible] = useState(initialModalVisible);
+  const safeError = getSafeStartupErrorDetails(error);
 
   useEffect(() => {
     setIsModalVisible(initialModalVisible);
@@ -80,11 +82,21 @@ export function ErrorFallback({
 
       <View style={styles.content}>
         <Text style={[styles.title, { color: colors.foreground }]}>
-          Something went wrong
+          L’application n’a pas pu continuer
         </Text>
 
         <Text style={[styles.message, { color: colors.mutedForeground }]}>
-          Please reload the app to continue.
+          {safeError.errorMessage}
+        </Text>
+
+        <Text
+          selectable
+          style={[
+            styles.stackPreview,
+            { color: colors.mutedForeground, fontFamily: monoFont },
+          ]}
+        >
+          {safeError.errorStack}
         </Text>
 
         <Pressable
@@ -104,18 +116,22 @@ export function ErrorFallback({
               { color: colors.primaryForeground },
             ]}
           >
-            Try Again
+            Réessayer
           </Text>
         </Pressable>
         <StartupDiagnosticButton
           reason="react-render-error"
           route=""
+          runtimeErrorType={safeError.errorType}
+          errorMessage={safeError.errorMessage}
+          errorStack={safeError.errorStack}
+          errorKind="react-render-error"
           style={styles.diagnosticButton}
           textStyle={{ color: colors.foreground }}
         />
         <Text style={[styles.privacyNote, { color: colors.mutedForeground }]}>
-          Le rapport exclut les données du compte, les jetons et le texte de
-          l’erreur. Rien n’est partagé sans votre accord.
+          Le rapport contient un message et un début de pile nettoyés, sans
+          données de compte ni jetons. Rien n’est partagé sans votre accord.
         </Text>
       </View>
 
@@ -217,6 +233,12 @@ const styles = StyleSheet.create({
     fontSize: 16,
     textAlign: "center",
     lineHeight: 24,
+  },
+  stackPreview: {
+    fontSize: 11,
+    lineHeight: 16,
+    maxWidth: 340,
+    textAlign: "left",
   },
   topButton: {
     position: "absolute",
