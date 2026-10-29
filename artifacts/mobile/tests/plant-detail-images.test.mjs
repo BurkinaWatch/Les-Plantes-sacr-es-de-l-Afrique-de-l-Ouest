@@ -3,14 +3,10 @@ import { createRequire } from "node:module";
 import path from "node:path";
 import test from "node:test";
 import { fileURLToPath } from "node:url";
-
-process.env.NODE_ENV = "test";
-globalThis.IS_REACT_ACT_ENVIRONMENT = true;
+import { act, createScreenRenderer } from "./screen-test-renderer.mjs";
 
 const require = createRequire(import.meta.url);
-const TestRenderer = require("react-test-renderer");
 const React = require("react");
-const { act } = TestRenderer;
 const Module = require("node:module");
 const projectRoot = path.resolve(
   path.dirname(fileURLToPath(import.meta.url)),
@@ -25,6 +21,13 @@ function makeHostComponent(type, { resolvePressableChildren = false } = {}) {
         ? props.children({ pressed: false })
         : props.children;
     return React.createElement(type, { ...props, ref }, children);
+  });
+}
+
+function makeScrollableHostComponent() {
+  return React.forwardRef((props, ref) => {
+    React.useImperativeHandle(ref, () => ({ scrollTo() {} }), []);
+    return React.createElement("ScrollView", props, props.children);
   });
 }
 
@@ -89,7 +92,7 @@ function makeNativeMock() {
     Pressable: makeHostComponent("Pressable", {
       resolvePressableChildren: true,
     }),
-    ScrollView: makeHostComponent("ScrollView"),
+    ScrollView: makeScrollableHostComponent(),
     StyleSheet: {
       create: (styles) => styles,
       absoluteFillObject: {},
@@ -200,7 +203,7 @@ test("each complementary plant renders its dedicated detail illustration", () =>
       currentPlant.id = id;
       let renderer;
       act(() => {
-        renderer = TestRenderer.create(React.createElement(screen));
+        renderer = createScreenRenderer(React.createElement(screen));
       });
 
       const images = renderedImages(renderer);
@@ -236,7 +239,7 @@ test("catalog plants render their registered illustration or keep the placeholde
       currentPlant.id = id;
       let renderer;
       act(() => {
-        renderer = TestRenderer.create(React.createElement(screen));
+        renderer = createScreenRenderer(React.createElement(screen));
       });
 
       const images = renderedImages(renderer);
@@ -277,7 +280,7 @@ test("detail screen keeps the existing fallback for plants without an illustrati
   try {
     let renderer;
     act(() => {
-      renderer = TestRenderer.create(React.createElement(screen));
+      renderer = createScreenRenderer(React.createElement(screen));
     });
 
     assert.equal(
@@ -301,7 +304,7 @@ test("plant image opens in a zoomable viewer and the detail page navigates by sw
   try {
     let renderer;
     act(() => {
-      renderer = TestRenderer.create(React.createElement(screen));
+      renderer = createScreenRenderer(React.createElement(screen));
     });
 
     const imageButton = renderer.root.findByProps({ testID: "plant-detail-image" });

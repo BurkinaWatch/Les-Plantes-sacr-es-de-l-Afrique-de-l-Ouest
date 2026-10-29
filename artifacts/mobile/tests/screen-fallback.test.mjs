@@ -3,13 +3,10 @@ import { createRequire } from "node:module";
 import path from "node:path";
 import test from "node:test";
 import { fileURLToPath } from "node:url";
+import { act, createScreenRenderer } from "./screen-test-renderer.mjs";
 
-process.env.NODE_ENV = "test";
-globalThis.IS_REACT_ACT_ENVIRONMENT = true;
 const require = createRequire(import.meta.url);
 const React = require("react");
-const TestRenderer = require("react-test-renderer");
-const { act } = TestRenderer;
 const Module = require("node:module");
 const projectRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const screenDist = path.join(projectRoot, ".screen-test-dist");
@@ -97,10 +94,20 @@ function makeHostComponent(type, { resolvePressableChildren = false } = {}) {
   });
 }
 
+function makeScrollableHostComponent() {
+  return React.forwardRef((props, ref) => {
+    React.useImperativeHandle(ref, () => ({
+      scrollTo() {},
+      scrollToEnd() {},
+    }), []);
+    return React.createElement("ScrollView", props, props.children);
+  });
+}
+
 function makeNativeMock() {
   const View = makeHostComponent("View");
   const Text = makeHostComponent("Text");
-  const ScrollView = makeHostComponent("ScrollView");
+  const ScrollView = makeScrollableHostComponent();
   const KeyboardAvoidingView = makeHostComponent("KeyboardAvoidingView");
   const Pressable = makeHostComponent("Pressable", { resolvePressableChildren: true });
   const TextInput = makeHostComponent("TextInput");
@@ -264,7 +271,7 @@ test("Totem screen shows recovery text and clears loading for empty AI content",
     const { default: ChatTotemScreen } = require(path.join(screenDist, "app/chat-totem.js"));
     let renderer;
     await act(async () => {
-      renderer = TestRenderer.create(React.createElement(ChatTotemScreen));
+      renderer = createScreenRenderer(React.createElement(ChatTotemScreen));
     });
 
     await act(async () => {
@@ -305,12 +312,11 @@ test("Scanner shows unavailable recovery UI for incomplete plant data and retrie
     const { default: ScannerScreen } = require(path.join(screenDist, "app/(tabs)/scanner.js"));
     let renderer;
     await act(async () => {
-      renderer = TestRenderer.create(React.createElement(ScannerScreen));
+      renderer = createScreenRenderer(React.createElement(ScannerScreen));
     });
 
     await act(async () => {
-      findPressableWithText(renderer, galleryLabel).props.onPress();
-      await Promise.resolve();
+      await findPressableWithText(renderer, galleryLabel).props.onPress();
     });
 
     assert.equal(fetchCalls.length, 1);
@@ -319,8 +325,7 @@ test("Scanner shows unavailable recovery UI for incomplete plant data and retrie
     assert.equal(renderer.root.findAllByType("ActivityIndicator").length, 0);
 
     await act(async () => {
-      findPressableWithText(renderer, retryLabel).props.onPress();
-      await Promise.resolve();
+      await findPressableWithText(renderer, retryLabel).props.onPress();
     });
 
     assert.equal(fetchCalls.length, 2);
@@ -352,7 +357,7 @@ test("Scanner keeps the selected image and shows provider recovery text", async 
     const { default: ScannerScreen } = require(path.join(screenDist, "app/(tabs)/scanner.js"));
     let renderer;
     await act(async () => {
-      renderer = TestRenderer.create(React.createElement(ScannerScreen));
+      renderer = createScreenRenderer(React.createElement(ScannerScreen));
     });
 
     await act(async () => {
@@ -391,7 +396,7 @@ test("Scanner ignores a delayed response from an older retry", async () => {
     const { default: ScannerScreen } = require(path.join(screenDist, "app/(tabs)/scanner.js"));
     let renderer;
     await act(async () => {
-      renderer = TestRenderer.create(React.createElement(ScannerScreen));
+      renderer = createScreenRenderer(React.createElement(ScannerScreen));
     });
 
     const galleryButton = findPressableWithText(renderer, galleryLabel);

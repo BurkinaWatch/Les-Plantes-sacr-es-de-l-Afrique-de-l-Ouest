@@ -4,13 +4,10 @@ import test from "node:test";
 import { fileURLToPath } from "node:url";
 import path from "node:path";
 import { buildStartupDiagnostic } from "../.test-dist/lib/startup-diagnostics.js";
+import { act, createScreenRenderer } from "./screen-test-renderer.mjs";
 
-process.env.NODE_ENV = "test";
-globalThis.IS_REACT_ACT_ENVIRONMENT = true;
 const require = createRequire(import.meta.url);
 const React = require("react");
-const Renderer = require("react-test-renderer");
-const { act } = Renderer;
 const Module = require("node:module");
 
 test("startup report contains useful runtime context without account or error details", () => {
@@ -149,7 +146,7 @@ test("diagnostic is only shared after the user presses the recovery button", asy
     const file = path.join(projectRoot, ".screen-test-dist/components/StartupDiagnosticButton.js");
     const { StartupDiagnosticButton } = require(file);
     await act(async () => {
-      renderer = Renderer.create(React.createElement(StartupDiagnosticButton, {
+      renderer = createScreenRenderer(React.createElement(StartupDiagnosticButton, {
         reason: "route-timeout",
         route: "(auth)/login?email=private@example.com",
       }));

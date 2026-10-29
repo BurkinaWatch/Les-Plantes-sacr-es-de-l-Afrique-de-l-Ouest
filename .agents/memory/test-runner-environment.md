@@ -1,6 +1,6 @@
 ---
 name: Test runner environment
-description: Workspace test tooling constraints and the dependency-free approach used for TypeScript tests
+description: Workspace test tooling constraints and the React-version-compatible renderer used for mobile screen tests
 ---
 
 The workspace package installer cannot add a dependency directly to an individual package when invoked from this monorepo. For focused tests, use Node's built-in test runner and compile only the needed TypeScript with the existing `tsc`; this keeps test execution isolated and avoids adding test dependencies.
@@ -41,11 +41,11 @@ For API modules with injected database clients, keep the production pool import 
 
 **How to apply:** Resolve the default workspace pool only when the caller omits the injected client; use explicit `.js` extensions for local imports reached by the compiled test module.
 
-For screen rendering, `react-test-renderer` can be used without Jest, but its development build must be selected before importing React or the renderer; the production build omits `act` and root inspection.
+For React 19.2 screen tests, keep Node's built-in test runner and use the standalone `test-renderer` package instead of deprecated `react-test-renderer`. Pin `test-renderer` to a release compatible with the project's React version: 1.2.0 uses `react-reconciler` 0.33 and supports React 19.2; 1.3.x requires React 19.3. Use `React.act`, set `NODE_ENV=test` and `IS_REACT_ACT_ENVIRONMENT` before loading React, and mock native imperative refs such as ScrollView's scrolling methods.
 
-**Why:** The workspace commonly exposes `NODE_ENV=production`, which otherwise makes screen tests fail before rendering.
+**Why:** React 19.2 emits a deprecation warning from `react-test-renderer`; the modern replacement also has version-specific reconciler compatibility, and the existing Node runner does not require a Jest migration.
 
-**How to apply:** Set `NODE_ENV` to `test` at the top of the screen test, mock native modules through Node's loader, and install renderer dependencies with a package-scoped pnpm command when the helper's root guard rejects them.
+**How to apply:** Add the compatible renderer as a package-local dev dependency, create roots with `createRoot`, query rendered host nodes through the shared screen-test adapter, and mock native modules through Node's loader.
 
 Static Expo asset registries must be loaded only after the test's Node loader mock handles
 their Metro `@/assets/...` imports.

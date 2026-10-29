@@ -1,14 +1,11 @@
 import assert from "node:assert/strict";
 import { createRequire } from "node:module";
 import test from "node:test";
+import { act, createScreenRenderer } from "./screen-test-renderer.mjs";
 
-process.env.NODE_ENV = "test";
-globalThis.IS_REACT_ACT_ENVIRONMENT = true;
 const require = createRequire(import.meta.url);
 const React = require("react");
-const Renderer = require("react-test-renderer");
 const { QueryClient, QueryClientProvider } = require("@tanstack/react-query");
-const { act } = Renderer;
 const Module = require("node:module");
 
 function text(node) {
@@ -108,7 +105,7 @@ async function fixture({
   );
   let renderer;
   try {
-    await act(async () => { renderer = Renderer.create(screen()); });
+    await act(async () => { renderer = createScreenRenderer(screen()); });
   } finally {
     Module._load = originalLoad;
   }
@@ -166,7 +163,8 @@ test("a checkout 401 preserves the form and a fresh login permits a deliberate r
     await act(async () => f.button("Continuer vers le paiement").props.onPress());
     assert.ok(f.button("Se reconnecter"));
     assert.equal(f.calls.checkout, 1);
-    assert.ok(!text(f.renderer.toTree()).includes("HTTP 401"));
+    const visibleText = f.renderer.root.findAllByType("Text").map(text).join("");
+    assert.ok(!visibleText.includes("HTTP 401"));
     f.auth.token = "fresh-session";
     await f.refresh();
     assert.ok(f.button("Continuer vers le paiement"));

@@ -2,13 +2,10 @@ import assert from "node:assert/strict";
 import { createRequire } from "node:module";
 import test from "node:test";
 import { fr } from "../.test-dist/i18n/fr.js";
+import { act, createScreenRenderer } from "./screen-test-renderer.mjs";
 
-process.env.NODE_ENV = "test";
-globalThis.IS_REACT_ACT_ENVIRONMENT = true;
 const require = createRequire(import.meta.url);
 const React = require("react");
-const Renderer = require("react-test-renderer");
-const { act } = Renderer;
 const Module = require("node:module");
 
 function content(node) {
@@ -53,7 +50,7 @@ async function mount({ params = {}, result = {}, platform = "web" } = {}) {
   const Screen = require(file).default;
   let renderer;
   try {
-    await act(async () => { renderer = Renderer.create(React.createElement(Screen)); });
+    await act(async () => { renderer = createScreenRenderer(React.createElement(Screen)); });
   } catch (error) {
     Module._load = original;
     throw error;
