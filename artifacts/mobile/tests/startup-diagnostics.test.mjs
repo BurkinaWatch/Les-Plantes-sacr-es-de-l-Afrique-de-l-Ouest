@@ -3,7 +3,10 @@ import { createRequire } from "node:module";
 import test from "node:test";
 import { fileURLToPath } from "node:url";
 import path from "node:path";
-import { buildStartupDiagnostic } from "../.test-dist/lib/startup-diagnostics.js";
+import {
+  buildAccessConnectionDiagnostic,
+  buildStartupDiagnostic,
+} from "../.test-dist/lib/startup-diagnostics.js";
 import { act, createScreenRenderer } from "./screen-test-renderer.mjs";
 
 const require = createRequire(import.meta.url);
@@ -100,6 +103,57 @@ test("startup report includes sanitized error details and exact native runtime m
   assert.match(report, /Message court : token=\[masqué\] failed for \[e-mail\]/);
   assert.match(report, /at RootLayout/);
   assert.doesNotMatch(report, /private-token|customer@example\.com|private\.invalid/);
+});
+
+test("connection report identifies transport or HTTP failures without leaking request secrets", () => {
+  const report = buildAccessConnectionDiagnostic({
+    platform: "android",
+    osVersion: 28,
+    appVersion: "1.0.18",
+    buildNumber: 27,
+    apiBaseUrl:
+      "https://private-user:private-password@les-plantes-sacr-es-de-l-afrique-de-l-ouest-production.up.railway.app/api?token=url-secret",
+    errorType: "TypeError",
+    errorMessage:
+      "Network request failed for https://private.invalid/path?token=url-secret; Bearer header-secret user@example.com",
+    occurredAt: new Date("2026-10-29T00:30:00.000Z"),
+  });
+
+  assert.match(report, /Date UTC : 2026-10-29T00:30:00\.000Z/);
+  assert.match(report, /Plateforme : android/);
+  assert.match(report, /Version du système : 28/);
+  assert.match(report, /Version de l’application : 1\.0\.18/);
+  assert.match(report, /Numéro de build : 27/);
+  assert.match(
+    report,
+    /Hôte API : les-plantes-sacr-es-de-l-afrique-de-l-ouest-production\.up\.railway\.app/,
+  );
+  assert.match(report, /Résultat : aucune réponse HTTP/);
+  assert.match(report, /Type d’erreur : TypeError/);
+  assert.doesNotMatch(
+    report,
+    /private-user|private-password|url-secret|header-secret|user@example\.com|private\.invalid/,
+  );
+});
+
+test("connection report preserves a valid HTTP status and rejects unsafe metadata", () => {
+  const report = buildAccessConnectionDiagnostic({
+    platform: "android",
+    osVersion: "28\naccount@example.com",
+    appVersion: "1.0.18",
+    buildNumber: 27,
+    apiBaseUrl: "not a url",
+    errorStatus: 401,
+    errorType: "ApiError",
+    errorMessage: "Authentification requise",
+    occurredAt: new Date("2026-10-29T00:31:00.000Z"),
+  });
+
+  assert.match(report, /Résultat : HTTP 401/);
+  assert.match(report, /Hôte API : indisponible/);
+  assert.match(report, /Version du système : inconnue/);
+  assert.match(report, /Message technique : Authentification requise/);
+  assert.doesNotMatch(report, /account@example\.com/);
 });
 
 test("diagnostic is only shared after the user presses the recovery button", async () => {
