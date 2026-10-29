@@ -72,6 +72,24 @@ test("fatal startup report shares only the sanitized error type and startup stag
   assert.doesNotMatch(report, /private@example\.com|account@example\.com|TypeError\\n/);
 });
 
+test("startup timeout report records the layout callback and current stage", () => {
+  const report = buildStartupDiagnostic({
+    reason: "route-timeout",
+    route: "(tabs)/index",
+    platform: "android",
+    osVersion: 28,
+    appVersion: "1.0.20",
+    buildNumber: 29,
+    stage: "navigation",
+    routeLayoutObserved: false,
+    occurredAt: new Date("2026-10-29T12:00:00.000Z"),
+  });
+
+  assert.match(report, /Étape : chargement de l’écran initial/);
+  assert.match(report, /Signal de mise en page du premier écran : non reçu/);
+  assert.match(report, /Écran concerné : écran principal/);
+});
+
 test("startup report includes sanitized error details and exact native runtime metadata", () => {
   const report = buildStartupDiagnostic({
     reason: "promise-rejection",
