@@ -21,6 +21,35 @@ test("startup readiness keeps a layout signal when the router changes from index
   assert.equal(isInitialRouteReady("", layoutObservedBeforeRouteEffect), false);
 });
 
+test("a committed initial screen marks startup ready even without onLayout", async () => {
+  const projectRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
+  const readyCalls = [];
+  const { StartupReadinessContext, useStartupReadiness } = require(
+    path.join(projectRoot, ".screen-test-dist/context/StartupReadinessContext.js"),
+  );
+  function MountedScreen() {
+    useStartupReadiness();
+    return React.createElement("View");
+  }
+
+  let renderer;
+  try {
+    await act(async () => {
+      renderer = createScreenRenderer(
+        React.createElement(
+          StartupReadinessContext.Provider,
+          { value: () => readyCalls.push("ready") },
+          React.createElement(MountedScreen),
+        ),
+      );
+    });
+
+    assert.deepEqual(readyCalls, ["ready"]);
+  } finally {
+    if (renderer) await act(async () => renderer.unmount());
+  }
+});
+
 test("startup report contains useful runtime context without account or error details", () => {
   const report = buildStartupDiagnostic({
     reason: "route-timeout",
