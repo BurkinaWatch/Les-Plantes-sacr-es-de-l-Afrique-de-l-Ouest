@@ -284,6 +284,10 @@ export function createStartupFatalCapture() {
       return fatalDiagnostic;
     },
 
+    getStage() {
+      return stage;
+    },
+
     recordPromiseRejection(rejection: unknown): boolean {
       if (ready) return false;
       return recordError(promiseRejectionAsError(rejection), "promise-rejection");
@@ -355,6 +359,10 @@ const startupFatalCapture = createStartupFatalCapture();
 
 export function setStartupStage(stage: StartupStage): void {
   startupFatalCapture.setStage(SAFE_STAGES.has(stage) ? stage : "javascript-entry");
+}
+
+export function getStartupStage(): StartupStage {
+  return startupFatalCapture.getStage();
 }
 
 export function recordStartupMarker(marker: string): void {

@@ -38,6 +38,7 @@ import {
 } from "@workspace/api-client-react";
 import {
   getStartupFatalDiagnostic,
+  getStartupStage,
   getSafeStartupErrorDetails,
   installStartupFatalCapture,
   recordStartupMarker,
@@ -269,7 +270,7 @@ function RootLayoutNav({
   onRouteLayoutReady,
   onRouteKeyChange,
 }: {
-  onRouteLayoutReady: (routeKey: string) => void;
+  onRouteLayoutReady: () => void;
   onRouteKeyChange: (routeKey: string) => void;
 }) {
   const segments = useSegments();
@@ -279,8 +280,8 @@ function RootLayoutNav({
   const routeKey = segments.join("/");
   const markCurrentRouteLaidOut = useCallback(() => {
     recordStartupMarker("STARTUP_05_FIRST_ON_LAYOUT");
-    onRouteLayoutReady(routeKey);
-  }, [onRouteLayoutReady, routeKey]);
+    onRouteLayoutReady();
+  }, [onRouteLayoutReady]);
   const routeGroup = segments[0] ?? "";
   const onAuthRoute = routeGroup === "(auth)";
   const onSubscriptionRoute = routeGroup === "abonnement";
@@ -581,7 +582,8 @@ function StartupFatalFallback({ error, resetError }: ErrorFallbackProps) {
 }
 
 function RootLayoutContent() {
-  const [laidOutRouteKey, setLaidOutRouteKey] = useState("");
+  const [initialScreenLayoutReceived, setInitialScreenLayoutReceived] =
+    useState(false);
   const [startupFailed, setStartupFailed] = useState(false);
   const [runtimeFatal, setRuntimeFatal] =
     useState<StartupFatalDiagnostic | null>(getStartupFatalDiagnostic);
@@ -589,12 +591,12 @@ function RootLayoutContent() {
   const navigationReady = Boolean(
     routeKey.length > 0 &&
       routeKey !== "index" &&
-      laidOutRouteKey === routeKey,
+      initialScreenLayoutReceived,
   );
 
-  const markRouteLaidOut = useCallback((laidOutKey: string) => {
+  const markRouteLaidOut = useCallback(() => {
     setStartupStage("route-laid-out");
-    setLaidOutRouteKey(laidOutKey);
+    setInitialScreenLayoutReceived(true);
   }, []);
 
   useEffect(() => {
@@ -639,13 +641,13 @@ function RootLayoutContent() {
 
     const startupTimeout = setTimeout(() => {
       console.error(
-        `[Startup] Initial route did not lay out within 12 seconds; active route: ${routeKey || "(none)"}, last laid-out route: ${laidOutRouteKey || "(none)"}`,
+        `[Startup] Initial screen did not lay out within 12 seconds; active route: ${routeKey || "(none)"}, layout callback received: ${initialScreenLayoutReceived}`,
       );
       setStartupFailed(true);
     }, 12000);
 
     return () => clearTimeout(startupTimeout);
-  }, [laidOutRouteKey, navigationReady, routeKey]);
+  }, [initialScreenLayoutReceived, navigationReady, routeKey]);
 
   useEffect(() => {
     if (!navigationReady) return;
@@ -701,6 +703,7 @@ function RootLayoutContent() {
                                 : "route-timeout"
                           }
                           runtimeFatal={runtimeFatal}
+                          routeLayoutObserved={initialScreenLayoutReceived}
                         />
                       ) : null}
                     </View>
@@ -726,6 +729,7 @@ function StartupRecoveryScreen({
   route,
   reason,
   runtimeFatal,
+  routeLayoutObserved,
 }: {
   route: string;
   reason:
@@ -733,6 +737,7 @@ function StartupRecoveryScreen({
     | "runtime-js-error"
     | "promise-rejection";
   runtimeFatal: StartupFatalDiagnostic | null;
+  routeLayoutObserved: boolean;
 }) {
   const handleRetry = async () => {
     try {
@@ -777,7 +782,8 @@ function StartupRecoveryScreen({
       <StartupDiagnosticButton
         reason={reason}
         route={route}
-        stage={runtimeFatal?.stage}
+        stage={runtimeFatal?.stage ?? getStartupStage()}
+        routeLayoutObserved={routeLayoutObserved}
         runtimeErrorType={runtimeFatal?.errorType}
         errorMessage={runtimeFatal?.errorMessage}
         errorStack={runtimeFatal?.errorStack}

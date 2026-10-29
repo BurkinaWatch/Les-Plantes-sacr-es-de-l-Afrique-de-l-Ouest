@@ -25,6 +25,7 @@ type StartupDiagnosticButtonProps = {
   reason: StartupDiagnosticReason;
   route: string;
   stage?: StartupStage;
+  routeLayoutObserved?: boolean;
   runtimeErrorType?: string;
   errorMessage?: string;
   errorStack?: string;
@@ -37,6 +38,7 @@ export function StartupDiagnosticButton({
   reason,
   route,
   stage,
+  routeLayoutObserved,
   runtimeErrorType,
   errorMessage,
   errorStack,
@@ -83,6 +85,7 @@ export function StartupDiagnosticButton({
         newArchitecture: runtimeInfo?.newArchitecture,
         jsEngine: runtimeInfo?.jsEngine,
         stage,
+        routeLayoutObserved,
         runtimeErrorType,
         errorMessage,
         errorStack,

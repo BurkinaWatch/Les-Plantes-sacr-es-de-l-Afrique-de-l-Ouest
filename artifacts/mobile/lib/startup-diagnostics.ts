@@ -131,6 +131,7 @@ export function buildStartupDiagnostic(input: {
   newArchitecture?: unknown;
   jsEngine?: unknown;
   stage?: StartupStage;
+  routeLayoutObserved?: boolean;
   runtimeErrorType?: unknown;
   errorMessage?: unknown;
   errorStack?: unknown;
@@ -170,6 +171,13 @@ export function buildStartupDiagnostic(input: {
         : "indisponible"
     }`,
     `Étape : ${input.stage ? STAGE_LABELS[input.stage] : REASON_LABELS[input.reason]}`,
+    ...(input.routeLayoutObserved === undefined
+      ? []
+      : [
+          `Signal de mise en page du premier écran : ${
+            input.routeLayoutObserved ? "reçu" : "non reçu"
+          }`,
+        ]),
     `Écran concerné : ${safeRoute(input.route)}`,
     ...(input.errorMessage !== undefined
       ? (() => {
