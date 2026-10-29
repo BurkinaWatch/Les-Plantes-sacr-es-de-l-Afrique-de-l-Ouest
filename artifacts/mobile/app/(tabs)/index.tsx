@@ -134,12 +134,15 @@ export default function HomeScreen() {
   const topPad = Platform.OS === 'web' ? Math.max(insets.top, 67) : insets.top;
 
   return (
-    <ScrollView
+    <View
       onLayout={markStartupReady}
       style={[styles.container, { backgroundColor: colors.background }]}
-      contentContainerStyle={{ paddingBottom: 100 + insets.bottom }}
-      showsVerticalScrollIndicator={false}
     >
+      <ScrollView
+        style={styles.container}
+        contentContainerStyle={{ paddingBottom: 100 + insets.bottom }}
+        showsVerticalScrollIndicator={false}
+      >
       {/* HERO — full-bleed photo with overlay */}
       <ImageBackground
         source={require('@/assets/images/hero-plants.png')}
@@ -278,7 +281,8 @@ export default function HomeScreen() {
       </View>
 
       <SotyssiBranding />
-    </ScrollView>
+      </ScrollView>
+    </View>
   );
 }
 
