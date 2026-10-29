@@ -159,8 +159,9 @@ test("connection report preserves a valid HTTP status and rejects unsafe metadat
 test("diagnostic is only shared after the user presses the recovery button", async () => {
   const projectRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
   const shareCalls = [];
+  const alerts = [];
   const native = {
-    Alert: { alert() {} },
+    Alert: { alert: (...args) => alerts.push(args) },
     NativeModules: {
       StartupDiagnostic: {
         getRuntimeInfo: () => ({
@@ -211,7 +212,7 @@ test("diagnostic is only shared after the user presses the recovery button", asy
       await renderer.root.findByProps({ testID: "share-startup-diagnostic" }).props.onPress();
     });
 
-    assert.equal(shareCalls.length, 1);
+    assert.equal(shareCalls.length, 1, JSON.stringify(alerts));
     assert.match(shareCalls[0].message, /Version du système : 35/);
     assert.match(shareCalls[0].message, /Numéro de build : 14/);
     assert.match(shareCalls[0].message, /Canal EAS Update : preview/);
