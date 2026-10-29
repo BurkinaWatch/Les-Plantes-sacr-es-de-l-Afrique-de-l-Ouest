@@ -31,3 +31,4 @@
 - [React Native Web image sizing](rn-web-image-sizing.md) — absolute positioning may leave local images at intrinsic dimensions; constrain layered images explicitly
 - [Offline APK optimization](offline-apk-optimization.md) — preserve embedded images and all ABIs; allow measured lossy WebP only with masters and quality gates.
 - [Android release ABIs](android-release-abis.md) — retain armv7 and emulator ABIs alongside arm64 unless device testing justifies narrowing support.
+- [Android request attribution](android-request-attribution.md) — distinguish agent-side probes from phone requests before attributing backend failures to a device.
