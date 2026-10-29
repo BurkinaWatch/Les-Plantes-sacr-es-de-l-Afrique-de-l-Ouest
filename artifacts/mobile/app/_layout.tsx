@@ -31,6 +31,7 @@ import { useColors } from "@/hooks/useColors";
 import { LanguageProvider } from "@/i18n";
 import { useNotifications } from "@/hooks/useNotifications";
 import { getApiBase } from "@/lib/api-config";
+import { isInitialRouteReady } from "@/lib/startup-readiness";
 import {
   setAuthTokenGetter,
   setBaseUrl,
@@ -588,10 +589,9 @@ function RootLayoutContent() {
   const [runtimeFatal, setRuntimeFatal] =
     useState<StartupFatalDiagnostic | null>(getStartupFatalDiagnostic);
   const [routeKey, setRouteKey] = useState("");
-  const navigationReady = Boolean(
-    routeKey.length > 0 &&
-      routeKey !== "index" &&
-      initialScreenLayoutReceived,
+  const navigationReady = isInitialRouteReady(
+    routeKey,
+    initialScreenLayoutReceived,
   );
 
   const markRouteLaidOut = useCallback(() => {

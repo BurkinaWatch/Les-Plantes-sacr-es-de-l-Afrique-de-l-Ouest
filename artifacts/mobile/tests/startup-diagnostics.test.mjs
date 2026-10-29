@@ -7,11 +7,19 @@ import {
   buildAccessConnectionDiagnostic,
   buildStartupDiagnostic,
 } from "../.test-dist/lib/startup-diagnostics.js";
+import { isInitialRouteReady } from "../.test-dist/lib/startup-readiness.js";
 import { act, createScreenRenderer } from "./screen-test-renderer.mjs";
 
 const require = createRequire(import.meta.url);
 const React = require("react");
 const Module = require("node:module");
+
+test("startup readiness keeps a layout signal when the router changes from index to its initial screen", () => {
+  assert.equal(isInitialRouteReady("index", false), false);
+  const layoutObservedBeforeRouteEffect = true;
+  assert.equal(isInitialRouteReady("(tabs)", layoutObservedBeforeRouteEffect), true);
+  assert.equal(isInitialRouteReady("", layoutObservedBeforeRouteEffect), false);
+});
 
 test("startup report contains useful runtime context without account or error details", () => {
   const report = buildStartupDiagnostic({
