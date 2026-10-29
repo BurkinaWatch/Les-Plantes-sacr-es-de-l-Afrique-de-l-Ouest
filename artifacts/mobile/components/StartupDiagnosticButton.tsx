@@ -14,6 +14,7 @@ import {
 } from "react-native";
 
 import {
+  buildAccessConnectionDiagnostic,
   buildStartupDiagnostic,
   StartupDiagnosticReason,
 } from "@/lib/startup-diagnostics";
@@ -136,6 +137,97 @@ export function StartupDiagnosticButton({
         ]}
       >
         {sharing ? "Préparation…" : "Partager un diagnostic sûr"}
+      </Text>
+    </Pressable>
+  );
+}
+
+function getErrorField(error: unknown, key: string): unknown {
+  return typeof error === "object" && error !== null && key in error
+    ? (error as Record<string, unknown>)[key]
+    : undefined;
+}
+
+export function AccessConnectionDiagnosticButton({
+  error,
+  apiBaseUrl,
+  style,
+  textStyle,
+}: {
+  error: unknown;
+  apiBaseUrl: string | null;
+  style?: StyleProp<ViewStyle>;
+  textStyle?: StyleProp<TextStyle>;
+}) {
+  const [sharing, setSharing] = useState(false);
+
+  if (Platform.OS === "web") return null;
+
+  const shareDiagnostic = async () => {
+    if (sharing) return;
+    setSharing(true);
+    try {
+      const diagnostic = buildAccessConnectionDiagnostic({
+        platform: Platform.OS,
+        osVersion: Platform.Version,
+        appVersion: Constants.expoConfig?.version,
+        buildNumber:
+          Constants.expoConfig?.android?.versionCode ??
+          Constants.expoConfig?.ios?.buildNumber,
+        apiBaseUrl,
+        errorStatus: getErrorField(error, "status"),
+        errorType: getErrorField(error, "name"),
+        errorMessage: getErrorField(error, "message"),
+      });
+      await Share.share({
+        title: "Diagnostic de connexion",
+        message: diagnostic,
+      });
+    } catch {
+      Alert.alert(
+        "Partage indisponible",
+        "Impossible d’ouvrir le menu de partage. Réessayez ou contactez l’assistance.",
+      );
+    } finally {
+      setSharing(false);
+    }
+  };
+
+  return (
+    <Pressable
+      accessibilityRole="button"
+      accessibilityLabel="Partager le diagnostic de connexion"
+      disabled={sharing}
+      onPress={() => void shareDiagnostic()}
+      style={({ pressed }) => [
+        {
+          minHeight: 44,
+          alignItems: "center",
+          justifyContent: "center",
+          borderRadius: 10,
+          borderWidth: 1,
+          borderColor: "#D4A017",
+          marginTop: 12,
+          paddingHorizontal: 16,
+          paddingVertical: 10,
+          opacity: sharing ? 0.6 : pressed ? 0.82 : 1,
+        },
+        style,
+      ]}
+      testID="share-access-connection-diagnostic"
+    >
+      <Text
+        style={[
+          {
+            color: "#F0EAD6",
+            fontSize: 14,
+            fontWeight: "700",
+            textAlign: "center",
+          },
+          textStyle,
+        ]}
+      >
+        {sharing ? "Préparation…" : "Partager le diagnostic de connexion"}
       </Text>
     </Pressable>
   );

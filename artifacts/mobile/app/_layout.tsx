@@ -19,7 +19,10 @@ import { SafeAreaProvider, useSafeAreaInsets } from "react-native-safe-area-cont
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import type { ErrorFallbackProps } from "@/components/ErrorFallback";
 import { SacredIcon } from "@/components/SacredIcon";
-import { StartupDiagnosticButton } from "@/components/StartupDiagnosticButton";
+import {
+  AccessConnectionDiagnosticButton,
+  StartupDiagnosticButton,
+} from "@/components/StartupDiagnosticButton";
 import { AppProvider } from "@/context/AppContext";
 import { AuthProvider, useAuth } from "@/context/AuthContext";
 import { StartupReadinessContext } from "@/context/StartupReadinessContext";
@@ -444,6 +447,12 @@ function RootLayoutNav({
                     Réessayer
                   </Text>
                 </Pressable>
+                <AccessConnectionDiagnosticButton
+                  error={accessQuery.error}
+                  apiBaseUrl={getApiBase()}
+                  textStyle={{ color: theme.ivory }}
+                  style={{ width: "100%" }}
+                />
               </>
             ) : (
               <>
