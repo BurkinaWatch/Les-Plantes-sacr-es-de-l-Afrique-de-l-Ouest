@@ -222,3 +222,62 @@ test("diagnostic is only shared after the user presses the recovery button", asy
     Module._load = originalLoad;
   }
 });
+
+test("access connection button shares a sanitized report only after user action", async () => {
+  const projectRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
+  const shareCalls = [];
+  const native = {
+    Alert: { alert() {} },
+    Platform: { OS: "android", Version: 28 },
+    Pressable: "Pressable",
+    Share: { share: async payload => { shareCalls.push(payload); } },
+    Text: "Text",
+  };
+  const originalLoad = Module._load;
+  Module._load = function (id, ...args) {
+    if (id === "expo-constants") {
+      return { expoConfig: { version: "1.0.18", android: { versionCode: 27 } } };
+    }
+    if (id === "expo-updates") return {};
+    if (id === "react-native") return native;
+    if (id === "@/lib/startup-diagnostics") {
+      return require(path.join(projectRoot, ".test-dist/lib/startup-diagnostics.js"));
+    }
+    return originalLoad.call(this, id, ...args);
+  };
+
+  let renderer;
+  try {
+    const file = path.join(
+      projectRoot,
+      ".screen-test-dist/components/StartupDiagnosticButton.js",
+    );
+    const { AccessConnectionDiagnosticButton } = require(file);
+    await act(async () => {
+      renderer = createScreenRenderer(
+        React.createElement(AccessConnectionDiagnosticButton, {
+          apiBaseUrl: "https://api.example.test/api?token=private",
+          error: Object.assign(new TypeError("Network request failed"), {
+            message: "Network request failed for user@example.com",
+          }),
+        }),
+      );
+    });
+
+    assert.equal(shareCalls.length, 0);
+    await act(async () => {
+      await renderer.root
+        .findByProps({ testID: "share-access-connection-diagnostic" })
+        .props.onPress();
+    });
+
+    assert.equal(shareCalls.length, 1);
+    assert.match(shareCalls[0].title, /connexion/i);
+    assert.match(shareCalls[0].message, /Résultat : aucune réponse HTTP/);
+    assert.match(shareCalls[0].message, /Hôte API : api\.example\.test/);
+    assert.doesNotMatch(shareCalls[0].message, /private|user@example\.com/);
+  } finally {
+    if (renderer) await act(async () => renderer.unmount());
+    Module._load = originalLoad;
+  }
+});
