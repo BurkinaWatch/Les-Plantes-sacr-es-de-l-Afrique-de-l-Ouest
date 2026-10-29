@@ -200,3 +200,55 @@ export function buildStartupDiagnostic(input: {
     "Rapport technique nettoyé : aucun identifiant, e-mail, jeton, paramètre de navigation ni journal système n’est inclus.",
   ].join("\n");
 }
+
+function safeApiHost(value: unknown): string {
+  if (typeof value !== "string" || value.length > 512) return "indisponible";
+  try {
+    const hostname = new URL(value).hostname;
+    return /^[a-zA-Z0-9.-]{1,253}$/.test(hostname)
+      ? hostname
+      : "indisponible";
+  } catch {
+    return "indisponible";
+  }
+}
+
+export function buildAccessConnectionDiagnostic(input: {
+  platform: string;
+  osVersion: unknown;
+  appVersion: unknown;
+  buildNumber: unknown;
+  apiBaseUrl: unknown;
+  errorStatus?: unknown;
+  errorType?: unknown;
+  errorMessage?: unknown;
+  occurredAt?: Date;
+}): string {
+  const occurredAt = input.occurredAt ?? new Date();
+  const timestamp = Number.isNaN(occurredAt.getTime())
+    ? "inconnu"
+    : occurredAt.toISOString();
+  const details = safeErrorDetails(input.errorType, input.errorMessage, undefined);
+  const status =
+    typeof input.errorStatus === "number" &&
+    Number.isInteger(input.errorStatus) &&
+    input.errorStatus >= 100 &&
+    input.errorStatus <= 599
+      ? `HTTP ${input.errorStatus}`
+      : "aucune réponse HTTP";
+
+  return [
+    "Diagnostic de connexion — Les Plantes Sacrées",
+    `Date UTC : ${timestamp}`,
+    `Plateforme : ${safePlatform(input.platform)}`,
+    `Version du système : ${safeVersion(input.osVersion)}`,
+    `Version de l’application : ${safeVersion(input.appVersion)}`,
+    `Numéro de build : ${safeBuildNumber(input.buildNumber)}`,
+    `Hôte API : ${safeApiHost(input.apiBaseUrl)}`,
+    `Résultat : ${status}`,
+    `Type d’erreur : ${details.errorType}`,
+    `Message technique : ${details.errorMessage}`,
+    "",
+    "Diagnostic limité à la connexion. Aucun compte, e-mail, jeton, en-tête ni paramètre de requête n’est inclus.",
+  ].join("\n");
+}
