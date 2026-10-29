@@ -159,9 +159,8 @@ test("connection report preserves a valid HTTP status and rejects unsafe metadat
 test("diagnostic is only shared after the user presses the recovery button", async () => {
   const projectRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
   const shareCalls = [];
-  const alerts = [];
   const native = {
-    Alert: { alert: (...args) => alerts.push(args) },
+    Alert: { alert() {} },
     NativeModules: {
       StartupDiagnostic: {
         getRuntimeInfo: () => ({
@@ -212,7 +211,7 @@ test("diagnostic is only shared after the user presses the recovery button", asy
       await renderer.root.findByProps({ testID: "share-startup-diagnostic" }).props.onPress();
     });
 
-    assert.equal(shareCalls.length, 1, JSON.stringify(alerts));
+    assert.equal(shareCalls.length, 1);
     assert.match(shareCalls[0].message, /Version du système : 35/);
     assert.match(shareCalls[0].message, /Numéro de build : 14/);
     assert.match(shareCalls[0].message, /Canal EAS Update : preview/);
@@ -227,8 +226,9 @@ test("diagnostic is only shared after the user presses the recovery button", asy
 test("access connection button shares a sanitized report only after user action", async () => {
   const projectRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
   const shareCalls = [];
+  const alerts = [];
   const native = {
-    Alert: { alert() {} },
+    Alert: { alert: (...args) => alerts.push(args) },
     Platform: { OS: "android", Version: 28 },
     Pressable: "Pressable",
     Share: { share: async payload => { shareCalls.push(payload); } },
@@ -253,6 +253,7 @@ test("access connection button shares a sanitized report only after user action"
       projectRoot,
       ".screen-test-dist/components/StartupDiagnosticButton.js",
     );
+    delete require.cache[require.resolve(file)];
     const { AccessConnectionDiagnosticButton } = require(file);
     await act(async () => {
       renderer = createScreenRenderer(
@@ -272,7 +273,7 @@ test("access connection button shares a sanitized report only after user action"
         .props.onPress();
     });
 
-    assert.equal(shareCalls.length, 1);
+    assert.equal(shareCalls.length, 1, JSON.stringify(alerts));
     assert.match(shareCalls[0].title, /connexion/i);
     assert.match(shareCalls[0].message, /Résultat : aucune réponse HTTP/);
     assert.match(shareCalls[0].message, /Hôte API : api\.example\.test/);
