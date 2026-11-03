@@ -159,28 +159,28 @@ const PLANT_VALUE_SIGNALS: Record<Dim, readonly SignalGroup[]> = {
   ],
 };
 
-// Narrower editorial themes preserve distinctions between prompts that would
-// otherwise disappear when answers are averaged into five dimensions.
-const QUESTION_VALUE_SIGNALS: Record<number, readonly string[]> = {
-  1: ['experience', 'memoire', 'souvenir', 'savoir', 'lecon', 'enseignement', 'apprendre', 'histoire', 'ancien'],
-  2: ['observer', 'observation', 'attention', 'ecoute', 'cycle', 'saison', 'environnement', 'changement'],
-  3: ['soin', 'soigner', 'protection', 'aider', 'nourrir', 'ressource', 'remede', 'soutien'],
-  4: ['partage', 'transmission', 'enseigner', 'apprendre', 'respect', 'liberte', 'communaute'],
-  5: ['cycle', 'fin', 'transformation', 'lecon', 'enseignement', 'saison', 'renouveau'],
-  6: ['duree', 'stable', 'permanent', 'ancrage', 'racine', 'continu', 'tradition', 'foyer'],
-  7: ['intuition', 'discernement', 'sagesse', 'question', 'signe', 'symbole', 'ecoute'],
-  8: ['limite', 'protection', 'proteger', 'frontiere', 'defense', 'intimite', 'garde'],
-  9: ['collectif', 'communaute', 'village', 'ensemble', 'peuple', 'alliance', 'cooperation'],
-  10: ['changement', 'renouveau', 'transformation', 'adaptation', 'mutation', 'renouveler'],
-  11: ['repere', 'stabilite', 'tradition', 'ancetre', 'heritage', 'origine', 'conseil', 'sagesse'],
-  12: ['symbole', 'legende', 'recit', 'reve', 'mythe', 'parole', 'vision'],
-  13: ['vivant', 'communaute', 'ecosysteme', 'nature', 'biodiversite', 'protection', 'preserver'],
-  14: ['dialogue', 'parole', 'conseil', 'echange', 'ecoute', 'sagesse', 'griot'],
-  15: ['adaptation', 'rebond', 'resistance', 'resilience', 'repartir', 'renouveler', 'force'],
-  16: ['famille', 'communaute', 'memoire', 'ancetre', 'patrimoine', 'tradition', 'savoir'],
-  17: ['connaissance', 'savoir', 'apprendre', 'verite', 'discernement', 'observation', 'raison'],
-  18: ['fragile', 'protection', 'defense', 'preserver', 'justice', 'garde', 'soutien'],
-  19: ['generation', 'ancetre', 'famille', 'heritage', 'transmission', 'patrimoine', 'griot'],
+// These are reviewable editorial cues, not scientific or cultural claims.
+// Keep them grounded in reflective fields, selective, and present in the text.
+export const QUESTION_VALUE_SIGNALS: Record<number, readonly string[]> = {
+  1: ['memoire', 'souvenir', 'savoir', 'apprendre', 'histoire', 'ancien', 'ancetre', 'conseil', 'enseignement'],
+  2: ['observation', 'attention', 'ecoute', 'cycle', 'saison', 'environnement', 'changement', 'silence', 'veiller'],
+  3: ['soin', 'soigner', 'protection', 'aider', 'nourrir', 'ressource', 'soutien', 'entraide'],
+  4: ['partage', 'transmission', 'apprendre', 'respect', 'liberte', 'communaute', 'savoir'],
+  5: ['cycle', 'transformation', 'saison', 'renouveau', 'changement', 'transition', 'passage', 'enseignement'],
+  6: ['duree', 'ancrage', 'racine', 'longtemps', 'millenaire', 'patience', 'ancien', 'memoire'],
+  7: ['intuition', 'discernement', 'sagesse', 'ecoute', 'prudence', 'incertitude', 'humilite', 'certitude'],
+  8: ['limite', 'protection', 'proteger', 'defense', 'garde', 'abriter', 'preserver', 'respect', 'equilibre'],
+  9: ['collectif', 'communaute', 'village', 'ensemble', 'peuple', 'alliance', 'partage', 'groupe', 'entraide'],
+  10: ['changement', 'renouveau', 'transformation', 'adaptation', 'cycle', 'croissance', 'changer'],
+  11: ['stabilite', 'ancetre', 'heritage', 'origine', 'conseil', 'sagesse', 'racine', 'memoire', 'ancrage', 'guide', 'guidance'],
+  12: ['legende', 'reve', 'mythe', 'parole', 'vision', 'histoire', 'griot'],
+  13: ['vivant', 'communaute', 'nature', 'protection', 'preserver', 'environnement', 'respect', 'equilibre', 'responsabilite', 'nourrir'],
+  14: ['parole', 'conseil', 'echange', 'ecoute', 'sagesse', 'griot', 'respect', 'accord', 'paix', 'harmonie'],
+  15: ['adaptation', 'resistance', 'resilience', 'force', 'endurance', 'patience', 'perseverance', 'survivre', 'croissance', 'resister'],
+  16: ['famille', 'communaute', 'memoire', 'ancetre', 'savoir', 'heritage', 'transmission', 'generation', 'racine'],
+  17: ['connaissance', 'savoir', 'verite', 'discernement', 'observation', 'preuve', 'comprendre', 'apprendre'],
+  18: ['fragile', 'protection', 'defense', 'preserver', 'justice', 'garde', 'soutien', 'proteger', 'abriter'],
+  19: ['generation', 'ancetre', 'famille', 'heritage', 'transmission', 'griot', 'memoire', 'conseil', 'savoir'],
   20: ['cycle', 'saison', 'rythme', 'energie', 'floraison', 'adaptation', 'croissance'],
 };
 
@@ -217,6 +217,31 @@ function getPlantValueText(plant: Plante): string {
   ].filter(Boolean).join(' '));
 }
 
+function getPlantReflectionText(plant: Plante): string {
+  return normalizeText([
+    plant.symboliqueAfricaine,
+    plant.symboliqueSpirirtuelle,
+    plant.symbolique,
+    ...plant.qualites,
+    ...plant.defauts,
+    ...plant.pouvoirs,
+    ...plant.enseignements,
+    plant.citation,
+    ...plant.proverbes,
+    ...plant.legendes,
+    ...plant.conseilsDeVie,
+    plant.enseignementDuJour,
+  ].filter(Boolean).join(' '));
+}
+
+function tokenizeText(text: string): Set<string> {
+  return new Set(normalizeText(text).match(/[a-z0-9]+/g) ?? []);
+}
+
+function hasSignalToken(tokens: ReadonlySet<string>, term: string): boolean {
+  return tokens.has(term) || tokens.has(`${term}s`) || tokens.has(`${term}x`);
+}
+
 export function derivePlantProfile(plant: Plante): Record<Dim, number> {
   const text = getPlantValueText(plant);
   const profile = {} as Record<Dim, number>;
@@ -234,14 +259,14 @@ export function derivePlantProfile(plant: Plante): Record<Dim, number> {
 
 type QuestionProfile = Record<number, number>;
 
-const PLANT_CATALOG_TEXTS = PLANTS.map(getPlantValueText);
+const PLANT_CATALOG_TOKENS = PLANTS.map((plant) => tokenizeText(getPlantReflectionText(plant)));
 const QUESTION_TERM_IDF = new Map<number, Map<string, number>>();
 
 for (const question of QUIZ_QUESTIONS) {
   const termWeights = new Map<string, number>();
   for (const term of QUESTION_VALUE_SIGNALS[question.id] ?? []) {
-    const documentFrequency = PLANT_CATALOG_TEXTS.reduce(
-      (count, text) => count + (text.includes(term) ? 1 : 0),
+    const documentFrequency = PLANT_CATALOG_TOKENS.reduce(
+      (count, tokens) => count + (hasSignalToken(tokens, term) ? 1 : 0),
       0,
     );
     termWeights.set(term, 1 + Math.log((PLANTS.length + 1) / (documentFrequency + 1)));
@@ -250,6 +275,7 @@ for (const question of QUIZ_QUESTIONS) {
 }
 
 function deriveRawQuestionProfile(text: string): QuestionProfile {
+  const tokens = tokenizeText(text);
   return Object.fromEntries(QUIZ_QUESTIONS.map((question) => {
     const terms = QUESTION_VALUE_SIGNALS[question.id] ?? [];
     const weights = QUESTION_TERM_IDF.get(question.id);
@@ -259,7 +285,7 @@ function deriveRawQuestionProfile(text: string): QuestionProfile {
     for (const term of terms) {
       const weight = weights?.get(term) ?? 1;
       totalWeight += weight;
-      if (text.includes(term)) matchingWeight += weight;
+      if (hasSignalToken(tokens, term)) matchingWeight += weight;
     }
 
     return [question.id, totalWeight > 0 ? (matchingWeight / totalWeight) * 100 : 50];
@@ -267,7 +293,7 @@ function deriveRawQuestionProfile(text: string): QuestionProfile {
 }
 
 const CATALOG_QUESTION_PROFILES = new Map(
-  PLANTS.map((plant, index) => [plant.id, deriveRawQuestionProfile(PLANT_CATALOG_TEXTS[index])]),
+  PLANTS.map((plant) => [plant.id, deriveRawQuestionProfile(getPlantReflectionText(plant))]),
 );
 const QUESTION_PROFILE_DISTRIBUTIONS = new Map<number, number[]>(
   QUIZ_QUESTIONS.map((question) => [
@@ -304,7 +330,7 @@ function percentileRank(value: number, sortedValues: readonly number[]): number 
 
 function deriveQuestionProfile(plant: Plante): QuestionProfile {
   const rawProfile = CATALOG_QUESTION_PROFILES.get(plant.id)
-    ?? deriveRawQuestionProfile(getPlantValueText(plant));
+    ?? deriveRawQuestionProfile(getPlantReflectionText(plant));
 
   return Object.fromEntries(QUIZ_QUESTIONS.map((question) => [
     question.id,

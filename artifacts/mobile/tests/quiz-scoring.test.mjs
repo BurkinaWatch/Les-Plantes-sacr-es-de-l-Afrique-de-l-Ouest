@@ -4,12 +4,43 @@ import test from "node:test";
 import {
   QUIZ_QUESTIONS,
   PLANTS,
+  QUESTION_VALUE_SIGNALS,
   TOTEM_RESULTS,
   calculateTotem,
   derivePlantProfile,
 } from "../.data-test-dist/data/quiz.js";
 
 const DIMENSIONS = new Set(["E", "O", "C", "A", "S"]);
+const REFLECTION_FIELDS = [
+  "symboliqueAfricaine",
+  "symboliqueSpirirtuelle",
+  "symbolique",
+  "qualites",
+  "defauts",
+  "pouvoirs",
+  "enseignements",
+  "citation",
+  "proverbes",
+  "legendes",
+  "conseilsDeVie",
+  "enseignementDuJour",
+];
+
+function normalizedWords(plant) {
+  const text = REFLECTION_FIELDS.flatMap((field) => {
+    const value = plant[field];
+    return Array.isArray(value) ? value : [value ?? ""];
+  })
+    .join(" ")
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLocaleLowerCase("fr-FR");
+  return new Set(text.match(/[a-z0-9]+/g) ?? []);
+}
+
+function containsSignal(words, term) {
+  return words.has(term) || words.has(`${term}s`) || words.has(`${term}x`);
+}
 
 function answersWith(value) {
   return Object.fromEntries(QUIZ_QUESTIONS.map((question) => [question.id, value]));
@@ -24,6 +55,95 @@ test("the quiz keeps its 20 statements on the five scoring dimensions", () => {
     ),
   );
   assert.equal(new Set(QUIZ_QUESTIONS.map((question) => question.id)).size, 20);
+});
+
+test("question signals occur in selective reflection text, not only in generic or medicinal fields", () => {
+  const questionIds = QUIZ_QUESTIONS.map((question) => String(question.id)).sort();
+  assert.deepEqual(Object.keys(QUESTION_VALUE_SIGNALS).sort(), questionIds);
+
+  for (const question of QUIZ_QUESTIONS) {
+    const terms = QUESTION_VALUE_SIGNALS[question.id];
+    assert.ok(terms.length >= 4, `Question ${question.id} needs several editorial signals`);
+    assert.equal(new Set(terms).size, terms.length, `Question ${question.id} repeats a signal`);
+
+    for (const term of terms) {
+      const matchingPlants = PLANTS.filter((plant) =>
+        containsSignal(normalizedWords(plant), term),
+      ).length;
+      assert.ok(
+        matchingPlants > 0,
+        `Question ${question.id} signal "${term}" does not occur in reflection text`,
+      );
+      assert.ok(
+        matchingPlants < PLANTS.length * 0.7,
+        `Question ${question.id} signal "${term}" is too broad (${matchingPlants}/${PLANTS.length})`,
+      );
+    }
+  }
+});
+
+test("medical notes alone do not alter a plant's reflection match", () => {
+  const base = {
+    ...PLANTS[0],
+    id: "quiz-medical-text-base",
+    symboliqueAfricaine: "",
+    symboliqueSpirirtuelle: "",
+    symbolique: "",
+    qualites: [],
+    defauts: [],
+    pouvoirs: [],
+    enseignements: [],
+    citation: "",
+    proverbes: [],
+    legendes: [],
+    conseilsDeVie: [],
+    enseignementDuJour: "",
+  };
+  const medicalVariant = {
+    ...base,
+    id: "quiz-medical-text-variant",
+    vertus: Object.values(QUESTION_VALUE_SIGNALS).flat(),
+    usagesTraditionnels: Object.values(QUESTION_VALUE_SIGNALS).flat(),
+  };
+  const answers = answersWith(3);
+  const result = calculateTotem(answers, [base, medicalVariant]);
+
+  assert.equal(
+    result.scores[base.id],
+    result.scores[medicalVariant.id],
+    "Medical or traditional-use notes must not act as personality signals",
+  );
+});
+
+test("a signal cannot match as a substring inside an unrelated word", () => {
+  const noSignal = {
+    ...PLANTS[0],
+    id: "quiz-word-boundary-base",
+    symboliqueAfricaine: "",
+    symboliqueSpirirtuelle: "",
+    symbolique: "repere",
+    qualites: [],
+    defauts: [],
+    pouvoirs: [],
+    enseignements: [],
+    citation: "",
+    proverbes: [],
+    legendes: [],
+    conseilsDeVie: [],
+    enseignementDuJour: "",
+  };
+  const substringOnly = {
+    ...noSignal,
+    id: "quiz-word-boundary-substring",
+    symbolique: "besoin",
+  };
+  const result = calculateTotem(answersWith(3), [noSignal, substringOnly]);
+
+  assert.equal(
+    result.scores[noSignal.id],
+    result.scores[substringOnly.id],
+    '"soin" must not match inside the unrelated word "besoin"',
+  );
 });
 
 test("scores include every current plant and resolve to renderable totems", () => {
