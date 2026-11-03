@@ -56,19 +56,39 @@ function SubscriptionPromoCard() {
       accessibilityLabel="Découvrir les abonnements"
       onPress={() => router.push('/abonnement' as any)}
       style={({ pressed }) => [
-        styles.card,
         styles.subscriptionPromo,
         {
-          backgroundColor: colors.card,
-          borderColor: colors.border,
-          opacity: pressed ? 0.86 : 1,
+          borderColor: colors.gold,
+          opacity: pressed ? 0.92 : 1,
+          transform: [{ scale: pressed ? 0.985 : 1 }],
         },
       ]}
     >
-      <Text style={[styles.quizPromoLabel, { color: colors.gold }]}>SOUTENIR LA TRANSMISSION</Text>
-      <Text style={[styles.quizPromoTitle, { color: colors.ivory }]}>Découvrir les abonnements</Text>
-      <Text style={[styles.quizPromoDesc, { color: colors.mutedForeground }]}>{description}</Text>
-      <Text style={[styles.subscriptionPromoLink, { color: colors.gold }]}>Voir les formules →</Text>
+      <LinearGradient
+        colors={[colors.warmBrown, colors.card]}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 1 }}
+        style={styles.subscriptionPromoSurface}
+      >
+        <View style={styles.subscriptionPromoHeading}>
+          <View style={[styles.subscriptionPromoAccent, { backgroundColor: colors.gold }]} />
+          <Text style={[styles.subscriptionPromoLabel, { color: colors.gold }]}>
+            SOUTENIR LA TRANSMISSION
+          </Text>
+        </View>
+        <Text style={[styles.subscriptionPromoTitle, { color: colors.ivory }]}>
+          Découvrir les abonnements
+        </Text>
+        <Text style={[styles.subscriptionPromoDesc, { color: colors.ivory }]}>{description}</Text>
+        <View style={[styles.subscriptionPromoCta, { backgroundColor: colors.gold }]}>
+          <Text style={[styles.subscriptionPromoLink, { color: colors.deepBrown }]}>
+            Découvrir les formules
+          </Text>
+          <Text style={[styles.subscriptionPromoArrow, { color: colors.deepBrown }]} accessibilityElementsHidden>
+            →
+          </Text>
+        </View>
+      </LinearGradient>
     </Pressable>
   );
 }
@@ -328,8 +348,31 @@ const styles = StyleSheet.create({
   infoTitle: { fontSize: 14, fontWeight: '400' as const },
   infoValue: { fontSize: 14, fontWeight: '600' as const },
   card: { borderRadius: 16, padding: 18, borderWidth: 1, gap: 12 },
-  subscriptionPromo: { marginTop: 0 },
-  subscriptionPromoLink: { fontSize: 14, fontWeight: '700' as const, marginTop: 2 },
+  subscriptionPromo: {
+    marginTop: 2,
+    borderRadius: 18,
+    borderWidth: 1.5,
+    overflow: 'hidden',
+    elevation: 5,
+  },
+  subscriptionPromoSurface: { padding: 20, gap: 9 },
+  subscriptionPromoHeading: { flexDirection: 'row', alignItems: 'center', gap: 8 },
+  subscriptionPromoAccent: { width: 3, height: 13, borderRadius: 2 },
+  subscriptionPromoLabel: { fontSize: 10, fontWeight: '800' as const, letterSpacing: 2 },
+  subscriptionPromoTitle: { fontSize: 22, lineHeight: 28, fontWeight: '800' as const },
+  subscriptionPromoDesc: { fontSize: 14, lineHeight: 20, fontWeight: '600' as const },
+  subscriptionPromoCta: {
+    minHeight: 44,
+    marginTop: 5,
+    paddingHorizontal: 16,
+    borderRadius: 12,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+  },
+  subscriptionPromoLink: { fontSize: 15, fontWeight: '800' as const },
+  subscriptionPromoArrow: { fontSize: 20, lineHeight: 22, fontWeight: '800' as const },
   deleteAccountLink: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 16, paddingVertical: 14, borderTopWidth: StyleSheet.hairlineWidth },
   deleteAccountText: { fontSize: 14, fontWeight: '700' as const },
   langRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
