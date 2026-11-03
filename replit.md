@@ -24,7 +24,6 @@ Required runtime configuration:
 
 - `DATABASE_URL` — provided by the Replit-managed PostgreSQL database
 - `GROQ_API_KEY` — required by plant recognition and Totem chat
-- `JWT_SECRET` — used to sign authentication tokens
 - `JWT_SECRET` — required server secret for signing and verifying authenticated API sessions; never expose it to the mobile bundle
 
 For the mobile preview, the dev script supplies the Replit Expo proxy and public domain variables automatically.
