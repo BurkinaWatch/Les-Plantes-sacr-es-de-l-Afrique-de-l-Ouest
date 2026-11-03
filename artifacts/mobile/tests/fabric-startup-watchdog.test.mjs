@@ -43,6 +43,14 @@ test("generated Android watchdog matches its Expo plugin template", () => {
   );
 });
 
+test("native startup recovery waits for a slow first Android launch", () => {
+  assert.match(sourceTemplate, /private const val TIMEOUT_MS = 45_000L/);
+  assert.match(
+    sourceTemplate,
+    /premier écran de l’application n’est pas apparu après 45 secondes/,
+  );
+});
+
 test("generated startup diagnostic module matches its Expo plugin template", () => {
   assert.equal(
     generatedDiagnosticModule,

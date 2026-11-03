@@ -36,7 +36,9 @@ import java.lang.ref.WeakReference
  * first view. This still works when the JavaScript root layout cannot mount.
  */
 internal object StartupWatchdog {
-  private const val TIMEOUT_MS = 12_000L
+  // First Android launches can be slow while the JS bundle and local assets warm.
+  // Keep the native recovery screen for a real stall, not a delayed first frame.
+  private const val TIMEOUT_MS = 45_000L
   private const val MAX_MARKERS = 40
   private const val BACKGROUND = 0xFF0A1F0C.toInt()
   private const val CARD = 0xFF1D3D20.toInt()
@@ -451,7 +453,7 @@ internal object StartupWatchdog {
     card.addView(title, verticalParams(activity, bottom = 12))
 
     val explanation = TextView(activity).apply {
-      text = "Le premier écran de l’application n’est pas apparu après 12 secondes. Copiez ce rapport et envoyez-le dans le chat."
+      text = "Le premier écran de l’application n’est pas apparu après 45 secondes. Copiez ce rapport et envoyez-le dans le chat."
       setTextColor(MUTED)
       textSize = 15f
       gravity = Gravity.CENTER_VERTICAL

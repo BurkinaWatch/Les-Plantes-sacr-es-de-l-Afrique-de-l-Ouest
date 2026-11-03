@@ -32,3 +32,9 @@ Do not swallow a fatal JavaScript startup error before a mounted recovery listen
 **Why:** Replacing the global handler and returning before the recovery UI subscribes can suppress the only visible exception and leave the native splash over an empty app.
 
 **How to apply:** When wrapping `ErrorUtils`, test both the mounted-recovery path and the pre-mount path; the latter must preserve React Native's original fatal-error handling.
+
+The automatic first-frame recovery delay must tolerate a slow Android cold start; keep the JavaScript and native watchdog thresholds aligned.
+
+**Why:** On the user's Android installation, the 12-second watchdog briefly showed a startup diagnostic even though the app then opened normally, making a successful first launch look broken.
+
+**How to apply:** Keep recovery available for a genuine stall, but use a longer shared timeout and cover threshold parity in tests so a slow first launch does not trigger a false alarm.

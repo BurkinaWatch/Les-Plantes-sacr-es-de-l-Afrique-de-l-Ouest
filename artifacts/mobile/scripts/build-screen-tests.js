@@ -12,6 +12,7 @@ const sources = [
   ["app/(tabs)/scanner.tsx", "app/(tabs)/scanner.js"],
   ["app/animal/[id].tsx", "app/animal/[id].js"],
   ["components/PasswordInput.tsx", "components/PasswordInput.js"],
+  ["components/PlanteCard.tsx", "components/PlanteCard.js"],
   ["context/StartupReadinessContext.tsx", "context/StartupReadinessContext.js"],
   ["components/StartupDiagnosticButton.tsx", "components/StartupDiagnosticButton.js"],
   ["constants/plantImages.ts", "constants/plantImages.js"],

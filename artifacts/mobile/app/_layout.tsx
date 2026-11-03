@@ -31,7 +31,10 @@ import { useColors } from "@/hooks/useColors";
 import { LanguageProvider } from "@/i18n";
 import { useNotifications } from "@/hooks/useNotifications";
 import { getApiBase } from "@/lib/api-config";
-import { isInitialRouteReady } from "@/lib/startup-readiness";
+import {
+  isInitialRouteReady,
+  STARTUP_RECOVERY_TIMEOUT_MS,
+} from "@/lib/startup-readiness";
 import {
   setAuthTokenGetter,
   setBaseUrl,
@@ -641,10 +644,10 @@ function RootLayoutContent() {
 
     const startupTimeout = setTimeout(() => {
       console.error(
-        `[Startup] Initial screen did not lay out within 12 seconds; active route: ${routeKey || "(none)"}, layout callback received: ${initialScreenLayoutReceived}`,
+        `[Startup] Initial screen did not lay out within ${STARTUP_RECOVERY_TIMEOUT_MS / 1000} seconds; active route: ${routeKey || "(none)"}, layout callback received: ${initialScreenLayoutReceived}`,
       );
       setStartupFailed(true);
-    }, 12000);
+    }, STARTUP_RECOVERY_TIMEOUT_MS);
 
     return () => clearTimeout(startupTimeout);
   }, [initialScreenLayoutReceived, navigationReady, routeKey]);

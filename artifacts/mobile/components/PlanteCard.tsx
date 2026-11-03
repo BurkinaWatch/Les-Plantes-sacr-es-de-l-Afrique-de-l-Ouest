@@ -1,10 +1,12 @@
 import { LinearGradient } from 'expo-linear-gradient';
+import { Image } from 'expo-image';
 import { useRouter } from 'expo-router';
 import React, { memo } from 'react';
-import { ImageBackground, Platform, Pressable, StyleSheet, Text, View } from 'react-native';
+import { Platform, Pressable, StyleSheet, Text, View } from 'react-native';
 
 import PLANT_IMAGES from '@/constants/plantImages';
 import type { Plante } from '@/data/animals';
+import { useColors } from '@/hooks/useColors';
 
 interface Props {
   plante: Plante;
@@ -23,6 +25,7 @@ const CATEGORY_LABELS: Record<string, string> = {
 
 export const PlanteCard = memo(function PlanteCard({ plante, compact = false, numColumns = 2 }: Props) {
   const router = useRouter();
+  const colors = useColors();
 
   const cardHeight = compact ? 90 : numColumns >= 4 ? 100 : numColumns === 3 ? 110 : 115;
   const nomSize = compact ? 14 : numColumns >= 4 ? 14 : numColumns === 3 ? 16 : 17;
@@ -34,16 +37,22 @@ export const PlanteCard = memo(function PlanteCard({ plante, compact = false, nu
       style={({ pressed }) => [styles.container, compact && styles.containerCompact, { opacity: pressed ? 0.85 : 1 }]}
       onPress={() => router.push(`/animal/${plante.id}` as any)}
     >
-      <ImageBackground
-        source={plantImage}
-        style={[styles.card, { height: cardHeight }]}
-        imageStyle={styles.cardImage}
-        resizeMode="cover"
-        fadeDuration={0}
+      <View
+        style={[styles.card, { height: cardHeight, backgroundColor: colors.card }]}
       >
+        {plantImage ? (
+          <Image
+            source={plantImage}
+            style={styles.cardImage}
+            contentFit="cover"
+            cachePolicy="memory-disk"
+            recyclingKey={plante.id}
+            transition={0}
+          />
+        ) : null}
         <LinearGradient
-          colors={['rgba(0,0,0,0.08)', 'rgba(0,0,0,0.62)']}
-          style={StyleSheet.absoluteFill}
+          colors={['rgba(0,0,0,0.05)', 'rgba(0,0,0,0.48)']}
+          style={styles.cardGradient}
         />
 
         <View style={styles.content}>
@@ -82,7 +91,7 @@ export const PlanteCard = memo(function PlanteCard({ plante, compact = false, nu
             )}
           </View>
         </View>
-      </ImageBackground>
+      </View>
     </Pressable>
   );
 });
@@ -113,7 +122,13 @@ const styles = StyleSheet.create({
     borderRadius: 16,
   },
   cardImage: {
+    ...StyleSheet.absoluteFill,
+    width: '100%',
+    height: '100%',
     borderRadius: 16,
+  },
+  cardGradient: {
+    ...StyleSheet.absoluteFill,
   },
   content: {
     padding: 10,
