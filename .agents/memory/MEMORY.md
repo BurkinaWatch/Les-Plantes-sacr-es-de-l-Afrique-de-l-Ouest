@@ -33,3 +33,4 @@
 - [Android release ABIs](android-release-abis.md) — retain armv7 and emulator ABIs alongside arm64 unless device testing justifies narrowing support.
 - [Android request attribution](android-request-attribution.md) — distinguish agent-side probes from phone requests before attributing backend failures to a device.
 - [Expo config-plugin sources](expo-plugin-source-ignore.md) — anchor generated Android ignores so custom Kotlin sources under plugins/android reach EAS builds.
+- [Quiz result diversity](quiz-result-diversity.md) — recommendations should use all 20 answers deterministically, not randomize or collapse them to five averages.

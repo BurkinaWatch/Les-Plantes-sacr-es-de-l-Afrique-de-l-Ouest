@@ -159,6 +159,37 @@ const PLANT_VALUE_SIGNALS: Record<Dim, readonly SignalGroup[]> = {
   ],
 };
 
+// Narrower editorial themes preserve distinctions between prompts that would
+// otherwise disappear when answers are averaged into five dimensions.
+const QUESTION_VALUE_SIGNALS: Record<number, readonly string[]> = {
+  1: ['experience', 'memoire', 'souvenir', 'savoir', 'lecon', 'enseignement', 'apprendre', 'histoire', 'ancien'],
+  2: ['observer', 'observation', 'attention', 'ecoute', 'cycle', 'saison', 'environnement', 'changement'],
+  3: ['soin', 'soigner', 'protection', 'aider', 'nourrir', 'ressource', 'remede', 'soutien'],
+  4: ['partage', 'transmission', 'enseigner', 'apprendre', 'respect', 'liberte', 'communaute'],
+  5: ['cycle', 'fin', 'transformation', 'lecon', 'enseignement', 'saison', 'renouveau'],
+  6: ['duree', 'stable', 'permanent', 'ancrage', 'racine', 'continu', 'tradition', 'foyer'],
+  7: ['intuition', 'discernement', 'sagesse', 'question', 'signe', 'symbole', 'ecoute'],
+  8: ['limite', 'protection', 'proteger', 'frontiere', 'defense', 'intimite', 'garde'],
+  9: ['collectif', 'communaute', 'village', 'ensemble', 'peuple', 'alliance', 'cooperation'],
+  10: ['changement', 'renouveau', 'transformation', 'adaptation', 'mutation', 'renouveler'],
+  11: ['repere', 'stabilite', 'tradition', 'ancetre', 'heritage', 'origine', 'conseil', 'sagesse'],
+  12: ['symbole', 'legende', 'recit', 'reve', 'mythe', 'parole', 'vision'],
+  13: ['vivant', 'communaute', 'ecosysteme', 'nature', 'biodiversite', 'protection', 'preserver'],
+  14: ['dialogue', 'parole', 'conseil', 'echange', 'ecoute', 'sagesse', 'griot'],
+  15: ['adaptation', 'rebond', 'resistance', 'resilience', 'repartir', 'renouveler', 'force'],
+  16: ['famille', 'communaute', 'memoire', 'ancetre', 'patrimoine', 'tradition', 'savoir'],
+  17: ['connaissance', 'savoir', 'apprendre', 'verite', 'discernement', 'observation', 'raison'],
+  18: ['fragile', 'protection', 'defense', 'preserver', 'justice', 'garde', 'soutien'],
+  19: ['generation', 'ancetre', 'famille', 'heritage', 'transmission', 'patrimoine', 'griot'],
+  20: ['cycle', 'saison', 'rythme', 'energie', 'floraison', 'adaptation', 'croissance'],
+};
+
+for (const question of QUIZ_QUESTIONS) {
+  if (!QUESTION_VALUE_SIGNALS[question.id]?.length) {
+    throw new Error(`Question ${question.id} is missing plant-matching signals.`);
+  }
+}
+
 function normalizeText(value: string): string {
   return value
     .normalize('NFD')
@@ -168,6 +199,7 @@ function normalizeText(value: string): string {
 
 function getPlantValueText(plant: Plante): string {
   return normalizeText([
+    plant.description,
     plant.symboliqueAfricaine,
     plant.symboliqueSpirirtuelle,
     plant.symbolique,
@@ -180,6 +212,8 @@ function getPlantValueText(plant: Plante): string {
     ...plant.legendes,
     ...plant.conseilsDeVie,
     plant.enseignementDuJour,
+    ...(plant.vertus ?? []),
+    ...(plant.usagesTraditionnels ?? []),
   ].filter(Boolean).join(' '));
 }
 
@@ -196,6 +230,89 @@ export function derivePlantProfile(plant: Plante): Record<Dim, number> {
   }
 
   return profile;
+}
+
+type QuestionProfile = Record<number, number>;
+
+const PLANT_CATALOG_TEXTS = PLANTS.map(getPlantValueText);
+const QUESTION_TERM_IDF = new Map<number, Map<string, number>>();
+
+for (const question of QUIZ_QUESTIONS) {
+  const termWeights = new Map<string, number>();
+  for (const term of QUESTION_VALUE_SIGNALS[question.id] ?? []) {
+    const documentFrequency = PLANT_CATALOG_TEXTS.reduce(
+      (count, text) => count + (text.includes(term) ? 1 : 0),
+      0,
+    );
+    termWeights.set(term, 1 + Math.log((PLANTS.length + 1) / (documentFrequency + 1)));
+  }
+  QUESTION_TERM_IDF.set(question.id, termWeights);
+}
+
+function deriveRawQuestionProfile(text: string): QuestionProfile {
+  return Object.fromEntries(QUIZ_QUESTIONS.map((question) => {
+    const terms = QUESTION_VALUE_SIGNALS[question.id] ?? [];
+    const weights = QUESTION_TERM_IDF.get(question.id);
+    let matchingWeight = 0;
+    let totalWeight = 0;
+
+    for (const term of terms) {
+      const weight = weights?.get(term) ?? 1;
+      totalWeight += weight;
+      if (text.includes(term)) matchingWeight += weight;
+    }
+
+    return [question.id, totalWeight > 0 ? (matchingWeight / totalWeight) * 100 : 50];
+  }));
+}
+
+const CATALOG_QUESTION_PROFILES = new Map(
+  PLANTS.map((plant, index) => [plant.id, deriveRawQuestionProfile(PLANT_CATALOG_TEXTS[index])]),
+);
+const QUESTION_PROFILE_DISTRIBUTIONS = new Map<number, number[]>(
+  QUIZ_QUESTIONS.map((question) => [
+    question.id,
+    [...CATALOG_QUESTION_PROFILES.values()]
+      .map((profile) => profile[question.id])
+      .sort((a, b) => a - b),
+  ]),
+);
+
+function percentileRank(value: number, sortedValues: readonly number[]): number {
+  if (sortedValues.length <= 1) return 50;
+
+  let low = 0;
+  let high = sortedValues.length;
+  while (low < high) {
+    const middle = Math.floor((low + high) / 2);
+    if (sortedValues[middle] < value) low = middle + 1;
+    else high = middle;
+  }
+  const firstEqual = low;
+
+  low = 0;
+  high = sortedValues.length;
+  while (low < high) {
+    const middle = Math.floor((low + high) / 2);
+    if (sortedValues[middle] <= value) low = middle + 1;
+    else high = middle;
+  }
+  const afterLastEqual = low;
+
+  return ((firstEqual + afterLastEqual - 1) / 2 / (sortedValues.length - 1)) * 100;
+}
+
+function deriveQuestionProfile(plant: Plante): QuestionProfile {
+  const rawProfile = CATALOG_QUESTION_PROFILES.get(plant.id)
+    ?? deriveRawQuestionProfile(getPlantValueText(plant));
+
+  return Object.fromEntries(QUIZ_QUESTIONS.map((question) => [
+    question.id,
+    percentileRank(
+      rawProfile[question.id],
+      QUESTION_PROFILE_DISTRIBUTIONS.get(question.id) ?? [],
+    ),
+  ]));
 }
 
 function firstNonEmpty(values: readonly (string | undefined)[]): string | undefined {
@@ -302,12 +419,16 @@ export function calculateTotem(
     );
   }
 
-  const maxDistance = Math.sqrt(DIMS.length * 100 * 100);
+  const questionTargets = Object.fromEntries(QUIZ_QUESTIONS.map((question) => [
+    question.id,
+    ((answers[question.id] - 1) / 4) * 100,
+  ])) as QuestionProfile;
+  const maxDistance = Math.sqrt(QUIZ_QUESTIONS.length * 100 * 100);
   const rankings = candidates.map((plant) => {
-    const profile = derivePlantProfile(plant);
+    const profile = deriveQuestionProfile(plant);
     const distance = Math.sqrt(
-      DIMS.reduce(
-        (sum, dimension) => sum + (dimensionScores[dimension] - profile[dimension]) ** 2,
+      QUIZ_QUESTIONS.reduce(
+        (sum, question) => sum + (questionTargets[question.id] - profile[question.id]) ** 2,
         0,
       ),
     );

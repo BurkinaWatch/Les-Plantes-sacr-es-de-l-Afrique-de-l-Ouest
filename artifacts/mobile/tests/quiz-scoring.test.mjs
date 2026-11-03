@@ -80,6 +80,48 @@ test("strongly contrasting response patterns can select different primaries", ()
   assert.notEqual(low.primary, high.primary);
 });
 
+test("individual answers matter even when five dimension averages are identical", () => {
+  const flatAnswers = answersWith(3);
+  const values = [1, 2, 4, 5];
+  const dimensionCounts = { E: 0, O: 0, C: 0, A: 0, S: 0 };
+  const variedAnswers = Object.fromEntries(
+    QUIZ_QUESTIONS.map((question) => [
+      question.id,
+      values[dimensionCounts[question.dimension]++],
+    ]),
+  );
+  const flat = calculateTotem(flatAnswers);
+  const varied = calculateTotem(variedAnswers);
+
+  assert.deepEqual(varied.dimensionScores, flat.dimensionScores);
+  assert.notEqual(varied.primary, flat.primary);
+});
+
+test("varied response patterns do not collapse to only a few plants", () => {
+  let state = 0x12345678;
+  const primaryCounts = new Map();
+
+  for (let sample = 0; sample < 128; sample += 1) {
+    const answers = Object.fromEntries(
+      QUIZ_QUESTIONS.map((question) => {
+        state = (Math.imul(state, 1664525) + 1013904223) >>> 0;
+        return [question.id, (state % 5) + 1];
+      }),
+    );
+    const primary = calculateTotem(answers).primary;
+    primaryCounts.set(primary, (primaryCounts.get(primary) ?? 0) + 1);
+  }
+
+  assert.ok(
+    primaryCounts.size >= 50,
+    `Expected at least 50 distinct primary plants; found ${primaryCounts.size}`,
+  );
+  assert.ok(
+    Math.max(...primaryCounts.values()) <= 12,
+    "No single plant should dominate this varied response sample",
+  );
+});
+
 test("dimension and candidate scores are finite percentages", () => {
   const result = calculateTotem(answersWith(3));
   for (const score of Object.values(result.scores)) {
