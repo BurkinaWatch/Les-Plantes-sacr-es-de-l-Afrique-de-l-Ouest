@@ -15,6 +15,12 @@ For production API calls, Expo Go's native networking is not subject to browser 
 
 **How to apply:** In a Replit web development preview, prefer its development domain over the release API URL so the request goes through the local API proxy; keep this override limited to web + development builds. Native Expo Go continues using its explicit production API URL. Prefer Expo Go for production tests; only allowlist the exact preview origin when production API browser testing is specifically required.
 
+The mobile web preview depends on the local API artifact workflow being running; a healthy Railway API does not make the Replit preview's local `/api` proxy available.
+
+**Why:** The preview can show a network failure while the production API is healthy if `artifacts/api-server: API Server` is stopped.
+
+**How to apply:** Before debugging API failures in the Replit web preview, start the managed API-server workflow and verify `/api/healthz` through the preview host. Keep this separate from checks of the installed APK, which targets the release API.
+
 API clients must preserve the `/api/` route prefix even when the configured API base URL is normalized to the host root. A missing prefix on the Expo web preview can reach the app fallback and return `200` with HTML, which the client may misreport as an unavailable API after JSON parsing fails.
 
 **Why:** The development proxy sends `/api/*` to the API artifact, while an unprefixed route can be handled by the mobile app instead of the API.
