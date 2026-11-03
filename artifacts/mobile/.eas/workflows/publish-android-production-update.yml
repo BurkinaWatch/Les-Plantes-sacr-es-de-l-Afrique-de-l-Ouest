@@ -1,0 +1,14 @@
+name: Publish Android production update
+
+on:
+  workflow_dispatch: {}
+
+jobs:
+  publish_android:
+    name: Publish Android production update
+    type: update
+    environment: production
+    params:
+      channel: production
+      platform: android
+      message: Android production OTA update
