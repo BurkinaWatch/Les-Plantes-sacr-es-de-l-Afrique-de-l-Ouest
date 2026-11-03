@@ -192,6 +192,11 @@ class ReleaseWiringTests(unittest.TestCase):
         mobile = workspace / "artifacts/mobile"
         (mobile / "scripts").mkdir(parents=True)
         shutil.copy(MOBILE / "scripts/release-android.sh", mobile / "scripts")
+        shutil.copy(MOBILE / "scripts/verify-android-plugin-sources.js", mobile / "scripts")
+        for source in ("StartupWatchdog.kt", "StartupDiagnosticModule.kt"):
+            target = mobile / "plugins/android" / source
+            target.parent.mkdir(parents=True, exist_ok=True)
+            shutil.copy(MOBILE / "plugins/android" / source, target)
         (mobile / ".keys").mkdir()
         (mobile / ".keys/play-upload-key.jks").write_text("fixture, not a signing key")
         apk = mobile / "android/app/build/outputs/apk/release/app-release.apk"
@@ -255,6 +260,7 @@ raise SystemExit({audit_status})
     def test_release_build_is_followed_by_blocking_audit_and_allowlisted_archive(self):
         source = (MOBILE / "scripts/release-android.sh").read_text()
         self.assertIn("set -euo pipefail", source)
+        self.assertLess(source.index("verify-android-plugin-sources.js"), source.index("expo prebuild"))
         self.assertLess(source.index("pnpm run optimize:catalog-images"), source.index("pnpm run verify:plant-images"))
         self.assertLess(source.index("pnpm run verify:plant-images"), source.index("expo prebuild"))
         self.assertLess(source.index("./gradlew :app:assembleRelease"), source.index("python3 scripts/audit-android-release.py"))
@@ -262,6 +268,11 @@ raise SystemExit({audit_status})
         self.assertIn('trap archive_evidence EXIT', source)
         self.assertIn('-C "$evidence" release-audit.json', source)
         self.assertNotIn("|| true", source)
+        package = json.loads((MOBILE / "package.json").read_text())
+        self.assertEqual(
+            package["scripts"]["eas-build-pre-install"],
+            "node scripts/verify-android-plugin-sources.js",
+        )
         workflow = (MOBILE.parents[1] / ".github/workflows/android-release-budget.yml").read_text()
         self.assertIn("pnpm --filter @workspace/mobile release:android", workflow)
         self.assertIn("path: generated-artifacts/android-release/release-audit.json", workflow)

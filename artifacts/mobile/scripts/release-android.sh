@@ -2,6 +2,7 @@
 # The only release entry point: signed compilation -> blocking audit -> evidence.
 set -euo pipefail
 cd "$(dirname "$0")/.."
+node scripts/verify-android-plugin-sources.js
 export ANDROID_HOME="${ANDROID_HOME:-$PWD/.android-sdk}"
 export ANDROID_SDK_ROOT="$ANDROID_HOME"
 export ANDROID_USER_HOME="${ANDROID_USER_HOME:-$PWD/.android-user}"
