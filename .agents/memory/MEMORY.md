@@ -32,3 +32,4 @@
 - [Offline APK optimization](offline-apk-optimization.md) — preserve embedded images and all ABIs; allow measured lossy WebP only with masters and quality gates.
 - [Android release ABIs](android-release-abis.md) — retain armv7 and emulator ABIs alongside arm64 unless device testing justifies narrowing support.
 - [Android request attribution](android-request-attribution.md) — distinguish agent-side probes from phone requests before attributing backend failures to a device.
+- [Expo config-plugin sources](expo-plugin-source-ignore.md) — anchor generated Android ignores so custom Kotlin sources under plugins/android reach EAS builds.
