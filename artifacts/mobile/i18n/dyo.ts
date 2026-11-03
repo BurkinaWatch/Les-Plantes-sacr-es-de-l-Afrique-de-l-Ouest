@@ -199,6 +199,8 @@ export const dyo: Translations = {
   auth_username_hint: 'E-mail : nom@exemple.com',
   auth_password: 'GAFE',
   auth_password_placeholder: 'I gafe',
+  auth_show_password: 'Gafe jira',
+  auth_hide_password: 'Gafe dogo',
   auth_confirm_password: 'GAFE SƐGƐSƐGƐ',
   auth_confirm_password_placeholder: 'I gafe sɛgɛsɛgɛ',
   auth_login_btn: 'Sigi',

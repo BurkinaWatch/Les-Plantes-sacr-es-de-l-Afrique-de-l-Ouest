@@ -16,6 +16,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { useAuth } from '@/context/AuthContext';
 import { useStartupReadiness } from '@/context/StartupReadinessContext';
+import { PasswordInput } from '@/components/PasswordInput';
 import { useColors } from '@/hooks/useColors';
 import { useTranslation } from '@/i18n';
 import { isValidEmail } from '@/lib/auth-validation';
@@ -112,27 +113,29 @@ export default function RegisterScreen() {
 
             <View style={styles.field}>
               <Text style={[styles.label, { color: colors.mutedForeground }]}>{t.auth_password}</Text>
-              <TextInput
+              <PasswordInput
+                testID="register-password"
                 style={[styles.input, { color: colors.ivory, borderColor: colors.border, backgroundColor: colors.warmBrown }]}
                 value={password}
                 onChangeText={setPassword}
                 placeholder={t.auth_password_placeholder}
+                accessibilityLabel={t.auth_password}
                 placeholderTextColor={colors.mutedForeground}
                 maxLength={128}
-                secureTextEntry
               />
             </View>
 
             <View style={styles.field}>
               <Text style={[styles.label, { color: colors.mutedForeground }]}>{t.auth_confirm_password}</Text>
-              <TextInput
+              <PasswordInput
+                testID="register-confirm-password"
                 style={[styles.input, { color: colors.ivory, borderColor: colors.border, backgroundColor: colors.warmBrown }]}
                 value={confirm}
                 onChangeText={setConfirm}
                 placeholder={t.auth_confirm_password_placeholder}
+                accessibilityLabel={t.auth_confirm_password}
                 placeholderTextColor={colors.mutedForeground}
                 maxLength={128}
-                secureTextEntry
               />
             </View>
 

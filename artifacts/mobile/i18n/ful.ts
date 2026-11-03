@@ -199,6 +199,8 @@ export const ful: Translations = {
   auth_username_hint: 'E-mail : nom@exemple.com',
   auth_password: 'COFTAL',
   auth_password_placeholder: 'Coftal maa',
+  auth_show_password: 'Hollu coftal',
+  auth_hide_password: 'Suuɗ coftal',
   auth_confirm_password: 'JOKKU COFTAL',
   auth_confirm_password_placeholder: 'Coftal maa kadi',
   auth_login_btn: 'Naatir',

@@ -35,8 +35,12 @@ async function mount({ params = {}, result = {}, platform = "web" } = {}) {
     };
     if (id === "@/hooks/useColors") return { useColors: () => ({}) };
     if (id === "@/i18n") return { useTranslation: () => ({ t: fr }) };
+    if (id === "@/components/PasswordInput") {
+      return require("../.screen-test-dist/components/PasswordInput.js");
+    }
     if (id === "@/lib/auth-validation") return require("../.screen-test-dist/lib/auth-validation.js");
     if (id.startsWith("@/assets/")) return 1;
+    if (id === "@expo/vector-icons") return { Ionicons: "Ionicons" };
     if (id === "expo-linear-gradient") return { LinearGradient: "LinearGradient" };
     if (id === "react-native-safe-area-context") return { useSafeAreaInsets: () => ({ top: 0, bottom: 0 }) };
     if (id === "react-native") return {
@@ -92,6 +96,17 @@ test("reconnection prefills the saved email and returns to subscription after lo
     assert.equal(f.input(fr.auth_username).props.value, "client@example.com");
     assert.equal(f.input(fr.auth_username).props.autoComplete, "username");
     assert.equal(f.input(fr.auth_password).props.autoComplete, "current-password");
+    const passwordInput = f.input(fr.auth_password);
+    const visibilityToggle = f.renderer.root.findByProps({
+      testID: "login-password-visibility-toggle",
+    });
+    assert.equal(passwordInput.props.secureTextEntry, true);
+    assert.equal(visibilityToggle.props.accessibilityLabel, fr.auth_show_password);
+    await act(async () => visibilityToggle.props.onPress());
+    assert.equal(passwordInput.props.secureTextEntry, false);
+    assert.equal(visibilityToggle.props.accessibilityLabel, fr.auth_hide_password);
+    await act(async () => visibilityToggle.props.onPress());
+    assert.equal(passwordInput.props.secureTextEntry, true);
     await act(async () => f.input(fr.auth_password).props.onChangeText("test-password"));
     await f.submit();
     assert.deepEqual(f.calls.credentials, [["client@example.com", "test-password"]]);

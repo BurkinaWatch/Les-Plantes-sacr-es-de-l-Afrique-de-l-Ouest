@@ -199,6 +199,8 @@ export const mos: Translations = {
   auth_username_hint: 'E-mail : nom@exemple.com',
   auth_password: 'GÃNGO',
   auth_password_placeholder: 'F gãngo',
+  auth_show_password: 'Yãg gãngo',
+  auth_hide_password: 'Pʋs gãngo',
   auth_confirm_password: 'WILG GÃNGO',
   auth_confirm_password_placeholder: 'Tɩɩ f gãngo',
   auth_login_btn: 'Kẽ',

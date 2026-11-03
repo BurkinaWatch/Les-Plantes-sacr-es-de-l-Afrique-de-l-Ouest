@@ -194,6 +194,8 @@ export const en: Translations = {
   auth_username_hint: 'Enter a valid email address.',
   auth_password: 'PASSWORD',
   auth_password_placeholder: 'Your password',
+  auth_show_password: 'Show password',
+  auth_hide_password: 'Hide password',
   auth_confirm_password: 'CONFIRM PASSWORD',
   auth_confirm_password_placeholder: 'Repeat your password',
   auth_login_btn: 'Sign In',

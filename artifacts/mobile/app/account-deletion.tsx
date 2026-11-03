@@ -17,6 +17,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { useApp } from '@/context/AppContext';
 import { useAuth } from '@/context/AuthContext';
+import { PasswordInput } from '@/components/PasswordInput';
 import { useColors } from '@/hooks/useColors';
 
 export default function AccountDeletionScreen() {
@@ -150,7 +151,7 @@ export default function AccountDeletionScreen() {
             <Text style={[styles.inputLabel, { color: colors.mutedForeground }]}>
               Mot de passe actuel
             </Text>
-            <TextInput
+            <PasswordInput
               testID="account-deletion-password"
               accessibilityLabel="Mot de passe actuel"
               value={password}
@@ -160,7 +161,6 @@ export default function AccountDeletionScreen() {
               }}
               placeholder="Saisissez votre mot de passe"
               placeholderTextColor={colors.mutedForeground}
-              secureTextEntry
               autoCapitalize="none"
               autoCorrect={false}
               autoComplete="current-password"

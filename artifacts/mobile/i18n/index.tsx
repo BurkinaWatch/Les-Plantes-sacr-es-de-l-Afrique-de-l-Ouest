@@ -211,6 +211,8 @@ export interface Translations {
   auth_username_hint: string;
   auth_password: string;
   auth_password_placeholder: string;
+  auth_show_password: string;
+  auth_hide_password: string;
   auth_confirm_password: string;
   auth_confirm_password_placeholder: string;
   auth_login_btn: string;

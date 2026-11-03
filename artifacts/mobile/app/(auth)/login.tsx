@@ -17,6 +17,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { useAuth } from '@/context/AuthContext';
 import { useStartupReadiness } from '@/context/StartupReadinessContext';
+import { PasswordInput } from '@/components/PasswordInput';
 import { useColors } from '@/hooks/useColors';
 import { useTranslation } from '@/i18n';
 import { isValidEmail, isValidUsername } from '@/lib/auth-validation';
@@ -138,7 +139,8 @@ export default function LoginScreen() {
 
       <View style={styles.field}>
         <Text style={[styles.label, { color: colors.mutedForeground }]}>{t.auth_password}</Text>
-        <TextInput
+        <PasswordInput
+          testID="login-password"
           style={[styles.input, { color: colors.ivory, borderColor: colors.border, backgroundColor: colors.warmBrown }]}
           value={password}
           onChangeText={setPassword}
@@ -147,7 +149,6 @@ export default function LoginScreen() {
           autoComplete="current-password"
           textContentType="password"
           placeholderTextColor={colors.mutedForeground}
-          secureTextEntry
         />
       </View>
 

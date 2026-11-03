@@ -11,6 +11,7 @@ const sources = [
   ["app/chat-totem.tsx", "app/chat-totem.js"],
   ["app/(tabs)/scanner.tsx", "app/(tabs)/scanner.js"],
   ["app/animal/[id].tsx", "app/animal/[id].js"],
+  ["components/PasswordInput.tsx", "components/PasswordInput.js"],
   ["context/StartupReadinessContext.tsx", "context/StartupReadinessContext.js"],
   ["components/StartupDiagnosticButton.tsx", "components/StartupDiagnosticButton.js"],
   ["constants/plantImages.ts", "constants/plantImages.js"],
