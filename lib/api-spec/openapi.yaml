@@ -14,6 +14,8 @@ tags:
     description: Username and password authentication
   - name: subscriptions
     description: Subscription and payment preparation operations
+  - name: recipes
+    description: Community culinary ratings for recipes
 paths:
   /healthz:
     get:
@@ -183,6 +185,59 @@ paths:
             text/html:
               schema:
                 type: string
+        "429":
+          $ref: "#/components/responses/TooManyRequests"
+  /recipes/{recipeId}/ratings:
+    parameters:
+      - name: recipeId
+        in: path
+        required: true
+        schema:
+          $ref: "#/components/schemas/RecipeId"
+    get:
+      operationId: getRecipeRatings
+      tags: [recipes]
+      summary: Get culinary ratings for a recipe
+      description: Returns aggregate taste and preparation-ease scores plus the authenticated user's own rating. These scores are not medical evidence.
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Culinary rating summary
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RecipeRatingSummary"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "429":
+          $ref: "#/components/responses/TooManyRequests"
+    put:
+      operationId: saveRecipeRating
+      tags: [recipes]
+      summary: Create or update the authenticated user's culinary rating
+      description: Stores only taste and preparation ease on a 1–5 scale. Free-text or health claims are not accepted.
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RecipeRatingInput"
+      responses:
+        "200":
+          description: Updated culinary rating summary
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RecipeRatingSummary"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
         "429":
           $ref: "#/components/responses/TooManyRequests"
   /subscriptions/plans:
@@ -510,6 +565,72 @@ components:
           type: integer
         failed:
           type: integer
+    RecipeId:
+      type: string
+      enum:
+        - tisane-kinkeliba
+        - jus-bissap
+        - eau-moringa
+        - decoction-neem
+        - beurre-karite
+        - tisane-citronnelle
+        - preparation-tamarin
+        - sauce-lalo
+        - infusion-ecorce-baobab
+        - poudre-soumbala
+        - bain-feuilles-eucalyptus
+        - boisson-pulpe-ditakh
+        - legume-luffa-jeune
+        - boisson-fruit-marula
+        - graines-courge-grillees
+        - miyan-kuka-baobab
+        - kontomire-stew-ghana
+        - ofe-onugbu-bitterleaf
+        - dawadawa-jollof-rice
+        - fonio-sauce-legumes
+        - abenkwan-palmnut-soup
+        - egusi-soup-nigeria
+        - soupe-feuilles-manioc-liberia
+        - miyan-taushe-courge
+    RecipeRatingValues:
+      type: object
+      additionalProperties: false
+      required: [taste, preparationEase]
+      properties:
+        taste:
+          type: integer
+          minimum: 1
+          maximum: 5
+        preparationEase:
+          type: integer
+          minimum: 1
+          maximum: 5
+    RecipeRatingInput:
+      $ref: "#/components/schemas/RecipeRatingValues"
+    RecipeRatingSummary:
+      type: object
+      additionalProperties: false
+      required: [tasteAverage, preparationEaseAverage, ratingCount, myRating]
+      properties:
+        tasteAverage:
+          oneOf:
+            - type: number
+              minimum: 1
+              maximum: 5
+            - type: "null"
+        preparationEaseAverage:
+          oneOf:
+            - type: number
+              minimum: 1
+              maximum: 5
+            - type: "null"
+        ratingCount:
+          type: integer
+          minimum: 0
+        myRating:
+          oneOf:
+            - $ref: "#/components/schemas/RecipeRatingValues"
+            - type: "null"
     HealthStatus:
       type: object
       properties:

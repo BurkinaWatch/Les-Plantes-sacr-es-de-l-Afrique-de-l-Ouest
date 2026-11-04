@@ -149,6 +149,79 @@ export const SubmitAccountDeletionRequestResponse = zod.unknown()
 
 
 /**
+ * Returns aggregate taste and preparation-ease scores plus the authenticated user's own rating. These scores are not medical evidence.
+ * @summary Get culinary ratings for a recipe
+ */
+export const GetRecipeRatingsParams = zod.object({
+  "recipeId": zod.enum(['tisane-kinkeliba', 'jus-bissap', 'eau-moringa', 'decoction-neem', 'beurre-karite', 'tisane-citronnelle', 'preparation-tamarin', 'sauce-lalo', 'infusion-ecorce-baobab', 'poudre-soumbala', 'bain-feuilles-eucalyptus', 'boisson-pulpe-ditakh', 'legume-luffa-jeune', 'boisson-fruit-marula', 'graines-courge-grillees', 'miyan-kuka-baobab', 'kontomire-stew-ghana', 'ofe-onugbu-bitterleaf', 'dawadawa-jollof-rice', 'fonio-sauce-legumes', 'abenkwan-palmnut-soup', 'egusi-soup-nigeria', 'soupe-feuilles-manioc-liberia', 'miyan-taushe-courge'])
+})
+
+export const getRecipeRatingsResponseTasteAverageOneMax = 5;
+
+export const getRecipeRatingsResponsePreparationEaseAverageOneMax = 5;
+
+export const getRecipeRatingsResponseRatingCountMin = 0;
+
+export const getRecipeRatingsResponseMyRatingOneTasteMax = 5;
+
+export const getRecipeRatingsResponseMyRatingOnePreparationEaseMax = 5;
+
+
+
+export const GetRecipeRatingsResponse = zod.object({
+  "tasteAverage": zod.union([zod.number().min(1).max(getRecipeRatingsResponseTasteAverageOneMax),zod.null()]),
+  "preparationEaseAverage": zod.union([zod.number().min(1).max(getRecipeRatingsResponsePreparationEaseAverageOneMax),zod.null()]),
+  "ratingCount": zod.number().int().min(getRecipeRatingsResponseRatingCountMin),
+  "myRating": zod.union([zod.object({
+  "taste": zod.number().int().min(1).max(getRecipeRatingsResponseMyRatingOneTasteMax),
+  "preparationEase": zod.number().int().min(1).max(getRecipeRatingsResponseMyRatingOnePreparationEaseMax)
+}),zod.null()])
+})
+
+
+/**
+ * Stores only taste and preparation ease on a 1–5 scale. Free-text or health claims are not accepted.
+ * @summary Create or update the authenticated user's culinary rating
+ */
+export const SaveRecipeRatingParams = zod.object({
+  "recipeId": zod.enum(['tisane-kinkeliba', 'jus-bissap', 'eau-moringa', 'decoction-neem', 'beurre-karite', 'tisane-citronnelle', 'preparation-tamarin', 'sauce-lalo', 'infusion-ecorce-baobab', 'poudre-soumbala', 'bain-feuilles-eucalyptus', 'boisson-pulpe-ditakh', 'legume-luffa-jeune', 'boisson-fruit-marula', 'graines-courge-grillees', 'miyan-kuka-baobab', 'kontomire-stew-ghana', 'ofe-onugbu-bitterleaf', 'dawadawa-jollof-rice', 'fonio-sauce-legumes', 'abenkwan-palmnut-soup', 'egusi-soup-nigeria', 'soupe-feuilles-manioc-liberia', 'miyan-taushe-courge'])
+})
+
+export const saveRecipeRatingBodyTasteMax = 5;
+
+export const saveRecipeRatingBodyPreparationEaseMax = 5;
+
+
+
+export const SaveRecipeRatingBody = zod.object({
+  "taste": zod.number().int().min(1).max(saveRecipeRatingBodyTasteMax),
+  "preparationEase": zod.number().int().min(1).max(saveRecipeRatingBodyPreparationEaseMax)
+})
+
+export const saveRecipeRatingResponseTasteAverageOneMax = 5;
+
+export const saveRecipeRatingResponsePreparationEaseAverageOneMax = 5;
+
+export const saveRecipeRatingResponseRatingCountMin = 0;
+
+export const saveRecipeRatingResponseMyRatingOneTasteMax = 5;
+
+export const saveRecipeRatingResponseMyRatingOnePreparationEaseMax = 5;
+
+
+
+export const SaveRecipeRatingResponse = zod.object({
+  "tasteAverage": zod.union([zod.number().min(1).max(saveRecipeRatingResponseTasteAverageOneMax),zod.null()]),
+  "preparationEaseAverage": zod.union([zod.number().min(1).max(saveRecipeRatingResponsePreparationEaseAverageOneMax),zod.null()]),
+  "ratingCount": zod.number().int().min(saveRecipeRatingResponseRatingCountMin),
+  "myRating": zod.union([zod.object({
+  "taste": zod.number().int().min(1).max(saveRecipeRatingResponseMyRatingOneTasteMax),
+  "preparationEase": zod.number().int().min(1).max(saveRecipeRatingResponseMyRatingOnePreparationEaseMax)
+}),zod.null()])
+})
+
+
+/**
  * @summary List available subscription plans
  */
 export const GetSubscriptionPlansResponse = zod.object({

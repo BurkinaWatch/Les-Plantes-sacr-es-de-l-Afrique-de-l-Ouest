@@ -22,6 +22,7 @@ import {
   type PlanteMedicinale,
 } from '@/data/plantes-medicinales';
 import { SacredIcon, iconForGlyph, type SacredIconName } from '@/components/SacredIcon';
+import { RecipeRatingsPanel } from '@/components/RecipeRatingsPanel';
 
 type Tab = 'recettes' | 'articles' | 'plantes';
 
@@ -216,6 +217,7 @@ export default function SavoirScreen() {
               </Text>
             </View>
           )}
+          <RecipeRatingsPanel recipeId={r.id} accentColor={r.couleur} />
         </ScrollView>
       </View>
     );

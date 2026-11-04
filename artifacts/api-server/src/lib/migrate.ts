@@ -7,8 +7,9 @@ export const REQUIRED_SCHEMA_TABLES = [
   "subscriptions",
   "payment_attempts",
   "payment_events",
+  "recipe_ratings",
 ] as const;
-export const CURRENT_SCHEMA_VERSION = 4;
+export const CURRENT_SCHEMA_VERSION = 5;
 
 type RequiredSchemaColumn = {
   tableName: string;
@@ -428,6 +429,50 @@ const REQUIRED_SCHEMA_COLUMNS: readonly RequiredSchemaColumn[] = [
     dataType: "timestamp without time zone",
     udtName: "timestamp",
   },
+  {
+    tableName: "recipe_ratings",
+    columnName: "recipe_id",
+    isNullable: "NO",
+    dataType: "text",
+    udtName: "text",
+  },
+  {
+    tableName: "recipe_ratings",
+    columnName: "user_id",
+    isNullable: "NO",
+    dataType: "integer",
+    udtName: "int4",
+  },
+  {
+    tableName: "recipe_ratings",
+    columnName: "taste_score",
+    isNullable: "NO",
+    dataType: "smallint",
+    udtName: "int2",
+  },
+  {
+    tableName: "recipe_ratings",
+    columnName: "preparation_ease_score",
+    isNullable: "NO",
+    dataType: "smallint",
+    udtName: "int2",
+  },
+  {
+    tableName: "recipe_ratings",
+    columnName: "created_at",
+    isNullable: "NO",
+    dataType: "timestamp without time zone",
+    udtName: "timestamp",
+    defaultRequirement: "now",
+  },
+  {
+    tableName: "recipe_ratings",
+    columnName: "updated_at",
+    isNullable: "NO",
+    dataType: "timestamp without time zone",
+    udtName: "timestamp",
+    defaultRequirement: "now",
+  },
 ];
 
 const REQUIRED_SCHEMA_CONSTRAINTS = [
@@ -511,6 +556,14 @@ const REQUIRED_SCHEMA_CONSTRAINTS = [
     constraintType: "PRIMARY KEY",
     columns: ["id"],
   },
+  {
+    tableName: "recipe_ratings",
+    constraintType: "FOREIGN KEY",
+    columns: ["user_id"],
+    referencedTableName: "users",
+    referencedColumns: ["id"],
+    deleteRule: "CASCADE",
+  },
 ] as const;
 
 const REQUIRED_SCHEMA_INDEXES = [
@@ -528,6 +581,17 @@ const REQUIRED_SCHEMA_INDEXES = [
     indexName: "payment_events_provider_event_transaction_unique",
     tableName: "payment_events",
     columns: ["provider", "event_type", "provider_transaction_id"],
+  },
+  {
+    indexName: "recipe_ratings_recipe_user_unique",
+    tableName: "recipe_ratings",
+    columns: ["recipe_id", "user_id"],
+    isUnique: true,
+  },
+  {
+    indexName: "recipe_ratings_user_id_idx",
+    tableName: "recipe_ratings",
+    columns: ["user_id"],
   },
 ] as const;
 
@@ -775,6 +839,34 @@ async function addTrialStartedAtColumn(client: SchemaClient): Promise<void> {
   );
 }
 
+async function addRecipeRatingsTable(client: SchemaClient): Promise<void> {
+  await client.query(`
+    CREATE TABLE IF NOT EXISTS recipe_ratings (
+      recipe_id TEXT NOT NULL,
+      user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+      taste_score SMALLINT NOT NULL
+        CONSTRAINT recipe_ratings_taste_score_range CHECK (taste_score BETWEEN 1 AND 5),
+      preparation_ease_score SMALLINT NOT NULL
+        CONSTRAINT recipe_ratings_preparation_ease_score_range
+        CHECK (preparation_ease_score BETWEEN 1 AND 5),
+      created_at TIMESTAMP NOT NULL DEFAULT NOW(),
+      updated_at TIMESTAMP NOT NULL DEFAULT NOW(),
+      CONSTRAINT recipe_ratings_recipe_id_format CHECK (
+        recipe_id ~ '^[a-z0-9]+(-[a-z0-9]+)*$'
+        AND char_length(recipe_id) <= 80
+      )
+    )
+  `);
+  await client.query(`
+    CREATE UNIQUE INDEX IF NOT EXISTS recipe_ratings_recipe_user_unique
+    ON recipe_ratings(recipe_id, user_id)
+  `);
+  await client.query(`
+    CREATE INDEX IF NOT EXISTS recipe_ratings_user_id_idx
+    ON recipe_ratings(user_id)
+  `);
+}
+
 const SCHEMA_MIGRATIONS: readonly SchemaMigration[] = [
   {
     version: 1,
@@ -832,6 +924,17 @@ const SCHEMA_MIGRATIONS: readonly SchemaMigration[] = [
       reviewed: true,
       notes:
         "Trial start timestamps determine whether an account may use paid features; dropping them could restart trials for existing accounts.",
+    },
+  },
+  {
+    version: 5,
+    up: addRecipeRatingsTable,
+    rollback: {
+      strategy: "reverse-migration",
+      reviewed: true,
+      notes:
+        "This additive table is retained during rollback so community ratings are not deleted; the older app ignores it and the new migration can be reapplied safely.",
+      down: async () => {},
     },
   },
 ];
@@ -1042,6 +1145,7 @@ type IndexRow = {
   index_name: string;
   table_name: string;
   column_names: string[];
+  is_unique: boolean;
 };
 
 function sameColumns(actual: string[], expected: readonly string[]) {
@@ -1417,6 +1521,7 @@ export async function verifySchema(
       SELECT
         index_class.relname AS index_name,
         table_class.relname AS table_name,
+        index_definition.indisunique AS is_unique,
         ARRAY_AGG(attribute.attname::text ORDER BY index_column.ordinality)::text[] AS column_names
       FROM pg_catalog.pg_index AS index_definition
       JOIN pg_catalog.pg_class AS index_class
@@ -1432,7 +1537,7 @@ export async function verifySchema(
         AND attribute.attnum = index_column.attnum
       WHERE schema_namespace.nspname = current_schema()
         AND index_class.relname = ANY($1::text[])
-      GROUP BY index_class.relname, table_class.relname
+      GROUP BY index_class.relname, table_class.relname, index_definition.indisunique
     `,
     [REQUIRED_SCHEMA_INDEXES.map((index) => index.indexName)],
   );
@@ -1442,6 +1547,8 @@ export async function verifySchema(
         (actualIndex) =>
           actualIndex.index_name === requiredIndex.indexName &&
           actualIndex.table_name === requiredIndex.tableName &&
+          (!("isUnique" in requiredIndex) ||
+            actualIndex.is_unique === requiredIndex.isUnique) &&
           sameColumns(actualIndex.column_names, requiredIndex.columns),
       ),
   ).map(

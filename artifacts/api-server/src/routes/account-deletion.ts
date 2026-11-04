@@ -75,7 +75,7 @@ function deletionPage(notice?: { title: string; message: string; success?: boole
   ${noticeHtml}
   <h2>Conséquences de la suppression</h2>
   <ul>
-    <li>Le compte, son accès et son état d’abonnement dans l’application sont supprimés.</li>
+    <li>Le compte, son accès, ses avis culinaires et son état d’abonnement dans l’application sont supprimés.</li>
     <li>Les jetons de notification et les tentatives de paiement rattachées au compte sont supprimés. Les événements de paiement associés sont conservés uniquement sous une forme expurgée afin d’éviter le traitement en double.</li>
     <li>Les justificatifs éventuellement conservés par SAS Pay ou d’autres prestataires relèvent de leurs propres règles.</li>
     <li>La suppression ne déclenche ni remboursement ni annulation auprès d’un prestataire de paiement. Les favoris et résultats du quiz stockés uniquement sur votre appareil ne peuvent être effacés que depuis l’application ou en supprimant ses données sur cet appareil.</li>

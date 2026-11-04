@@ -185,6 +185,59 @@ export interface SubscriptionReconciliation {
   failed: number;
 }
 
+export type RecipeId = typeof RecipeId[keyof typeof RecipeId];
+
+
+export const RecipeId = {
+  'tisane-kinkeliba': 'tisane-kinkeliba',
+  'jus-bissap': 'jus-bissap',
+  'eau-moringa': 'eau-moringa',
+  'decoction-neem': 'decoction-neem',
+  'beurre-karite': 'beurre-karite',
+  'tisane-citronnelle': 'tisane-citronnelle',
+  'preparation-tamarin': 'preparation-tamarin',
+  'sauce-lalo': 'sauce-lalo',
+  'infusion-ecorce-baobab': 'infusion-ecorce-baobab',
+  'poudre-soumbala': 'poudre-soumbala',
+  'bain-feuilles-eucalyptus': 'bain-feuilles-eucalyptus',
+  'boisson-pulpe-ditakh': 'boisson-pulpe-ditakh',
+  'legume-luffa-jeune': 'legume-luffa-jeune',
+  'boisson-fruit-marula': 'boisson-fruit-marula',
+  'graines-courge-grillees': 'graines-courge-grillees',
+  'miyan-kuka-baobab': 'miyan-kuka-baobab',
+  'kontomire-stew-ghana': 'kontomire-stew-ghana',
+  'ofe-onugbu-bitterleaf': 'ofe-onugbu-bitterleaf',
+  'dawadawa-jollof-rice': 'dawadawa-jollof-rice',
+  'fonio-sauce-legumes': 'fonio-sauce-legumes',
+  'abenkwan-palmnut-soup': 'abenkwan-palmnut-soup',
+  'egusi-soup-nigeria': 'egusi-soup-nigeria',
+  'soupe-feuilles-manioc-liberia': 'soupe-feuilles-manioc-liberia',
+  'miyan-taushe-courge': 'miyan-taushe-courge',
+} as const;
+
+export interface RecipeRatingValues {
+  /**
+     * @minimum 1
+     * @maximum 5
+     */
+  taste: number;
+  /**
+     * @minimum 1
+     * @maximum 5
+     */
+  preparationEase: number;
+}
+
+export type RecipeRatingInput = RecipeRatingValues;
+
+export interface RecipeRatingSummary {
+  tasteAverage: number | null;
+  preparationEaseAverage: number | null;
+  /** @minimum 0 */
+  ratingCount: number;
+  myRating: RecipeRatingValues | null;
+}
+
 export type HealthStatusStatus = typeof HealthStatusStatus[keyof typeof HealthStatusStatus];
 
 

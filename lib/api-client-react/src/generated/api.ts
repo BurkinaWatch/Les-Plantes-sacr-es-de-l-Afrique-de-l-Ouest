@@ -36,6 +36,9 @@ import type {
   GetSubscriptionPlans200,
   GetSubscriptionStatus200,
   HealthStatus,
+  RecipeId,
+  RecipeRatingSummary,
+  RecipeRatingValues,
   SubscriptionPayment,
   SubscriptionReconciliation,
   TooManyRequestsResponse,
@@ -718,6 +721,198 @@ export const useSubmitAccountDeletionRequest = <TError = ErrorType<string | TooM
         TContext
       > => {
       return useMutation(getSubmitAccountDeletionRequestMutationOptions(options), queryClient);
+    }
+
+export const getGetRecipeRatingsUrl = (recipeId: RecipeId,) => {
+
+
+
+
+  return `/api/recipes/${recipeId}/ratings`
+}
+
+/**
+ * Returns aggregate taste and preparation-ease scores plus the authenticated user's own rating. These scores are not medical evidence.
+ * @summary Get culinary ratings for a recipe
+ */
+export const getRecipeRatings = async (recipeId: RecipeId, options?: Parameters<typeof customFetch>[1]): Promise<RecipeRatingSummary> => {
+
+  return customFetch<RecipeRatingSummary>(getGetRecipeRatingsUrl(recipeId),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetRecipeRatingsQueryKey = (recipeId: RecipeId,) => {
+    return [
+    `/api/recipes/${recipeId}/ratings`
+    ] as const;
+    }
+
+
+export const getGetRecipeRatingsQueryOptions = <TData = Awaited<ReturnType<typeof getRecipeRatings>>, TError = ErrorType<BadRequestResponse | UnauthorizedResponse | TooManyRequestsResponse>>(recipeId: RecipeId, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getRecipeRatings>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetRecipeRatingsQueryKey(recipeId);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getRecipeRatings>>> = ({ signal }) => getRecipeRatings(recipeId, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: recipeId !== null && recipeId !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getRecipeRatings>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type GetRecipeRatingsQueryResult = NonNullable<Awaited<ReturnType<typeof getRecipeRatings>>>
+export type GetRecipeRatingsQueryError = ErrorType<BadRequestResponse | UnauthorizedResponse | TooManyRequestsResponse>
+
+
+export function useGetRecipeRatings<TData = Awaited<ReturnType<typeof getRecipeRatings>>, TError = ErrorType<BadRequestResponse | UnauthorizedResponse | TooManyRequestsResponse>>(
+ recipeId: RecipeId, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getRecipeRatings>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getRecipeRatings>>,
+          TError,
+          Awaited<ReturnType<typeof getRecipeRatings>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetRecipeRatings<TData = Awaited<ReturnType<typeof getRecipeRatings>>, TError = ErrorType<BadRequestResponse | UnauthorizedResponse | TooManyRequestsResponse>>(
+ recipeId: RecipeId, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getRecipeRatings>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getRecipeRatings>>,
+          TError,
+          Awaited<ReturnType<typeof getRecipeRatings>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetRecipeRatings<TData = Awaited<ReturnType<typeof getRecipeRatings>>, TError = ErrorType<BadRequestResponse | UnauthorizedResponse | TooManyRequestsResponse>>(
+ recipeId: RecipeId, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getRecipeRatings>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Get culinary ratings for a recipe
+ */
+
+export function useGetRecipeRatings<TData = Awaited<ReturnType<typeof getRecipeRatings>>, TError = ErrorType<BadRequestResponse | UnauthorizedResponse | TooManyRequestsResponse>>(
+ recipeId: RecipeId, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getRecipeRatings>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getGetRecipeRatingsQueryOptions(recipeId,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export const getSaveRecipeRatingUrl = (recipeId: RecipeId,) => {
+
+
+
+
+  return `/api/recipes/${recipeId}/ratings`
+}
+
+/**
+ * Stores only taste and preparation ease on a 1–5 scale. Free-text or health claims are not accepted.
+ * @summary Create or update the authenticated user's culinary rating
+ */
+export const saveRecipeRating = async (recipeId: RecipeId,
+    recipeRatingValues: RecipeRatingValues, options?: Parameters<typeof customFetch>[1]): Promise<RecipeRatingSummary> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return customFetch<RecipeRatingSummary>(getSaveRecipeRatingUrl(recipeId),
+  {
+    ...options,
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(recipeRatingValues)
+  }
+);}
+
+
+
+
+
+export const getSaveRecipeRatingMutationKey = () => ['saveRecipeRating'] as const;
+
+export const getSaveRecipeRatingMutationOptions = <TError = ErrorType<BadRequestResponse | UnauthorizedResponse | TooManyRequestsResponse>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof saveRecipeRating>>, TError,SaveRecipeRatingMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof saveRecipeRating>>, TError,SaveRecipeRatingMutationVariables, TContext> => {
+
+const mutationKey = getSaveRecipeRatingMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof saveRecipeRating>>, SaveRecipeRatingMutationVariables> = (props) => {
+          const {recipeId,data} = props ?? {};
+
+          return  saveRecipeRating(recipeId,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type SaveRecipeRatingMutationResult = NonNullable<Awaited<ReturnType<typeof saveRecipeRating>>>
+    export type SaveRecipeRatingMutationBody = BodyType<RecipeRatingValues>
+    export type SaveRecipeRatingMutationError = ErrorType<BadRequestResponse | UnauthorizedResponse | TooManyRequestsResponse>
+    export type SaveRecipeRatingMutationVariables = {recipeId: RecipeId;data: BodyType<RecipeRatingValues>}
+
+    /**
+ * @summary Create or update the authenticated user's culinary rating
+ */
+export const useSaveRecipeRating = <TError = ErrorType<BadRequestResponse | UnauthorizedResponse | TooManyRequestsResponse>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof saveRecipeRating>>, TError,SaveRecipeRatingMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof saveRecipeRating>>,
+        TError,
+        SaveRecipeRatingMutationVariables,
+        TContext
+      > => {
+      return useMutation(getSaveRecipeRatingMutationOptions(options), queryClient);
     }
 
 export const getGetSubscriptionPlansUrl = () => {
