@@ -467,7 +467,14 @@ export function calculateTotem(
   const rankings = candidates.map((plant) => {
     const profile = deriveQuestionProfile(plant);
     const plantPattern = QUIZ_QUESTIONS.map((question) => profile[question.id]);
-    const correlation = pearsonCorrelation(answerPattern, plantPattern);
+    const questionCorrelation = pearsonCorrelation(answerPattern, plantPattern);
+    const axisProfile = TOTEM_RESULTS[plant.id]?.profilDimensions
+      ?? derivePlantProfile(plant);
+    const axisCorrelation = pearsonCorrelation(
+      DIMS.map((dimension) => dimensionScores[dimension]),
+      DIMS.map((dimension) => axisProfile[dimension]),
+    );
+    const correlation = questionCorrelation * 0.75 + axisCorrelation * 0.25;
     return {
       id: plant.id,
       // This is a relative editorial index, not a probability or validated
