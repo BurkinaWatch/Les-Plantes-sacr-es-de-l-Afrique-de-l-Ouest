@@ -8,8 +8,9 @@ export const REQUIRED_SCHEMA_TABLES = [
   "payment_attempts",
   "payment_events",
   "recipe_ratings",
+  "quiz_plant_feedback",
 ] as const;
-export const CURRENT_SCHEMA_VERSION = 5;
+export const CURRENT_SCHEMA_VERSION = 6;
 
 type RequiredSchemaColumn = {
   tableName: string;
@@ -473,6 +474,34 @@ const REQUIRED_SCHEMA_COLUMNS: readonly RequiredSchemaColumn[] = [
     udtName: "timestamp",
     defaultRequirement: "now",
   },
+  {
+    tableName: "quiz_plant_feedback",
+    columnName: "algorithm_version",
+    isNullable: "NO",
+    dataType: "integer",
+    udtName: "int4",
+  },
+  {
+    tableName: "quiz_plant_feedback",
+    columnName: "plant_id",
+    isNullable: "NO",
+    dataType: "text",
+    udtName: "text",
+  },
+  {
+    tableName: "quiz_plant_feedback",
+    columnName: "resonates",
+    isNullable: "NO",
+    dataType: "boolean",
+    udtName: "bool",
+  },
+  {
+    tableName: "quiz_plant_feedback",
+    columnName: "vote_count",
+    isNullable: "NO",
+    dataType: "integer",
+    udtName: "int4",
+  },
 ];
 
 const REQUIRED_SCHEMA_CONSTRAINTS = [
@@ -563,6 +592,11 @@ const REQUIRED_SCHEMA_CONSTRAINTS = [
     referencedTableName: "users",
     referencedColumns: ["id"],
     deleteRule: "CASCADE",
+  },
+  {
+    tableName: "quiz_plant_feedback",
+    constraintType: "PRIMARY KEY",
+    columns: ["algorithm_version", "plant_id", "resonates"],
   },
 ] as const;
 
@@ -867,6 +901,28 @@ async function addRecipeRatingsTable(client: SchemaClient): Promise<void> {
   `);
 }
 
+async function addQuizPlantFeedbackTable(client: SchemaClient): Promise<void> {
+  await client.query(`
+    CREATE TABLE IF NOT EXISTS quiz_plant_feedback (
+      algorithm_version INTEGER NOT NULL,
+      plant_id TEXT NOT NULL,
+      resonates BOOLEAN NOT NULL,
+      vote_count INTEGER NOT NULL DEFAULT 0,
+      CONSTRAINT quiz_plant_feedback_pkey
+        PRIMARY KEY (algorithm_version, plant_id, resonates),
+      CONSTRAINT quiz_plant_feedback_version_positive
+        CHECK (algorithm_version > 0),
+      CONSTRAINT quiz_plant_feedback_plant_id_format
+        CHECK (
+          plant_id ~ '^[a-z0-9]+(-[a-z0-9]+)*$'
+          AND char_length(plant_id) <= 80
+        ),
+      CONSTRAINT quiz_plant_feedback_vote_count_nonnegative
+        CHECK (vote_count >= 0)
+    )
+  `);
+}
+
 const SCHEMA_MIGRATIONS: readonly SchemaMigration[] = [
   {
     version: 1,
@@ -934,6 +990,17 @@ const SCHEMA_MIGRATIONS: readonly SchemaMigration[] = [
       reviewed: true,
       notes:
         "This additive table is retained during rollback so community ratings are not deleted; the older app ignores it and the new migration can be reapplied safely.",
+      down: async () => {},
+    },
+  },
+  {
+    version: 6,
+    up: addQuizPlantFeedbackTable,
+    rollback: {
+      strategy: "reverse-migration",
+      reviewed: true,
+      notes:
+        "Keep anonymous aggregate quiz feedback during rollback; older app versions ignore the table and the migration can be safely reapplied.",
       down: async () => {},
     },
   },
