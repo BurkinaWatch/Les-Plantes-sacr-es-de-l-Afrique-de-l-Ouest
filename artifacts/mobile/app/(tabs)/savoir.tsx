@@ -114,8 +114,13 @@ export default function SavoirScreen() {
           <View style={[styles.sectionCard, { backgroundColor: colors.card, borderColor: r.couleur + '40' }]}>
             <View style={styles.iconLabelRow}>
               <SacredIcon name="sparkles" size={14} color={r.couleur} />
-              <Text style={[styles.sectionCardTitle, { color: r.couleur, marginBottom: 0 }]}>BIENFAITS</Text>
+              <Text style={[styles.sectionCardTitle, { color: r.couleur, marginBottom: 0 }]}>REPÈRES DE LA FICHE</Text>
             </View>
+            <Text style={[styles.ingredientNote, { color: colors.mutedForeground, marginTop: 6, marginBottom: 4 }]}>
+              {r.categorie === 'alimentation'
+                ? 'Recette alimentaire : les traditions, études de composition et témoignages ne prouvent pas un effet médical.'
+                : 'Usage traditionnel rapporté : il ne remplace pas un diagnostic ou un traitement médical.'}
+            </Text>
             {r.bienfaits.map((b, i) => (
               <View key={i} style={styles.listRow}>
                 <View style={[styles.listDot, { backgroundColor: r.couleur }]} />
@@ -185,6 +190,32 @@ export default function SavoirScreen() {
               {r.tradition}{'\n'}{r.region}
             </Text>
           </View>
+
+          {r.sourceLinks && r.sourceLinks.length > 0 && (
+            <View style={[styles.sourceBox, { borderColor: colors.border, backgroundColor: colors.card }]}>
+              <Text style={[styles.sourceLabel, { color: colors.mutedForeground }]}>SOURCES DE LA RECETTE</Text>
+              {r.sourceLinks.map((src, i) => (
+                <Pressable
+                  key={`${src.url}-${i}`}
+                  accessibilityRole="link"
+                  accessibilityLabel={`Ouvrir la source : ${src.title}`}
+                  style={({ pressed }) => [styles.sourceLinkRow, { opacity: pressed ? 0.7 : 1 }]}
+                  onPress={() => openSource(src.url)}
+                >
+                  <SacredIcon name="book" size={15} color={r.couleur} />
+                  <View style={{ flex: 1 }}>
+                    <Text style={[styles.sourceLinkTitle, { color: r.couleur }]}>{src.title}</Text>
+                    <Text style={[styles.sourceLinkMeta, { color: colors.mutedForeground }]}>
+                      {src.kind.toUpperCase()} · {src.note}
+                    </Text>
+                  </View>
+                </Pressable>
+              ))}
+              <Text style={[styles.sourceDisclaimer, { color: colors.mutedForeground }]}>
+                Les sources étayent la préparation culinaire, pas une efficacité médicale.
+              </Text>
+            </View>
+          )}
         </ScrollView>
       </View>
     );

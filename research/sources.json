@@ -1,6 +1,6 @@
 {
   "research": "Savoirs botaniques ouest-africains — sources utilisées pour les fiches de la rubrique Savoir",
-  "retrievedAt": "2026-09-27",
+  "retrievedAt": "2026-11-04",
   "scopeNote": "Les articles scientifiques sont cités uniquement pour les affirmations que leurs résumés étayent. Les sources sociales sont des témoignages ou pistes de recherche, jamais des preuves médicales.",
   "sources": [
     {
@@ -456,6 +456,148 @@
       "kind": "publication sociale publique",
       "evidence": "Le titre et l’extrait indexés évoquent ayoyo/ademe comme légume-feuille au Ghana. La vidéo n’a pas été ouverte et l’extrait n’identifie aucune espèce botanique.",
       "limitation": "Ne pas attribuer le nom à Corchorus olitorius ; aucune preuve médicale."
+    },
+    {
+      "key": "recipe-afrifoodnetwork-miyan-kuka",
+      "title": "Kuka Soup Recipe (Nigerian Miyan Kuka, Baobab Leaf Soup)",
+      "url": "https://afrifoodnetwork.com/recipes/soup-stew-recipes/miyan-kuka/",
+      "retrieved": "2026-11-04",
+      "tier": 2,
+      "kind": "culinary recipe page",
+      "evidence": "Recipe page identifies miyan kuka as Hausa soup made with powdered baobab leaves and describes a seasoned meat/fish stock, dawadawa, and cereal swallow as common elements.",
+      "limitation": "Culinary source; it does not establish medicinal efficacy."
+    },
+    {
+      "key": "recipe-afrifoodnetwork-kontomire",
+      "title": "How to Prepare Kontomire Stew (Ghana Cocoyam Leaf Stew)",
+      "url": "https://afrifoodnetwork.com/recipes/soup-stew-recipes/kontomire-stew/",
+      "retrieved": "2026-11-04",
+      "tier": 2,
+      "kind": "culinary recipe page",
+      "evidence": "Recipe page describes a Ghanaian stew based on cooked cocoyam leaves, palm oil, tomatoes, smoked fish, and ground melon seed, with family variations.",
+      "limitation": "Culinary source; leaves must be cooked and the page does not establish medicinal efficacy."
+    },
+    {
+      "key": "recipe-ghanaianfood-kontomire",
+      "title": "Kontomire Stew (Palava Sauce)",
+      "url": "https://ghanaianfood.com/recipes/kontomire-stew",
+      "retrieved": "2026-11-04",
+      "tier": 2,
+      "kind": "culinary recipe page",
+      "evidence": "Independent Ghanaian recipe page provides a second version of kontomire stew and explicitly warns that cocoyam leaves require thorough cooking.",
+      "limitation": "Culinary source; do not treat its nutrition language as clinical evidence."
+    },
+    {
+      "key": "recipe-allnigerianrecipes-bitterleaf-soup",
+      "title": "Bitterleaf Soup (Ofe Onugbu) - All Nigerian Recipes",
+      "url": "https://www.allnigerianrecipes.com/soups/bitterleaf-soup/",
+      "retrieved": "2026-11-04",
+      "tier": 2,
+      "kind": "culinary recipe page",
+      "evidence": "Recipe page describes ofe onugbu as an Igbo soup and details washing bitter leaves, cocoyam thickener, palm oil, and fish or meat.",
+      "limitation": "Culinary source; it does not establish medicinal efficacy."
+    },
+    {
+      "key": "recipe-pulse-ghana-dawadawa-jollof",
+      "title": "How to prepare Dawadawa jollof rice",
+      "url": "https://www.pulse.com.gh/story/how-to-prepare-dawadawa-jollof-rice-2024081005313224295",
+      "published": "2020-05-14",
+      "retrieved": "2026-11-04",
+      "tier": 2,
+      "kind": "culinary media recipe",
+      "evidence": "Pulse Ghana article lists tomatoes, onion, dawadawa, smoked fish and rice, and describes cooking the sauce before simmering the rice.",
+      "limitation": "Food-media recipe; promotional or general health statements on the page are not treated as evidence."
+    },
+    {
+      "key": "recipe-nkosi-fonio-sauce",
+      "title": "Fonio in Sauce with Chicken and Vegetables",
+      "url": "https://www.nkosiagro.com/en/blogs/blog-and-recipes/fonio-in-sauce-with-chicken-and-vegetables",
+      "retrieved": "2026-11-04",
+      "tier": 2,
+      "kind": "culinary recipe page",
+      "evidence": "Recipe page provides portions and steps for fonio served with chicken, tomato and vegetables, and lists Mali, Guinea and West Africa as cuisine context.",
+      "limitation": "Commercial food retailer's recipe; culinary source only."
+    },
+    {
+      "key": "recipe-afrifoodnetwork-abenkwan",
+      "title": "Palm Nut Soup (Abenkwan) Recipe (Ghanaian Palm Cream Soup)",
+      "url": "https://afrifoodnetwork.com/recipes/soup-stew-recipes/palmnut-soup/",
+      "retrieved": "2026-11-04",
+      "tier": 2,
+      "kind": "culinary recipe page",
+      "evidence": "Recipe page describes Ghanaian abenkwan based on palmnut pulp with tomato, meat or fish, and accompaniments.",
+      "limitation": "Culinary source; it does not establish medicinal efficacy."
+    },
+    {
+      "key": "recipe-ghanaianfood-abenkwan",
+      "title": "Palm Nut Soup (Abenkwan)",
+      "url": "https://ghanaianfood.com/recipes/palm-nut-soup-abenkwan",
+      "retrieved": "2026-11-04",
+      "tier": 2,
+      "kind": "culinary recipe page",
+      "evidence": "Independent Ghanaian recipe page describes palm fruit cream, meat or fish, and a fufu accompaniment.",
+      "limitation": "Culinary source; it does not establish medicinal efficacy."
+    },
+    {
+      "key": "recipe-afrifoodnetwork-egusi",
+      "title": "How to Cook Egusi Soup: Nigerian Melon Seed Soup Recipe",
+      "url": "https://afrifoodnetwork.com/recipes/soup-stew-recipes/egusi-soup/",
+      "retrieved": "2026-11-04",
+      "tier": 2,
+      "kind": "culinary recipe page",
+      "evidence": "Recipe page describes Nigerian soup thickened with ground egusi and includes palm oil, fish or meat, crayfish, pepper, and leafy vegetables; it notes that methods vary.",
+      "limitation": "Culinary source; it does not establish medicinal efficacy."
+    },
+    {
+      "key": "recipe-allnigerianrecipes-egusi",
+      "title": "Nigerian Egusi Soup",
+      "url": "https://www.allnigerianrecipes.com/soups/egusi-soup/",
+      "retrieved": "2026-11-04",
+      "tier": 2,
+      "kind": "culinary recipe page",
+      "evidence": "Independent Nigerian recipe source identifies egusi soup across Hausa, Igbo, and Yoruba names and describes more than one cooking method.",
+      "limitation": "Culinary source; it does not establish medicinal efficacy."
+    },
+    {
+      "key": "recipe-afrifoodnetwork-cassava-leaf-soup",
+      "title": "Cassava Leaf Soup Recipe (Liberian Style with Palm Oil)",
+      "url": "https://afrifoodnetwork.com/recipes/soup-stew-recipes/cassava-leaf-soup/",
+      "retrieved": "2026-11-04",
+      "tier": 2,
+      "kind": "culinary recipe page",
+      "evidence": "Recipe page describes a Liberian-style stew of cassava leaves with palm oil, tomato, aromatics, and smoked protein.",
+      "limitation": "The source warns against raw or insufficiently prepared cassava leaves; the app does not provide a home detoxification protocol."
+    },
+    {
+      "key": "recipe-cookingwithclaudy-cassava-leaf-stew",
+      "title": "Cassava Leaf Stew",
+      "url": "https://cookingwithclaudy.com/cassava-leaf-stew/",
+      "retrieved": "2026-11-04",
+      "tier": 2,
+      "kind": "culinary recipe page",
+      "evidence": "Independent recipe page for cassava leaf stew describes the dish as common in Sierra Leone and Liberia and displays 4.89/5 from nine votes at the time checked.",
+      "limitation": "Small, self-selected rating sample is not representative and says nothing about health effects; follow safe cassava-leaf preparation."
+    },
+    {
+      "key": "recipe-nigerianfoodtv-miyan-taushe",
+      "title": "Miyan Taushe (Nigerian Pumpkin Soup)",
+      "url": "https://www.nigerianfoodtv.com/miyan-taushe-nigerian-pumpkin-soup/",
+      "retrieved": "2026-11-04",
+      "tier": 2,
+      "kind": "culinary recipe page",
+      "evidence": "Nigerian Food TV describes miyan taushe as a Hausa pumpkin soup and says the recipe was shared by a Hausa cook and a subscriber; ingredients include ripe pumpkin, protein, and leafy greens.",
+      "limitation": "Culinary source; household methods vary and it does not establish medicinal efficacy."
+    },
+    {
+      "key": "news-gna-dawadawa",
+      "title": "Beyond the scent: Dawadawa, the indigenous northern Ghanaian spice",
+      "url": "https://gna.org.gh/2026/03/beyond-the-scent-dawadawa-the-indigenous-northern-ghanaian-spice/",
+      "published": "2026-03-14",
+      "retrieved": "2026-11-04",
+      "tier": 2,
+      "kind": "news feature",
+      "evidence": "Ghana News Agency feature describes dawadawa as fermented African locust bean used in Ghanaian cooking, particularly northern Ghana, and reports a trader's recollection of gathering and processing.",
+      "limitation": "Journalistic and reported cultural context, not clinical evidence."
     }
   ]
 }

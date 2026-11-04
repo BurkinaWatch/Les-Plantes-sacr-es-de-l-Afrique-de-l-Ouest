@@ -803,4 +803,255 @@ export const ARTICLES: Article[] = [
       },
     ],
   },
+  {
+    id: 'dawadawa-ingredient-etude',
+    titre: 'Dawadawa : un condiment, plusieurs pratiques',
+    sousTitre: 'Fermentation et variation entre communautés ghanéennes',
+    auteur: 'Équipe éditoriale des Plantes Sacrées',
+    source: 'Étude ouverte et reportage de la Ghana News Agency',
+    annee: '2025–2026',
+    duree: '5 min',
+    categorie: 'culture',
+    categorieLabel: 'Cuisine & transmission',
+    planteIcon: '🫘',
+    couleur: '#9B6B3D',
+    resume:
+      'Le dawadawa issu des graines de néré est un condiment fermenté important dans la cuisine ghanéenne. Les études mesurent des différences entre échantillons : elles ne permettent pas d’en faire un médicament.',
+    tags: ['dawadawa', 'néré', 'fermentation', 'Ghana', 'alimentation'],
+    contenu: [
+      {
+        type: 'paragraph',
+        content:
+          'Le dawadawa est décrit comme un condiment fermenté de graines de néré (Parkia biglobosa), utilisé dans des préparations ghanéennes, notamment dans le nord du pays. Un reportage de la Ghana News Agency rapporte aussi les souvenirs de collecte et de transformation transmis par une commerçante. Ces témoignages éclairent une pratique culinaire ; ils ne constituent pas un essai de santé.',
+      },
+      {
+        type: 'subtitle',
+        content: 'Ce qu’a mesuré l’étude',
+      },
+      {
+        type: 'paragraph',
+        content:
+          'Une étude ouverte a examiné des échantillons provenant de six communautés du Ghana, notamment leur composition nutritionnelle et leur diversité microbienne. Les teneurs rapportées variaient d’un lieu à l’autre. Cette variabilité rappelle que la fermentation artisanale, les ingrédients et les conditions de fabrication comptent ; un chiffre tiré d’un échantillon ne décrit pas tous les dawadawa.',
+      },
+      {
+        type: 'subtitle',
+        content: 'Comment lire les résultats',
+      },
+      {
+        type: 'paragraph',
+        content:
+          'Une analyse de laboratoire sur des aliments ne démontre pas à elle seule un bénéfice clinique. Les recettes de l’application utilisent le condiment pour son rôle culinaire. Elles ne recommandent ni dosage médicinal ni remplacement d’un soin. Acheter un produit destiné à l’alimentation, suivre les consignes de conservation et éviter un condiment altéré.',
+      },
+    ],
+    sourceLinks: [
+      {
+        title: 'Microbial Diversity, Nutritional Composition, and Health Implications of Fermented Locust Bean Seed (Dawadawa) From Ghana.',
+        url: 'https://pmc.ncbi.nlm.nih.gov/articles/PMC12447108/',
+        kind: 'scientifique',
+        note: 'Étude de composition et de diversité microbienne sur des échantillons de six communautés ghanéennes ; pas un essai thérapeutique.',
+      },
+      {
+        title: 'Beyond the scent: Dawadawa, the indigenous northern Ghanaian spice',
+        url: 'https://gna.org.gh/2026/03/beyond-the-scent-dawadawa-the-indigenous-northern-ghanaian-spice/',
+        kind: 'institutionnelle',
+        note: 'Reportage de la Ghana News Agency sur la place culinaire et la transmission du dawadawa.',
+      },
+      {
+        title: 'How to prepare Dawadawa jollof rice',
+        url: 'https://www.pulse.com.gh/story/how-to-prepare-dawadawa-jollof-rice-2024081005313224295',
+        kind: 'source culinaire',
+        note: 'Exemple de recette au riz publiée par Pulse Ghana ; lien culinaire, pas preuve d’un effet sur la santé.',
+      },
+    ],
+  },
+  {
+    id: 'zamne-evaluation-sensorielle',
+    titre: 'Zamné : étudier un condiment du Burkina Faso',
+    sousTitre: 'Une évaluation sensorielle située, pas un vote universel',
+    auteur: 'Équipe éditoriale des Plantes Sacrées',
+    source: 'Scientific Reports, étude ouverte',
+    annee: '2025',
+    duree: '4 min',
+    categorie: 'culture',
+    categorieLabel: 'Cuisine & recherche',
+    planteIcon: '🌰',
+    couleur: '#A77B4C',
+    resume:
+      'Une étude sensorielle porte sur le zamné fermenté, préparé à partir de graines de Senegalia macrostachya au Burkina Faso, et le compare au soumbala.',
+    tags: ['zamné', 'Burkina Faso', 'fermentation', 'évaluation sensorielle'],
+    contenu: [
+      {
+        type: 'paragraph',
+        content:
+          'Le zamné est un aliment fermenté décrit dans l’étude comme étant consommé dans la région centrale du Burkina Faso. Les auteurs ont comparé son profil sensoriel à celui du soumbala, condiment fermenté de Parkia biglobosa. Cette recherche documente un aliment et une méthode d’évaluation ; elle n’établit pas que l’un des deux condiments est meilleur pour la santé.',
+      },
+      {
+        type: 'subtitle',
+        content: 'Ce que les participants ont évalué',
+      },
+      {
+        type: 'paragraph',
+        content:
+          'Le panel a évalué notamment l’apparence, l’odeur, le goût et l’acceptabilité des échantillons. Certains scores et descriptions étaient favorables pour des caractéristiques précises du zamné frais. Ils concernent les participants et les préparations de cette étude : ils ne prouvent pas une préférence générale au Burkina Faso, encore moins une popularité constante sur plusieurs plateformes.',
+      },
+      {
+        type: 'paragraph',
+        content:
+          'Pour transmettre une recette, il reste important de préciser l’espèce, le lieu, la méthode de fermentation et les conditions d’hygiène. Le résumé scientifique ne fournit pas à lui seul un protocole domestique complet ; l’application ne transforme donc pas ces résultats sensoriels en instructions de fermentation.',
+      },
+    ],
+    sourceLinks: [
+      {
+        title: 'Sensory properties of fermented Zamné (Senegalia macrostachya seeds) and their influence on the broth quality and sensory profile.',
+        url: 'https://pmc.ncbi.nlm.nih.gov/articles/PMC12318027/',
+        kind: 'scientifique',
+        note: 'Étude sensorielle comparant le zamné fermenté au soumbala ; résultats propres au panel et aux échantillons étudiés.',
+      },
+    ],
+  },
+  {
+    id: 'feuille-amere-transformation',
+    titre: 'Feuille amère : la préparation change le résultat',
+    sousTitre: 'Ce que l’on sait — et ce qu’il reste à vérifier',
+    auteur: 'Équipe éditoriale des Plantes Sacrées',
+    source: 'Foods, revue scientifique ouverte',
+    annee: '2026',
+    duree: '5 min',
+    categorie: 'ethnobotanique',
+    categorieLabel: 'Alimentation & preuves',
+    planteIcon: '🍃',
+    couleur: '#688A4F',
+    resume:
+      'Une revue examine les effets du lavage et de la cuisson sur Vernonia amygdalina, tout en soulignant que les recherches ne permettent pas de généraliser un effet nutritionnel ou clinique.',
+    tags: ['Vernonia amygdalina', 'feuille amère', 'cuisson', 'preuves'],
+    contenu: [
+      {
+        type: 'paragraph',
+        content:
+          'Vernonia amygdalina, appelée feuille amère dans plusieurs contextes, est un légume consommé dans différentes régions. Une revue de 2026 s’intéresse aux étapes de transformation alimentaire — notamment l’ébullition et le lavage à l’eau — et sépare les observations mesurées des hypothèses encore extrapolées.',
+      },
+      {
+        type: 'subtitle',
+        content: 'Pourquoi le détail culinaire compte',
+      },
+      {
+        type: 'paragraph',
+        content:
+          'La revue indique que le lavage et l’ébullition peuvent réduire l’amertume et certains facteurs antinutritionnels, mais aussi modifier des nutriments sensibles à la chaleur. Les études sont hétérogènes : leurs résultats ne donnent pas une valeur unique applicable à toutes les variétés, préparations ou portions.',
+      },
+      {
+        type: 'subtitle',
+        content: 'La limite médicale',
+      },
+      {
+        type: 'paragraph',
+        content:
+          'Les travaux sur les extraits, la composition ou la bioaccessibilité ne démontrent pas qu’une soupe de feuilles amères soigne une maladie. La revue signale elle-même un écart entre les données de laboratoire et la pratique alimentaire réelle. Une recette reste ici une préparation culinaire, pas un conseil de traitement.',
+      },
+    ],
+    sourceLinks: [
+      {
+        title: 'Processing, Bioaccessibility, Predicted Bioavailability, Gut Microbiome Interactions and Potential Food Applications of Vernonia amygdalina (Bitter Leaf): Bridging the Evidence-to-Practice Gap.',
+        url: 'https://pmc.ncbi.nlm.nih.gov/articles/PMC13565637/',
+        kind: 'scientifique',
+        note: 'Revue des méthodes de transformation et des limites de l’extrapolation aux aliments consommés.',
+      },
+      {
+        title: 'Bitterleaf Soup (Ofe Onugbu) - All Nigerian Recipes',
+        url: 'https://www.allnigerianrecipes.com/soups/bitterleaf-soup/',
+        kind: 'source culinaire',
+        note: 'Source de cuisine igbo décrivant le lavage des feuilles et la soupe ; elle ne démontre pas d’effet thérapeutique.',
+      },
+    ],
+  },
+  {
+    id: 'moringa-essais-humains',
+    titre: 'Moringa : ne pas confondre tradition et preuve clinique',
+    sousTitre: 'Une revue systématique examine les essais chez l’humain',
+    auteur: 'Équipe éditoriale des Plantes Sacrées',
+    source: 'Food Science & Nutrition, revue systématique ouverte',
+    annee: '2026',
+    duree: '5 min',
+    categorie: 'medecine',
+    categorieLabel: 'Lecture critique',
+    planteIcon: '🌱',
+    couleur: '#568C58',
+    resume:
+      'Une méta-analyse d’essais randomisés n’a pas trouvé de preuve suffisante pour établir un effet causal du moringa sur le poids ou la pression artérielle.',
+    tags: ['moringa', 'essais cliniques', 'revue systématique', 'prudence'],
+    contenu: [
+      {
+        type: 'paragraph',
+        content:
+          'Le moringa est consommé comme aliment et fait aussi l’objet de nombreuses allégations de santé en ligne. Une revue systématique publiée en 2026 a recherché des essais randomisés portant sur le poids et la pression artérielle. Huit essais ont été inclus parmi les études repérées par les auteurs.',
+      },
+      {
+        type: 'subtitle',
+        content: 'Conclusion des auteurs',
+      },
+      {
+        type: 'paragraph',
+        content:
+          'La revue conclut que les éléments disponibles ne suffisent pas à établir un lien causal entre la consommation de Moringa oleifera et une réduction de ces mesures chez l’humain. Ce constat ne signifie pas que le moringa n’a aucune valeur alimentaire ; il signifie que ces essais ne justifient pas une promesse de traitement ou de prévention.',
+      },
+      {
+        type: 'paragraph',
+        content:
+          'Les messages viraux, les témoignages et les mesures de laboratoire peuvent aider à repérer des questions, mais ils ne remplacent pas des essais bien conçus. Pour une tension élevée ou un changement de poids préoccupant, il faut demander conseil à un professionnel de santé plutôt que remplacer un suivi par une plante.',
+      },
+    ],
+    sourceLinks: [
+      {
+        title: 'The Effect of Moringa oleifera on Body Weight and Blood Pressure: A Systematic Review and Meta-Analysis of Randomized Controlled Trials.',
+        url: 'https://pmc.ncbi.nlm.nih.gov/articles/PMC13238855/',
+        kind: 'scientifique',
+        note: 'Revue systématique et méta-analyse d’essais randomisés ; les auteurs jugent les preuves insuffisantes pour établir un lien causal.',
+      },
+    ],
+  },
+  {
+    id: 'basilic-africain-cuisine',
+    titre: 'Le basilic africain dans la cuisine ouest-africaine',
+    sousTitre: 'Une herbe aromatique, des usages culinaires à distinguer des essais',
+    auteur: 'Équipe éditoriale des Plantes Sacrées',
+    source: 'Plants, revue scientifique ouverte',
+    annee: '2026',
+    duree: '4 min',
+    categorie: 'culture',
+    categorieLabel: 'Cuisine & botanique',
+    planteIcon: '🌿',
+    couleur: '#53856A',
+    resume:
+      'Une revue botanique décrit Ocimum gratissimum comme une plante aromatique utilisée pour parfumer des plats et des soupes ouest-africains, tout en rappelant que les données pharmacologiques ne valent pas preuve clinique.',
+    tags: ['Ocimum gratissimum', 'basilic africain', 'aromates', 'cuisine'],
+    contenu: [
+      {
+        type: 'paragraph',
+        content:
+          'Ocimum gratissimum, souvent appelé basilic africain, est présenté dans une revue de 2026 comme une plante aromatique dont les feuilles servent à parfumer des plats et des soupes dans des foyers d’Afrique de l’Ouest. Les noms populaires peuvent varier : vérifier l’espèce avant d’associer une recette à cette plante.',
+      },
+      {
+        type: 'subtitle',
+        content: 'L’aromate n’est pas une ordonnance',
+      },
+      {
+        type: 'paragraph',
+        content:
+          'La revue rassemble des données sur la composition et des activités observées dans différentes études. Une activité pharmacologique ou un résultat de laboratoire n’équivaut pas à une efficacité démontrée chez des personnes. Cette fiche documente l’usage culinaire décrit par la revue ; elle ne recommande pas d’utiliser l’huile essentielle ou un extrait concentré.',
+      },
+      {
+        type: 'paragraph',
+        content:
+          'En cuisine, employer des feuilles vendues comme aliment, les laver avec de l’eau potable et les ajouter selon le goût. Les extraits concentrés et les huiles essentielles ne sont pas interchangeables avec une herbe utilisée comme condiment.',
+      },
+    ],
+    sourceLinks: [
+      {
+        title: 'Ocimum gratissimum: Chemical Composition, Phytochemical Properties, Antioxidants, and Pharmacological Activities: A Review.',
+        url: 'https://pmc.ncbi.nlm.nih.gov/articles/PMC13259028/',
+        kind: 'scientifique',
+        note: 'Revue de composition et d’activités étudiées ; elle indique aussi un usage aromatique dans les plats et soupes ouest-africains.',
+      },
+    ],
+  },
 ];

@@ -9,6 +9,7 @@ const sources = [
   "data/plantes-medicinales-complementaires.ts",
   "data/plantes-savoirs-complementaires.ts",
   "data/plantes-medicinales.ts",
+  "data/recipes.ts",
   "data/articles.ts",
   "data/animals.ts",
   "data/quiz.ts",

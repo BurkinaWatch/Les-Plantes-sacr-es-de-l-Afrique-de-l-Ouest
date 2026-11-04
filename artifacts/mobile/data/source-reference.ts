@@ -2,6 +2,7 @@ export type SourceReferenceKind =
   | 'taxonomie'
   | 'scientifique'
   | 'institutionnelle'
+  | 'source culinaire'
   | 'publication sociale';
 
 export interface SourceReference {
