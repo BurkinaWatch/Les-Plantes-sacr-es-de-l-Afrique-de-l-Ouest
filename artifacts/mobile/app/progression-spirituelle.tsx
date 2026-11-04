@@ -17,6 +17,7 @@ import { SacredIcon, type SacredIconName } from '@/components/SacredIcon';
 import { QUIZ_ALGORITHM_VERSION, TOTEM_RESULTS } from '@/data/quiz';
 import { getPlanteById } from '@/data/animals';
 import { useColors } from '@/hooks/useColors';
+import { useTranslation } from '@/i18n';
 
 interface Message {
   id: string;
@@ -106,6 +107,7 @@ export default function ProgressionSpirituelleScreen() {
   const colors = useColors();
   const insets = useSafeAreaInsets();
   const router = useRouter();
+  const { t } = useTranslation();
   const { quizResult } = useApp();
   const topPad = Platform.OS === 'web' ? Math.max(insets.top, 67) : insets.top;
 
@@ -384,20 +386,20 @@ export default function ProgressionSpirituelleScreen() {
         {/* ── COMPATIBILITÉS ── */}
         {quizResult.scores && (
           <>
-            <SectionTitle title="Affinités avec les totems" color={totemColor} />
+            <SectionTitle title="Indice éditorial par plante" color={totemColor} />
             <View style={[styles.card, { backgroundColor: colors.card, borderColor: colors.border }]}>
               <Text style={[styles.cardSubtitle, { color: colors.mutedForeground }]}>
-                Indice de rapprochement éditorial sur 100, pas une probabilité ni une compatibilité validée.
+                {t.quiz_result_match_note}
               </Text>
               {quizResult.lowDifferentiation && (
                 <Text style={[styles.cardSubtitle, { color: colors.mutedForeground }]}>
-                  Tes réponses étaient très proches; considère ce classement comme une piste limitée.
+                  {t.quiz_result_low_differentiation}
                 </Text>
               )}
               {quizResult.algorithmVersion !== QUIZ_ALGORITHM_VERSION && (
                 <Pressable onPress={() => router.push('/(tabs)/quiz' as any)}>
                   <Text style={[styles.cardSubtitle, { color: colors.gold }]}>
-                    {`Résultat ancien — ${"Refaire le quiz pour le recalculer."}`}
+                    {t.quiz_result_outdated}
                   </Text>
                 </Pressable>
               )}

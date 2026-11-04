@@ -3,8 +3,8 @@ name: Quiz result diversity
 description: Product expectations for varied, deterministic plant-quiz recommendations.
 ---
 
-**Rule:** Keep plant recommendations responsive to individual quiz answers. Identical full answer sets should remain deterministic; do not add randomness merely to spread results. Match only against symbolic and reflective editorial fields, not medicinal virtues, traditional uses, or botanical morphology. Preserve the disclosure that recommendations are reflection prompts, not diagnoses or authoritative spiritual assignments.
+**Rule:** Keep recommendations deterministic and based on the centered pattern of all 20 answers, combined with the five editorial axes. Match only against symbolic and reflective editorial fields, never medicinal virtues, traditional uses, or botanical morphology. Treat scores as editorial indices, not probabilities or validated compatibility. Nearly uniform answers should get a neutral score and a clear low-differentiation notice.
 
-**Why:** The owner observed that too many users received the same few associated plants. Averaging twenty answers into five dimensions loses distinctions between different response patterns.
+**Why:** The owner observed that common agree-heavy answers repeatedly returned the same few plants. Purely random-profile tests hid this response-style bias, while a real score cannot be presented as validated without user research.
 
-**How to apply:** Keep question-specific plant-text signals, token-boundary matching, and regression tests that verify distinct answer patterns—including patterns with equal five-axis averages—can produce distinct recommendations. Treat signal mappings as editorial heuristics and keep them reviewable.
+**How to apply:** Keep question-specific, token-boundary signal matching and combine it with the axis profile; regression-test agree-heavy, centered, axis-correlated, and uniform answer cohorts. Keep mappings reviewable and describe the result as a reflection prompt.

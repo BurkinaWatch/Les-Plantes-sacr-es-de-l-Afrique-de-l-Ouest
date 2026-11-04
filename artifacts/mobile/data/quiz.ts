@@ -225,12 +225,13 @@ function hasSignalToken(tokens: ReadonlySet<string>, term: string): boolean {
 }
 
 export function derivePlantProfile(plant: Plante): Record<Dim, number> {
-  const text = getPlantReflectionText(plant);
+  const tokens = tokenizeText(getPlantReflectionText(plant));
   const profile = {} as Record<Dim, number>;
 
   for (const dimension of DIMS) {
     const evidence = PLANT_VALUE_SIGNALS[dimension].reduce(
-      (total, group) => total + (group.terms.some((term) => text.includes(term)) ? group.weight : 0),
+      (total, group) =>
+        total + (group.terms.some((term) => hasSignalToken(tokens, term)) ? group.weight : 0),
       0,
     );
     profile[dimension] = Math.min(100, 12 + evidence * 8);
@@ -275,7 +276,7 @@ function deriveRawQuestionProfile(text: string): QuestionProfile {
 }
 
 const CATALOG_QUESTION_PROFILES = new Map(
-  PLANTS.map((plant) => [plant.id, deriveRawQuestionProfile(getPlantReflectionText(plant))]),
+  PLANTS.map((plant) => [plant, deriveRawQuestionProfile(getPlantReflectionText(plant))]),
 );
 const QUESTION_PROFILE_DISTRIBUTIONS = new Map<number, number[]>(
   QUIZ_QUESTIONS.map((question) => [
@@ -311,7 +312,7 @@ function percentileRank(value: number, sortedValues: readonly number[]): number 
 }
 
 function deriveQuestionProfile(plant: Plante): QuestionProfile {
-  const rawProfile = CATALOG_QUESTION_PROFILES.get(plant.id)
+  const rawProfile = CATALOG_QUESTION_PROFILES.get(plant)
     ?? deriveRawQuestionProfile(getPlantReflectionText(plant));
 
   return Object.fromEntries(QUIZ_QUESTIONS.map((question) => [
@@ -348,6 +349,8 @@ function makeTotemResult(plant: Plante): TotemResult {
     plant.conseilsDeVie[0],
   ]) ?? description;
   const couleur = /^#[\da-f]{6}$/i.test(plant.couleur) ? plant.couleur : '#5C7A3E';
+  const profilDimensions = derivePlantProfile(plant);
+  CATALOG_AXIS_PROFILES.set(plant, { ...profilDimensions });
 
   return {
     id: plant.id,
@@ -357,9 +360,11 @@ function makeTotemResult(plant: Plante): TotemResult {
     defis: listOrFallback(plant.defauts.length > 0 ? plant.defauts : plant.conseilsDeVie, fallback),
     citation,
     couleur,
-    profilDimensions: derivePlantProfile(plant),
+    profilDimensions,
   };
 }
+
+const CATALOG_AXIS_PROFILES = new WeakMap<Plante, Record<Dim, number>>();
 
 export const TOTEM_RESULTS: Record<PlantId, TotemResult> = Object.fromEntries(
   PLANTS.map((plant) => [plant.id, makeTotemResult(plant)]),
@@ -468,7 +473,7 @@ export function calculateTotem(
     const profile = deriveQuestionProfile(plant);
     const plantPattern = QUIZ_QUESTIONS.map((question) => profile[question.id]);
     const questionCorrelation = pearsonCorrelation(answerPattern, plantPattern);
-    const axisProfile = TOTEM_RESULTS[plant.id]?.profilDimensions
+    const axisProfile = CATALOG_AXIS_PROFILES.get(plant)
       ?? derivePlantProfile(plant);
     const axisCorrelation = pearsonCorrelation(
       DIMS.map((dimension) => dimensionScores[dimension]),

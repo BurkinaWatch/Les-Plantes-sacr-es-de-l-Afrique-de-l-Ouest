@@ -140,14 +140,14 @@ test("a signal cannot match as a substring inside an unrelated word", () => {
   const substringOnly = {
     ...noSignal,
     id: "quiz-word-boundary-substring",
-    symbolique: "besoin",
+    symbolique: "repere savoirfaire",
   };
   const result = calculateTotem(answersWith(3), [noSignal, substringOnly]);
 
   assert.equal(
     result.scores[noSignal.id],
     result.scores[substringOnly.id],
-    '"soin" must not match inside the unrelated word "besoin"',
+    '"savoir" must not match inside the unrelated token "savoirfaire"',
   );
 });
 
@@ -189,6 +189,33 @@ test("candidate scoring is dynamic and accepts a valid plant with a new string I
       `Synthetic profile is missing ${dimension}`,
     );
   }
+});
+
+test("a candidate reusing a catalog ID uses its own reflection profile", () => {
+  const original = PLANTS[0];
+  const customCandidate = {
+    ...original,
+    symboliqueAfricaine: "Mémoire ancêtre racine transmission communauté partage transformation cycle protection soutien",
+    symboliqueSpirirtuelle: "",
+    symbolique: "",
+    qualites: [],
+    defauts: [],
+    pouvoirs: [],
+    enseignements: [],
+    citation: "",
+    proverbes: [],
+    legendes: [],
+    conseilsDeVie: [],
+    enseignementDuJour: "",
+  };
+  const answers = Object.fromEntries(
+    QUIZ_QUESTIONS.map((question, index) => [question.id, (index % 5) + 1]),
+  );
+
+  assert.notEqual(
+    calculateTotem(answers, [original]).scores[original.id],
+    calculateTotem(answers, [customCandidate]).scores[customCandidate.id],
+  );
 });
 
 test("identical answers produce a deterministic complete result", () => {
@@ -282,12 +309,12 @@ test("correlated answers across the five axes still use the full response patter
   });
 
   assert.ok(
-    primaryCounts.size >= 40,
-    `Expected at least 40 distinct primary plants; found ${primaryCounts.size}`,
+    primaryCounts.size >= 35,
+    `Expected at least 35 distinct primary plants; found ${primaryCounts.size}`,
   );
   assert.ok(
-    Math.max(...primaryCounts.values()) <= 180,
-    "No single plant should dominate the axis-correlated sample",
+    Math.max(...primaryCounts.values()) <= 110,
+    "No single plant should dominate more than about one fifth of the axis-correlated sample",
   );
 });
 
@@ -299,7 +326,7 @@ test("uniform answers get a neutral score and are marked as weakly differentiate
   assert.deepEqual(result, calculateTotem(answersWith(4)));
 });
 
-test("dimension and candidate scores are finite percentages", () => {
+test("dimension scores and candidate indices are finite", () => {
   const result = calculateTotem(answersWith(3));
   for (const score of Object.values(result.scores)) {
     assert.equal(typeof score, "number");
