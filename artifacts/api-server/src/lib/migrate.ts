@@ -1527,13 +1527,21 @@ export async function verifySchema(
       deleteRule: null,
     };
     if (row.column_name) {
-      existing.columns.push(row.column_name);
+      // Joining key_column_usage to constraint_column_usage can repeat each
+      // local column for composite constraints. Keep the first occurrence so
+      // the ordinal order stays intact without treating that join fan-out as
+      // a malformed constraint.
+      if (!existing.columns.includes(row.column_name)) {
+        existing.columns.push(row.column_name);
+      }
     }
     if (row.foreign_table_name) {
       existing.foreignTableName = row.foreign_table_name;
     }
     if (row.foreign_column_name) {
-      existing.foreignColumns.push(row.foreign_column_name);
+      if (!existing.foreignColumns.includes(row.foreign_column_name)) {
+        existing.foreignColumns.push(row.foreign_column_name);
+      }
     }
     if (row.delete_rule) {
       existing.deleteRule = row.delete_rule;
