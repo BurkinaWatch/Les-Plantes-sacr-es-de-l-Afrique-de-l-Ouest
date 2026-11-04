@@ -113,6 +113,11 @@ test("medical notes alone do not alter a plant's reflection match", () => {
     result.scores[medicalVariant.id],
     "Medical or traditional-use notes must not act as personality signals",
   );
+  assert.deepEqual(
+    derivePlantProfile(base),
+    derivePlantProfile(medicalVariant),
+    "Medical or traditional-use notes must not alter the editorial plant profile",
+  );
 });
 
 test("a signal cannot match as a substring inside an unrelated word", () => {
@@ -194,8 +199,14 @@ test("identical answers produce a deterministic complete result", () => {
 });
 
 test("strongly contrasting response patterns can select different primaries", () => {
-  const low = calculateTotem(answersWith(1));
-  const high = calculateTotem(answersWith(5));
+  const ascending = Object.fromEntries(
+    QUIZ_QUESTIONS.map((question, index) => [question.id, (index % 5) + 1]),
+  );
+  const descending = Object.fromEntries(
+    QUIZ_QUESTIONS.map((question, index) => [question.id, 5 - (index % 5)]),
+  );
+  const low = calculateTotem(ascending);
+  const high = calculateTotem(descending);
 
   assert.notEqual(low.primary, high.primary);
 });
@@ -217,29 +228,75 @@ test("individual answers matter even when five dimension averages are identical"
   assert.notEqual(varied.primary, flat.primary);
 });
 
-test("varied response patterns do not collapse to only a few plants", () => {
+function countPrimaryPlants(makeAnswers, sampleCount = 512) {
   let state = 0x12345678;
+  const random = () => {
+    state = (Math.imul(state, 1664525) + 1013904223) >>> 0;
+    return state;
+  };
   const primaryCounts = new Map();
 
-  for (let sample = 0; sample < 128; sample += 1) {
-    const answers = Object.fromEntries(
-      QUIZ_QUESTIONS.map((question) => {
-        state = (Math.imul(state, 1664525) + 1013904223) >>> 0;
-        return [question.id, (state % 5) + 1];
-      }),
-    );
+  for (let sample = 0; sample < sampleCount; sample += 1) {
+    const answers = makeAnswers(random);
     const primary = calculateTotem(answers).primary;
     primaryCounts.set(primary, (primaryCounts.get(primary) ?? 0) + 1);
   }
 
+  return primaryCounts;
+}
+
+test("common centered and agreement-heavy answers do not collapse to a few plants", () => {
+  const answerStyles = [
+    ["mostly 3–4", (random) => Object.fromEntries(QUIZ_QUESTIONS.map((question) => {
+      const value = random() % 100;
+      return [question.id, value < 50 ? 3 : value < 85 ? 4 : value < 95 ? 2 : 5];
+    }))],
+    ["mostly 4–5", (random) => Object.fromEntries(QUIZ_QUESTIONS.map((question) => {
+      const value = random() % 100;
+      return [question.id, value < 55 ? 4 : value < 80 ? 5 : value < 95 ? 3 : 2];
+    }))],
+  ];
+
+  for (const [style, makeAnswers] of answerStyles) {
+    const primaryCounts = countPrimaryPlants(makeAnswers);
+    assert.ok(
+      primaryCounts.size >= 50,
+      `${style}: expected at least 50 distinct plants; found ${primaryCounts.size}`,
+    );
+    assert.ok(
+      Math.max(...primaryCounts.values()) <= 80,
+      `${style}: one plant dominates more than 16% of the sample`,
+    );
+  }
+});
+
+test("correlated answers across the five axes still use the full response pattern", () => {
+  const primaryCounts = countPrimaryPlants((random) => {
+    const dimensionLevels = Object.fromEntries(
+      ["E", "O", "C", "A", "S"].map((dimension) => [dimension, 2 + (random() % 4)]),
+    );
+    return Object.fromEntries(QUIZ_QUESTIONS.map((question) => [
+      question.id,
+      Math.max(1, Math.min(5, dimensionLevels[question.dimension] + (random() % 3) - 1)),
+    ]));
+  });
+
   assert.ok(
-    primaryCounts.size >= 50,
-    `Expected at least 50 distinct primary plants; found ${primaryCounts.size}`,
+    primaryCounts.size >= 40,
+    `Expected at least 40 distinct primary plants; found ${primaryCounts.size}`,
   );
   assert.ok(
-    Math.max(...primaryCounts.values()) <= 12,
-    "No single plant should dominate this varied response sample",
+    Math.max(...primaryCounts.values()) <= 180,
+    "No single plant should dominate the axis-correlated sample",
   );
+});
+
+test("uniform answers get a neutral score and are marked as weakly differentiated", () => {
+  const result = calculateTotem(answersWith(4));
+
+  assert.equal(result.lowDifferentiation, true);
+  assert.ok(Object.values(result.scores).every((score) => score === 50));
+  assert.deepEqual(result, calculateTotem(answersWith(4)));
 });
 
 test("dimension and candidate scores are finite percentages", () => {

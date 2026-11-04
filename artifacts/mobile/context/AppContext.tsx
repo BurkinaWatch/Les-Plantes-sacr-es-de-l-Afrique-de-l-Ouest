@@ -9,6 +9,8 @@ interface QuizResult {
   primary: PlantId;
   secondary: PlantId;
   completedAt: string;
+  algorithmVersion?: number;
+  lowDifferentiation?: boolean;
   scores?: Record<PlantId, number>;
   dimensionScores?: Record<'E' | 'O' | 'C' | 'A' | 'S', number>;
 }

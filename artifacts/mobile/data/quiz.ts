@@ -77,6 +77,8 @@ export const SPIRITUAL_REFERENCES: SpiritualReference[] = [
 ];
 
 // Twenty prompts are interleaved across the five reflection axes.
+export const QUIZ_ALGORITHM_VERSION = 2;
+
 export const QUIZ_QUESTIONS: QuizStatement[] = [
   { id: 1, dimension: 'E', dimensionLabel: 'Ancrage', statement: 'Quand un choix m’importe, je prends en compte ce que l’expérience et la mémoire m’ont appris.', reversed: false },
   { id: 2, dimension: 'O', dimensionLabel: 'Écoute', statement: 'Avant d’agir, je prends le temps d’observer ce qui change autour de moi.', reversed: false },
@@ -135,7 +137,7 @@ const PLANT_VALUE_SIGNALS: Record<Dim, readonly SignalGroup[]> = {
   ],
   C: [
     { terms: ['protection', 'protecteur', 'proteger', 'defense', 'garde'], weight: 2 },
-    { terms: ['soin', 'soigner', 'sante', 'guerison', 'guerir'], weight: 2 },
+    { terms: ['soutien', 'entraide', 'aider', 'besoin', 'respect'], weight: 2 },
     { terms: ['limite', 'preserver', 'preservation', 'fragile', 'abriter'], weight: 2 },
     { terms: ['resistance', 'resister', 'resilient', 'endurant', 'survivre'], weight: 1 },
     { terms: ['nourrir', 'nourriture', 'aliment', 'ressource', 'eau'], weight: 1 },
@@ -164,7 +166,7 @@ const PLANT_VALUE_SIGNALS: Record<Dim, readonly SignalGroup[]> = {
 export const QUESTION_VALUE_SIGNALS: Record<number, readonly string[]> = {
   1: ['memoire', 'souvenir', 'savoir', 'apprendre', 'histoire', 'ancien', 'ancetre', 'conseil', 'enseignement'],
   2: ['observation', 'attention', 'ecoute', 'cycle', 'saison', 'environnement', 'changement', 'silence', 'veiller'],
-  3: ['soin', 'soigner', 'protection', 'aider', 'nourrir', 'ressource', 'soutien', 'entraide'],
+  3: ['protection', 'nourrir', 'ressource', 'soutien', 'besoin', 'fragile', 'respect', 'limite'],
   4: ['partage', 'transmission', 'apprendre', 'respect', 'liberte', 'communaute', 'savoir'],
   5: ['cycle', 'transformation', 'saison', 'renouveau', 'changement', 'transition', 'passage', 'enseignement'],
   6: ['duree', 'ancrage', 'racine', 'longtemps', 'millenaire', 'patience', 'ancien', 'memoire'],
@@ -197,26 +199,6 @@ function normalizeText(value: string): string {
     .toLocaleLowerCase('fr-FR');
 }
 
-function getPlantValueText(plant: Plante): string {
-  return normalizeText([
-    plant.description,
-    plant.symboliqueAfricaine,
-    plant.symboliqueSpirirtuelle,
-    plant.symbolique,
-    ...plant.qualites,
-    ...plant.defauts,
-    ...plant.pouvoirs,
-    ...plant.enseignements,
-    plant.citation,
-    ...plant.proverbes,
-    ...plant.legendes,
-    ...plant.conseilsDeVie,
-    plant.enseignementDuJour,
-    ...(plant.vertus ?? []),
-    ...(plant.usagesTraditionnels ?? []),
-  ].filter(Boolean).join(' '));
-}
-
 function getPlantReflectionText(plant: Plante): string {
   return normalizeText([
     plant.symboliqueAfricaine,
@@ -243,7 +225,7 @@ function hasSignalToken(tokens: ReadonlySet<string>, term: string): boolean {
 }
 
 export function derivePlantProfile(plant: Plante): Record<Dim, number> {
-  const text = getPlantValueText(plant);
+  const text = getPlantReflectionText(plant);
   const profile = {} as Record<Dim, number>;
 
   for (const dimension of DIMS) {
@@ -406,6 +388,30 @@ export interface TotemCalculation {
   secondaryScore: number;
   scores: Record<PlantId, number>;
   dimensionScores: Record<Dim, number>;
+  lowDifferentiation: boolean;
+}
+
+function pearsonCorrelation(left: readonly number[], right: readonly number[]): number {
+  if (left.length !== right.length || left.length === 0) return 0;
+
+  const leftMean = left.reduce((sum, value) => sum + value, 0) / left.length;
+  const rightMean = right.reduce((sum, value) => sum + value, 0) / right.length;
+  let covariance = 0;
+  let leftVariance = 0;
+  let rightVariance = 0;
+
+  for (let index = 0; index < left.length; index += 1) {
+    const leftDelta = left[index] - leftMean;
+    const rightDelta = right[index] - rightMean;
+    covariance += leftDelta * rightDelta;
+    leftVariance += leftDelta ** 2;
+    rightVariance += rightDelta ** 2;
+  }
+
+  const denominator = Math.sqrt(leftVariance * rightVariance);
+  return denominator > 0
+    ? Math.max(-1, Math.min(1, covariance / denominator))
+    : 0;
 }
 
 export function calculateTotem(
@@ -445,22 +451,31 @@ export function calculateTotem(
     );
   }
 
-  const questionTargets = Object.fromEntries(QUIZ_QUESTIONS.map((question) => [
-    question.id,
-    ((answers[question.id] - 1) / 4) * 100,
-  ])) as QuestionProfile;
-  const maxDistance = Math.sqrt(QUIZ_QUESTIONS.length * 100 * 100);
+  // Center each person's answers so a general tendency to agree does not
+  // overpower the more informative differences between their 20 responses.
+  const answerPattern = QUIZ_QUESTIONS.map((question) =>
+    question.reversed ? 6 - answers[question.id] : answers[question.id],
+  );
+  const answerMean = answerPattern.reduce((sum, value) => sum + value, 0) / answerPattern.length;
+  const answerSpread = Math.sqrt(
+    answerPattern.reduce((sum, value) => sum + (value - answerMean) ** 2, 0) /
+      answerPattern.length,
+  );
+  const lowDifferentiation = answerSpread < 0.35;
+  const responseReliability = Math.min(1, answerSpread / 0.75);
+
   const rankings = candidates.map((plant) => {
     const profile = deriveQuestionProfile(plant);
-    const distance = Math.sqrt(
-      QUIZ_QUESTIONS.reduce(
-        (sum, question) => sum + (questionTargets[question.id] - profile[question.id]) ** 2,
-        0,
-      ),
-    );
+    const plantPattern = QUIZ_QUESTIONS.map((question) => profile[question.id]);
+    const correlation = pearsonCorrelation(answerPattern, plantPattern);
     return {
       id: plant.id,
-      score: Math.max(0, Math.min(100, 100 * (1 - distance / maxDistance))),
+      // This is a relative editorial index, not a probability or validated
+      // measure of compatibility. Shrink weakly differentiated answers toward 50.
+      score: Math.max(
+        0,
+        Math.min(100, 50 + 50 * correlation * responseReliability),
+      ),
     };
   }).sort((a, b) => b.score - a.score || a.id.localeCompare(b.id));
 
@@ -477,5 +492,6 @@ export function calculateTotem(
     secondaryScore: Math.round(secondary.score),
     scores,
     dimensionScores,
+    lowDifferentiation,
   };
 }

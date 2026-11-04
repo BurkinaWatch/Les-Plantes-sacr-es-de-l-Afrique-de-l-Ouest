@@ -14,7 +14,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { useApp } from '@/context/AppContext';
 import { SacredIcon, type SacredIconName } from '@/components/SacredIcon';
-import { TOTEM_RESULTS } from '@/data/quiz';
+import { QUIZ_ALGORITHM_VERSION, TOTEM_RESULTS } from '@/data/quiz';
 import { getPlanteById } from '@/data/animals';
 import { useColors } from '@/hooks/useColors';
 
@@ -387,8 +387,20 @@ export default function ProgressionSpirituelleScreen() {
             <SectionTitle title="Affinités avec les totems" color={totemColor} />
             <View style={[styles.card, { backgroundColor: colors.card, borderColor: colors.border }]}>
               <Text style={[styles.cardSubtitle, { color: colors.mutedForeground }]}>
-                Ton score de résonance avec chaque plante sacrée
+                Indice de rapprochement éditorial sur 100, pas une probabilité ni une compatibilité validée.
               </Text>
+              {quizResult.lowDifferentiation && (
+                <Text style={[styles.cardSubtitle, { color: colors.mutedForeground }]}>
+                  Tes réponses étaient très proches; considère ce classement comme une piste limitée.
+                </Text>
+              )}
+              {quizResult.algorithmVersion !== QUIZ_ALGORITHM_VERSION && (
+                <Pressable onPress={() => router.push('/(tabs)/quiz' as any)}>
+                  <Text style={[styles.cardSubtitle, { color: colors.gold }]}>
+                    {`Résultat ancien — ${"Refaire le quiz pour le recalculer."}`}
+                  </Text>
+                </Pressable>
+              )}
               {(Object.entries(quizResult.scores) as [string, number][])
                 .sort((a, b) => b[1] - a[1])
                 .map(([id, score]) => {
@@ -423,7 +435,7 @@ export default function ProgressionSpirituelleScreen() {
                           />
                         </View>
                         <Text style={[styles.affinityScore, { color: isPrimary ? t.couleur : colors.mutedForeground }]}>
-                          {score}%
+                          {score}/100
                         </Text>
                       </View>
                     </View>

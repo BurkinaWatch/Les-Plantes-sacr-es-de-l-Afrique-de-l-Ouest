@@ -138,6 +138,9 @@ export interface Translations {
   quiz_result_secondary_prefix: string;
   quiz_result_profile_title: string;
   quiz_result_profile_note: string;
+  quiz_result_match_note: string;
+  quiz_result_low_differentiation: string;
+  quiz_result_outdated: string;
   quiz_result_revelation_label: string;
   quiz_result_forces_label: string;
   quiz_result_defis_label: string;

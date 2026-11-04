@@ -13,7 +13,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { SacredIcon } from '@/components/SacredIcon';
 import { useApp } from '@/context/AppContext';
-import { TOTEM_RESULTS } from '@/data/quiz';
+import { QUIZ_ALGORITHM_VERSION, TOTEM_RESULTS } from '@/data/quiz';
 import { getPlanteById } from '@/data/animals';
 import { useColors } from '@/hooks/useColors';
 import { useTranslation } from '@/i18n';
@@ -85,6 +85,23 @@ export default function MaPlanteScreen() {
       </LinearGradient>
 
       <View style={{ padding: 20, gap: 18 }}>
+        {quizResult.algorithmVersion !== QUIZ_ALGORITHM_VERSION && (
+          <View style={[styles.card, { backgroundColor: colors.gold + '10', borderColor: colors.gold + '45' }]}>
+            <Text style={[styles.cardText, { color: colors.ivory }]}>{t.quiz_result_outdated}</Text>
+            <Pressable onPress={() => router.push('/(tabs)/quiz' as any)}>
+              <Text style={[styles.cardLabel, { color: colors.gold }]}>{t.quiz_start}</Text>
+            </Pressable>
+          </View>
+        )}
+
+        {quizResult.lowDifferentiation && (
+          <View style={[styles.card, { backgroundColor: colors.gold + '10', borderColor: colors.gold + '45' }]}>
+            <Text style={[styles.cardText, { color: colors.ivory }]}>
+              {t.quiz_result_low_differentiation}
+            </Text>
+          </View>
+        )}
+
         <View style={[styles.card, { backgroundColor: colors.card, borderColor: colors.border }]}>
           <Text style={[styles.cardLabel, { color: colors.gold }]}>{t.my_animal_soul_label}</Text>
           <Text style={[styles.cardText, { color: colors.ivory }]}>{primaryTotem.description}</Text>

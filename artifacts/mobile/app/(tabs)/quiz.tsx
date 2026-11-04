@@ -20,6 +20,7 @@ import {
   SPIRITUAL_REFERENCES,
   TOTEM_REFLECTIONS,
   TOTEM_RESULTS,
+  QUIZ_ALGORITHM_VERSION,
   calculateTotem,
   type LikertValue,
   type QuizAnswers,
@@ -84,6 +85,8 @@ export default function QuizScreen() {
           primary: calc.primary,
           secondary: calc.secondary,
           completedAt: new Date().toISOString(),
+          algorithmVersion: QUIZ_ALGORITHM_VERSION,
+          lowDifferentiation: calc.lowDifferentiation,
           scores: calc.scores,
           dimensionScores: calc.dimensionScores,
         });
@@ -154,8 +157,20 @@ export default function QuizScreen() {
           </Pressable>
 
           {quizResult && (
-            <Pressable onPress={() => router.push('/(tabs)/ma-plante' as any)}>
-              <Text style={[styles.previousResult, { color: colors.terracotta }]}>{t.quiz_prev_result}</Text>
+            <Pressable
+              onPress={() => {
+                if (quizResult.algorithmVersion === QUIZ_ALGORITHM_VERSION) {
+                  router.push('/(tabs)/ma-plante' as any);
+                } else {
+                  setScreen('charte');
+                }
+              }}
+            >
+              <Text style={[styles.previousResult, { color: colors.terracotta }]}>
+                {quizResult.algorithmVersion === QUIZ_ALGORITHM_VERSION
+                  ? t.quiz_prev_result
+                  : t.quiz_start}
+              </Text>
             </Pressable>
           )}
         </View>
@@ -289,6 +304,14 @@ export default function QuizScreen() {
         </LinearGradient>
 
         <View style={{ padding: 20, gap: 20 }}>
+          {result.lowDifferentiation && (
+            <View style={[styles.card, { backgroundColor: colors.gold + '10', borderColor: colors.gold + '35' }]}>
+              <Text style={[styles.cardText, { color: colors.ivory }]}>
+                {t.quiz_result_low_differentiation}
+              </Text>
+            </View>
+          )}
+
           <View style={[styles.card, { backgroundColor: colors.card, borderColor: colors.border }]}>
             <Text style={[styles.cardLabel, { color: colors.gold }]}>{t.quiz_result_profile_title}</Text>
             {(['E', 'O', 'C', 'A', 'S'] as const).map((d) => {
@@ -318,7 +341,7 @@ export default function QuizScreen() {
             <Text style={[styles.cardLabel, { color: colors.gold }]}>QUESTION DE RÉFLEXION</Text>
             <Text style={[styles.cardText, { color: colors.ivory }]}>{TOTEM_REFLECTIONS[result.primary]}</Text>
             <Text style={[styles.sourceText, { color: colors.mutedForeground }]}>
-              Piste éditoriale tirée de la fiche de cette plante, pas une prescription rituelle ni un diagnostic.
+              Piste éditoriale tirée de la fiche, pas une prescription rituelle, une compatibilité validée ou un diagnostic.
             </Text>
           </View>
 
