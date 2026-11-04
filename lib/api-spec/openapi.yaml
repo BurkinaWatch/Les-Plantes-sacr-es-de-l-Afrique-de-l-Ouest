@@ -16,6 +16,8 @@ tags:
     description: Subscription and payment preparation operations
   - name: recipes
     description: Community culinary ratings for recipes
+  - name: quiz
+    description: Anonymous, optional quiz feedback
 paths:
   /healthz:
     get:
@@ -238,6 +240,26 @@ paths:
           $ref: "#/components/responses/BadRequest"
         "401":
           $ref: "#/components/responses/Unauthorized"
+        "429":
+          $ref: "#/components/responses/TooManyRequests"
+  /quiz/plant-feedback:
+    post:
+      operationId: submitQuizPlantFeedback
+      tags: [quiz]
+      summary: Add an optional anonymous plant-resonance vote
+      description: Stores only aggregate counts by plant, quiz version, and yes/no choice. Detailed quiz answers and account identifiers are not accepted or stored.
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/QuizPlantFeedbackInput"
+      responses:
+        "204":
+          description: The anonymous aggregate counter was updated
+        "400":
+          $ref: "#/components/responses/BadRequest"
         "429":
           $ref: "#/components/responses/TooManyRequests"
   /subscriptions/plans:
@@ -631,6 +653,21 @@ components:
           oneOf:
             - $ref: "#/components/schemas/RecipeRatingValues"
             - type: "null"
+    QuizPlantFeedbackInput:
+      type: object
+      additionalProperties: false
+      required: [algorithmVersion, plantId, resonates]
+      properties:
+        algorithmVersion:
+          type: integer
+          const: 3
+        plantId:
+          type: string
+          minLength: 1
+          maxLength: 80
+          pattern: "^[a-z0-9]+(-[a-z0-9]+)*$"
+        resonates:
+          type: boolean
     HealthStatus:
       type: object
       properties:

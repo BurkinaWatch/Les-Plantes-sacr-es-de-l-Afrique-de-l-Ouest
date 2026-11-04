@@ -20,3 +20,4 @@
 export * from "./users";
 export * from "./subscriptions";
 export * from "./recipe-ratings";
+export * from "./quiz-plant-feedback";

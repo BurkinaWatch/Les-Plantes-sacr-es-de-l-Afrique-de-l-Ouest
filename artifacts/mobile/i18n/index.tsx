@@ -149,6 +149,14 @@ export interface Translations {
   quiz_result_secondary_desc: string;
   quiz_result_see_full: string;
   quiz_restart: string;
+  quiz_feedback_title: string;
+  quiz_feedback_disclosure: string;
+  quiz_feedback_yes: string;
+  quiz_feedback_no: string;
+  quiz_feedback_sending: string;
+  quiz_feedback_success: string;
+  quiz_feedback_already_sent: string;
+  quiz_feedback_error: string;
 
   // ── MY ANIMAL
   my_animal_totem_label: string;

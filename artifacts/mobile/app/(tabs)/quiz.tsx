@@ -1,8 +1,10 @@
 import * as Haptics from 'expo-haptics';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import {
+  ActivityIndicator,
   Animated,
   Platform,
   Pressable,
@@ -15,6 +17,7 @@ import { Linking } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { useApp } from '@/context/AppContext';
+import { useSubmitQuizPlantFeedback } from '@workspace/api-client-react';
 import {
   QUIZ_QUESTIONS,
   SPIRITUAL_REFERENCES,
@@ -36,6 +39,7 @@ const DIM_ICONS: Record<string, SacredIconName> = {
 const LIKERT_VALUES: LikertValue[] = [1, 2, 3, 4, 5];
 
 type Screen = 'welcome' | 'charte' | 'quiz' | 'result';
+type FeedbackState = 'checking' | 'ready' | 'sending' | 'sent' | 'alreadySent' | 'error';
 
 export default function QuizScreen() {
   const colors = useColors();
@@ -43,15 +47,38 @@ export default function QuizScreen() {
   const router = useRouter();
   const { quizResult, setQuizResult, clearQuizResult } = useApp();
   const { t } = useTranslation();
+  const feedbackMutation = useSubmitQuizPlantFeedback({
+    request: { skipAuth: true, credentials: 'omit' },
+  });
 
   const [screen, setScreen] = useState<Screen>('welcome');
   const [currentQ, setCurrentQ] = useState(0);
   const [answers, setAnswers] = useState<QuizAnswers>({});
   const [result, setResult] = useState<ReturnType<typeof calculateTotem> | null>(null);
   const [selectedValue, setSelectedValue] = useState<LikertValue | null>(null);
+  const [feedbackState, setFeedbackState] = useState<FeedbackState>('checking');
 
   const fadeAnim = useRef(new Animated.Value(1)).current;
   const topPad = Platform.OS === 'web' ? Math.max(insets.top, 67) : insets.top;
+  const feedbackStorageKey = result
+    ? `quiz-plant-feedback:v${QUIZ_ALGORITHM_VERSION}:${result.primary}`
+    : null;
+
+  useEffect(() => {
+    if (!feedbackStorageKey) return;
+    let active = true;
+    setFeedbackState('checking');
+    AsyncStorage.getItem(feedbackStorageKey)
+      .then((saved) => {
+        if (active) setFeedbackState(saved === 'sent' ? 'alreadySent' : 'ready');
+      })
+      .catch(() => {
+        if (active) setFeedbackState('ready');
+      });
+    return () => {
+      active = false;
+    };
+  }, [feedbackStorageKey]);
 
   const DIMENSION_LABELS = {
     E: { label: t.dim_E_label, icon: DIM_ICONS.E, desc: t.dim_E_desc },
@@ -102,6 +129,37 @@ export default function QuizScreen() {
     setResult(null);
     setSelectedValue(null);
     clearQuizResult();
+  }
+
+  async function submitQuizFeedback(resonates: boolean) {
+    if (
+      !result ||
+      !feedbackStorageKey ||
+      feedbackState === 'sending' ||
+      feedbackState === 'sent' ||
+      feedbackState === 'alreadySent'
+    ) {
+      return;
+    }
+
+    setFeedbackState('sending');
+    try {
+      await feedbackMutation.mutateAsync({
+        data: {
+          algorithmVersion: QUIZ_ALGORITHM_VERSION,
+          plantId: result.primary,
+          resonates,
+        },
+      });
+      try {
+        await AsyncStorage.setItem(feedbackStorageKey, 'sent');
+      } catch {
+        // The server stores only an aggregate counter; local suppression is best effort.
+      }
+      setFeedbackState('sent');
+    } catch {
+      setFeedbackState('error');
+    }
   }
 
   // ── ÉCRAN D'ACCUEIL ──────────────────────────────────────────
@@ -373,6 +431,67 @@ export default function QuizScreen() {
           <View style={[styles.card, { backgroundColor: secondary.couleur + '15', borderColor: secondary.couleur + '40' }]}>
             <Text style={[styles.cardLabel, { color: secondary.couleur }]}>{t.quiz_result_secondary_label} — {secondary.nom.toUpperCase()}</Text>
             <Text style={[styles.cardText, { color: colors.ivory }]}>{t.quiz_result_secondary_desc}</Text>
+          </View>
+
+          <View style={[styles.card, { backgroundColor: colors.card, borderColor: colors.border }]}>
+            <Text style={[styles.cardLabel, { color: colors.gold }]}>{t.quiz_feedback_title}</Text>
+            <Text style={[styles.cardText, { color: colors.mutedForeground }]}>
+              {t.quiz_feedback_disclosure}
+            </Text>
+            {feedbackState === 'checking' && (
+              <ActivityIndicator color={colors.gold} accessibilityLabel={t.quiz_feedback_sending} />
+            )}
+            {feedbackState === 'sending' && (
+              <Text style={[styles.cardText, { color: colors.mutedForeground }]}>
+                {t.quiz_feedback_sending}
+              </Text>
+            )}
+            {(feedbackState === 'sent' || feedbackState === 'alreadySent') && (
+              <Text style={[styles.cardText, { color: colors.mutedForeground }]}>
+                {feedbackState === 'sent' ? t.quiz_feedback_success : t.quiz_feedback_already_sent}
+              </Text>
+            )}
+            {feedbackState === 'error' && (
+              <Text style={[styles.cardText, { color: colors.terracotta }]}>
+                {t.quiz_feedback_error}
+              </Text>
+            )}
+            {(feedbackState === 'ready' || feedbackState === 'error') && (
+              <View style={{ gap: 10, marginTop: 4 }}>
+                <Pressable
+                  accessibilityRole="button"
+                  onPress={() => void submitQuizFeedback(true)}
+                  style={({ pressed }) => ({
+                    opacity: pressed ? 0.85 : 1,
+                    borderRadius: 12,
+                    padding: 13,
+                    alignItems: 'center',
+                    backgroundColor: colors.gold,
+                  })}
+                >
+                  <Text style={{ color: colors.deepBrown, fontWeight: '700', textAlign: 'center' }}>
+                    {t.quiz_feedback_yes}
+                  </Text>
+                </Pressable>
+                <Pressable
+                  accessibilityRole="button"
+                  onPress={() => void submitQuizFeedback(false)}
+                  style={({ pressed }) => ({
+                    opacity: pressed ? 0.85 : 1,
+                    borderRadius: 12,
+                    padding: 13,
+                    alignItems: 'center',
+                    borderWidth: 1,
+                    borderColor: colors.border,
+                    backgroundColor: colors.background,
+                  })}
+                >
+                  <Text style={{ color: colors.ivory, fontWeight: '700', textAlign: 'center' }}>
+                    {t.quiz_feedback_no}
+                  </Text>
+                </Pressable>
+              </View>
+            )}
           </View>
 
           <Pressable

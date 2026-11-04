@@ -238,6 +238,17 @@ export interface RecipeRatingSummary {
   myRating: RecipeRatingValues | null;
 }
 
+export interface QuizPlantFeedbackInput {
+  algorithmVersion: 3;
+  /**
+     * @minLength 1
+     * @maxLength 80
+     * @pattern ^[a-z0-9]+(-[a-z0-9]+)*$
+     */
+  plantId: string;
+  resonates: boolean;
+}
+
 export type HealthStatusStatus = typeof HealthStatusStatus[keyof typeof HealthStatusStatus];
 
 

@@ -26,6 +26,7 @@ export * from './healthStatusChecks';
 export * from './healthStatusChecksDatabase';
 export * from './healthStatusChecksJwt';
 export * from './healthStatusStatus';
+export * from './quizPlantFeedbackInput';
 export * from './recipeId';
 export * from './recipeRatingInput';
 export * from './recipeRatingSummary';

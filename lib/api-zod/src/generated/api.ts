@@ -222,6 +222,25 @@ export const SaveRecipeRatingResponse = zod.object({
 
 
 /**
+ * Stores only aggregate counts by plant, quiz version, and yes/no choice. Detailed quiz answers and account identifiers are not accepted or stored.
+ * @summary Add an optional anonymous plant-resonance vote
+ */
+export const submitQuizPlantFeedbackBodyPlantIdMax = 80;
+
+
+export const submitQuizPlantFeedbackBodyPlantIdRegExp = new RegExp('^[a-z0-9]+(-[a-z0-9]+)*$');
+
+
+export const SubmitQuizPlantFeedbackBody = zod.object({
+  "algorithmVersion": zod.literal(3),
+  "plantId": zod.string().min(1).max(submitQuizPlantFeedbackBodyPlantIdMax).regex(submitQuizPlantFeedbackBodyPlantIdRegExp),
+  "resonates": zod.boolean()
+})
+
+export const SubmitQuizPlantFeedbackResponse = zod.void()
+
+
+/**
  * @summary List available subscription plans
  */
 export const GetSubscriptionPlansResponse = zod.object({

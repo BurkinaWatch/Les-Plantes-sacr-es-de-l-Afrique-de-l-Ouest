@@ -77,20 +77,20 @@ export const SPIRITUAL_REFERENCES: SpiritualReference[] = [
 ];
 
 // Twenty prompts are interleaved across the five reflection axes.
-export const QUIZ_ALGORITHM_VERSION = 2;
+export const QUIZ_ALGORITHM_VERSION = 3;
 
 export const QUIZ_QUESTIONS: QuizStatement[] = [
   { id: 1, dimension: 'E', dimensionLabel: 'Ancrage', statement: 'Quand un choix m’importe, je prends en compte ce que l’expérience et la mémoire m’ont appris.', reversed: false },
-  { id: 2, dimension: 'O', dimensionLabel: 'Écoute', statement: 'Avant d’agir, je prends le temps d’observer ce qui change autour de moi.', reversed: false },
+  { id: 2, dimension: 'O', dimensionLabel: 'Écoute', statement: 'Quand je dois réagir, je préfère m’appuyer sur des repères connus plutôt que prendre le temps d’observer ce qui change autour de moi.', reversed: true },
   { id: 3, dimension: 'C', dimensionLabel: 'Protection', statement: 'Quand quelqu’un traverse une difficulté, je cherche une aide concrète qui respecte ses besoins.', reversed: false },
-  { id: 4, dimension: 'A', dimensionLabel: 'Transmission', statement: 'J’aime partager ce que j’ai appris en laissant aux autres la liberté de leur propre chemin.', reversed: false },
+  { id: 4, dimension: 'A', dimensionLabel: 'Transmission', statement: 'Je préfère approfondir ce que j’ai appris pour mon propre usage avant de le partager.', reversed: true },
   { id: 5, dimension: 'S', dimensionLabel: 'Transformation', statement: 'Quand une étape se termine, je prends le temps d’en comprendre les leçons avant d’en commencer une autre.', reversed: false },
   { id: 6, dimension: 'E', dimensionLabel: 'Ancrage', statement: 'Je me sens nourri par des lieux, des pratiques ou des liens qui s’inscrivent dans la durée.', reversed: false },
   { id: 7, dimension: 'O', dimensionLabel: 'Écoute', statement: 'Je peux écouter mon intuition sans la confondre avec une certitude.', reversed: false },
-  { id: 8, dimension: 'C', dimensionLabel: 'Protection', statement: 'Je sais poser une limite pour protéger mon équilibre sans rabaisser l’autre.', reversed: false },
+  { id: 8, dimension: 'C', dimensionLabel: 'Protection', statement: 'Pour préserver une relation, il m’arrive d’accepter une demande avant d’exprimer mes limites.', reversed: true },
   { id: 9, dimension: 'A', dimensionLabel: 'Transmission', statement: 'Je préfère une réussite collective à une réussite qui m’isole.', reversed: false },
-  { id: 10, dimension: 'S', dimensionLabel: 'Transformation', statement: 'Je peux abandonner une habitude qui ne m’aide plus, même si elle me rassurait.', reversed: false },
-  { id: 11, dimension: 'E', dimensionLabel: 'Ancrage', statement: 'Je reviens volontiers à mes repères pour traverser les périodes d’incertitude.', reversed: false },
+  { id: 10, dimension: 'S', dimensionLabel: 'Transformation', statement: 'Quand une habitude me convient, je préfère la garder plutôt que d’essayer une autre manière de faire.', reversed: true },
+  { id: 11, dimension: 'E', dimensionLabel: 'Ancrage', statement: 'Quand je traverse une période d’incertitude, je préfère explorer de nouveaux repères plutôt que revenir à ceux que je connais déjà.', reversed: true },
   { id: 12, dimension: 'O', dimensionLabel: 'Écoute', statement: 'Les récits, les symboles ou les rêves peuvent ouvrir des questions utiles, sans dicter mes décisions.', reversed: false },
   { id: 13, dimension: 'C', dimensionLabel: 'Protection', statement: 'Avant d’agir, je pense aux effets de mes choix sur les personnes et le vivant.', reversed: false },
   { id: 14, dimension: 'A', dimensionLabel: 'Transmission', statement: 'Dans un désaccord, je cherche d’abord ce qui peut permettre de se parler avec respect.', reversed: false },

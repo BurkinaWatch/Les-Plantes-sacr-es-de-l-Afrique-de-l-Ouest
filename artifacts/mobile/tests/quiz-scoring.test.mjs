@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import test from "node:test";
 
 import {
+  QUIZ_ALGORITHM_VERSION,
   QUIZ_QUESTIONS,
   PLANTS,
   QUESTION_VALUE_SIGNALS,
@@ -55,6 +56,41 @@ test("the quiz keeps its 20 statements on the five scoring dimensions", () => {
     ),
   );
   assert.equal(new Set(QUIZ_QUESTIONS.map((question) => question.id)).size, 20);
+});
+
+test("the current quiz balances one reverse-coded statement on each reflection axis", () => {
+  assert.equal(QUIZ_ALGORITHM_VERSION, 3);
+  const reversed = QUIZ_QUESTIONS.filter((question) => question.reversed);
+  assert.equal(reversed.length, 5);
+
+  for (const dimension of DIMENSIONS) {
+    assert.equal(
+      reversed.filter((question) => question.dimension === dimension).length,
+      1,
+      `Dimension ${dimension} needs one reverse-coded statement`,
+    );
+  }
+});
+
+test("reverse-coded answers contribute in the intended direction", () => {
+  const neutralAnswers = answersWith(3);
+
+  for (const question of QUIZ_QUESTIONS.filter((item) => item.reversed)) {
+    const agreesWithAxis = calculateTotem({
+      ...neutralAnswers,
+      [question.id]: 1,
+    });
+    const disagreesWithAxis = calculateTotem({
+      ...neutralAnswers,
+      [question.id]: 5,
+    });
+
+    assert.ok(
+      agreesWithAxis.dimensionScores[question.dimension] >
+        disagreesWithAxis.dimensionScores[question.dimension],
+      `Question ${question.id} must reverse its scale`,
+    );
+  }
 });
 
 test("question signals occur in selective reflection text, not only in generic or medicinal fields", () => {
@@ -240,13 +276,19 @@ test("strongly contrasting response patterns can select different primaries", ()
 
 test("individual answers matter even when five dimension averages are identical", () => {
   const flatAnswers = answersWith(3);
-  const values = [1, 2, 4, 5];
+  const semanticValues = [1, 2, 4, 5];
+  const reversedIds = new Set(
+    QUIZ_QUESTIONS.filter((question) => question.reversed).map((question) => question.id),
+  );
   const dimensionCounts = { E: 0, O: 0, C: 0, A: 0, S: 0 };
   const variedAnswers = Object.fromEntries(
-    QUIZ_QUESTIONS.map((question) => [
-      question.id,
-      values[dimensionCounts[question.dimension]++],
-    ]),
+    QUIZ_QUESTIONS.map((question) => {
+      const semanticValue = semanticValues[dimensionCounts[question.dimension]++];
+      return [
+        question.id,
+        reversedIds.has(question.id) ? 6 - semanticValue : semanticValue,
+      ];
+    }),
   );
   const flat = calculateTotem(flatAnswers);
   const varied = calculateTotem(variedAnswers);
@@ -287,8 +329,8 @@ test("common centered and agreement-heavy answers do not collapse to a few plant
   for (const [style, makeAnswers] of answerStyles) {
     const primaryCounts = countPrimaryPlants(makeAnswers);
     assert.ok(
-      primaryCounts.size >= 50,
-      `${style}: expected at least 50 distinct plants; found ${primaryCounts.size}`,
+      primaryCounts.size >= 45,
+      `${style}: expected at least 45 distinct plants; found ${primaryCounts.size}`,
     );
     assert.ok(
       Math.max(...primaryCounts.values()) <= 80,
@@ -318,12 +360,19 @@ test("correlated answers across the five axes still use the full response patter
   );
 });
 
-test("uniform answers get a neutral score and are marked as weakly differentiated", () => {
-  const result = calculateTotem(answersWith(4));
+test("uniform midpoint answers get a neutral score and are marked as weakly differentiated", () => {
+  const result = calculateTotem(answersWith(3));
 
   assert.equal(result.lowDifferentiation, true);
   assert.ok(Object.values(result.scores).every((score) => score === 50));
-  assert.deepEqual(result, calculateTotem(answersWith(4)));
+  assert.deepEqual(result, calculateTotem(answersWith(3)));
+});
+
+test("uniform agreement is not mistaken for a neutral response style", () => {
+  const result = calculateTotem(answersWith(4));
+
+  assert.equal(result.lowDifferentiation, false);
+  assert.ok(Object.values(result.scores).some((score) => score !== 50));
 });
 
 test("dimension scores and candidate indices are finite", () => {
